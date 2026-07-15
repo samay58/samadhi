@@ -26,6 +26,7 @@ public struct FluidMusicField: View {
     }
 
     public var body: some View {
+        // The field tops out at 20 fps and stops once the tempo aperture becomes the motion owner.
         TimelineView(.animation(minimumInterval: 1 / 20, paused: !shouldAnimate)) { timeline in
             let time = shouldAnimate ? timeline.date.timeIntervalSinceReferenceDate : 0
             ZStack {
@@ -134,6 +135,7 @@ public struct FluidMusicField: View {
     }
 
     private var readabilityWash: some View {
+        // This wash protects text contrast while the mesh moves underneath it.
         LinearGradient(
             colors: mode == .ready
                 ? [SamadhiColor.parchment.opacity(0.34), .clear, SamadhiColor.parchment.opacity(0.42)]

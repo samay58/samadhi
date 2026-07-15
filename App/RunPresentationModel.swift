@@ -8,6 +8,7 @@ import UIKit
 @MainActor
 @Observable
 final class RunPresentationModel {
+    // This is the boundary between the pure run state machine and iOS. Follow send -> dispatch -> execute.
     private(set) var state: RunState = .ready
     private(set) var showLockBrief = false
 
@@ -31,6 +32,7 @@ final class RunPresentationModel {
     }
 
     var viewState: RunViewState {
+        // UI-only choices live here so the domain module never needs SwiftUI.
         let session = state.session
         let trackIndex = session?.trackIndex ?? 0
         let track = TrackMetadata.demoTracks[trackIndex % TrackMetadata.demoTracks.count]
@@ -135,6 +137,7 @@ final class RunPresentationModel {
     }
 
     private func dispatch(_ event: RunEvent) {
+        // Every input crosses the reducer once. New state is applied before its returned work starts.
         let oldState = state
         let (newState, effects) = reducer.reduce(state: state, event: event)
         if newState != oldState {
@@ -156,6 +159,7 @@ final class RunPresentationModel {
     }
 
     private func execute(_ effect: RunEffect) {
+        // Motion and audio are simulated here for now. Production services replace this layer without changing the reducer.
         switch effect {
         case let .requestMotionAuthorization(sessionID):
             let delay: Duration = configuration.fastMode ? .milliseconds(60) : .milliseconds(260)

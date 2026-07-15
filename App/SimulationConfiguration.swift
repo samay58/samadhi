@@ -1,6 +1,7 @@
 import Foundation
 
 struct SimulationConfiguration {
+    // Launch flags make previews and UI tests deterministic. They are not product settings.
     let fastMode: Bool
     let permissionDenied: Bool
     let simulateRouteLoss: Bool

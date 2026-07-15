@@ -60,6 +60,7 @@ struct HoldToFinishControl: View {
         }
         .buttonStyle(.glassProminent)
         .tint(SamadhiColor.clay)
+        // The visible fill mirrors the reducer's hold window. Hold IDs make duplicate completions harmless.
         .onLongPressGesture(
             minimumDuration: 0.9,
             maximumDistance: 24,

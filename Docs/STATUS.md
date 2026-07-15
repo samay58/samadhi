@@ -47,11 +47,12 @@
 - Moved task cancellation bookkeeping into dedicated task store
 - Replaced hard-coded three-track navigation with configured collection size
 - Added formatter config and clean lint gate
+- Added newcomer guidance at load-bearing architectural and interaction seams
 - Removed stale pre-final evidence, rejected cover exports, completed-generation prompts, and superseded build handoff
 
 ## Proof
 
-Latest cleanup gate passed:
+Latest complete gate passed after the code-navigation pass:
 
 - 15 Swift package tests
 - 2 app-model tests

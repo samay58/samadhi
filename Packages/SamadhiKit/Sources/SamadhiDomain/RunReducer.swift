@@ -1,3 +1,4 @@
+// Product behavior lives here as value-state transitions. The reducer returns outside work but never performs it.
 public struct RunReducer: Sendable {
     private let trackCount: Int
 
@@ -68,6 +69,7 @@ public struct RunReducer: Sendable {
             }
 
         case let (.active(active), .cadenceLocked(sessionID, acquisitionID, spm)):
+            // Both IDs must match because an old sensor callback can arrive after a restart.
             guard active.session.id == sessionID,
                 case let .playing(.acquiring(_, currentID), controls) = active.activity,
                 currentID == acquisitionID
@@ -94,6 +96,7 @@ public struct RunReducer: Sendable {
             return (.active(next), [])
 
         case let (.active(active), .controlsFocusEntered):
+            // Visible controls stay pinned while VoiceOver owns focus.
             guard case let .playing(rhythm, controls) = active.activity, case .hidden = controls else {
                 if case let .playing(rhythm, .timed) = active.activity {
                     var next = active
@@ -228,6 +231,7 @@ public struct RunReducer: Sendable {
             return routeRecovery(from: confirmation.session, origin: confirmation.origin)
 
         case let (.routeRecovery(recovery), .audioRouteRestored):
+            // A restored route never restarts a running session without explicit user intent.
             var next = recovery
             next.availability = .restored
             if case .paused = recovery.origin {
@@ -280,6 +284,7 @@ public struct RunReducer: Sendable {
             )
 
         case let (.active(active), .activeSecond):
+            // Only stable playback enters the summary. Paused and cadence-acquisition time is excluded.
             guard case let .playing(rhythm, _) = active.activity else { return (state, []) }
             var next = active
             switch rhythm {
