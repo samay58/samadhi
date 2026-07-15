@@ -1,9 +1,13 @@
-import InStepDesign
+import SamadhiDesign
 import SwiftUI
 
 struct RootView: View {
+    @State private var model = RunPresentationModel()
+
     var body: some View {
-        MilestoneZeroView()
+        SamadhiScreen(state: model.viewState) { action in
+            model.send(action)
+        }
     }
 }
 

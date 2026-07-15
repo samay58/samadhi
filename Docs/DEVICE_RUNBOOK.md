@@ -8,7 +8,7 @@ A valid development signing identity is installed. No physical iPhone was connec
 
 1. Connect and trust the iPhone.
 2. Confirm Developer Mode is enabled.
-3. Select the InStep scheme and the connected device.
+3. Select the Samadhi scheme and the connected device.
 4. Set the development team if Xcode does not resolve signing automatically.
 5. Build, install, and launch the Debug configuration.
 6. Record device, OS, route, logs, and any signing changes.
