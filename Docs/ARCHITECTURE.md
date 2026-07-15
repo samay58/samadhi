@@ -2,13 +2,13 @@
 
 ## Shape
 
-In Step uses a functional core with an actor-ready shell.
+Samadhi uses a functional core with an actor-ready shell.
 
-- `InStepDomain` contains pure state, events, effects, fixtures, and summary calculation.
-- `InStepMotion` exposes cadence-provider boundaries and simulated cadence only in Milestone 1.
-- `InStepAudio` exposes a beat-clock boundary and simulated beat clock only in Milestone 1.
-- `InStepDesign` owns SwiftUI screens, components, motion tokens, and preview fixtures.
-- `InStepDiagnostics` owns debug-only fixture controls.
+- `SamadhiDomain` contains pure state, events, effects, fixtures, and summary calculation.
+- `SamadhiMotion` exposes cadence-provider boundaries and simulated cadence only in Milestone 1.
+- `SamadhiAudio` exposes a beat-clock boundary and simulated beat clock only in Milestone 1.
+- `SamadhiDesign` owns SwiftUI screens, components, motion tokens, and preview fixtures.
+- `SamadhiDiagnostics` owns debug-only fixture controls.
 - The app target owns a single main-actor presentation model and executes simulated effects.
 
 ## State ownership

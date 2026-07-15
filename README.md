@@ -1,6 +1,10 @@
-# In Step
+![Samadhi: music in stride](Brand/GitHub-Cover-Samadhi-1280x640.png)
 
-In Step is a native iPhone interaction prototype for a body-aware music player. Milestones 0 and 1 use deterministic simulated cadence and a simulated beat clock. Core Motion and adaptive audio are intentionally outside this build.
+# Samadhi
+
+*music in stride*
+
+Samadhi is a native iPhone interaction prototype for a body-aware music player. Milestones 0 and 1 use deterministic simulated cadence and a simulated beat clock. Core Motion and adaptive audio are intentionally outside this build.
 
 ## Requirements
 
@@ -15,4 +19,3 @@ In Step is a native iPhone interaction prototype for a body-aware music player. 
 ```
 
 The generated Xcode project targets iOS 26 and contains no third-party production dependencies.
-

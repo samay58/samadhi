@@ -1,0 +1,82 @@
+import XCTest
+
+@MainActor
+final class SamadhiUITests: XCTestCase {
+    private var app: XCUIApplication!
+
+    func testGoldenFlow() {
+        prepareApp("-SAMADHI_TEST_ACQUISITION_WINDOW")
+        app.launch()
+        XCTAssertTrue(app.wait(for: .runningForeground, timeout: 5))
+        XCTAssertTrue(element("ready-screen").waitForExistence(timeout: 10))
+        let start = app.buttons["start-run"]
+        XCTAssertTrue(start.waitForExistence(timeout: 2))
+        start.tap()
+
+        XCTAssertTrue(app.staticTexts["Listening for your stride"].waitForExistence(timeout: 2))
+        XCTAssertTrue(element("cadence-lock").waitForExistence(timeout: 3))
+
+        element("run-screen").tap()
+        let pause = app.buttons["pause-run"]
+        XCTAssertTrue(pause.waitForExistence(timeout: 2))
+        pause.tap()
+
+        let resume = app.buttons["resume-run"]
+        XCTAssertTrue(resume.waitForExistence(timeout: 2))
+        resume.tap()
+
+        XCTAssertTrue(app.buttons["skip-track"].waitForExistence(timeout: 2))
+        app.buttons["skip-track"].tap()
+        XCTAssertTrue(app.staticTexts["Afterimage"].waitForExistence(timeout: 2))
+
+        app.buttons["finish-run"].tap()
+        let hold = app.buttons["hold-to-finish"]
+        XCTAssertTrue(hold.waitForExistence(timeout: 2))
+        hold.press(forDuration: 1.5)
+
+        XCTAssertTrue(element("run-summary").waitForExistence(timeout: 3))
+        app.buttons["summary-done"].tap()
+        XCTAssertTrue(element("ready-screen").waitForExistence(timeout: 2))
+    }
+
+    func testPermissionRecoveryUsesFixedRhythm() {
+        prepareApp("-SAMADHI_PERMISSION_DENIED")
+        app.launch()
+        XCTAssertTrue(app.buttons["start-run"].waitForExistence(timeout: 2))
+        app.buttons["start-run"].tap()
+        XCTAssertTrue(element("permission-recovery").waitForExistence(timeout: 2))
+        app.buttons["use-fixed-rhythm"].tap()
+        XCTAssertTrue(element("run-screen").waitForExistence(timeout: 2))
+    }
+
+    func testRouteLossRequiresExplicitResume() {
+        prepareApp("-SAMADHI_ROUTE_LOST")
+        app.launch()
+        XCTAssertTrue(app.buttons["start-run"].waitForExistence(timeout: 2))
+        app.buttons["start-run"].tap()
+        XCTAssertTrue(element("route-recovery").waitForExistence(timeout: 3))
+        let resume = app.buttons["route-resume"]
+        XCTAssertTrue(resume.waitForExistence(timeout: 2))
+        resume.tap()
+        XCTAssertTrue(element("run-screen").waitForExistence(timeout: 2))
+    }
+
+    func testMissingArtworkStillStarts() {
+        prepareApp("-SAMADHI_MISSING_ARTWORK")
+        app.launch()
+        XCTAssertTrue(app.buttons["start-run"].waitForExistence(timeout: 2))
+        app.buttons["start-run"].tap()
+        XCTAssertTrue(element("run-screen").waitForExistence(timeout: 2))
+    }
+
+    private func element(_ identifier: String) -> XCUIElement {
+        app.descendants(matching: .any).matching(identifier: identifier).firstMatch
+    }
+
+    private func prepareApp(_ additionalArgument: String? = nil) {
+        continueAfterFailure = false
+        app = XCUIApplication()
+        app.launchArguments = ["-SAMADHI_FAST_MODE"]
+        if let additionalArgument { app.launchArguments.append(additionalArgument) }
+    }
+}
