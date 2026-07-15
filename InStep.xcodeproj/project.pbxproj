@@ -1,0 +1,567 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		5D160C842B87FDBBE81C743D /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB7B4599BC499AA61D9EFDE3 /* RootView.swift */; };
+		893CE21E340AEEAC45E31A6A /* InStepDomain in Frameworks */ = {isa = PBXBuildFile; productRef = 19A9A2C09AFE5D6FC100C8D0 /* InStepDomain */; };
+		8A27B9EB8BA34986AD3647B6 /* InStepApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5457756C5D64D16C06E7EDAC /* InStepApp.swift */; };
+		9713C99CF418405AF918FC17 /* InStepUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D24196BDF68EBDF5EB35E11E /* InStepUITests.swift */; };
+		C0330060071F5DE916A664E1 /* InStepTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7E0A627ACA90298C3DE2EEC /* InStepTests.swift */; };
+		CD67FE0C516CE17871E6DA1C /* InStepDesign in Frameworks */ = {isa = PBXBuildFile; productRef = E25BA0E76AA74D11EE321C96 /* InStepDesign */; };
+		FAB0EE818E8CE8F205FD3C65 /* InStepDomain in Frameworks */ = {isa = PBXBuildFile; productRef = 24EB566FC419383A8211B3EA /* InStepDomain */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		2EEACC058218494200920BCD /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 4EE87335E59143EFE25B2D88 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 08F34C6D5F2DC39713382081;
+			remoteInfo = InStep;
+		};
+		F848EEBE151D4E3A2F7212E7 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 4EE87335E59143EFE25B2D88 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 08F34C6D5F2DC39713382081;
+			remoteInfo = InStep;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		0348E8C904075386E9FD5994 /* InStepKit */ = {isa = PBXFileReference; lastKnownFileType = folder; name = InStepKit; path = Packages/InStepKit; sourceTree = SOURCE_ROOT; };
+		24E1B86315F98F1AA504AA14 /* InStepTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = InStepTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		2A1682B577EE8075F356A4D1 /* InStep.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = InStep.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		5457756C5D64D16C06E7EDAC /* InStepApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InStepApp.swift; sourceTree = "<group>"; };
+		D24196BDF68EBDF5EB35E11E /* InStepUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InStepUITests.swift; sourceTree = "<group>"; };
+		E92F9594BF716482064104B6 /* InStepUITests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = InStepUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		EB7B4599BC499AA61D9EFDE3 /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
+		F7E0A627ACA90298C3DE2EEC /* InStepTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InStepTests.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		2F947D73CBBBCCE1F62155AB /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				FAB0EE818E8CE8F205FD3C65 /* InStepDomain in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		87C5E9242BB4831FAFCFD7FE /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				893CE21E340AEEAC45E31A6A /* InStepDomain in Frameworks */,
+				CD67FE0C516CE17871E6DA1C /* InStepDesign in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		0A65A479BCC017D1E66FF103 /* InStepUITests */ = {
+			isa = PBXGroup;
+			children = (
+				D24196BDF68EBDF5EB35E11E /* InStepUITests.swift */,
+			);
+			path = InStepUITests;
+			sourceTree = "<group>";
+		};
+		0CC7C5CC65DFACFB8961261C = {
+			isa = PBXGroup;
+			children = (
+				E21701BB2BF2842C87D88482 /* App */,
+				E12CB204078784BA7006B370 /* Packages */,
+				966FDF50A325DB76110C636C /* Tests */,
+				BE9B54BE9DEAFFFB5BCBB81C /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		78190A22E56CF0B396C5DA1C /* InStepTests */ = {
+			isa = PBXGroup;
+			children = (
+				F7E0A627ACA90298C3DE2EEC /* InStepTests.swift */,
+			);
+			path = InStepTests;
+			sourceTree = "<group>";
+		};
+		966FDF50A325DB76110C636C /* Tests */ = {
+			isa = PBXGroup;
+			children = (
+				78190A22E56CF0B396C5DA1C /* InStepTests */,
+				0A65A479BCC017D1E66FF103 /* InStepUITests */,
+			);
+			path = Tests;
+			sourceTree = "<group>";
+		};
+		BE9B54BE9DEAFFFB5BCBB81C /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				2A1682B577EE8075F356A4D1 /* InStep.app */,
+				24E1B86315F98F1AA504AA14 /* InStepTests.xctest */,
+				E92F9594BF716482064104B6 /* InStepUITests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		E12CB204078784BA7006B370 /* Packages */ = {
+			isa = PBXGroup;
+			children = (
+				0348E8C904075386E9FD5994 /* InStepKit */,
+			);
+			path = Packages;
+			sourceTree = "<group>";
+		};
+		E21701BB2BF2842C87D88482 /* App */ = {
+			isa = PBXGroup;
+			children = (
+				5457756C5D64D16C06E7EDAC /* InStepApp.swift */,
+				EB7B4599BC499AA61D9EFDE3 /* RootView.swift */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		08F34C6D5F2DC39713382081 /* InStep */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 4D2587F1768ABB785FAB7766 /* Build configuration list for PBXNativeTarget "InStep" */;
+			buildPhases = (
+				EF1B42263F6F217A008337E3 /* Sources */,
+				87C5E9242BB4831FAFCFD7FE /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = InStep;
+			packageProductDependencies = (
+				19A9A2C09AFE5D6FC100C8D0 /* InStepDomain */,
+				E25BA0E76AA74D11EE321C96 /* InStepDesign */,
+			);
+			productName = InStep;
+			productReference = 2A1682B577EE8075F356A4D1 /* InStep.app */;
+			productType = "com.apple.product-type.application";
+		};
+		228585C9501B1477BDC56645 /* InStepTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 5332C9803F27865FF2B5701C /* Build configuration list for PBXNativeTarget "InStepTests" */;
+			buildPhases = (
+				149EBFBFCFB56EDC6F4A34EA /* Sources */,
+				2F947D73CBBBCCE1F62155AB /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				741C8252B30428B670878DCA /* PBXTargetDependency */,
+			);
+			name = InStepTests;
+			packageProductDependencies = (
+				24EB566FC419383A8211B3EA /* InStepDomain */,
+			);
+			productName = InStepTests;
+			productReference = 24E1B86315F98F1AA504AA14 /* InStepTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		2FFAFF3776FA5CE70396DA97 /* InStepUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = C6531B9F8880355C162BCECE /* Build configuration list for PBXNativeTarget "InStepUITests" */;
+			buildPhases = (
+				C774A086A3AB387CA370C06D /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				6512D0F1B1E062ADB6952641 /* PBXTargetDependency */,
+			);
+			name = InStepUITests;
+			packageProductDependencies = (
+			);
+			productName = InStepUITests;
+			productReference = E92F9594BF716482064104B6 /* InStepUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		4EE87335E59143EFE25B2D88 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1430;
+				TargetAttributes = {
+					08F34C6D5F2DC39713382081 = {
+						DevelopmentTeam = "";
+					};
+					228585C9501B1477BDC56645 = {
+						DevelopmentTeam = "";
+					};
+					2FFAFF3776FA5CE70396DA97 = {
+						DevelopmentTeam = "";
+						TestTargetID = 08F34C6D5F2DC39713382081;
+					};
+				};
+			};
+			buildConfigurationList = 903E829C79A1E7FBF8056924 /* Build configuration list for PBXProject "InStep" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = 0CC7C5CC65DFACFB8961261C;
+			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				B2B60846EF0ECD3CA324C67D /* XCLocalSwiftPackageReference "Packages/InStepKit" */,
+			);
+			preferredProjectObjectVersion = 77;
+			productRefGroup = BE9B54BE9DEAFFFB5BCBB81C /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				08F34C6D5F2DC39713382081 /* InStep */,
+				228585C9501B1477BDC56645 /* InStepTests */,
+				2FFAFF3776FA5CE70396DA97 /* InStepUITests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		149EBFBFCFB56EDC6F4A34EA /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C0330060071F5DE916A664E1 /* InStepTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C774A086A3AB387CA370C06D /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				9713C99CF418405AF918FC17 /* InStepUITests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		EF1B42263F6F217A008337E3 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				8A27B9EB8BA34986AD3647B6 /* InStepApp.swift in Sources */,
+				5D160C842B87FDBBE81C743D /* RootView.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		6512D0F1B1E062ADB6952641 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 08F34C6D5F2DC39713382081 /* InStep */;
+			targetProxy = 2EEACC058218494200920BCD /* PBXContainerItemProxy */;
+		};
+		741C8252B30428B670878DCA /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 08F34C6D5F2DC39713382081 /* InStep */;
+			targetProxy = F848EEBE151D4E3A2F7212E7 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		0682E0FA7B26D97921A65C93 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.samaydhawan.InStepUITests;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = InStep;
+			};
+			name = Release;
+		};
+		6D306630A1D3DCD21F9FACCE /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.samaydhawan.InStep;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Release;
+		};
+		72D81C04BF3F001668A66304 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.samaydhawan.InStepTests;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/InStep.app/InStep";
+			};
+			name = Debug;
+		};
+		946749892EAE410B359482B7 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.samaydhawan.InStepTests;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/InStep.app/InStep";
+			};
+			name = Release;
+		};
+		AA027A5E6FC484D23904D82A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = "";
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 6.0;
+			};
+			name = Debug;
+		};
+		BF9E4091AD077F9ECB92B09F /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.samaydhawan.InStepUITests;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = InStep;
+			};
+			name = Debug;
+		};
+		CA43655E2F131C7A4E2FF491 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = "";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 6.0;
+			};
+			name = Release;
+		};
+		F718A52D7A05F35BE163EAE1 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.samaydhawan.InStep;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		4D2587F1768ABB785FAB7766 /* Build configuration list for PBXNativeTarget "InStep" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F718A52D7A05F35BE163EAE1 /* Debug */,
+				6D306630A1D3DCD21F9FACCE /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		5332C9803F27865FF2B5701C /* Build configuration list for PBXNativeTarget "InStepTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				72D81C04BF3F001668A66304 /* Debug */,
+				946749892EAE410B359482B7 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		903E829C79A1E7FBF8056924 /* Build configuration list for PBXProject "InStep" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				AA027A5E6FC484D23904D82A /* Debug */,
+				CA43655E2F131C7A4E2FF491 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		C6531B9F8880355C162BCECE /* Build configuration list for PBXNativeTarget "InStepUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				BF9E4091AD077F9ECB92B09F /* Debug */,
+				0682E0FA7B26D97921A65C93 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCLocalSwiftPackageReference section */
+		B2B60846EF0ECD3CA324C67D /* XCLocalSwiftPackageReference "Packages/InStepKit" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = Packages/InStepKit;
+		};
+/* End XCLocalSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		19A9A2C09AFE5D6FC100C8D0 /* InStepDomain */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = InStepDomain;
+		};
+		24EB566FC419383A8211B3EA /* InStepDomain */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = InStepDomain;
+		};
+		E25BA0E76AA74D11EE321C96 /* InStepDesign */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = InStepDesign;
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = 4EE87335E59143EFE25B2D88 /* Project object */;
+}

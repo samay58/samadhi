@@ -1,0 +1,56 @@
+name: InStep
+options:
+  bundleIdPrefix: com.samaydhawan
+  deploymentTarget:
+    iOS: "26.0"
+  createIntermediateGroups: true
+packages:
+  InStepKit:
+    path: Packages/InStepKit
+settings:
+  base:
+    SWIFT_VERSION: 6.0
+    DEVELOPMENT_TEAM: ""
+targets:
+  InStep:
+    type: application
+    platform: iOS
+    sources:
+      - App
+    dependencies:
+      - package: InStepKit
+        product: InStepDomain
+      - package: InStepKit
+        product: InStepDesign
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.samaydhawan.InStep
+        GENERATE_INFOPLIST_FILE: YES
+        INFOPLIST_KEY_UILaunchScreen_Generation: YES
+        INFOPLIST_KEY_UIApplicationSceneManifest_Generation: YES
+        TARGETED_DEVICE_FAMILY: "1"
+  InStepTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources:
+      - Tests/InStepTests
+    dependencies:
+      - target: InStep
+      - package: InStepKit
+        product: InStepDomain
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.samaydhawan.InStepTests
+        GENERATE_INFOPLIST_FILE: YES
+  InStepUITests:
+    type: bundle.ui-testing
+    platform: iOS
+    sources:
+      - Tests/InStepUITests
+    dependencies:
+      - target: InStep
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.samaydhawan.InStepUITests
+        GENERATE_INFOPLIST_FILE: YES
+
