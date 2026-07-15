@@ -1,56 +1,63 @@
-name: InStep
+name: Samadhi
 options:
   bundleIdPrefix: com.samaydhawan
   deploymentTarget:
     iOS: "26.0"
   createIntermediateGroups: true
 packages:
-  InStepKit:
-    path: Packages/InStepKit
+  SamadhiKit:
+    path: Packages/SamadhiKit
 settings:
   base:
     SWIFT_VERSION: 6.0
     DEVELOPMENT_TEAM: ""
 targets:
-  InStep:
+  Samadhi:
     type: application
     platform: iOS
     sources:
       - App
+      - path: Resources
+        buildPhase: resources
     dependencies:
-      - package: InStepKit
-        product: InStepDomain
-      - package: InStepKit
-        product: InStepDesign
+      - package: SamadhiKit
+        product: SamadhiDomain
+      - package: SamadhiKit
+        product: SamadhiDesign
+      - package: SamadhiKit
+        product: SamadhiMotion
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: com.samaydhawan.InStep
+        PRODUCT_BUNDLE_IDENTIFIER: com.samaydhawan.Samadhi
+        PRODUCT_NAME: Samadhi
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         GENERATE_INFOPLIST_FILE: YES
+        INFOPLIST_KEY_CFBundleDisplayName: Samadhi
         INFOPLIST_KEY_UILaunchScreen_Generation: YES
         INFOPLIST_KEY_UIApplicationSceneManifest_Generation: YES
         TARGETED_DEVICE_FAMILY: "1"
-  InStepTests:
+        CODE_SIGN_STYLE: Automatic
+  SamadhiTests:
     type: bundle.unit-test
     platform: iOS
     sources:
-      - Tests/InStepTests
+      - Tests/SamadhiTests
     dependencies:
-      - target: InStep
-      - package: InStepKit
-        product: InStepDomain
+      - target: Samadhi
+      - package: SamadhiKit
+        product: SamadhiDomain
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: com.samaydhawan.InStepTests
+        PRODUCT_BUNDLE_IDENTIFIER: com.samaydhawan.SamadhiTests
         GENERATE_INFOPLIST_FILE: YES
-  InStepUITests:
+  SamadhiUITests:
     type: bundle.ui-testing
     platform: iOS
     sources:
-      - Tests/InStepUITests
+      - Tests/SamadhiUITests
     dependencies:
-      - target: InStep
+      - target: Samadhi
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: com.samaydhawan.InStepUITests
+        PRODUCT_BUNDLE_IDENTIFIER: com.samaydhawan.SamadhiUITests
         GENERATE_INFOPLIST_FILE: YES
-

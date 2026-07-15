@@ -1,0 +1,367 @@
+Building for debugging...
+Build complete! (0.26 sec)
+Test Suite 'All tests' started at 2026-07-15 18:25:11.063.
+Test Suite 'All tests' passed at 2026-07-15 18:25:11.063.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.001) seconds
+Test Suite 'All tests' started at 2026-07-15 18:25:11.129.
+Test Suite 'All tests' passed at 2026-07-15 18:25:11.130.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.001) seconds
+Test Suite 'All tests' started at 2026-07-15 18:25:11.195.
+Test Suite 'All tests' passed at 2026-07-15 18:25:11.196.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.001) seconds
+◇ Test run started.
+↳ Testing Library Version: 2073
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Test cadenceSimulationHasDeterministicOrderingAndCompletion() started.
+✔ Test cadenceSimulationHasDeterministicOrderingAndCompletion() passed after 0.001 seconds.
+✔ Test run with 1 test in 0 suites passed after 0.001 seconds.
+◇ Test run started.
+↳ Testing Library Version: 2073
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Test routeRestorationNeverAutoResumesPlayingOrigin() started.
+◇ Test staleCadenceAndTimeoutTokensDoNothing() started.
+◇ Test pauseExcludesTimeAndResumeReacquiresWithPrior() started.
+◇ Test changingTracksResetsSongProgress() started.
+◇ Test permissionDenialHasHonestFixedRhythmFallback() started.
+◇ Test finishingPersistsMixedSummaryMetrics() started.
+◇ Test voiceOverFocusPinsControlsAndReschedulesTimeoutOnExit() started.
+◇ Test routeLossCancelsAllWorkAndPausesPlayback() started.
+◇ Test finishRequiresVisibleControlsAndMatchingHold() started.
+✔ Test finishingPersistsMixedSummaryMetrics() passed after 0.001 seconds.
+✔ Test voiceOverFocusPinsControlsAndReschedulesTimeoutOnExit() passed after 0.001 seconds.
+✔ Test pauseExcludesTimeAndResumeReacquiresWithPrior() passed after 0.001 seconds.
+✔ Test routeLossCancelsAllWorkAndPausesPlayback() passed after 0.001 seconds.
+✔ Test changingTracksResetsSongProgress() passed after 0.001 seconds.
+✔ Test routeRestorationNeverAutoResumesPlayingOrigin() passed after 0.001 seconds.
+◇ Test pauseCancelsTransientWorkBeforeStoppingPlayback() started.
+✔ Test staleCadenceAndTimeoutTokensDoNothing() passed after 0.001 seconds.
+◇ Test adaptiveStartLocksAndRecordsOnlyEligibleTime() started.
+✔ Test finishRequiresVisibleControlsAndMatchingHold() passed after 0.001 seconds.
+✔ Test adaptiveStartLocksAndRecordsOnlyEligibleTime() passed after 0.001 seconds.
+✔ Test permissionDenialHasHonestFixedRhythmFallback() passed after 0.001 seconds.
+✔ Test pauseCancelsTransientWorkBeforeStoppingPlayback() passed after 0.001 seconds.
+✔ Test run with 11 tests in 0 suites passed after 0.001 seconds.
+◇ Test run started.
+↳ Testing Library Version: 2073
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Test pausedBeatClockFreezesAtCapturedPhase() started.
+◇ Test beatPhaseRepeatsDeterministically() started.
+✔ Test pausedBeatClockFreezesAtCapturedPhase() passed after 0.001 seconds.
+✔ Test beatPhaseRepeatsDeterministically() passed after 0.001 seconds.
+✔ Test run with 2 tests in 0 suites passed after 0.001 seconds.
+Command line invocation:
+    /Applications/Xcode-beta.app/Contents/Developer/usr/bin/xcodebuild test -project Samadhi.xcodeproj -scheme Samadhi -destination "platform=iOS Simulator,name=iPhone 17 Pro,OS=latest" -parallel-testing-enabled NO CODE_SIGNING_ALLOWED=NO
+
+Build settings from command line:
+    CODE_SIGNING_ALLOWED = NO
+
+Resolve Package Graph
+
+
+Resolved source packages:
+  SamadhiKit: /Users/samaydhawan/Documents/Codex/2026-07-15/files-mentioned-by-the-user-in/work/in-step-interaction/Packages/SamadhiKit
+
+2026-07-15 18:25:11.881 xcodebuild[71468:1852248] [MT] IDERunDestination: Supported platforms for the buildables in the current scheme is empty.
+ComputePackagePrebuildTargetDependencyGraph
+
+Prepare packages
+
+CreateBuildRequest
+
+SendProjectDescription
+
+CreateBuildOperation
+
+ComputeTargetDependencyGraph
+note: Building targets in dependency order
+note: Target dependency graph (10 targets)
+    Target 'SamadhiUITests' in project 'Samadhi'
+        ➜ Explicit dependency on target 'Samadhi' in project 'Samadhi'
+    Target 'SamadhiTests' in project 'Samadhi'
+        ➜ Explicit dependency on target 'Samadhi' in project 'Samadhi'
+        ➜ Explicit dependency on target 'SamadhiDomain-product' in project 'SamadhiKit'
+    Target 'Samadhi' in project 'Samadhi'
+        ➜ Explicit dependency on target 'SamadhiDomain-product' in project 'SamadhiKit'
+        ➜ Explicit dependency on target 'SamadhiDesign-product' in project 'SamadhiKit'
+        ➜ Explicit dependency on target 'SamadhiMotion-product' in project 'SamadhiKit'
+    Target 'SamadhiMotion-product' in project 'SamadhiKit'
+        ➜ Explicit dependency on target 'SamadhiMotion' in project 'SamadhiKit'
+        ➜ Explicit dependency on target 'SamadhiDomain' in project 'SamadhiKit'
+    Target 'SamadhiMotion' in project 'SamadhiKit'
+        ➜ Explicit dependency on target 'SamadhiDomain' in project 'SamadhiKit'
+    Target 'SamadhiDesign-product' in project 'SamadhiKit'
+        ➜ Explicit dependency on target 'SamadhiDesign' in project 'SamadhiKit'
+        ➜ Explicit dependency on target 'SamadhiDomain' in project 'SamadhiKit'
+        ➜ Explicit dependency on target 'SamadhiAudio' in project 'SamadhiKit'
+    Target 'SamadhiDesign' in project 'SamadhiKit'
+        ➜ Explicit dependency on target 'SamadhiDomain' in project 'SamadhiKit'
+        ➜ Explicit dependency on target 'SamadhiAudio' in project 'SamadhiKit'
+    Target 'SamadhiAudio' in project 'SamadhiKit'
+        ➜ Explicit dependency on target 'SamadhiDomain' in project 'SamadhiKit'
+    Target 'SamadhiDomain-product' in project 'SamadhiKit'
+        ➜ Explicit dependency on target 'SamadhiDomain' in project 'SamadhiKit'
+    Target 'SamadhiDomain' in project 'SamadhiKit' (no dependencies)
+
+GatherProvisioningInputs
+
+CreateBuildDescription
+
+ExecuteExternalTool /Applications/Xcode-beta.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc --version
+
+ExecuteExternalTool /Applications/Xcode-beta.app/Contents/Developer/usr/bin/actool --print-asset-tag-combinations --output-format xml1 /Users/samaydhawan/Documents/Codex/2026-07-15/files-mentioned-by-the-user-in/work/in-step-interaction/Resources/Assets.xcassets
+
+ExecuteExternalTool /Applications/Xcode-beta.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang -v -E -dM -isysroot /Applications/Xcode-beta.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator27.0.sdk -x c -c /dev/null
+
+ExecuteExternalTool /Applications/Xcode-beta.app/Contents/Developer/usr/bin/actool --version --output-format xml1
+
+ExecuteExternalTool /Applications/Xcode-beta.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ld -version_details
+
+Build description signature: b97693993fec06fbfa5e3515079d1bca
+Build description path: /Users/samaydhawan/Library/Developer/Xcode/DerivedData/Samadhi-hdueptixzzobaxdatpuvvuskdscq/Build/Intermediates.noindex/XCBuildData/b97693993fec06fbfa5e3515079d1bca.xcbuilddata
+ClangStatCache /Applications/Xcode-beta.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang-stat-cache /Applications/Xcode-beta.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator27.0.sdk /Users/samaydhawan/Library/Developer/Xcode/DerivedData/SDKStatCaches.noindex/iphonesimulator27.0-24A5380g-3243818bda632a4370e1cc7a9fd181c5.sdkstatcache
+    cd /Users/samaydhawan/Documents/Codex/2026-07-15/files-mentioned-by-the-user-in/work/in-step-interaction/Samadhi.xcodeproj
+    /Applications/Xcode-beta.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang-stat-cache /Applications/Xcode-beta.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator27.0.sdk -o /Users/samaydhawan/Library/Developer/Xcode/DerivedData/SDKStatCaches.noindex/iphonesimulator27.0-24A5380g-3243818bda632a4370e1cc7a9fd181c5.sdkstatcache
+
+CopySwiftLibs /Users/samaydhawan/Library/Developer/Xcode/DerivedData/Samadhi-hdueptixzzobaxdatpuvvuskdscq/Build/Products/Debug-iphonesimulator/Samadhi.app (in target 'Samadhi' from project 'Samadhi')
+    cd /Users/samaydhawan/Documents/Codex/2026-07-15/files-mentioned-by-the-user-in/work/in-step-interaction
+    builtin-swiftStdLibTool --copy --verbose --scan-executable /Users/samaydhawan/Library/Developer/Xcode/DerivedData/Samadhi-hdueptixzzobaxdatpuvvuskdscq/Build/Products/Debug-iphonesimulator/Samadhi.app/Samadhi.debug.dylib --scan-folder /Users/samaydhawan/Library/Developer/Xcode/DerivedData/Samadhi-hdueptixzzobaxdatpuvvuskdscq/Build/Products/Debug-iphonesimulator/Samadhi.app/Frameworks --scan-folder /Users/samaydhawan/Library/Developer/Xcode/DerivedData/Samadhi-hdueptixzzobaxdatpuvvuskdscq/Build/Products/Debug-iphonesimulator/Samadhi.app/PlugIns --scan-folder /Users/samaydhawan/Library/Developer/Xcode/DerivedData/Samadhi-hdueptixzzobaxdatpuvvuskdscq/Build/Products/Debug-iphonesimulator/Samadhi.app/SystemExtensions --scan-folder /Users/samaydhawan/Library/Developer/Xcode/DerivedData/Samadhi-hdueptixzzobaxdatpuvvuskdscq/Build/Products/Debug-iphonesimulator/Samadhi.app/Extensions --platform iphonesimulator --toolchain /Applications/Xcode-beta.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain --destination /Users/samaydhawan/Library/Developer/Xcode/DerivedData/Samadhi-hdueptixzzobaxdatpuvvuskdscq/Build/Products/Debug-iphonesimulator/Samadhi.app/Frameworks --strip-bitcode --strip-bitcode-tool /Applications/Xcode-beta.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/bitcode_strip --emit-dependency-info /Users/samaydhawan/Library/Developer/Xcode/DerivedData/Samadhi-hdueptixzzobaxdatpuvvuskdscq/Build/Intermediates.noindex/Samadhi.build/Debug-iphonesimulator/Samadhi.build/SwiftStdLibToolInputDependencies.dep --filter-for-swift-os
+Ignoring --strip-bitcode because --sign was not passed
+
+ProcessInfoPlistFile /Users/samaydhawan/Library/Developer/Xcode/DerivedData/Samadhi-hdueptixzzobaxdatpuvvuskdscq/Build/Products/Debug-iphonesimulator/Samadhi.app/Info.plist /Users/samaydhawan/Library/Developer/Xcode/DerivedData/Samadhi-hdueptixzzobaxdatpuvvuskdscq/Build/Intermediates.noindex/Samadhi.build/Debug-iphonesimulator/Samadhi.build/empty-Samadhi.plist (in target 'Samadhi' from project 'Samadhi')
+    cd /Users/samaydhawan/Documents/Codex/2026-07-15/files-mentioned-by-the-user-in/work/in-step-interaction
+    builtin-infoPlistUtility /Users/samaydhawan/Library/Developer/Xcode/DerivedData/Samadhi-hdueptixzzobaxdatpuvvuskdscq/Build/Intermediates.noindex/Samadhi.build/Debug-iphonesimulator/Samadhi.build/empty-Samadhi.plist -producttype com.apple.product-type.application -genpkginfo /Users/samaydhawan/Library/Developer/Xcode/DerivedData/Samadhi-hdueptixzzobaxdatpuvvuskdscq/Build/Products/Debug-iphonesimulator/Samadhi.app/PkgInfo -expandbuildsettings -format binary -platform iphonesimulator -additionalcontentfile /Users/samaydhawan/Library/Developer/Xcode/DerivedData/Samadhi-hdueptixzzobaxdatpuvvuskdscq/Build/Intermediates.noindex/Samadhi.build/Debug-iphonesimulator/Samadhi.build/assetcatalog_generated_info.plist -o /Users/samaydhawan/Library/Developer/Xcode/DerivedData/Samadhi-hdueptixzzobaxdatpuvvuskdscq/Build/Products/Debug-iphonesimulator/Samadhi.app/Info.plist
+
+ProcessInfoPlistFile /Users/samaydhawan/Library/Developer/Xcode/DerivedData/Samadhi-hdueptixzzobaxdatpuvvuskdscq/Build/Products/Debug-iphonesimulator/Samadhi.app/PlugIns/SamadhiTests.xctest/Info.plist /Users/samaydhawan/Library/Developer/Xcode/DerivedData/Samadhi-hdueptixzzobaxdatpuvvuskdscq/Build/Intermediates.noindex/Samadhi.build/Debug-iphonesimulator/SamadhiTests.build/empty-SamadhiTests.plist (in target 'SamadhiTests' from project 'Samadhi')
+    cd /Users/samaydhawan/Documents/Codex/2026-07-15/files-mentioned-by-the-user-in/work/in-step-interaction
+    builtin-infoPlistUtility /Users/samaydhawan/Library/Developer/Xcode/DerivedData/Samadhi-hdueptixzzobaxdatpuvvuskdscq/Build/Intermediates.noindex/Samadhi.build/Debug-iphonesimulator/SamadhiTests.build/empty-SamadhiTests.plist -producttype com.apple.product-type.bundle.unit-test -expandbuildsettings -format binary -platform iphonesimulator -o /Users/samaydhawan/Library/Developer/Xcode/DerivedData/Samadhi-hdueptixzzobaxdatpuvvuskdscq/Build/Products/Debug-iphonesimulator/Samadhi.app/PlugIns/SamadhiTests.xctest/Info.plist
+
+ProcessInfoPlistFile /Users/samaydhawan/Library/Developer/Xcode/DerivedData/Samadhi-hdueptixzzobaxdatpuvvuskdscq/Build/Products/Debug-iphonesimulator/SamadhiUITests-Runner.app/PlugIns/SamadhiUITests.xctest/Info.plist /Users/samaydhawan/Library/Developer/Xcode/DerivedData/Samadhi-hdueptixzzobaxdatpuvvuskdscq/Build/Intermediates.noindex/Samadhi.build/Debug-iphonesimulator/SamadhiUITests.build/empty-SamadhiUITests.plist (in target 'SamadhiUITests' from project 'Samadhi')
+    cd /Users/samaydhawan/Documents/Codex/2026-07-15/files-mentioned-by-the-user-in/work/in-step-interaction
+    builtin-infoPlistUtility /Users/samaydhawan/Library/Developer/Xcode/DerivedData/Samadhi-hdueptixzzobaxdatpuvvuskdscq/Build/Intermediates.noindex/Samadhi.build/Debug-iphonesimulator/SamadhiUITests.build/empty-SamadhiUITests.plist -producttype com.apple.product-type.bundle.ui-testing -expandbuildsettings -format binary -platform iphonesimulator -additionalcontentfile /Users/samaydhawan/Library/Developer/Xcode/DerivedData/Samadhi-hdueptixzzobaxdatpuvvuskdscq/Build/Intermediates.noindex/Samadhi.build/Debug-iphonesimulator/SamadhiUITests.build/ProductTypeInfoPlistAdditions.plist -o /Users/samaydhawan/Library/Developer/Xcode/DerivedData/Samadhi-hdueptixzzobaxdatpuvvuskdscq/Build/Products/Debug-iphonesimulator/SamadhiUITests-Runner.app/PlugIns/SamadhiUITests.xctest/Info.plist
+
+PruneExplicitPrecompiledModules /Users/samaydhawan/Library/Developer/Xcode/DerivedData/Samadhi-hdueptixzzobaxdatpuvvuskdscq/Build/Intermediates.noindex/SwiftExplicitPrecompiledModules
+
+PruneExplicitPrecompiledModules /Users/samaydhawan/Library/Developer/Xcode/DerivedData/Samadhi-hdueptixzzobaxdatpuvvuskdscq/Build/Intermediates.noindex/ExplicitPrecompiledModules
+
+PruneExplicitPrecompiledModules /Users/samaydhawan/Library/Developer/Xcode/DerivedData/SDKExplicitPrecompiledModules
+
+IOSurfaceClientSetSurfaceNotify failed e00002c7
+Test Suite 'All tests' started at 2026-07-15 18:25:13.706.
+Test Suite 'All tests' passed at 2026-07-15 18:25:13.707.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+◇ Test run started.
+↳ Testing Library Version: 2073
+↳ Target Platform: arm64-apple-ios17.0-simulator
+◇ Test presentationStartsReadyWithDemoMusic() started.
+✔ Test presentationStartsReadyWithDemoMusic() passed after 0.001 seconds.
+◇ Test startActionMovesPresentationIntoPreparation() started.
+✔ Test startActionMovesPresentationIntoPreparation() passed after 0.002 seconds.
+✔ Test run with 2 tests in 0 suites passed after 0.003 seconds.
+2026-07-15 18:25:14.679435-0400 SamadhiUITests-Runner[71526:1852735] [Default] Running tests...
+    t =      nans Interface orientation changed to Portrait
+Test Suite 'All tests' started at 2026-07-15 18:25:16.571.
+Test Suite 'SamadhiUITests.xctest' started at 2026-07-15 18:25:16.571.
+Test Suite 'SamadhiUITests' started at 2026-07-15 18:25:16.571.
+Test Case '-[SamadhiUITests.SamadhiUITests testGoldenFlow]' started.
+    t =     0.00s Start Test at 2026-07-15 18:25:16.573
+    t =     0.02s Set Up
+    t =     0.02s Open com.samaydhawan.Samadhi
+    t =     0.02s     Launch com.samaydhawan.Samadhi
+2026-07-15 18:25:16.643 xcodebuild[71468:1852248] [MT] IDELaunchParametersSnapshot: debugger version lookup failed for path '<nil>': noURL
+2026-07-15 18:25:16.643 xcodebuild[71468:1852248] [MT] IDELaunchParametersSnapshot: no debugger version
+    t =     0.28s         Setting up automation session
+objc[71526]: Class UIAccessibilityLoaderWebShared is implemented in both /Library/Developer/CoreSimulator/Volumes/iOS_24A5380i/Library/Developer/CoreSimulator/Profiles/Runtimes/iOS 27.0.simruntime/Contents/Resources/RuntimeRoot/System/Library/AccessibilityBundles/WebKit.axbundle/WebKit (0x11042c398) and /Library/Developer/CoreSimulator/Volumes/iOS_24A5380i/Library/Developer/CoreSimulator/Profiles/Runtimes/iOS 27.0.simruntime/Contents/Resources/RuntimeRoot/System/Library/AccessibilityBundles/WebCore.axbundle/WebCore (0x110500310). This may cause spurious casting failures and mysterious crashes. One of the duplicates must be removed or renamed.
+    t =     2.22s         Wait for com.samaydhawan.Samadhi to idle
+    t =     3.49s Wait for com.samaydhawan.Samadhi to become Running Foreground
+    t =     3.49s Waiting 10.0s for "ready-screen" Any to exist
+    t =     4.52s     Checking `Expect predicate `existsNoRetry == 1` for object "ready-screen" Any`
+    t =     4.52s         Checking existence of `"ready-screen" Any`
+    t =     4.56s Waiting 2.0s for "start-run" Button to exist
+    t =     5.59s     Checking `Expect predicate `existsNoRetry == 1` for object "start-run" Button`
+    t =     5.59s         Checking existence of `"start-run" Button`
+    t =     5.62s Tap "start-run" Button
+    t =     5.62s     Wait for com.samaydhawan.Samadhi to idle
+    t =     5.62s     Find the "start-run" Button
+    t =     5.64s     Check for interrupting elements affecting "start-run" Button
+    t =     5.65s     Synthesize event
+    t =     5.96s     Wait for com.samaydhawan.Samadhi to idle
+    t =     6.70s Waiting 2.0s for "Listening for your stride" StaticText to exist
+    t =     7.73s     Checking `Expect predicate `existsNoRetry == 1` for object "Listening for your stride" StaticText`
+    t =     7.74s         Checking existence of `"Listening for your stride" StaticText`
+    t =     7.75s Waiting 3.0s for "cadence-lock" Any to exist
+    t =     8.79s     Checking `Expect predicate `existsNoRetry == 1` for object "cadence-lock" Any`
+    t =     8.79s         Checking existence of `"cadence-lock" Any`
+    t =     8.82s Tap "run-screen" Any
+    t =     8.82s     Wait for com.samaydhawan.Samadhi to idle
+    t =     8.82s     Find the "run-screen" Any
+    t =     8.83s     Check for interrupting elements affecting "run-screen" ScrollView
+    t =     8.85s     Synthesize event
+    t =     9.15s     Wait for com.samaydhawan.Samadhi to idle
+    t =     9.15s Waiting 2.0s for "pause-run" Button to exist
+    t =    10.18s     Checking `Expect predicate `existsNoRetry == 1` for object "pause-run" Button`
+    t =    10.18s         Checking existence of `"pause-run" Button`
+    t =    10.21s Tap "pause-run" Button
+    t =    10.21s     Wait for com.samaydhawan.Samadhi to idle
+    t =    10.21s     Find the "pause-run" Button
+    t =    10.22s     Check for interrupting elements affecting "pause-run" Button
+    t =    10.24s     Synthesize event
+    t =    10.53s     Wait for com.samaydhawan.Samadhi to idle
+    t =    11.23s Waiting 2.0s for "resume-run" Button to exist
+    t =    12.26s     Checking `Expect predicate `existsNoRetry == 1` for object "resume-run" Button`
+    t =    12.26s         Checking existence of `"resume-run" Button`
+    t =    12.29s Tap "resume-run" Button
+    t =    12.29s     Wait for com.samaydhawan.Samadhi to idle
+    t =    12.29s     Find the "resume-run" Button
+    t =    12.30s     Check for interrupting elements affecting "resume-run" Button
+    t =    12.32s     Synthesize event
+    t =    12.61s     Wait for com.samaydhawan.Samadhi to idle
+    t =    13.32s Waiting 2.0s for "skip-track" Button to exist
+    t =    14.36s     Checking `Expect predicate `existsNoRetry == 1` for object "skip-track" Button`
+    t =    14.36s         Checking existence of `"skip-track" Button`
+    t =    14.39s Tap "skip-track" Button
+    t =    14.39s     Wait for com.samaydhawan.Samadhi to idle
+    t =    14.40s     Find the "skip-track" Button
+    t =    14.41s     Check for interrupting elements affecting "skip-track" Button
+    t =    14.43s     Synthesize event
+    t =    14.73s     Wait for com.samaydhawan.Samadhi to idle
+    t =    15.43s Waiting 2.0s for "Afterimage" StaticText to exist
+    t =    16.47s     Checking `Expect predicate `existsNoRetry == 1` for object "Afterimage" StaticText`
+    t =    16.47s         Checking existence of `"Afterimage" StaticText`
+    t =    16.49s Tap "finish-run" Button
+    t =    16.49s     Wait for com.samaydhawan.Samadhi to idle
+    t =    16.49s     Find the "finish-run" Button
+    t =    16.51s     Check for interrupting elements affecting "finish-run" Button
+    t =    16.52s     Synthesize event
+    t =    16.81s     Wait for com.samaydhawan.Samadhi to idle
+    t =    17.36s Waiting 2.0s for "hold-to-finish" Button to exist
+    t =    18.38s     Checking `Expect predicate `existsNoRetry == 1` for object "hold-to-finish" Button`
+    t =    18.38s         Checking existence of `"hold-to-finish" Button`
+    t =    18.40s Press "hold-to-finish" Button for 1.5 seconds
+    t =    18.40s     Wait for com.samaydhawan.Samadhi to idle
+    t =    18.40s     Find the "hold-to-finish" Button
+    t =    18.42s     Check for interrupting elements affecting "hold-to-finish" Button
+    t =    18.43s     Synthesize event
+    t =    20.16s     Wait for com.samaydhawan.Samadhi to idle
+    t =    20.33s Waiting 3.0s for "run-summary" Any to exist
+    t =    21.37s     Checking `Expect predicate `existsNoRetry == 1` for object "run-summary" Any`
+    t =    21.37s         Checking existence of `"run-summary" Any`
+    t =    21.38s Tap "summary-done" Button
+    t =    21.38s     Wait for com.samaydhawan.Samadhi to idle
+    t =    21.39s     Find the "summary-done" Button
+    t =    21.40s     Check for interrupting elements affecting "summary-done" Button
+    t =    21.41s     Synthesize event
+    t =    21.70s     Wait for com.samaydhawan.Samadhi to idle
+    t =    22.28s Waiting 2.0s for "ready-screen" Any to exist
+    t =    23.32s     Checking `Expect predicate `existsNoRetry == 1` for object "ready-screen" Any`
+    t =    23.32s         Checking existence of `"ready-screen" Any`
+    t =    23.33s Tear Down
+Test Case '-[SamadhiUITests.SamadhiUITests testGoldenFlow]' passed (23.675 seconds).
+Test Case '-[SamadhiUITests.SamadhiUITests testMissingArtworkStillStarts]' started.
+    t =     0.00s Start Test at 2026-07-15 18:25:40.251
+    t =     0.02s Set Up
+    t =     0.02s Open com.samaydhawan.Samadhi
+    t =     0.02s     Launch com.samaydhawan.Samadhi
+    t =     0.02s         Terminate com.samaydhawan.Samadhi:71528
+2026-07-15 18:25:41.321 xcodebuild[71468:1852248] [MT] IDELaunchParametersSnapshot: debugger version lookup failed for path '<nil>': noURL
+2026-07-15 18:25:41.321 xcodebuild[71468:1852248] [MT] IDELaunchParametersSnapshot: no debugger version
+    t =     1.28s         Setting up automation session
+    t =     3.22s         Wait for com.samaydhawan.Samadhi to idle
+    t =     4.52s Waiting 2.0s for "start-run" Button to exist
+    t =     5.56s     Checking `Expect predicate `existsNoRetry == 1` for object "start-run" Button`
+    t =     5.56s         Checking existence of `"start-run" Button`
+    t =     5.60s Tap "start-run" Button
+    t =     5.60s     Wait for com.samaydhawan.Samadhi to idle
+    t =     5.61s     Find the "start-run" Button
+    t =     5.62s     Check for interrupting elements affecting "start-run" Button
+    t =     5.63s     Synthesize event
+    t =     5.94s     Wait for com.samaydhawan.Samadhi to idle
+    t =     6.69s Waiting 2.0s for "run-screen" Any to exist
+    t =     7.72s     Checking `Expect predicate `existsNoRetry == 1` for object "run-screen" Any`
+    t =     7.72s         Checking existence of `"run-screen" Any`
+    t =     7.74s Tear Down
+Test Case '-[SamadhiUITests.SamadhiUITests testMissingArtworkStillStarts]' passed (7.982 seconds).
+Test Case '-[SamadhiUITests.SamadhiUITests testPermissionRecoveryUsesFixedRhythm]' started.
+    t =     0.00s Start Test at 2026-07-15 18:25:48.233
+    t =     0.02s Set Up
+    t =     0.02s Open com.samaydhawan.Samadhi
+    t =     0.02s     Launch com.samaydhawan.Samadhi
+    t =     0.02s         Terminate com.samaydhawan.Samadhi:71772
+2026-07-15 18:25:49.300 xcodebuild[71468:1852248] [MT] IDELaunchParametersSnapshot: debugger version lookup failed for path '<nil>': noURL
+2026-07-15 18:25:49.300 xcodebuild[71468:1852248] [MT] IDELaunchParametersSnapshot: no debugger version
+    t =     1.27s         Setting up automation session
+    t =     3.19s         Wait for com.samaydhawan.Samadhi to idle
+    t =     4.49s Waiting 2.0s for "start-run" Button to exist
+    t =     5.53s     Checking `Expect predicate `existsNoRetry == 1` for object "start-run" Button`
+    t =     5.53s         Checking existence of `"start-run" Button`
+    t =     5.57s Tap "start-run" Button
+    t =     5.57s     Wait for com.samaydhawan.Samadhi to idle
+    t =     5.57s     Find the "start-run" Button
+    t =     5.58s     Check for interrupting elements affecting "start-run" Button
+    t =     5.60s     Synthesize event
+    t =     5.91s     Wait for com.samaydhawan.Samadhi to idle
+    t =     6.64s Waiting 2.0s for "permission-recovery" Any to exist
+    t =     7.67s     Checking `Expect predicate `existsNoRetry == 1` for object "permission-recovery" Any`
+    t =     7.67s         Checking existence of `"permission-recovery" Any`
+    t =     7.69s Tap "use-fixed-rhythm" Button
+    t =     7.69s     Wait for com.samaydhawan.Samadhi to idle
+    t =     7.70s     Find the "use-fixed-rhythm" Button
+    t =     7.71s     Check for interrupting elements affecting "use-fixed-rhythm" Button
+    t =     7.72s     Synthesize event
+    t =     8.01s     Wait for com.samaydhawan.Samadhi to idle
+    t =     8.72s Waiting 2.0s for "run-screen" Any to exist
+    t =     9.75s     Checking `Expect predicate `existsNoRetry == 1` for object "run-screen" Any`
+    t =     9.75s         Checking existence of `"run-screen" Any`
+    t =     9.76s Tear Down
+Test Case '-[SamadhiUITests.SamadhiUITests testPermissionRecoveryUsesFixedRhythm]' passed (10.020 seconds).
+Test Case '-[SamadhiUITests.SamadhiUITests testRouteLossRequiresExplicitResume]' started.
+    t =     0.00s Start Test at 2026-07-15 18:25:58.254
+    t =     0.02s Set Up
+    t =     0.02s Open com.samaydhawan.Samadhi
+    t =     0.03s     Launch com.samaydhawan.Samadhi
+    t =     0.03s         Terminate com.samaydhawan.Samadhi:71822
+2026-07-15 18:25:59.308 xcodebuild[71468:1852248] [MT] IDELaunchParametersSnapshot: debugger version lookup failed for path '<nil>': noURL
+2026-07-15 18:25:59.308 xcodebuild[71468:1852248] [MT] IDELaunchParametersSnapshot: no debugger version
+    t =     1.26s         Setting up automation session
+    t =     3.21s         Wait for com.samaydhawan.Samadhi to idle
+    t =     4.50s Waiting 2.0s for "start-run" Button to exist
+    t =     5.52s     Checking `Expect predicate `existsNoRetry == 1` for object "start-run" Button`
+    t =     5.52s         Checking existence of `"start-run" Button`
+    t =     5.55s Tap "start-run" Button
+    t =     5.55s     Wait for com.samaydhawan.Samadhi to idle
+    t =     5.56s     Find the "start-run" Button
+    t =     5.57s     Check for interrupting elements affecting "start-run" Button
+    t =     5.58s     Synthesize event
+    t =     5.90s     Wait for com.samaydhawan.Samadhi to idle
+    t =     6.64s Waiting 3.0s for "route-recovery" Any to exist
+    t =     7.66s     Checking `Expect predicate `existsNoRetry == 1` for object "route-recovery" Any`
+    t =     7.66s         Checking existence of `"route-recovery" Any`
+    t =     7.67s Waiting 2.0s for "route-resume" Button to exist
+    t =     8.71s     Checking `Expect predicate `existsNoRetry == 1` for object "route-resume" Button`
+    t =     8.71s         Checking existence of `"route-resume" Button`
+    t =     8.73s Tap "route-resume" Button
+    t =     8.73s     Wait for com.samaydhawan.Samadhi to idle
+    t =     8.73s     Find the "route-resume" Button
+    t =     8.74s     Check for interrupting elements affecting "route-resume" Button
+    t =     8.75s     Synthesize event
+    t =     9.05s     Wait for com.samaydhawan.Samadhi to idle
+    t =     9.77s Waiting 2.0s for "run-screen" Any to exist
+    t =    10.79s     Checking `Expect predicate `existsNoRetry == 1` for object "run-screen" Any`
+    t =    10.79s         Checking existence of `"run-screen" Any`
+    t =    10.81s Tear Down
+Test Case '-[SamadhiUITests.SamadhiUITests testRouteLossRequiresExplicitResume]' passed (11.076 seconds).
+Test Suite 'SamadhiUITests' passed at 2026-07-15 18:26:09.330.
+	 Executed 4 tests, with 0 failures (0 unexpected) in 52.753 (52.759) seconds
+Test Suite 'SamadhiUITests.xctest' passed at 2026-07-15 18:26:09.331.
+	 Executed 4 tests, with 0 failures (0 unexpected) in 52.753 (52.759) seconds
+Test Suite 'All tests' passed at 2026-07-15 18:26:09.331.
+	 Executed 4 tests, with 0 failures (0 unexpected) in 52.753 (52.760) seconds
+2026-07-15 18:26:09.620 xcodebuild[71468:1852248] [MT] IDETestOperationsObserverDebug: 57.075 elapsed -- Testing started completed.
+2026-07-15 18:26:09.620 xcodebuild[71468:1852248] [MT] IDETestOperationsObserverDebug: 0.000 sec, +0.000 sec -- start
+2026-07-15 18:26:09.620 xcodebuild[71468:1852248] [MT] IDETestOperationsObserverDebug: 57.075 sec, +57.075 sec -- end
+
+Test session results, code coverage, and logs:
+	/Users/samaydhawan/Library/Developer/Xcode/DerivedData/Samadhi-hdueptixzzobaxdatpuvvuskdscq/Logs/Test/Test-Samadhi-2026.07.15_18-25-11--0400.xcresult
+
+** TEST SUCCEEDED **
+
+Testing started

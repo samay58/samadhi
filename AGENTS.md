@@ -1,4 +1,4 @@
-# In Step repository instructions
+# Samadhi repository instructions
 
 ## Product
 - This is a minimal body-aware music player, not a fitness platform.
@@ -7,7 +7,7 @@
 - Interaction quality and reliable audio behavior outrank feature breadth.
 
 ## Architecture
-- Keep InStepDomain free of UI and Apple media frameworks.
+- Keep SamadhiDomain free of UI and Apple media frameworks.
 - Use the functional-core, actor-shell architecture in ARCHITECTURE.md.
 - Do not introduce a production dependency without documenting why.
 - Do not call audio or motion services directly from SwiftUI views.

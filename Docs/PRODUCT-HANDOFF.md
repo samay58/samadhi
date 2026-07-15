@@ -1,10 +1,10 @@
-# In Step
+# Samadhi
 ## Codex Build Handoff
 ### A design-led cadence music player for iPhone
 
 **Status:** Implementation brief  
 **Audience:** Codex working locally with Xcode and an iPhone  
-**Working title:** In Step  
+**Working title:** Samadhi
 **Primary objective:** Build the smallest possible app that makes running feel musically locked-in, with exceptional interaction quality and no fitness-app clutter.
 
 ---
@@ -559,7 +559,7 @@ Use Codable files or a tiny repository abstraction over app storage. Add SwiftDa
 
 Now Playing already owns the appropriate Lock Screen media surface. A separate Live Activity risks duplicate controls and visual clutter. The best first system-level extension is a single action:
 
-> Start In Step
+> Start Samadhi
 
 The intent should open the app directly into the ready state with the last collection selected. It must reuse the same run coordinator, not create a parallel execution path.
 
@@ -1359,26 +1359,26 @@ No view should independently start motion updates or audio tasks.
 Use one Xcode app project plus a local Swift package so that domain code, design components, previews, and tests remain isolated and easy for Codex to inspect.
 
 ```text
-InStep/
-  InStep.xcodeproj
+Samadhi/
+  Samadhi.xcodeproj
   App/
-    InStepApp.swift
+    SamadhiApp.swift
     AppEnvironment.swift
     RootView.swift
     AppIntentRouter.swift
   Packages/
-    InStepKit/
+    SamadhiKit/
       Package.swift
       Sources/
-        InStepDomain/
-        InStepMotion/
-        InStepAudio/
-        InStepDesign/
-        InStepDiagnostics/
+        SamadhiDomain/
+        SamadhiMotion/
+        SamadhiAudio/
+        SamadhiDesign/
+        SamadhiDiagnostics/
       Tests/
-        InStepDomainTests/
-        InStepMotionTests/
-        InStepAudioTests/
+        SamadhiDomainTests/
+        SamadhiMotionTests/
+        SamadhiAudioTests/
   Resources/
     DemoTracks/
     TrackManifests/
@@ -1399,7 +1399,7 @@ InStep/
 
 ## Module boundaries
 
-### InStepDomain
+### SamadhiDomain
 
 Pure Swift:
 
@@ -1414,7 +1414,7 @@ Pure Swift:
 
 No SwiftUI, CoreMotion, AVFoundation, or MediaPlayer imports.
 
-### InStepMotion
+### SamadhiMotion
 
 - `CadenceProvider`
 - CMPedometer adapter
@@ -1422,7 +1422,7 @@ No SwiftUI, CoreMotion, AVFoundation, or MediaPlayer imports.
 - Recorded-fixture provider
 - Permission mapping
 
-### InStepAudio
+### SamadhiAudio
 
 - Playback provider protocol
 - Adaptive local engine
@@ -1433,7 +1433,7 @@ No SwiftUI, CoreMotion, AVFoundation, or MediaPlayer imports.
 - Track decoding and preload
 - Interruption and route-change mapping
 
-### InStepDesign
+### SamadhiDesign
 
 - Ready screen components
 - Tempo aperture
@@ -1446,7 +1446,7 @@ No SwiftUI, CoreMotion, AVFoundation, or MediaPlayer imports.
 
 This package should be importable into SwiftUI preview tooling.
 
-### InStepDiagnostics
+### SamadhiDiagnostics
 
 Debug-only:
 
@@ -1589,7 +1589,7 @@ Do not dead-end.
 Show:
 
 > Motion access is off  
-> In Step uses step rhythm to adapt the music.
+> Samadhi uses step rhythm to adapt the music.
 
 Actions:
 
@@ -1723,9 +1723,9 @@ Do not claim audio quality is proven by unit tests. Audio quality requires liste
 Create a deterministic launch argument:
 
 ```text
--INSTEP_USE_SIMULATED_CADENCE YES
--INSTEP_FIXTURE steady-168
--INSTEP_USE_DEMO_AUDIO YES
+-SAMADHI_USE_SIMULATED_CADENCE YES
+-SAMADHI_FIXTURE steady-168
+-SAMADHI_USE_DEMO_AUDIO YES
 ```
 
 Golden-path UI test:
@@ -1873,7 +1873,7 @@ Do not merely mention these tools. Use them and preserve evidence.
 Create `AGENTS.md` before implementation with these rules:
 
 ```markdown
-# In Step repository instructions
+# Samadhi repository instructions
 
 ## Product
 - This is a minimal body-aware music player, not a fitness platform.
@@ -1882,7 +1882,7 @@ Create `AGENTS.md` before implementation with these rules:
 - Interaction quality and reliable audio behavior outrank feature breadth.
 
 ## Architecture
-- Keep InStepDomain free of UI and Apple media frameworks.
+- Keep SamadhiDomain free of UI and Apple media frameworks.
 - Use the functional-core, actor-shell architecture in ARCHITECTURE.md.
 - Do not introduce a production dependency without documenting why.
 - Do not call audio or motion services directly from SwiftUI views.
@@ -2344,7 +2344,7 @@ Use the following as the first task after placing this document in the repositor
 ```text
 Read this entire repository before changing files, especially AGENTS.md, Docs/PRODUCT.md, Docs/ARCHITECTURE.md, and Docs/DECISIONS.md.
 
-Your job is to build In Step as a native iOS 26 SwiftUI app. It is a minimal, design-led cadence music player. It is not a fitness platform.
+Your job is to build Samadhi as a native iOS 26 SwiftUI app. It is a minimal, design-led cadence music player. It is not a fitness platform.
 
 Begin with Milestone 0 and Milestone 1 only. Do not connect Core Motion or build the production audio engine yet.
 
