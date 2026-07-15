@@ -1,0 +1,620 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		08C7CAABAD85AB4BC3C88E80 /* SamadhiDomain in Frameworks */ = {isa = PBXBuildFile; productRef = FCB42BF9FF49F690F8EEE5F2 /* SamadhiDomain */; };
+		59F6A7F42EF07136C8A749D2 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A28146360481C17881F591C3 /* RootView.swift */; };
+		6D0A66115FB9B31D7C320CBA /* SamadhiUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84DEE35021BD9A5D2A7F5F45 /* SamadhiUITests.swift */; };
+		7447DD9A496F5085B1D37B6B /* SamadhiDomain in Frameworks */ = {isa = PBXBuildFile; productRef = C461B57BEEA896BE3B7CAC5B /* SamadhiDomain */; };
+		78FAE03DF8A4D42BD14A7DD8 /* silent-loop.wav in Resources */ = {isa = PBXBuildFile; fileRef = CDFAF5B2DD68CC941F094A15 /* silent-loop.wav */; };
+		8E48AE66560F367C401395CF /* SamadhiMotion in Frameworks */ = {isa = PBXBuildFile; productRef = 87200EBB3D911863E80E185E /* SamadhiMotion */; };
+		A592E055654CAC8DE4DBEAD1 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8200E148AF4ABACA3B47ADA2 /* Assets.xcassets */; };
+		A9FE8C130C33F60BB2C2925B /* SamadhiTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 131DED91DED56986EDD4FE9B /* SamadhiTests.swift */; };
+		BFB93B5F0188CF63A19E30CB /* RunPresentationModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27E4457C2F93694193D8E85D /* RunPresentationModel.swift */; };
+		D80D703E28BBEBEDC8A9AE3A /* SamadhiDesign in Frameworks */ = {isa = PBXBuildFile; productRef = A48F446192EFBD7579C7BF67 /* SamadhiDesign */; };
+		EC41CEFCE78C60A45AD5680A /* SamadhiApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1CE55560A18BCBFBAF13E01 /* SamadhiApp.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		0DFB7235C049C727E772FA33 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = AA168B605B6A5B3F510D6EFD /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 17E89907A038C366CC3AB648;
+			remoteInfo = Samadhi;
+		};
+		D04872D4CAE9173D1A53FA47 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = AA168B605B6A5B3F510D6EFD /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 17E89907A038C366CC3AB648;
+			remoteInfo = Samadhi;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		131DED91DED56986EDD4FE9B /* SamadhiTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SamadhiTests.swift; sourceTree = "<group>"; };
+		27E4457C2F93694193D8E85D /* RunPresentationModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RunPresentationModel.swift; sourceTree = "<group>"; };
+		64781032C8A2BA5D5DD7DF6C /* Samadhi.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Samadhi.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		8200E148AF4ABACA3B47ADA2 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		84DEE35021BD9A5D2A7F5F45 /* SamadhiUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SamadhiUITests.swift; sourceTree = "<group>"; };
+		A28146360481C17881F591C3 /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
+		AB90BB4B3A76F3AFC7FD65D2 /* SamadhiKit */ = {isa = PBXFileReference; lastKnownFileType = folder; name = SamadhiKit; path = Packages/SamadhiKit; sourceTree = SOURCE_ROOT; };
+		B1CE55560A18BCBFBAF13E01 /* SamadhiApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SamadhiApp.swift; sourceTree = "<group>"; };
+		C583155850D54880F50B821C /* SamadhiUITests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = SamadhiUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		CDFAF5B2DD68CC941F094A15 /* silent-loop.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = "silent-loop.wav"; sourceTree = "<group>"; };
+		E0461D97FCA914A69C6B5C69 /* SamadhiTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = SamadhiTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		0D9E62A8F5F76D59707441D8 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				08C7CAABAD85AB4BC3C88E80 /* SamadhiDomain in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		7114185EB461ECCBDAB51EF0 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				7447DD9A496F5085B1D37B6B /* SamadhiDomain in Frameworks */,
+				D80D703E28BBEBEDC8A9AE3A /* SamadhiDesign in Frameworks */,
+				8E48AE66560F367C401395CF /* SamadhiMotion in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		2AF0CFDAA01CA6E9FB7D1E79 /* Packages */ = {
+			isa = PBXGroup;
+			children = (
+				AB90BB4B3A76F3AFC7FD65D2 /* SamadhiKit */,
+			);
+			path = Packages;
+			sourceTree = "<group>";
+		};
+		4811542AC6ADBE4FE5533A5C /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				64781032C8A2BA5D5DD7DF6C /* Samadhi.app */,
+				E0461D97FCA914A69C6B5C69 /* SamadhiTests.xctest */,
+				C583155850D54880F50B821C /* SamadhiUITests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		4C393A4B14C9335BDBD164CA /* SamadhiTests */ = {
+			isa = PBXGroup;
+			children = (
+				131DED91DED56986EDD4FE9B /* SamadhiTests.swift */,
+			);
+			path = SamadhiTests;
+			sourceTree = "<group>";
+		};
+		7191FD2C041F73712CC6B3D1 /* Tests */ = {
+			isa = PBXGroup;
+			children = (
+				4C393A4B14C9335BDBD164CA /* SamadhiTests */,
+				CD74821AF0182B88DED9879D /* SamadhiUITests */,
+			);
+			path = Tests;
+			sourceTree = "<group>";
+		};
+		7383BCB7887BF7C7A6A7BB1A = {
+			isa = PBXGroup;
+			children = (
+				C7AB60613785D7A5C926458F /* App */,
+				2AF0CFDAA01CA6E9FB7D1E79 /* Packages */,
+				86F63E26427112E77D5EC862 /* Resources */,
+				7191FD2C041F73712CC6B3D1 /* Tests */,
+				4811542AC6ADBE4FE5533A5C /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		86F63E26427112E77D5EC862 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				8200E148AF4ABACA3B47ADA2 /* Assets.xcassets */,
+				A8EA17E43513967F5A3991A6 /* DemoTracks */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		A8EA17E43513967F5A3991A6 /* DemoTracks */ = {
+			isa = PBXGroup;
+			children = (
+				CDFAF5B2DD68CC941F094A15 /* silent-loop.wav */,
+			);
+			path = DemoTracks;
+			sourceTree = "<group>";
+		};
+		C7AB60613785D7A5C926458F /* App */ = {
+			isa = PBXGroup;
+			children = (
+				A28146360481C17881F591C3 /* RootView.swift */,
+				27E4457C2F93694193D8E85D /* RunPresentationModel.swift */,
+				B1CE55560A18BCBFBAF13E01 /* SamadhiApp.swift */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+		CD74821AF0182B88DED9879D /* SamadhiUITests */ = {
+			isa = PBXGroup;
+			children = (
+				84DEE35021BD9A5D2A7F5F45 /* SamadhiUITests.swift */,
+			);
+			path = SamadhiUITests;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		17E89907A038C366CC3AB648 /* Samadhi */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A84EBBD302ED6413D6C8C9E6 /* Build configuration list for PBXNativeTarget "Samadhi" */;
+			buildPhases = (
+				FC3F8B7A8A63CEA9B9C1E8CE /* Sources */,
+				1127E4E2E024041400E1BB26 /* Resources */,
+				7114185EB461ECCBDAB51EF0 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Samadhi;
+			packageProductDependencies = (
+				C461B57BEEA896BE3B7CAC5B /* SamadhiDomain */,
+				A48F446192EFBD7579C7BF67 /* SamadhiDesign */,
+				87200EBB3D911863E80E185E /* SamadhiMotion */,
+			);
+			productName = Samadhi;
+			productReference = 64781032C8A2BA5D5DD7DF6C /* Samadhi.app */;
+			productType = "com.apple.product-type.application";
+		};
+		42554D0466317DE33DB5F46F /* SamadhiUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = AE755D642F6B3A0C9BDF9D4C /* Build configuration list for PBXNativeTarget "SamadhiUITests" */;
+			buildPhases = (
+				FBA3042D73A2E221913C8DC1 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				6AA7305B129182CA8A8FD77B /* PBXTargetDependency */,
+			);
+			name = SamadhiUITests;
+			packageProductDependencies = (
+			);
+			productName = SamadhiUITests;
+			productReference = C583155850D54880F50B821C /* SamadhiUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+		F92AFD6664D5A580F202CBE6 /* SamadhiTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 94D98EE2BDB0B1BE8DCCC439 /* Build configuration list for PBXNativeTarget "SamadhiTests" */;
+			buildPhases = (
+				29713505A74E596AD80DCB41 /* Sources */,
+				0D9E62A8F5F76D59707441D8 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				38A3094F684BAF9F181BDC98 /* PBXTargetDependency */,
+			);
+			name = SamadhiTests;
+			packageProductDependencies = (
+				FCB42BF9FF49F690F8EEE5F2 /* SamadhiDomain */,
+			);
+			productName = SamadhiTests;
+			productReference = E0461D97FCA914A69C6B5C69 /* SamadhiTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		AA168B605B6A5B3F510D6EFD /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1430;
+				TargetAttributes = {
+					17E89907A038C366CC3AB648 = {
+						DevelopmentTeam = "";
+						ProvisioningStyle = Automatic;
+					};
+					42554D0466317DE33DB5F46F = {
+						DevelopmentTeam = "";
+						TestTargetID = 17E89907A038C366CC3AB648;
+					};
+					F92AFD6664D5A580F202CBE6 = {
+						DevelopmentTeam = "";
+					};
+				};
+			};
+			buildConfigurationList = E5D5E4F289590948B8C02FA2 /* Build configuration list for PBXProject "Samadhi" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = 7383BCB7887BF7C7A6A7BB1A;
+			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				94AB9E20B9B0A56FBCBBDA00 /* XCLocalSwiftPackageReference "Packages/SamadhiKit" */,
+			);
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 4811542AC6ADBE4FE5533A5C /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				17E89907A038C366CC3AB648 /* Samadhi */,
+				F92AFD6664D5A580F202CBE6 /* SamadhiTests */,
+				42554D0466317DE33DB5F46F /* SamadhiUITests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		1127E4E2E024041400E1BB26 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A592E055654CAC8DE4DBEAD1 /* Assets.xcassets in Resources */,
+				78FAE03DF8A4D42BD14A7DD8 /* silent-loop.wav in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		29713505A74E596AD80DCB41 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A9FE8C130C33F60BB2C2925B /* SamadhiTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		FBA3042D73A2E221913C8DC1 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				6D0A66115FB9B31D7C320CBA /* SamadhiUITests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		FC3F8B7A8A63CEA9B9C1E8CE /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				59F6A7F42EF07136C8A749D2 /* RootView.swift in Sources */,
+				BFB93B5F0188CF63A19E30CB /* RunPresentationModel.swift in Sources */,
+				EC41CEFCE78C60A45AD5680A /* SamadhiApp.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		38A3094F684BAF9F181BDC98 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 17E89907A038C366CC3AB648 /* Samadhi */;
+			targetProxy = 0DFB7235C049C727E772FA33 /* PBXContainerItemProxy */;
+		};
+		6AA7305B129182CA8A8FD77B /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 17E89907A038C366CC3AB648 /* Samadhi */;
+			targetProxy = D04872D4CAE9173D1A53FA47 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		0AF5EEC58DBF1253139A5E58 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.samaydhawan.SamadhiUITests;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = Samadhi;
+			};
+			name = Debug;
+		};
+		1357753ACB41C995A20D44A8 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = "";
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 6.0;
+			};
+			name = Debug;
+		};
+		4017E8CFBEE13B838BF59DB6 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.samaydhawan.SamadhiTests;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Samadhi.app/Samadhi";
+			};
+			name = Release;
+		};
+		6A81EC292B763BE996FEDD86 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.samaydhawan.SamadhiTests;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Samadhi.app/Samadhi";
+			};
+			name = Debug;
+		};
+		6B866BABCFD7757ABC02C29F /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = "";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 6.0;
+			};
+			name = Release;
+		};
+		9208259D12DF08B2D6A321CD /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = Samadhi;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.samaydhawan.Samadhi;
+				PRODUCT_NAME = Samadhi;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Release;
+		};
+		9544E0F070B8D2CA7E9E8896 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.samaydhawan.SamadhiUITests;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = Samadhi;
+			};
+			name = Release;
+		};
+		B4F140E6FD107E908A643C95 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = Samadhi;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.samaydhawan.Samadhi;
+				PRODUCT_NAME = Samadhi;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		94D98EE2BDB0B1BE8DCCC439 /* Build configuration list for PBXNativeTarget "SamadhiTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				6A81EC292B763BE996FEDD86 /* Debug */,
+				4017E8CFBEE13B838BF59DB6 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		A84EBBD302ED6413D6C8C9E6 /* Build configuration list for PBXNativeTarget "Samadhi" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				B4F140E6FD107E908A643C95 /* Debug */,
+				9208259D12DF08B2D6A321CD /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		AE755D642F6B3A0C9BDF9D4C /* Build configuration list for PBXNativeTarget "SamadhiUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				0AF5EEC58DBF1253139A5E58 /* Debug */,
+				9544E0F070B8D2CA7E9E8896 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		E5D5E4F289590948B8C02FA2 /* Build configuration list for PBXProject "Samadhi" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1357753ACB41C995A20D44A8 /* Debug */,
+				6B866BABCFD7757ABC02C29F /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCLocalSwiftPackageReference section */
+		94AB9E20B9B0A56FBCBBDA00 /* XCLocalSwiftPackageReference "Packages/SamadhiKit" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = Packages/SamadhiKit;
+		};
+/* End XCLocalSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		87200EBB3D911863E80E185E /* SamadhiMotion */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = SamadhiMotion;
+		};
+		A48F446192EFBD7579C7BF67 /* SamadhiDesign */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = SamadhiDesign;
+		};
+		C461B57BEEA896BE3B7CAC5B /* SamadhiDomain */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = SamadhiDomain;
+		};
+		FCB42BF9FF49F690F8EEE5F2 /* SamadhiDomain */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = SamadhiDomain;
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = AA168B605B6A5B3F510D6EFD /* Project object */;
+}
