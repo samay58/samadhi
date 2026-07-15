@@ -2,6 +2,7 @@ import SamadhiDomain
 
 @MainActor
 final class RunTaskStore {
+    // Replaceable async work has one owner. Starting the same kind cancels its older task.
     private var tasks: [RunTaskKind: Task<Void, Never>] = [:]
     private var generations: [RunTaskKind: Int] = [:]
 
@@ -17,6 +18,7 @@ final class RunTaskStore {
         generations[kind] = generation
         tasks[kind] = Task { [weak self] in
             await operation()
+            // Cancelled work can still return. Its generation must not clear a newer replacement.
             guard let self, generations[kind] == generation else { return }
             tasks[kind] = nil
         }

@@ -13,6 +13,7 @@ public struct SamadhiScreen: View {
 
     public var body: some View {
         ZStack {
+            // Background and foreground route independently so the atmosphere stays continuous across phases.
             atmosphere
             content
         }
@@ -23,6 +24,7 @@ public struct SamadhiScreen: View {
 
     @ViewBuilder
     private var content: some View {
+        // This switch only chooses a screen. RunReducer owns every product transition.
         switch state.phase {
         case .ready:
             ReadyScreen(state: state, send: send)

@@ -1,3 +1,4 @@
+// Read this file before RunReducer: states describe what can be true, events enter, and effects leave.
 public enum MotionAuthorization: Sendable, Equatable {
     case authorized
     case denied
@@ -164,6 +165,7 @@ public enum RunTaskKind: Sendable, Equatable, Hashable {
 }
 
 public enum RunEffect: Sendable, Equatable {
+    // Effects name outside work without performing it. IDs make late callbacks safe to ignore.
     case requestMotionAuthorization(sessionID: Int)
     case preparePlayback(sessionID: Int, mode: RunMode)
     case beginPlayback(sessionID: Int)

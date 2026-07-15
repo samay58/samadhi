@@ -50,6 +50,7 @@ struct ActiveRunScreen: View {
         }
         .scrollIndicators(.hidden)
         .contentShape(Rectangle())
+        // The full surface reveals low-attention controls; VoiceOver gets the same action without a tap target hunt.
         .simultaneousGesture(TapGesture().onEnded(showControls))
         .accessibilityAction(named: "Show controls", showControls)
         .accessibilityIdentifier("run-screen")

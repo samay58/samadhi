@@ -12,6 +12,7 @@
 - Do not introduce a production dependency without documenting why.
 - Do not call audio or motion services directly from SwiftUI views.
 - Represent mutually exclusive states with enums, not boolean clusters.
+- Comments explain intent, invariants, or architectural seams. Never narrate obvious syntax.
 
 ## Design
 - Use native SwiftUI.

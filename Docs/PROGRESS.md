@@ -33,6 +33,12 @@
 - Removed stale evidence, rejected exports, completed prompts, and superseded handoff
 - Passed 15 package tests, 2 app-model tests, and 4 UI tests after cleanup
 
+## 2026-07-15. Code navigation
+
+- Added sparse plain-English guidance at the state, effect, task, accessibility, motion, and screen-routing seams
+- Recorded the comment standard in repository instructions so later work stays readable without becoming noisy
+- Re-ran formatter, 15 package tests, 2 app-model tests, and 4 UI tests
+
 ## Current checkpoint
 
 Milestones 0 and 1 complete. Milestone 2 needs product and technical spec before implementation.

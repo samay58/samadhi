@@ -33,6 +33,7 @@ public struct TempoAperture: View {
     }
 
     public var body: some View {
+        // One beat phase drives every pulse detail. Pause and Reduce Motion freeze that same clock.
         TimelineView(
             .animation(
                 minimumInterval: 1 / 30, paused: effectiveReduceMotion || mode == .paused || mode == .interrupted)
@@ -145,6 +146,7 @@ private struct TempoOrbDrawing: View {
                 .padding(7)
 
             Circle()
+                // The outer arc is song progress. It must remain visually separate from the beat pulse.
                 .trim(from: 0, to: max(progress, 0.012))
                 .stroke(
                     SamadhiColor.ivory.opacity(mode == .interrupted ? 0.36 : 0.9),
