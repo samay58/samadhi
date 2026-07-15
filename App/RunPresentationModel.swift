@@ -1,8 +1,8 @@
 import Foundation
+import Observation
 import SamadhiDesign
 import SamadhiDomain
 import SamadhiMotion
-import Observation
 import UIKit
 
 @MainActor
@@ -11,27 +11,23 @@ final class RunPresentationModel {
     private(set) var state: RunState = .ready
     private(set) var showLockBrief = false
 
-    @ObservationIgnored private let reducer = RunReducer()
+    @ObservationIgnored private let reducer = RunReducer(trackCount: TrackMetadata.demoTracks.count)
     @ObservationIgnored private let configuration: SimulationConfiguration
     @ObservationIgnored private let cadenceProvider: SimulatedCadenceProvider
-    @ObservationIgnored private var tasks: [RunTaskKind: Task<Void, Never>] = [:]
-    @ObservationIgnored private var taskGenerations: [RunTaskKind: Int] = [:]
+    @ObservationIgnored private let taskStore = RunTaskStore()
     @ObservationIgnored private var nextToken = 1
     @ObservationIgnored private var currentHoldID: Int?
 
     init() {
         let configuration = SimulationConfiguration.current
         self.configuration = configuration
-        let cadenceDelay: Duration = configuration.extendedAcquisitionWindow
+        let cadenceDelay: Duration =
+            configuration.extendedAcquisitionWindow
             ? .milliseconds(1_400)
             : (configuration.fastMode ? .milliseconds(340) : .milliseconds(420))
         cadenceProvider = SimulatedCadenceProvider(
             sampleDelay: cadenceDelay
         )
-    }
-
-    deinit {
-        for task in tasks.values { task.cancel() }
     }
 
     var viewState: RunViewState {
@@ -41,7 +37,6 @@ final class RunPresentationModel {
         var phase: RunVisualPhase = .ready
         var controlsVisible = false
         var cadence: Int?
-        var fixedRhythm = session?.mode == .fixed
 
         switch state {
         case .ready:
@@ -62,13 +57,11 @@ final class RunPresentationModel {
                     cadence = spm
                 case .fixed:
                     phase = .running
-                    fixedRhythm = true
                 }
             case let .paused(rhythm):
                 phase = .paused
                 controlsVisible = true
                 if case let .locked(spm) = rhythm { cadence = spm }
-                if case .fixed = rhythm { fixedRhythm = true }
             }
         case let .confirmingFinish(confirmation):
             phase = .confirmingFinish
@@ -85,13 +78,11 @@ final class RunPresentationModel {
             phase: phase,
             controlsVisible: controlsVisible,
             cadenceSPM: cadence,
-            elapsedSeconds: session?.elapsedActiveSeconds ?? summaryDuration,
             trackElapsedSeconds: session?.trackElapsedSeconds ?? 0,
             trackProgress: min(Double(session?.trackElapsedSeconds ?? 0) / Double(track.durationSeconds), 1),
             track: track,
             hasArtwork: !configuration.missingArtwork,
-            showLockBrief: showLockBrief,
-            fixedRhythm: fixedRhythm
+            showLockBrief: showLockBrief
         )
     }
 
@@ -126,9 +117,6 @@ final class RunPresentationModel {
             guard let holdID = currentHoldID else { return }
             currentHoldID = nil
             dispatch(.finishHoldCompleted(holdID: holdID))
-        case .cancelFinish:
-            currentHoldID = nil
-            dispatch(.finishConfirmationCancelled(timeoutID: token()))
         case .useFixedRhythm:
             dispatch(.useFixedRhythmTapped)
         case .openSettings:
@@ -139,11 +127,6 @@ final class RunPresentationModel {
         case .done:
             dispatch(.summaryDismissed)
         }
-    }
-
-    private var summaryDuration: Int {
-        guard case let .summary(summary) = state else { return 0 }
-        return summary.durationSeconds
     }
 
     private func token() -> Int {
@@ -160,7 +143,7 @@ final class RunPresentationModel {
 
         if case .cadenceLocked = event, newState != oldState {
             showLockBrief = true
-            replaceTask(.lockBrief) { [weak self] in
+            taskStore.replace(.lockBrief) { [weak self] in
                 try? await Task.sleep(for: .milliseconds(1_200))
                 guard !Task.isCancelled else { return }
                 self?.showLockBrief = false
@@ -177,19 +160,20 @@ final class RunPresentationModel {
         case let .requestMotionAuthorization(sessionID):
             let delay: Duration = configuration.fastMode ? .milliseconds(60) : .milliseconds(260)
             let authorization: MotionAuthorization = configuration.permissionDenied ? .denied : .authorized
-            replaceTask(.authorization) { [weak self] in
+            taskStore.replace(.authorization) { [weak self] in
                 try? await Task.sleep(for: delay)
                 guard !Task.isCancelled else { return }
                 guard let self else { return }
-                dispatch(.authorizationResolved(
-                    sessionID: sessionID,
-                    authorization
-                ))
+                dispatch(
+                    .authorizationResolved(
+                        sessionID: sessionID,
+                        authorization
+                    ))
             }
 
         case let .preparePlayback(sessionID, _):
             let delay: Duration = configuration.fastMode ? .milliseconds(70) : .milliseconds(280)
-            replaceTask(.preparation) { [weak self] in
+            taskStore.replace(.preparation) { [weak self] in
                 try? await Task.sleep(for: delay)
                 guard !Task.isCancelled else { return }
                 guard let self else { return }
@@ -201,12 +185,12 @@ final class RunPresentationModel {
             if configuration.simulateRouteLoss {
                 let routeLossDelay: Duration = configuration.fastMode ? .milliseconds(650) : .seconds(2)
                 let restoreDelay: Duration = configuration.fastMode ? .milliseconds(350) : .seconds(1)
-                replaceTask(.simulatedRoute) { [weak self] in
+                taskStore.replace(.simulatedRoute) { [weak self] in
                     try? await Task.sleep(for: routeLossDelay)
                     guard !Task.isCancelled else { return }
                     guard let self else { return }
                     dispatch(.audioRouteLost)
-                    replaceTask(.simulatedRoute) { [weak self] in
+                    taskStore.replace(.simulatedRoute) { [weak self] in
                         try? await Task.sleep(for: restoreDelay)
                         guard !Task.isCancelled else { return }
                         self?.dispatch(.audioRouteRestored)
@@ -215,7 +199,7 @@ final class RunPresentationModel {
             }
 
         case let .beginCadenceAcquisition(sessionID, acquisitionID, _):
-            replaceTask(.acquisition) { [weak self, cadenceProvider] in
+            taskStore.replace(.acquisition) { [weak self, cadenceProvider] in
                 for await sample in cadenceProvider.samples() {
                     guard !Task.isCancelled else { return }
                     if case let .locked(spm) = sample {
@@ -225,7 +209,7 @@ final class RunPresentationModel {
             }
 
         case let .pausePlayback(sessionID):
-            cancelTask(.ticker)
+            taskStore.cancel(.ticker)
             _ = sessionID
 
         case let .resumePlayback(sessionID):
@@ -236,7 +220,7 @@ final class RunPresentationModel {
 
         case let .scheduleControlsTimeout(_, timeoutID):
             let delay: Duration = configuration.fastMode ? .seconds(3) : .seconds(5)
-            replaceTask(.controlsTimeout) { [weak self] in
+            taskStore.replace(.controlsTimeout) { [weak self] in
                 try? await Task.sleep(for: delay)
                 guard !Task.isCancelled else { return }
                 guard let self else { return }
@@ -244,35 +228,32 @@ final class RunPresentationModel {
             }
 
         case let .scheduleFinishHold(_, holdID):
-            replaceTask(.finishHold) { [weak self] in
+            taskStore.replace(.finishHold) { [weak self] in
                 try? await Task.sleep(for: .milliseconds(900))
                 guard !Task.isCancelled else { return }
                 self?.dispatch(.finishHoldCompleted(holdID: holdID))
             }
 
         case let .fadeAndStop(sessionID):
-            replaceTask(.finishing) { [weak self] in
+            taskStore.replace(.finishing) { [weak self] in
                 try? await Task.sleep(for: .milliseconds(420))
                 guard !Task.isCancelled else { return }
                 self?.dispatch(.finishCompleted(sessionID: sessionID))
             }
 
-        case .persistSummary:
-            break
-
         case let .emitHaptic(event):
             emitHaptic(event)
 
         case let .cancelTask(_, kind):
-            cancelTask(kind)
+            taskStore.cancel(kind)
 
         case .cancelAllTasks:
-            cancelAllTasks()
+            taskStore.cancelAll()
         }
     }
 
     private func startTicker(sessionID: Int) {
-        replaceTask(.ticker) { [weak self] in
+        taskStore.replace(.ticker) { [weak self] in
             while !Task.isCancelled {
                 try? await Task.sleep(for: .seconds(1))
                 guard !Task.isCancelled else { return }
@@ -280,29 +261,6 @@ final class RunPresentationModel {
                 self?.dispatch(.activeSecond)
             }
         }
-    }
-
-    private func replaceTask(_ kind: RunTaskKind, operation: @escaping @MainActor () async -> Void) {
-        cancelTask(kind)
-        let generation = (taskGenerations[kind] ?? 0) + 1
-        taskGenerations[kind] = generation
-        tasks[kind] = Task { [weak self] in
-            await operation()
-            guard let self, taskGenerations[kind] == generation else { return }
-            tasks[kind] = nil
-        }
-    }
-
-    private func cancelTask(_ kind: RunTaskKind) {
-        tasks[kind]?.cancel()
-        tasks[kind] = nil
-        taskGenerations[kind, default: 0] += 1
-    }
-
-    private func cancelAllTasks() {
-        for task in tasks.values { task.cancel() }
-        tasks.removeAll()
-        for kind in taskGenerations.keys { taskGenerations[kind, default: 0] += 1 }
     }
 
     private func emitHaptic(_ event: HapticEvent) {
@@ -316,24 +274,5 @@ final class RunPresentationModel {
         case .finish:
             UIImpactFeedbackGenerator(style: .heavy).impactOccurred()
         }
-    }
-}
-
-private struct SimulationConfiguration {
-    let fastMode: Bool
-    let permissionDenied: Bool
-    let simulateRouteLoss: Bool
-    let missingArtwork: Bool
-    let extendedAcquisitionWindow: Bool
-
-    static var current: SimulationConfiguration {
-        let arguments = ProcessInfo.processInfo.arguments
-        return SimulationConfiguration(
-            fastMode: arguments.contains("-SAMADHI_FAST_MODE"),
-            permissionDenied: arguments.contains("-SAMADHI_PERMISSION_DENIED"),
-            simulateRouteLoss: arguments.contains("-SAMADHI_ROUTE_LOST"),
-            missingArtwork: arguments.contains("-SAMADHI_MISSING_ARTWORK"),
-            extendedAcquisitionWindow: arguments.contains("-SAMADHI_TEST_ACQUISITION_WINDOW")
-        )
     }
 }

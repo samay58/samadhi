@@ -4,7 +4,6 @@ import SwiftUI
 public enum ApertureMode: Sendable, Equatable {
     case acquiring
     case locked
-    case adapting
     case paused
     case interrupted
 }
@@ -34,7 +33,10 @@ public struct TempoAperture: View {
     }
 
     public var body: some View {
-        TimelineView(.animation(minimumInterval: 1 / 30, paused: effectiveReduceMotion || mode == .paused || mode == .interrupted)) { _ in
+        TimelineView(
+            .animation(
+                minimumInterval: 1 / 30, paused: effectiveReduceMotion || mode == .paused || mode == .interrupted)
+        ) { _ in
             let phase = visualPhase
             TempoOrbDrawing(
                 mode: mode,
@@ -43,8 +45,8 @@ public struct TempoAperture: View {
                 animatesProgress: !effectiveReduceMotion,
                 increasedContrast: contrast == .increased || increasedContrastOverride
             )
-                .scaleEffect(orbScale(for: phase))
-                .offset(y: orbLift(for: phase))
+            .scaleEffect(orbScale(for: phase))
+            .offset(y: orbLift(for: phase))
         }
         .aspectRatio(1, contentMode: .fit)
         .accessibilityElement(children: .ignore)
@@ -60,12 +62,12 @@ public struct TempoAperture: View {
     }
 
     private func orbScale(for phase: Double) -> CGFloat {
-        guard !effectiveReduceMotion, mode == .locked || mode == .adapting else { return 1 }
+        guard !effectiveReduceMotion, mode == .locked else { return 1 }
         return 1 + 0.038 * beatImpulse(for: phase)
     }
 
     private func orbLift(for phase: Double) -> CGFloat {
-        guard !effectiveReduceMotion, mode == .locked || mode == .adapting else { return 0 }
+        guard !effectiveReduceMotion, mode == .locked else { return 0 }
         return -5 * beatImpulse(for: phase)
     }
 
@@ -76,7 +78,7 @@ public struct TempoAperture: View {
     private var accessibilityLabel: String {
         switch mode {
         case .acquiring: "Listening for your stride"
-        case .locked, .adapting: "In step"
+        case .locked: "In step"
         case .paused: "Paused"
         case .interrupted: "Music paused"
         }
@@ -88,7 +90,7 @@ public struct TempoAperture: View {
 
     private var accessibilityValue: String {
         let songProgress = "\(Int(progress * 100)) percent through song"
-        guard let cadenceSPM, mode == .locked || mode == .adapting else { return songProgress }
+        guard let cadenceSPM, mode == .locked else { return songProgress }
         return "\(cadenceSPM) steps per minute, \(songProgress)"
     }
 }
@@ -127,14 +129,19 @@ private struct TempoOrbDrawing: View {
                 }
                 .overlay {
                     Circle()
-                        .strokeBorder(SamadhiColor.ivory.opacity(increasedContrast ? 0.96 : 0.64), lineWidth: increasedContrast ? 3 : 1.5)
+                        .strokeBorder(
+                            SamadhiColor.ivory.opacity(increasedContrast ? 0.96 : 0.64),
+                            lineWidth: increasedContrast ? 3 : 1.5)
                 }
                 .shadow(color: SamadhiColor.apricot.opacity(0.28), radius: 30, y: 12)
                 .shadow(color: SamadhiColor.ink.opacity(0.34), radius: 18, y: 14)
                 .padding(18)
 
             Circle()
-                .stroke(SamadhiColor.ivory.opacity(mode == .interrupted ? 0.2 : 0.28), lineWidth: increasedContrast ? 3 : 1.5)
+                .stroke(
+                    SamadhiColor.ivory.opacity(mode == .interrupted ? 0.2 : 0.28),
+                    lineWidth: increasedContrast ? 3 : 1.5
+                )
                 .padding(7)
 
             Circle()
@@ -148,7 +155,10 @@ private struct TempoOrbDrawing: View {
                 .animation(animatesProgress ? .smooth(duration: 0.5) : nil, value: progress)
 
             Circle()
-                .stroke(SamadhiColor.apricot.opacity(mode == .paused ? 0.22 : 0.52), style: StrokeStyle(lineWidth: 1, dash: [2, 8]))
+                .stroke(
+                    SamadhiColor.apricot.opacity(mode == .paused ? 0.22 : 0.52),
+                    style: StrokeStyle(lineWidth: 1, dash: [2, 8])
+                )
                 .padding(38)
 
             Ellipse()
@@ -164,12 +174,15 @@ private struct TempoOrbDrawing: View {
         switch mode {
         case .acquiring:
             [SamadhiColor.plum, SamadhiColor.apricot.opacity(0.82), SamadhiColor.olive, SamadhiColor.plum]
-        case .locked, .adapting:
+        case .locked:
             [SamadhiColor.clay, SamadhiColor.apricot, SamadhiColor.olive, SamadhiColor.plum, SamadhiColor.clay]
         case .paused:
             [SamadhiColor.plum, SamadhiColor.apricot.opacity(0.48), SamadhiColor.ink, SamadhiColor.plum]
         case .interrupted:
-            [SamadhiColor.plum.opacity(0.72), SamadhiColor.ink, SamadhiColor.olive.opacity(0.58), SamadhiColor.plum.opacity(0.72)]
+            [
+                SamadhiColor.plum.opacity(0.72), SamadhiColor.ink, SamadhiColor.olive.opacity(0.58),
+                SamadhiColor.plum.opacity(0.72),
+            ]
         }
     }
 }

@@ -8,4 +8,3 @@ struct SamadhiApp: App {
         }
     }
 }
-

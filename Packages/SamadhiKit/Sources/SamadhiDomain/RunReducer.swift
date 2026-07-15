@@ -1,216 +1,9 @@
-import Foundation
-
-public enum MotionAuthorization: Sendable, Equatable {
-    case authorized
-    case denied
-    case unavailable
-}
-
-public enum RunMode: Sendable, Equatable {
-    case adaptive
-    case fixed
-}
-
-public struct RunSummary: Sendable, Equatable {
-    public let durationSeconds: Int
-    public let averageCadence: Int?
-    public let timeInStepPercent: Int
-    public let songCount: Int
-
-    public init(durationSeconds: Int, averageCadence: Int?, timeInStepPercent: Int, songCount: Int) {
-        self.durationSeconds = durationSeconds
-        self.averageCadence = averageCadence
-        self.timeInStepPercent = timeInStepPercent
-        self.songCount = songCount
-    }
-}
-
-public struct RunSession: Sendable, Equatable {
-    public let id: Int
-    public var mode: RunMode
-    public var elapsedActiveSeconds: Int
-    public var cadenceTotal: Int
-    public var cadenceSamples: Int
-    public var inStepSamples: Int
-    public var eligibleInStepSamples: Int
-    public var songCount: Int
-    public var trackIndex: Int
-    public var trackElapsedSeconds: Int
-
-    public init(id: Int, mode: RunMode = .adaptive) {
-        self.id = id
-        self.mode = mode
-        elapsedActiveSeconds = 0
-        cadenceTotal = 0
-        cadenceSamples = 0
-        inStepSamples = 0
-        eligibleInStepSamples = 0
-        songCount = 1
-        trackIndex = 0
-        trackElapsedSeconds = 0
-    }
-
-    public mutating func recordSecond(cadence: Int?, inStep: Bool?) {
-        elapsedActiveSeconds += 1
-        trackElapsedSeconds += 1
-        if let cadence {
-            cadenceTotal += cadence
-            cadenceSamples += 1
-        }
-        if let inStep {
-            eligibleInStepSamples += 1
-            if inStep { inStepSamples += 1 }
-        }
-    }
-
-    public var summary: RunSummary {
-        RunSummary(
-            durationSeconds: elapsedActiveSeconds,
-            averageCadence: cadenceSamples == 0 ? nil : cadenceTotal / cadenceSamples,
-            timeInStepPercent: eligibleInStepSamples == 0 ? 0 : (inStepSamples * 100) / eligibleInStepSamples,
-            songCount: songCount
-        )
-    }
-}
-
-public enum PreparationStage: Sendable, Equatable {
-    case authorization
-    case playback(RunMode)
-}
-
-public struct Preparation: Sendable, Equatable {
-    public var session: RunSession
-    public var stage: PreparationStage
-}
-
-public enum RhythmState: Sendable, Equatable {
-    case acquiring(priorSPM: Int?, acquisitionID: Int)
-    case locked(spm: Int)
-    case fixed
-}
-
-public enum ControlsState: Sendable, Equatable {
-    case hidden
-    case timed(timeoutID: Int)
-    case voiceOverPinned
-}
-
-public enum RunActivity: Sendable, Equatable {
-    case playing(rhythm: RhythmState, controls: ControlsState)
-    case paused(rhythm: RhythmState)
-
-    public var rhythm: RhythmState {
-        switch self {
-        case let .playing(rhythm, _), let .paused(rhythm): rhythm
-        }
-    }
-}
-
-public enum FinishHold: Sendable, Equatable {
-    case armed
-    case pressing(holdID: Int)
-}
-
-public struct ActiveRun: Sendable, Equatable {
-    public var session: RunSession
-    public var activity: RunActivity
-}
-
-public struct FinishConfirmation: Sendable, Equatable {
-    public var session: RunSession
-    public var origin: RunActivity
-    public var hold: FinishHold
-}
-
-public enum RouteAvailability: Sendable, Equatable {
-    case missing
-    case restored
-}
-
-public struct RouteRecovery: Sendable, Equatable {
-    public var session: RunSession
-    public var origin: RunActivity
-    public var availability: RouteAvailability
-}
-
-public enum RunState: Sendable, Equatable {
-    case ready
-    case preparing(Preparation)
-    case permissionRecovery(RunSession)
-    case active(ActiveRun)
-    case confirmingFinish(FinishConfirmation)
-    case routeRecovery(RouteRecovery)
-    case finishing(RunSession)
-    case summary(RunSummary)
-}
-
-public enum HapticEvent: Sendable, Equatable {
-    case start
-    case lock
-    case pause
-    case resume
-    case finish
-}
-
-public enum RunTaskKind: Sendable, Equatable, Hashable {
-    case authorization
-    case preparation
-    case acquisition
-    case controlsTimeout
-    case finishHold
-    case ticker
-    case finishing
-    case lockBrief
-    case simulatedRoute
-}
-
-public enum RunEffect: Sendable, Equatable {
-    case requestMotionAuthorization(sessionID: Int)
-    case preparePlayback(sessionID: Int, mode: RunMode)
-    case beginPlayback(sessionID: Int)
-    case beginCadenceAcquisition(sessionID: Int, acquisitionID: Int, priorSPM: Int?)
-    case pausePlayback(sessionID: Int)
-    case resumePlayback(sessionID: Int)
-    case previousTrack(sessionID: Int)
-    case skipTrack(sessionID: Int)
-    case scheduleControlsTimeout(sessionID: Int, timeoutID: Int)
-    case scheduleFinishHold(sessionID: Int, holdID: Int)
-    case fadeAndStop(sessionID: Int)
-    case persistSummary(RunSummary)
-    case emitHaptic(HapticEvent)
-    case cancelTask(sessionID: Int, RunTaskKind)
-    case cancelAllTasks(sessionID: Int)
-}
-
-public enum RunEvent: Sendable, Equatable {
-    case startTapped(sessionID: Int)
-    case authorizationResolved(sessionID: Int, MotionAuthorization)
-    case useFixedRhythmTapped
-    case playbackPrepared(sessionID: Int)
-    case cadenceLocked(sessionID: Int, acquisitionID: Int, spm: Int)
-    case surfaceTapped(timeoutID: Int)
-    case controlsTimedOut(timeoutID: Int)
-    case controlsFocusEntered
-    case controlsFocusExited(timeoutID: Int)
-    case pauseTapped
-    case resumeTapped(acquisitionID: Int, timeoutID: Int)
-    case previousTapped
-    case skipTapped
-    case finishTapped
-    case finishHoldBegan(holdID: Int)
-    case finishHoldCancelled(holdID: Int)
-    case finishHoldCompleted(holdID: Int)
-    case finishConfirmationCancelled(timeoutID: Int)
-    case audioRouteLost
-    case audioRouteRestored
-    case routeResumeTapped(acquisitionID: Int, timeoutID: Int)
-    case activeSecond
-    case finishCompleted(sessionID: Int)
-    case summaryDismissed
-}
-
 public struct RunReducer: Sendable {
-    public init() {}
+    private let trackCount: Int
+
+    public init(trackCount: Int = 3) {
+        self.trackCount = max(trackCount, 1)
+    }
 
     public func reduce(state: RunState, event: RunEvent) -> (RunState, [RunEffect]) {
         switch (state, event) {
@@ -222,7 +15,7 @@ public struct RunReducer: Sendable {
             )
 
         case let (.preparing(preparation), .authorizationResolved(sessionID, authorization))
-            where preparation.session.id == sessionID && preparation.stage == .authorization:
+        where preparation.session.id == sessionID && preparation.stage == .authorization:
             switch authorization {
             case .authorized:
                 var next = preparation
@@ -241,19 +34,28 @@ public struct RunReducer: Sendable {
             )
 
         case let (.preparing(preparation), .playbackPrepared(sessionID))
-            where preparation.session.id == sessionID:
+        where preparation.session.id == sessionID:
             let session = preparation.session
             switch preparation.stage {
             case .playback(.adaptive):
                 let acquisitionID = 1
                 return (
-                    .active(ActiveRun(
-                        session: session,
-                        activity: .playing(rhythm: .acquiring(priorSPM: nil, acquisitionID: acquisitionID), controls: .hidden)
-                    )),
+                    .active(
+                        ActiveRun(
+                            session: session,
+                            activity: .playing(
+                                rhythm: .acquiring(priorSPM: nil, acquisitionID: acquisitionID),
+                                controls: .hidden
+                            )
+                        )
+                    ),
                     [
                         .beginPlayback(sessionID: session.id),
-                        .beginCadenceAcquisition(sessionID: session.id, acquisitionID: acquisitionID, priorSPM: nil),
+                        .beginCadenceAcquisition(
+                            sessionID: session.id,
+                            acquisitionID: acquisitionID,
+                            priorSPM: nil
+                        ),
                     ]
                 )
             case .playback(.fixed):
@@ -267,8 +69,9 @@ public struct RunReducer: Sendable {
 
         case let (.active(active), .cadenceLocked(sessionID, acquisitionID, spm)):
             guard active.session.id == sessionID,
-                  case let .playing(.acquiring(_, currentID), controls) = active.activity,
-                  currentID == acquisitionID else { return (state, []) }
+                case let .playing(.acquiring(_, currentID), controls) = active.activity,
+                currentID == acquisitionID
+            else { return (state, []) }
             var next = active
             next.activity = .playing(rhythm: .locked(spm: spm), controls: controls)
             return (.active(next), [.emitHaptic(.lock), .cancelTask(sessionID: sessionID, .acquisition)])
@@ -284,15 +87,15 @@ public struct RunReducer: Sendable {
 
         case let (.active(active), .controlsTimedOut(timeoutID)):
             guard case let .playing(rhythm, .timed(currentID)) = active.activity,
-                  currentID == timeoutID else { return (state, []) }
+                currentID == timeoutID
+            else { return (state, []) }
             var next = active
             next.activity = .playing(rhythm: rhythm, controls: .hidden)
             return (.active(next), [])
 
         case let (.active(active), .controlsFocusEntered):
-            guard case let .playing(rhythm, controls) = active.activity,
-                  case .hidden = controls else {
-                if case let .playing(rhythm, .timed(_)) = active.activity {
+            guard case let .playing(rhythm, controls) = active.activity, case .hidden = controls else {
+                if case let .playing(rhythm, .timed) = active.activity {
                     var next = active
                     next.activity = .playing(rhythm: rhythm, controls: .voiceOverPinned)
                     return (.active(next), [.cancelTask(sessionID: active.session.id, .controlsTimeout)])
@@ -307,7 +110,10 @@ public struct RunReducer: Sendable {
             guard case let .playing(rhythm, .voiceOverPinned) = active.activity else { return (state, []) }
             var next = active
             next.activity = .playing(rhythm: rhythm, controls: .timed(timeoutID: timeoutID))
-            return (.active(next), [.scheduleControlsTimeout(sessionID: active.session.id, timeoutID: timeoutID)])
+            return (
+                .active(next),
+                [.scheduleControlsTimeout(sessionID: active.session.id, timeoutID: timeoutID)]
+            )
 
         case let (.active(active), .pauseTapped):
             guard case let .playing(rhythm, _) = active.activity else { return (state, []) }
@@ -334,30 +140,42 @@ public struct RunReducer: Sendable {
                 cadenceEffect = []
             case let .locked(spm):
                 resumedRhythm = .acquiring(priorSPM: spm, acquisitionID: acquisitionID)
-                cadenceEffect = [.beginCadenceAcquisition(sessionID: active.session.id, acquisitionID: acquisitionID, priorSPM: spm)]
+                cadenceEffect = [
+                    .beginCadenceAcquisition(
+                        sessionID: active.session.id,
+                        acquisitionID: acquisitionID,
+                        priorSPM: spm
+                    )
+                ]
             case let .acquiring(prior, _):
                 resumedRhythm = .acquiring(priorSPM: prior, acquisitionID: acquisitionID)
-                cadenceEffect = [.beginCadenceAcquisition(sessionID: active.session.id, acquisitionID: acquisitionID, priorSPM: prior)]
+                cadenceEffect = [
+                    .beginCadenceAcquisition(
+                        sessionID: active.session.id,
+                        acquisitionID: acquisitionID,
+                        priorSPM: prior
+                    )
+                ]
             }
             var next = active
             next.activity = .playing(rhythm: resumedRhythm, controls: .timed(timeoutID: timeoutID))
             return (
                 .active(next),
                 [.resumePlayback(sessionID: active.session.id), .emitHaptic(.resume)] + cadenceEffect + [
-                    .scheduleControlsTimeout(sessionID: active.session.id, timeoutID: timeoutID),
+                    .scheduleControlsTimeout(sessionID: active.session.id, timeoutID: timeoutID)
                 ]
             )
 
         case let (.active(active), .skipTapped):
             var next = active
-            next.session.trackIndex = (next.session.trackIndex + 1) % 3
+            next.session.trackIndex = (next.session.trackIndex + 1) % trackCount
             next.session.songCount += 1
             next.session.trackElapsedSeconds = 0
             return (.active(next), [.skipTrack(sessionID: active.session.id)])
 
         case let (.active(active), .previousTapped):
             var next = active
-            next.session.trackIndex = (next.session.trackIndex + 2) % 3
+            next.session.trackIndex = (next.session.trackIndex - 1 + trackCount) % trackCount
             next.session.trackElapsedSeconds = 0
             return (.active(next), [.previousTrack(sessionID: active.session.id)])
 
@@ -367,7 +185,9 @@ public struct RunReducer: Sendable {
                 return (state, [])
             case .playing, .paused:
                 return (
-                    .confirmingFinish(FinishConfirmation(session: active.session, origin: active.activity, hold: .armed)),
+                    .confirmingFinish(
+                        FinishConfirmation(session: active.session, origin: active.activity, hold: .armed)
+                    ),
                     [.cancelTask(sessionID: active.session.id, .controlsTimeout)]
                 )
             }
@@ -401,18 +221,6 @@ public struct RunReducer: Sendable {
                 ]
             )
 
-        case let (.confirmingFinish(confirmation), .finishConfirmationCancelled(timeoutID)):
-            let active = ActiveRun(session: confirmation.session, activity: confirmation.origin)
-            if case let .playing(rhythm, _) = confirmation.origin {
-                var next = active
-                next.activity = .playing(rhythm: rhythm, controls: .timed(timeoutID: timeoutID))
-                return (
-                    .active(next),
-                    [.cancelTask(sessionID: confirmation.session.id, .finishHold), .scheduleControlsTimeout(sessionID: confirmation.session.id, timeoutID: timeoutID)]
-                )
-            }
-            return (.active(active), [.cancelTask(sessionID: confirmation.session.id, .finishHold)])
-
         case let (.active(active), .audioRouteLost):
             return routeRecovery(from: active.session, origin: active.activity)
 
@@ -429,7 +237,8 @@ public struct RunReducer: Sendable {
 
         case let (.routeRecovery(recovery), .routeResumeTapped(acquisitionID, timeoutID)):
             guard recovery.availability == .restored,
-                  case let .playing(rhythm, _) = recovery.origin else { return (state, []) }
+                case let .playing(rhythm, _) = recovery.origin
+            else { return (state, []) }
             let nextRhythm: RhythmState
             var effects: [RunEffect] = [.resumePlayback(sessionID: recovery.session.id)]
             switch rhythm {
@@ -437,14 +246,36 @@ public struct RunReducer: Sendable {
                 nextRhythm = .fixed
             case let .locked(spm):
                 nextRhythm = .acquiring(priorSPM: spm, acquisitionID: acquisitionID)
-                effects.append(.beginCadenceAcquisition(sessionID: recovery.session.id, acquisitionID: acquisitionID, priorSPM: spm))
+                effects.append(
+                    .beginCadenceAcquisition(
+                        sessionID: recovery.session.id,
+                        acquisitionID: acquisitionID,
+                        priorSPM: spm
+                    )
+                )
             case let .acquiring(prior, _):
                 nextRhythm = .acquiring(priorSPM: prior, acquisitionID: acquisitionID)
-                effects.append(.beginCadenceAcquisition(sessionID: recovery.session.id, acquisitionID: acquisitionID, priorSPM: prior))
+                effects.append(
+                    .beginCadenceAcquisition(
+                        sessionID: recovery.session.id,
+                        acquisitionID: acquisitionID,
+                        priorSPM: prior
+                    )
+                )
             }
-            effects.append(.scheduleControlsTimeout(sessionID: recovery.session.id, timeoutID: timeoutID))
+            effects.append(
+                .scheduleControlsTimeout(sessionID: recovery.session.id, timeoutID: timeoutID)
+            )
             return (
-                .active(ActiveRun(session: recovery.session, activity: .playing(rhythm: nextRhythm, controls: .timed(timeoutID: timeoutID)))),
+                .active(
+                    ActiveRun(
+                        session: recovery.session,
+                        activity: .playing(
+                            rhythm: nextRhythm,
+                            controls: .timed(timeoutID: timeoutID)
+                        )
+                    )
+                ),
                 effects
             )
 
@@ -452,15 +283,18 @@ public struct RunReducer: Sendable {
             guard case let .playing(rhythm, _) = active.activity else { return (state, []) }
             var next = active
             switch rhythm {
-            case let .locked(spm): next.session.recordSecond(cadence: spm, inStep: true)
-            case .fixed: next.session.recordSecond(cadence: nil, inStep: nil)
-            case .acquiring: return (state, [])
+            case let .locked(spm):
+                next.session.recordSecond(cadence: spm, inStep: true)
+            case .fixed:
+                next.session.recordSecond(cadence: nil, inStep: nil)
+            case .acquiring:
+                return (state, [])
             }
             return (.active(next), [])
 
         case let (.finishing(session), .finishCompleted(sessionID)) where session.id == sessionID:
             let summary = session.summary
-            return (.summary(summary), [.persistSummary(summary)])
+            return (.summary(summary), [])
 
         case (.summary, .summaryDismissed):
             return (.ready, [])
@@ -478,18 +312,5 @@ public struct RunReducer: Sendable {
                 .pausePlayback(sessionID: session.id),
             ]
         )
-    }
-}
-
-public extension RunState {
-    var session: RunSession? {
-        switch self {
-        case .ready, .summary: nil
-        case let .preparing(value): value.session
-        case let .permissionRecovery(value), let .finishing(value): value
-        case let .active(value): value.session
-        case let .confirmingFinish(value): value.session
-        case let .routeRecovery(value): value.session
-        }
     }
 }

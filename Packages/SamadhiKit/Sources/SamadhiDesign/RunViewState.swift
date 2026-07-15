@@ -37,13 +37,11 @@ public struct RunViewState: Sendable, Equatable {
     public var phase: RunVisualPhase
     public var controlsVisible: Bool
     public var cadenceSPM: Int?
-    public var elapsedSeconds: Int
     public var trackElapsedSeconds: Int
     public var trackProgress: Double
     public var track: TrackMetadata
     public var hasArtwork: Bool
     public var showLockBrief: Bool
-    public var fixedRhythm: Bool
     public var forceReduceMotion: Bool
     public var forceIncreasedContrast: Bool
 
@@ -51,26 +49,22 @@ public struct RunViewState: Sendable, Equatable {
         phase: RunVisualPhase,
         controlsVisible: Bool = false,
         cadenceSPM: Int? = nil,
-        elapsedSeconds: Int = 0,
         trackElapsedSeconds: Int = 0,
         trackProgress: Double = 0,
         track: TrackMetadata = .demoTracks[0],
         hasArtwork: Bool = true,
         showLockBrief: Bool = false,
-        fixedRhythm: Bool = false,
         forceReduceMotion: Bool = false,
         forceIncreasedContrast: Bool = false
     ) {
         self.phase = phase
         self.controlsVisible = controlsVisible
         self.cadenceSPM = cadenceSPM
-        self.elapsedSeconds = elapsedSeconds
         self.trackElapsedSeconds = trackElapsedSeconds
         self.trackProgress = min(max(trackProgress, 0), 1)
         self.track = track
         self.hasArtwork = hasArtwork
         self.showLockBrief = showLockBrief
-        self.fixedRhythm = fixedRhythm
         self.forceReduceMotion = forceReduceMotion
         self.forceIncreasedContrast = forceIncreasedContrast
     }
@@ -88,7 +82,6 @@ public enum RunAction: Sendable, Equatable {
     case finishHoldBegan
     case finishHoldCancelled
     case finishHoldCompleted
-    case cancelFinish
     case useFixedRhythm
     case openSettings
     case routeResume

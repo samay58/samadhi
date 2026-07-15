@@ -72,12 +72,14 @@ public struct FluidMusicField: View {
             return mode == .ready
                 ? [
                     SamadhiColor.parchment, Color(red: 0.78, green: 0.75, blue: 0.69), SamadhiColor.ivory,
-                    Color(red: 0.63, green: 0.58, blue: 0.53), Color(red: 0.44, green: 0.43, blue: 0.39), Color(red: 0.72, green: 0.68, blue: 0.61),
+                    Color(red: 0.63, green: 0.58, blue: 0.53), Color(red: 0.44, green: 0.43, blue: 0.39),
+                    Color(red: 0.72, green: 0.68, blue: 0.61),
                     SamadhiColor.ivory, Color(red: 0.58, green: 0.61, blue: 0.55), SamadhiColor.parchment,
                 ]
                 : [
                     SamadhiColor.plum, Color(red: 0.37, green: 0.35, blue: 0.32), SamadhiColor.ink,
-                    Color(red: 0.34, green: 0.32, blue: 0.29), Color(red: 0.26, green: 0.28, blue: 0.25), Color(red: 0.35, green: 0.31, blue: 0.29),
+                    Color(red: 0.34, green: 0.32, blue: 0.29), Color(red: 0.26, green: 0.28, blue: 0.25),
+                    Color(red: 0.35, green: 0.31, blue: 0.29),
                     SamadhiColor.ink, Color(red: 0.32, green: 0.35, blue: 0.31), SamadhiColor.plum,
                 ]
         }
@@ -86,13 +88,16 @@ public struct FluidMusicField: View {
         case .ready:
             return [
                 SamadhiColor.parchment, Color(red: 0.95, green: 0.73, blue: 0.48), SamadhiColor.ivory,
-                Color(red: 0.82, green: 0.43, blue: 0.27), Color(red: 0.48, green: 0.29, blue: 0.31), Color(red: 0.91, green: 0.58, blue: 0.35),
-                Color(red: 0.58, green: 0.64, blue: 0.48), Color(red: 0.87, green: 0.73, blue: 0.53), SamadhiColor.parchment,
+                Color(red: 0.82, green: 0.43, blue: 0.27), Color(red: 0.48, green: 0.29, blue: 0.31),
+                Color(red: 0.91, green: 0.58, blue: 0.35),
+                Color(red: 0.58, green: 0.64, blue: 0.48), Color(red: 0.87, green: 0.73, blue: 0.53),
+                SamadhiColor.parchment,
             ]
         case .running:
             return [
                 SamadhiColor.plum, Color(red: 0.55, green: 0.28, blue: 0.24), Color(red: 0.28, green: 0.18, blue: 0.22),
-                Color(red: 0.62, green: 0.31, blue: 0.22), Color(red: 0.39, green: 0.28, blue: 0.28), Color(red: 0.45, green: 0.24, blue: 0.24),
+                Color(red: 0.62, green: 0.31, blue: 0.22), Color(red: 0.39, green: 0.28, blue: 0.28),
+                Color(red: 0.45, green: 0.24, blue: 0.24),
                 Color(red: 0.31, green: 0.38, blue: 0.28), Color(red: 0.42, green: 0.39, blue: 0.27), SamadhiColor.ink,
             ]
         }
@@ -101,7 +106,8 @@ public struct FluidMusicField: View {
     private func contourLines(at time: TimeInterval) -> some View {
         Canvas { context, size in
             let slow = time * 0.13
-            let color = mode == .ready
+            let color =
+                mode == .ready
                 ? SamadhiColor.ink.opacity(0.10)
                 : SamadhiColor.ivory.opacity(0.12)
 

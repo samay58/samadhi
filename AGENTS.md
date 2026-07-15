@@ -2,13 +2,13 @@
 
 ## Product
 - This is a minimal body-aware music player, not a fitness platform.
-- Do not add features not present in PRODUCT.md.
+- Do not add features not present in Docs/PRODUCT.md and Docs/PLAN.md.
 - The shipped app contains no AI or network dependency.
 - Interaction quality and reliable audio behavior outrank feature breadth.
 
 ## Architecture
 - Keep SamadhiDomain free of UI and Apple media frameworks.
-- Use the functional-core, actor-shell architecture in ARCHITECTURE.md.
+- Use the functional-core, main-actor-shell architecture in Docs/ARCHITECTURE.md.
 - Do not introduce a production dependency without documenting why.
 - Do not call audio or motion services directly from SwiftUI views.
 - Represent mutually exclusive states with enums, not boolean clusters.
@@ -28,7 +28,7 @@
 - Do not claim cadence quality without physical-device evidence.
 - Do not claim audio quality without a listening check.
 - Keep Docs/DECISIONS.md and Docs/TESTING.md current.
+- Update Docs/STATUS.md, Docs/PLAN.md, and Docs/PROGRESS.md at each milestone boundary.
 
 ## Scope discipline
-- When a requested implementation implies new scope, stop and record it under Deferred rather than silently adding it.
-
+- When implementation implies new scope, stop and record decision in Docs/PLAN.md rather than silently adding it.
