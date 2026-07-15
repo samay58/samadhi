@@ -1,38 +1,78 @@
-# Product
+# Product ethos
 
 ## Promise
 
-Your run sets the rhythm. The music meets you there.
+**Music in stride.**
 
-Samadhi is a body-aware music player. A runner opens it, sees their music, presses Start, and moves. The interface confirms cadence lock, then recedes.
+Samadhi should make movement and music feel like one calm system. Name refers to meditative consciousness: absorbed attention, steady motion, reduced self-consciousness.
 
-The name refers to meditative consciousness. The desired feeling is absorbed and present: movement and music becoming one calm field rather than a fitness dashboard demanding attention.
+Runner opens app, presses Start, begins moving. Music finds their rhythm. Interface confirms lock, then withdraws.
 
-## Active scope
+## Felt outcome
 
-Milestone 0 establishes the repository, build, testing, and evidence framework. Milestone 1 proves the complete interaction using deterministic simulated cadence and a simulated beat clock.
+Success is not more workout data. Success is runner forgetting app and feeling inside music.
 
-Included states are ready, starting, acquiring, locked running, controls revealed, paused, resumed, finish hold, summary, motion-permission recovery, and audio-route recovery. Accessibility coverage includes Reduce Motion, large Dynamic Type, high contrast, missing artwork, and long metadata.
+Experience should create:
 
-The ready surface uses a full-screen, deterministic fluid music field instead of square cover art. It moves slowly enough to preserve hierarchy, uses the selected collection palette, freezes under Reduce Motion, and tightens into the tempo aperture after Start. It is rendered locally and contains no generated video, network fetch, or model call.
+- Fast arrival into rhythm
+- Stable sensation despite noisy body data
+- Clear confidence without constant metrics
+- Music-led attention
+- Safe, honest recovery when sensing or audio fails
 
-The rest of the app must not feel flat. Depth comes from one clearly prioritized object, native raised controls, responsive compression, and spatial continuity between states. Do not add card stacks, extra chrome, or simultaneous motion layers. Inspired by Avec's one-object-at-a-time focus and v0 for iOS's native-control discipline, every screen keeps one centerpiece and one obvious next action.
+## Product laws
 
-## Excluded
+### One action before motion
 
-No Core Motion, production audio engine, Apple Music, Spotify, GPS, maps, distance, pace, coaching, plans, social features, streaks, recommendations, accounts, analytics, AI, backend, subscription, dashboard, or tab bar.
+Returning runner starts with one deliberate action.
 
-## Acceptance
+### Music first
 
-- A returning user starts with one action.
-- Cadence uncertainty feels calm.
-- Lock is clear without demanding attention.
-- The running state is legible in a one-second glance.
-- Controls are available but not persistent.
-- Finish resists accidental activation.
-- The summary is restrained.
-- Every meaningful state has deterministic preview coverage.
-- Reduce Motion and accessibility text sizes preserve the flow.
-- The ambient field fills the screen without competing with collection identity or Start.
+Cadence is input, not content. Song, atmosphere, and rhythm outrank telemetry.
 
-The complete implementation brief is preserved in `Docs/PRODUCT-HANDOFF.md`.
+### Confirm, then withdraw
+
+UI becomes visible during preparation, uncertainty, and direct manipulation. Stable playback should feel quiet.
+
+### Continuity over spectacle
+
+Objects transform in place. Motion explains state. No transition competes with music.
+
+### Stability over responsiveness theater
+
+Raw sensor changes never drive frantic UI. Product should feel composed when input is noisy.
+
+### Honest capability
+
+Never imply beat-perfect adaptation, real cadence quality, or audio quality before physical proof exists.
+
+### Local by default
+
+No account, cloud backend, remote listening history, analytics SDK, ad identifier, or model call.
+
+### No product inflation
+
+No dashboard, map, coaching layer, streak, social surface, recommendation feed, or tab bar. Central interaction must carry product.
+
+## Design character
+
+Warm, tactile, restrained, native. Depth signals hierarchy, not decoration.
+
+- One visual owner at a time
+- Open typography instead of passive cards
+- Glass only for raised interactive controls
+- Full-screen atmosphere that supports music identity
+- Motion frozen or reduced when tempo aperture owns attention
+- Readable text across palette, Dynamic Type, high contrast, and Reduce Motion
+
+Design benchmark research lives in [DESIGN-BENCHMARKS.md](DESIGN-BENCHMARKS.md).
+
+## Current product test
+
+Current build answers one question: can complete run interaction feel calm, legible, and coherent before real sensing and audio exist?
+
+Answer: yes in Simulator. Physical cadence and adaptive audio remain unproven.
+
+## Current exclusions
+
+Core Motion, production audio, music import, Apple Music, Spotify, GPS, maps, pace, distance, coaching, plans, social features, accounts, analytics, subscriptions, and backend remain outside current build.

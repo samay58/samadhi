@@ -15,7 +15,9 @@
 		8E48AE66560F367C401395CF /* SamadhiMotion in Frameworks */ = {isa = PBXBuildFile; productRef = 87200EBB3D911863E80E185E /* SamadhiMotion */; };
 		A592E055654CAC8DE4DBEAD1 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8200E148AF4ABACA3B47ADA2 /* Assets.xcassets */; };
 		A9FE8C130C33F60BB2C2925B /* SamadhiTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 131DED91DED56986EDD4FE9B /* SamadhiTests.swift */; };
+		AADD64A3B49FF8F3E42C941C /* RunTaskStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 475C0E9AEDB57921D9893CA3 /* RunTaskStore.swift */; };
 		BFB93B5F0188CF63A19E30CB /* RunPresentationModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27E4457C2F93694193D8E85D /* RunPresentationModel.swift */; };
+		D2DEE5D8F696BC6339CA819B /* SimulationConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95B076E4388E9E61360A6215 /* SimulationConfiguration.swift */; };
 		D80D703E28BBEBEDC8A9AE3A /* SamadhiDesign in Frameworks */ = {isa = PBXBuildFile; productRef = A48F446192EFBD7579C7BF67 /* SamadhiDesign */; };
 		EC41CEFCE78C60A45AD5680A /* SamadhiApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1CE55560A18BCBFBAF13E01 /* SamadhiApp.swift */; };
 /* End PBXBuildFile section */
@@ -40,9 +42,11 @@
 /* Begin PBXFileReference section */
 		131DED91DED56986EDD4FE9B /* SamadhiTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SamadhiTests.swift; sourceTree = "<group>"; };
 		27E4457C2F93694193D8E85D /* RunPresentationModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RunPresentationModel.swift; sourceTree = "<group>"; };
+		475C0E9AEDB57921D9893CA3 /* RunTaskStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RunTaskStore.swift; sourceTree = "<group>"; };
 		64781032C8A2BA5D5DD7DF6C /* Samadhi.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Samadhi.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		8200E148AF4ABACA3B47ADA2 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		84DEE35021BD9A5D2A7F5F45 /* SamadhiUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SamadhiUITests.swift; sourceTree = "<group>"; };
+		95B076E4388E9E61360A6215 /* SimulationConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SimulationConfiguration.swift; sourceTree = "<group>"; };
 		A28146360481C17881F591C3 /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
 		AB90BB4B3A76F3AFC7FD65D2 /* SamadhiKit */ = {isa = PBXFileReference; lastKnownFileType = folder; name = SamadhiKit; path = Packages/SamadhiKit; sourceTree = SOURCE_ROOT; };
 		B1CE55560A18BCBFBAF13E01 /* SamadhiApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SamadhiApp.swift; sourceTree = "<group>"; };
@@ -141,7 +145,9 @@
 			children = (
 				A28146360481C17881F591C3 /* RootView.swift */,
 				27E4457C2F93694193D8E85D /* RunPresentationModel.swift */,
+				475C0E9AEDB57921D9893CA3 /* RunTaskStore.swift */,
 				B1CE55560A18BCBFBAF13E01 /* SamadhiApp.swift */,
+				95B076E4388E9E61360A6215 /* SimulationConfiguration.swift */,
 			);
 			path = App;
 			sourceTree = "<group>";
@@ -298,7 +304,9 @@
 			files = (
 				59F6A7F42EF07136C8A749D2 /* RootView.swift in Sources */,
 				BFB93B5F0188CF63A19E30CB /* RunPresentationModel.swift in Sources */,
+				AADD64A3B49FF8F3E42C941C /* RunTaskStore.swift in Sources */,
 				EC41CEFCE78C60A45AD5680A /* SamadhiApp.swift in Sources */,
+				D2DEE5D8F696BC6339CA819B /* SimulationConfiguration.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -28,9 +28,10 @@ public struct BrandMark: View {
             context.stroke(
                 ribbon,
                 with: .linearGradient(
-                    Gradient(colors: inverted
-                        ? [SamadhiColor.ivory, SamadhiColor.apricot, SamadhiColor.ivory]
-                        : [SamadhiColor.plum, SamadhiColor.clay, SamadhiColor.olive]),
+                    Gradient(
+                        colors: inverted
+                            ? [SamadhiColor.ivory, SamadhiColor.apricot, SamadhiColor.ivory]
+                            : [SamadhiColor.plum, SamadhiColor.clay, SamadhiColor.olive]),
                     startPoint: .zero,
                     endPoint: CGPoint(x: size.width, y: size.height)
                 ),

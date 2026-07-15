@@ -1,32 +1,57 @@
-# Testing
+# Verification
 
-## Repeatable commands
+## Full gate
 
-```sh
+~~~sh
 ./Scripts/bootstrap.sh
 ./Scripts/test.sh
-```
+~~~
 
-## Milestone 0
+Scripts/test.sh runs Swift package tests, app-model tests, and UI tests serially on iPhone 17 Pro Simulator.
 
-- Generate the Xcode project.
-- Build the app for the selected Simulator.
-- Run Swift package tests.
-- Run app unit and UI test targets.
+Latest gate passed 15 Swift package tests, 2 app-model tests, and 4 UI tests. Result summary lives at Evidence/Logs/final-test-summary.json.
 
-## Milestone 1
+Formatter gate:
 
-- Reducer transition tests cover all phases and recovery paths.
-- Summary tests verify excluded acquisition and paused time.
-- Domain effect tests verify cancellation ordering, route safety, VoiceOver control pinning, finish persistence, and song-progress resets.
-- Beat-clock and cadence-provider tests verify deterministic phase, paused freezing, ordered samples, and completion.
-- Preview matrix covers every meaningful product and accessibility state.
-- Golden XCUITest covers Start, lock, controls, pause, resume, skip, finish hold, summary, and Done.
-- Failure XCUITests cover permission denial and route loss.
-- Missing-artwork UI coverage starts the run rather than checking only the ready screen.
+~~~sh
+DEVELOPER_DIR=/Applications/Xcode-beta.app/Contents/Developer \
+  xcrun swift-format lint --configuration .swift-format --recursive \
+  App Packages/SamadhiKit/Sources Packages/SamadhiKit/Tests Tests
+~~~
 
-## Evidence record
+## Coverage
 
-Runtime commands, Simulator identity, test outcomes, screenshots, and known limitations are recorded in `Docs/BUILD_LOG.md`.
+Domain tests cover:
 
-The iOS 27 beta runtime can terminate UI test runners when tests execute concurrently. `Scripts/test.sh` disables parallel testing; the serial suite is the repeatable gate and passes cleanly.
+- Adaptive and fixed starts
+- Stale cadence and timeout tokens
+- Paused-time exclusion
+- Resume reacquisition with cadence prior
+- Permission fallback
+- Route loss and explicit resume
+- Finish visibility and hold identity
+- Cancellation ordering
+- VoiceOver control pinning
+- Mixed summary metrics
+- Track progress reset and configured collection wraparound
+
+UI tests cover:
+
+- Complete golden run
+- Motion permission recovery
+- Audio route recovery
+- Missing artwork
+
+App-model tests cover ready mapping and start transition.
+
+## Visual proof
+
+Final frames under Evidence/Simulator/ cover ready, locked run, controls, summary, and Home Screen icon. Evidence/Previews/ covers accessibility text and state-specific visual checks.
+
+## Truth boundary
+
+Simulator verifies interaction, accessibility structure, reducer behavior, resource packaging, and deterministic motion. It cannot validate physical cadence quality, real headphone route behavior, tempo adaptation, or listening artifacts.
+
+## Known environment behavior
+
+iOS 27 beta Simulator can terminate concurrent UI test runners. Test script disables parallel execution. Serial suite is required gate.

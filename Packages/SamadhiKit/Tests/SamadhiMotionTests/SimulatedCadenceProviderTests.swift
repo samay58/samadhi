@@ -1,4 +1,5 @@
 import Testing
+
 @testable import SamadhiMotion
 
 @Test func cadenceSimulationHasDeterministicOrderingAndCompletion() async {

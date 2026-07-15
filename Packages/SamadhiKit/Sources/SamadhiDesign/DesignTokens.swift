@@ -21,8 +21,6 @@ public enum Space {
 }
 
 public enum MotionToken {
-    public static let immediate = 0.09
     public static let control = 0.18
     public static let transition = 0.42
-    public static let settle = 0.65
 }

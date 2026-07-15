@@ -1,41 +1,39 @@
 # Decisions
 
-## D-001. Deployment target
+## iOS 26 target
 
-Target iOS 26. The installed Xcode 27 SDK is used to compile, but the product target remains the handoff's specified minimum.
+Use iOS 26 for personal prototype. One platform language is worth narrower compatibility. Revisit only if public distribution becomes active goal.
 
-## D-002. Project generation
+## Reproducible project
 
-Use XcodeGen to keep the Xcode project reproducible and reviewable. XcodeGen is a development tool only and adds no shipped dependency.
+Use XcodeGen. Generated project stays versioned and reviewable. XcodeGen remains development-only dependency.
 
-## D-003. Milestone 1 simulation boundary
+## Simulation boundary
 
-Use deterministic simulated cadence and beat-clock implementations. Do not link Core Motion or build a production audio graph.
+Milestone 1 uses deterministic cadence and beat timing. It does not link Core Motion or production audio frameworks. Simulator proves interaction, not physical quality.
 
-## D-004. State architecture
+## State architecture
 
-Use a pure reducer and one main-actor presentation model. Avoid screen-level view models and mutually exclusive boolean clusters.
+Use pure reducer plus one main-actor presentation model. Avoid screen view models and boolean phase clusters.
 
-## D-005. Evidence substitute
+## Native ambient surface
 
-Appshots and Record & Replay are unavailable locally. Preserve Simulator screenshots, video, runtime UI snapshots, logs, XCUITests, and preview-host proof instead. Do not label these substitutes as Appshots.
+Use local MeshGradient, restrained contours, and tempo aperture. No generated video, hosted animation, or free-running visual loop. Native rendering stays sharp, state-aware, and interruptible.
 
-## D-006. Ambient visual surface
+## Depth through hierarchy
 
-Replace the square demo artwork with a native full-screen fluid field built from `MeshGradient` and restrained contour lines. The field is deterministic, collection-colored, local, and frozen under Reduce Motion. Do not use generated video, AgentCash, hosted assets, or a free-running decorative loop. The live renderer is cheaper, sharper at every device size, and can preserve continuity into the tempo aperture.
+Use one visual owner. Reserve glass for controls. Use open typography and tonal washes for passive information. Persistent rings must communicate progress or cadence.
 
-## D-007. Product-wide depth
+## Brand
 
-Use depth as interaction hierarchy, not decoration. The musical surface is continuous, one object owns attention, and native glass is reserved for controls that sit above it. State changes should compress, settle, reveal, or transform in place. Summary and recovery screens remain still enough to signal a change in energy. This takes the useful lessons from Avec and v0 for iOS without copying their layout or importing a web component system.
+Product name is Samadhi. “In step” remains lowercase cadence metric. Public tagline is “music in stride.”
 
-## D-008. Open information hierarchy
+Use compact interlocking ribbon icon on opaque parchment. In-app mark uses native ribbon drawing instead of square icon.
 
-Do not use passive glass or bordered cards for labels, music identity, recovery copy, or summary metrics. Use spacing, type scale, and edge-free tonal contrast fields. Glass indicates an actionable control. Persistent circular marks must communicate progress or cadence state.
+## Evidence
 
-## D-009. Brand mark boundary
+Simulator screenshots, preview states, test logs, and result summary prove current build. They do not prove physical cadence or listening quality.
 
-Use the first user-provided interlocking ribbon direction for the production app icon. Refine it on an opaque parchment field, scale it for a 60-point Home Screen presentation, and keep it free of text and literal fitness or music symbols. Use the native ribbon glyph inside the interface so a square app icon is never nested into the app chrome. The icon decision, optical scale, and generation record are versioned in `Docs/BRAND.md`.
+## Documentation
 
-## D-010. Product name
-
-Rename the product to Samadhi across the application target, Xcode project and scheme, bundle identifiers, Swift package modules, tests, documentation, repository folder, and final handoff path. Preserve “in step” only as a lowercase cadence-quality metric. Samadhi names the intended feeling of meditative consciousness.
+Active truth lives in PRODUCT.md, STATUS.md, and PLAN.md. Architecture, decisions, testing, progress, and brand support those files. Superseded build handoff and completed prompt artifacts were removed; Git history preserves them.

@@ -1,4 +1,5 @@
 import Testing
+
 @testable import SamadhiDomain
 
 private let reducer = RunReducer()
@@ -44,7 +45,8 @@ private let reducer = RunReducer()
 
     state = reducer.reduce(state: state, event: .resumeTapped(acquisitionID: 8, timeoutID: 9)).0
     guard case let .active(active) = state,
-          case let .playing(.acquiring(prior, acquisitionID), .timed(timeoutID)) = active.activity else {
+        case let .playing(.acquiring(prior, acquisitionID), .timed(timeoutID)) = active.activity
+    else {
         Issue.record("Expected reacquiring run")
         return
     }
@@ -65,7 +67,8 @@ private let reducer = RunReducer()
     state = reducer.reduce(state: state, event: .useFixedRhythmTapped).0
     state = reducer.reduce(state: state, event: .playbackPrepared(sessionID: 10)).0
     guard case let .active(active) = state,
-          case .playing(.fixed, .hidden) = active.activity else {
+        case .playing(.fixed, .hidden) = active.activity
+    else {
         Issue.record("Expected fixed rhythm playback")
         return
     }
@@ -84,7 +87,8 @@ private let reducer = RunReducer()
 
     state = reducer.reduce(state: state, event: .routeResumeTapped(acquisitionID: 12, timeoutID: 13)).0
     guard case let .active(active) = state,
-          case let .playing(.acquiring(prior, acquisitionID), .timed(timeoutID)) = active.activity else {
+        case let .playing(.acquiring(prior, acquisitionID), .timed(timeoutID)) = active.activity
+    else {
         Issue.record("Expected explicit reacquisition")
         return
     }
@@ -114,21 +118,23 @@ private let reducer = RunReducer()
 
 @Test func pauseCancelsTransientWorkBeforeStoppingPlayback() {
     let result = reducer.reduce(state: lockedRun(), event: .pauseTapped)
-    #expect(result.1 == [
-        .cancelTask(sessionID: 1, .acquisition),
-        .cancelTask(sessionID: 1, .controlsTimeout),
-        .cancelTask(sessionID: 1, .ticker),
-        .pausePlayback(sessionID: 1),
-        .emitHaptic(.pause),
-    ])
+    #expect(
+        result.1 == [
+            .cancelTask(sessionID: 1, .acquisition),
+            .cancelTask(sessionID: 1, .controlsTimeout),
+            .cancelTask(sessionID: 1, .ticker),
+            .pausePlayback(sessionID: 1),
+            .emitHaptic(.pause),
+        ])
 }
 
 @Test func routeLossCancelsAllWorkAndPausesPlayback() {
     let result = reducer.reduce(state: lockedRun(), event: .audioRouteLost)
-    #expect(result.1 == [
-        .cancelAllTasks(sessionID: 1),
-        .pausePlayback(sessionID: 1),
-    ])
+    #expect(
+        result.1 == [
+            .cancelAllTasks(sessionID: 1),
+            .pausePlayback(sessionID: 1),
+        ])
 }
 
 @Test func voiceOverFocusPinsControlsAndReschedulesTimeoutOnExit() {
@@ -144,7 +150,7 @@ private let reducer = RunReducer()
     #expect(result.1 == [.scheduleControlsTimeout(sessionID: 1, timeoutID: 6)])
 }
 
-@Test func finishingPersistsMixedSummaryMetrics() {
+@Test func finishingBuildsMixedSummaryMetrics() {
     var session = RunSession(id: 21)
     session.recordSecond(cadence: 160, inStep: true)
     session.recordSecond(cadence: 180, inStep: false)
@@ -153,7 +159,7 @@ private let reducer = RunReducer()
     let result = reducer.reduce(state: .finishing(session), event: .finishCompleted(sessionID: 21))
     let expected = RunSummary(durationSeconds: 2, averageCadence: 170, timeInStepPercent: 50, songCount: 3)
     #expect(result.0 == .summary(expected))
-    #expect(result.1 == [.persistSummary(expected)])
+    #expect(result.1.isEmpty)
 }
 
 @Test func changingTracksResetsSongProgress() {
@@ -167,6 +173,16 @@ private let reducer = RunReducer()
     #expect(result.0.session?.trackIndex == 1)
     #expect(result.0.session?.songCount == 2)
     #expect(result.1 == [.skipTrack(sessionID: 1)])
+}
+
+@Test func trackNavigationUsesConfiguredCollectionSize() {
+    let twoTrackReducer = RunReducer(trackCount: 2)
+
+    var state = twoTrackReducer.reduce(state: lockedRun(), event: .previousTapped).0
+    #expect(state.session?.trackIndex == 1)
+
+    state = twoTrackReducer.reduce(state: state, event: .skipTapped).0
+    #expect(state.session?.trackIndex == 0)
 }
 
 private func lockedRun() -> RunState {

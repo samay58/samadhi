@@ -24,23 +24,32 @@ private let previewSend: @MainActor (RunAction) -> Void = { _ in }
 }
 
 #Preview("Controls visible") {
-    SamadhiScreen(state: RunViewState(phase: .running, controlsVisible: true, cadenceSPM: 168, elapsedSeconds: 428, trackElapsedSeconds: 91, trackProgress: 0.43), send: previewSend)
+    SamadhiScreen(
+        state: RunViewState(
+            phase: .running, controlsVisible: true, cadenceSPM: 168, trackElapsedSeconds: 91,
+            trackProgress: 0.43), send: previewSend)
 }
 
 #Preview("Paused") {
-    SamadhiScreen(state: RunViewState(phase: .paused, controlsVisible: true, cadenceSPM: 168, elapsedSeconds: 428, trackElapsedSeconds: 91, trackProgress: 0.43), send: previewSend)
+    SamadhiScreen(
+        state: RunViewState(
+            phase: .paused, controlsVisible: true, cadenceSPM: 168, trackElapsedSeconds: 91,
+            trackProgress: 0.43), send: previewSend)
 }
 
 #Preview("Finish confirmation") {
-    SamadhiScreen(state: RunViewState(phase: .confirmingFinish, cadenceSPM: 168, elapsedSeconds: 428, trackElapsedSeconds: 91, trackProgress: 0.43), send: previewSend)
+    SamadhiScreen(
+        state: RunViewState(
+            phase: .confirmingFinish, cadenceSPM: 168, trackElapsedSeconds: 91, trackProgress: 0.43
+        ), send: previewSend)
 }
 
 #Preview("Headphones disconnected") {
-    SamadhiScreen(state: RunViewState(phase: .routeRecovery(restored: false), elapsedSeconds: 428), send: previewSend)
+    SamadhiScreen(state: RunViewState(phase: .routeRecovery(restored: false)), send: previewSend)
 }
 
 #Preview("Route restored") {
-    SamadhiScreen(state: RunViewState(phase: .routeRecovery(restored: true), elapsedSeconds: 428), send: previewSend)
+    SamadhiScreen(state: RunViewState(phase: .routeRecovery(restored: true)), send: previewSend)
 }
 
 #Preview("Motion permission denied") {
@@ -49,7 +58,9 @@ private let previewSend: @MainActor (RunAction) -> Void = { _ in }
 
 #Preview("Summary") {
     SamadhiScreen(
-        state: RunViewState(phase: .summary(RunSummary(durationSeconds: 1938, averageCadence: 171, timeInStepPercent: 84, songCount: 4))),
+        state: RunViewState(
+            phase: .summary(RunSummary(durationSeconds: 1938, averageCadence: 171, timeInStepPercent: 84, songCount: 4))
+        ),
         send: previewSend
     )
 }
@@ -59,12 +70,17 @@ private let previewSend: @MainActor (RunAction) -> Void = { _ in }
 }
 
 #Preview("Accessibility text") {
-    SamadhiScreen(state: RunViewState(phase: .running, controlsVisible: true, cadenceSPM: 168, elapsedSeconds: 428), send: previewSend)
-        .environment(\.dynamicTypeSize, .accessibility5)
+    SamadhiScreen(
+        state: RunViewState(phase: .running, controlsVisible: true, cadenceSPM: 168),
+        send: previewSend
+    )
+    .environment(\.dynamicTypeSize, .accessibility5)
 }
 
 #Preview("High contrast") {
-    SamadhiScreen(state: RunViewState(phase: .running, controlsVisible: true, cadenceSPM: 168, forceIncreasedContrast: true), send: previewSend)
+    SamadhiScreen(
+        state: RunViewState(phase: .running, controlsVisible: true, cadenceSPM: 168, forceIncreasedContrast: true),
+        send: previewSend)
 }
 
 #Preview("Long metadata") {

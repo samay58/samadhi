@@ -4,18 +4,45 @@
 
 *music in stride*
 
-Samadhi is a native iPhone interaction prototype for a body-aware music player. Milestones 0 and 1 use deterministic simulated cadence and a simulated beat clock. Core Motion and adaptive audio are intentionally outside this build.
+Samadhi is a native iPhone music experience that lets a runner's cadence and music settle into one rhythm. Current build proves complete interaction with deterministic simulated cadence and beat timing. It does not yet sense a physical run or adapt real audio.
 
-## Requirements
+## Current state
 
-- Xcode 27 or later with an iOS Simulator
-- XcodeGen
+Milestones 0 and 1 are complete. App builds for iOS 26, covers full run flow, preserves calm recovery behavior, supports accessibility states, and passes automated domain, presentation, and UI tests.
+
+Start with [product ethos](Docs/PRODUCT.md), then read [current status](Docs/STATUS.md) and [next plan](Docs/PLAN.md).
 
 ## Build
 
-```sh
+Requirements:
+
+- Xcode with iOS 26 SDK support
+- XcodeGen
+
+~~~sh
 ./Scripts/bootstrap.sh
 ./Scripts/test.sh
-```
+~~~
 
-The generated Xcode project targets iOS 26 and contains no third-party production dependencies.
+Code formatting:
+
+~~~sh
+DEVELOPER_DIR=/Applications/Xcode-beta.app/Contents/Developer \
+  xcrun swift-format lint --configuration .swift-format --recursive \
+  App Packages/SamadhiKit/Sources Packages/SamadhiKit/Tests Tests
+~~~
+
+## Project guide
+
+| Question | Source |
+| --- | --- |
+| What feeling are we building? | [Docs/PRODUCT.md](Docs/PRODUCT.md) |
+| Where are we now? | [Docs/STATUS.md](Docs/STATUS.md) |
+| What happens next? | [Docs/PLAN.md](Docs/PLAN.md) |
+| How is code shaped? | [Docs/ARCHITECTURE.md](Docs/ARCHITECTURE.md) |
+| Why were key choices made? | [Docs/DECISIONS.md](Docs/DECISIONS.md) |
+| What proves current behavior? | [Docs/TESTING.md](Docs/TESTING.md) |
+| What changed over time? | [Docs/PROGRESS.md](Docs/PROGRESS.md) |
+| How should brand feel? | [Docs/BRAND.md](Docs/BRAND.md) |
+
+No third-party production dependency ships in app.
