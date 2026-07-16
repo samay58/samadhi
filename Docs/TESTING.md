@@ -9,7 +9,7 @@
 
 Scripts/test.sh runs Swift package tests, app-model tests, and UI tests serially on iPhone 17 Pro Simulator.
 
-The 2026-07-16 full gate passed 32 Swift package tests, 2 app-model tests, and 4 UI tests. The added coverage proves identified playback progress, preparation failure, and the deterministic player contract.
+The 2026-07-16 full serial gate passed 37 package tests, 2 app-model tests, and 4 UI tests.
 
 Formatter gate:
 
@@ -49,6 +49,16 @@ Motion tests cover:
 - Walking-range rejection, isolated spike rejection, and sustained missing cadence
 
 The Core Motion adapter compiles for a generic iPhone target. Its sensor quality is not covered by automated tests.
+
+Tempo-analysis tests cover:
+
+- Periodic onset detection at 120, 150, 168, and 190 BPM
+- Half and double tempo equivalence within 2 percent
+- Alternating accents
+- Silence and irregular-onset rejection
+- Mono and stereo audio-file decoding through the public analysis interface
+
+These generated fixtures validate the module seam, not music accuracy. The twelve-excerpt real-music corpus remains open.
 
 UI tests cover:
 
@@ -96,7 +106,7 @@ The `Samadhi MusicKit Gate` scheme verifies that the harness and framework calls
 
 ## Next source gate
 
-Run one verified-tempo catalog track through the production adapter, then connect Core Motion and the adaptation policy. Before Milestone 2 completion, record a concise Bluetooth listening note and prove five screen-locked minutes, next track, controlled interruption, and route loss.
+Run resolved catalog previews through the estimator and compare them with known references. Choose one verified-tempo fixture, run it through the production adapter, then connect Core Motion and the adaptation policy. Before Milestone 2 completion, record one concise Bluetooth listening note and prove five screen-locked minutes, next track, controlled interruption, and route loss.
 
 ## Known environment behavior
 

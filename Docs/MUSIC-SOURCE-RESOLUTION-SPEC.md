@@ -56,40 +56,32 @@ Before Milestone 2 completion, prove five screen-locked minutes, pause, resume, 
 
 Pass requires continuous background audio, correct observable state, no unauthorized auto-resume after route loss, and a clean return to the run experience. Apple Music is already the selected production player, but Milestone 2 cannot complete until this gate passes.
 
-### Local-file fallback
+### Closed local-file contingency
 
-If any Apple gate fails, use SwiftUI multi-file import for supported DRM-free audio. Copy selected files into Application Support, release security-scoped access immediately, analyze each local file, and play through `AVAudioEngine`, `AVAudioPlayerNode`, and `AVAudioUnitTimePitch`.
+Before source selection, a load-bearing Apple Music failure would have selected SwiftUI multi-file import and an app-owned audio engine. That contingency is now closed for Milestone 2. A future platform-level failure requires a new explicit source decision; it does not justify maintaining two players.
 
-The local path preserves the same source-neutral collection, track, tempo, cadence, progress, adaptation, event, and effect models. Only the provider adapter changes. Apple Music spike code is removed after its evidence and decision are saved.
+The source-neutral collection, track, tempo, cadence, progress, adaptation, event, and effect models remain deliberately independent of MusicKit. This keeps the architecture honest without carrying a dormant second adapter.
 
 ## User Stories
 
-1. As a runner, I want to choose a collection I already know, so that Samadhi becomes useful before it tries to recommend music.
-2. As a runner, I want the chosen source to keep playing with the screen locked, so that a run does not depend on an open app.
+1. As a runner, I want to choose an Apple Music collection I already know, so that Samadhi becomes useful before it tries to recommend music.
+2. As a runner, I want music to continue with the screen locked, so that a run does not depend on an open app.
 3. As a runner, I want tempo changes to preserve pitch and sound natural, so that adaptation does not damage the music.
 4. As a runner, I want incompatible tracks to play normally or be skipped honestly, so that the app never forces a bad match.
 5. As a runner, I want route loss to pause safely and require an explicit resume, so that music does not restart unexpectedly.
-6. As an Apple Music user, I want permission requested in context, so that I understand why Samadhi needs library access.
-7. As an Apple Music user, I want my real playlists to load, so that setup is short and familiar.
-8. As an Apple Music user, I want Samadhi to explain when Apple account or source access is unavailable, so that a configuration failure is not presented as an empty library.
-9. As a local-file user, I want to import several songs in one action, so that the fallback still supports a meaningful run.
-10. As a local-file user, I want imported songs copied into app storage, so that playback does not depend on a temporary Files permission.
-11. As a local-file user, I want unsupported or protected files identified individually, so that one bad file does not discard the whole collection.
-12. As a runner, I want analysis progress before a run begins, so that the app does not pretend an unknown track can be matched.
-13. As a runner, I want real song progress and transitions, so that the ring and controls reflect the audio I hear.
-14. As a runner, I want the lock state to mean a measured tempo match, so that the interface makes no beat-phase claim it cannot prove.
-15. As a runner, I want the summary to report tempo-matched time only when it was measured, so that fixed rhythm remains Not measured.
-16. As a developer, I want one production player, so that recovery, background behavior, and testing stay coherent.
-17. As a developer, I want provider callbacks converted to source-neutral events, so that the reducer remains the owner of run phase.
-18. As a developer, I want simulation behind the same boundaries, so that repeatable tests never require a personal library or network.
-19. As a developer, I want physical traces to include source, device, OS, route, track, and result, so that a pass can be audited later.
-20. As a maintainer, I want rejected provider code removed after the decision, so that the repository reflects the product rather than its experiments.
+6. As an Apple Music user, I want permission requested in context and configuration failures explained plainly.
+7. As an Apple Music user, I want my real playlists to load in their original order.
+8. As a runner, I want analysis progress before a run begins, so that Samadhi does not pretend an unknown track can be matched.
+9. As a runner, I want real song progress and transitions, so that the ring and controls reflect the audio I hear.
+10. As a runner, I want lock and summary language to report measured tempo matching without implying foot-strike phase.
+11. As a developer, I want provider callbacks converted to identified source-neutral events, so that the reducer remains the owner of run phase.
+12. As a developer, I want deterministic simulation and auditable physical evidence, so that normal tests do not require a personal library or network.
 
 ## Implementation Decisions
 
 ### One production player
 
-The source decision is exclusive. Apple Music wins only if every gate passes. Otherwise local files win. There is no provider selector, no dual adapter graph, and no dormant rejected implementation.
+Apple Music is the selected production player. There is no provider selector, dual adapter graph, or dormant local-file implementation. Deferred reliability checks can block Milestone 2 completion, but they do not silently reopen the source decision.
 
 ### Existing seams remain authoritative
 
@@ -132,7 +124,7 @@ Spotify is rejected as a production source for adaptive playback in Milestone 2.
 | Alter track playback | Developer Policy requires content to remain in original form | Conflicts with Samadhi's core behavior |
 | One coherent player | Would require Spotify plus another audio path | Violates one-player rule |
 
-Spotify playlist metadata import is also deferred. It would create a second account and identity system while leaving playback unsolved. Local multi-file import is the smaller honest fallback.
+Spotify playlist metadata import is also deferred. It would create a second account and identity system while leaving playback unsolved.
 
 ### Tempo identity
 
@@ -198,9 +190,9 @@ After source selection, the full serial Xcode gate must pass before a milestone 
 
 ### Immediate execution order
 
-1. Run one catalog track with a verified tempo through the production adapter.
-2. Connect real cadence and bounded adaptation.
-3. Build playlist import, analysis, persistence, progress, and transitions.
+1. Validate resolved previews through the local estimator and choose one verified-tempo catalog fixture.
+2. Run that fixture through the production adapter, then connect real cadence and bounded adaptation.
+3. Build playlist import, analysis persistence, progress, and transitions.
 4. Complete Bluetooth listening, five locked minutes, next track, controlled interruption, and route loss before Milestone 2 completion.
 
 ### Verified platform sources

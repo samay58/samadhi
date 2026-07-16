@@ -3,6 +3,7 @@
     import Foundation
     @preconcurrency import MusicKit
     import Observation
+    import SamadhiAudio
     import UIKit
 
     struct FeasibilityTraceEntry: Codable, Identifiable, Sendable {
@@ -30,6 +31,7 @@
         private(set) var requiresExplicitResume = false
 
         private let player = ApplicationMusicPlayer.shared
+        private let tempoAnalyzer = LocalTempoAnalyzer()
         private var monitoringTasks: [Task<Void, Never>] = []
         private var lastPlayerState = ""
         private var lastHeartbeat = Date.distantPast
@@ -150,7 +152,7 @@
 
                 let sample = Array(tracks.prefix(10))
                 var analyzable = 0
-                for track in sample where await self.previewYieldsPCM(track) {
+                for track in sample where await self.previewYieldsTempo(track) {
                     analyzable += 1
                 }
                 self.analyzableCoverage =
@@ -307,7 +309,7 @@
             }
         }
 
-        private func previewYieldsPCM(_ track: Track) async -> Bool {
+        private func previewYieldsTempo(_ track: Track) async -> Bool {
             let resolvedTrack = await trackWithCatalogPreview(for: track)
             guard let url = resolvedTrack.previewAssets?.compactMap({ $0.url ?? $0.hlsURL }).first
             else {
@@ -318,38 +320,15 @@
             do {
                 let localURL = try await localPreviewURL(for: url)
                 defer { try? FileManager.default.removeItem(at: localURL) }
-                let asset = AVURLAsset(url: localURL)
-                guard try await asset.load(.isPlayable),
-                    let audioTrack = try await asset.loadTracks(withMediaType: .audio).first
-                else {
-                    record("preview_unreadable", track.title)
+                guard let analysis = try await tempoAnalyzer.analyze(fileURL: localURL) else {
+                    record("preview_tempo_rejected", track.title)
                     return false
                 }
-
-                let reader = try AVAssetReader(asset: asset)
-                let output = AVAssetReaderTrackOutput(
-                    track: audioTrack,
-                    outputSettings: [
-                        AVFormatIDKey: kAudioFormatLinearPCM,
-                        AVLinearPCMBitDepthKey: 32,
-                        AVLinearPCMIsFloatKey: true,
-                        AVLinearPCMIsNonInterleaved: false,
-                    ]
+                record(
+                    "preview_tempo_estimated",
+                    "\(track.title); \(analysis.baseBPM.formatted(.number.precision(.fractionLength(1)))) BPM; confidence \(analysis.confidence.formatted(.number.precision(.fractionLength(2)))); version \(analysis.version)"
                 )
-                guard reader.canAdd(output) else {
-                    record("preview_undecodable", track.title)
-                    return false
-                }
-                reader.add(output)
-                guard reader.startReading() else {
-                    record("preview_undecodable", track.title)
-                    return false
-                }
-
-                let yieldedPCM = output.copyNextSampleBuffer() != nil
-                reader.cancelReading()
-                record(yieldedPCM ? "preview_decoded" : "preview_empty", track.title)
-                return yieldedPCM
+                return true
             } catch {
                 record("preview_error", "\(track.title); \(error)")
                 return false
