@@ -20,8 +20,8 @@ Milestone 2 turns the interaction prototype into a useful music product.
 
 Build in this order:
 
-1. Run the Apple Music feasibility gate on a physical iPhone.
-2. Choose Apple Music or local file import as the one production source.
+1. Sign one clean physical build with a fresh exact-App-ID development profile and retry one minimal Apple catalog request.
+2. If the token request passes, complete Apple Music tempo-source, listening, background, interruption, and route gates. If it fails, choose local file import immediately.
 3. Prove real cadence and one known-tempo track through the selected player.
 4. Add tempo analysis and import at least three usable tracks.
 5. Connect real progress, honest lock, summary, background playback, and recovery.
@@ -30,12 +30,14 @@ Build in this order:
 ## Current gate state
 
 - Apple Music feasibility: authorization, library loading, playback, rate writes, pause, and resume passed; direct previews failed and catalog resolution is blocked by automatic developer-token failure
+- Token remediation: one fresh development profile bound to the exact App ID is the final bounded retry
+- Spotify feasibility: rejected for adaptive playback; it cannot supply the required app-owned, analyzable, rate-controlled audio path
 - Source decision: open; neither Apple Music nor local files has been selected
 - Source-neutral domain and adaptation rules: complete for the current slice
 - Cadence boundary, deterministic filter, and Core Motion adapter: built but not physically calibrated or connected to the normal run flow
 - Device harness: equivalent-ID catalog retry is installed on a physical iPhone 17 Pro and recorded 40 `.developerTokenRequestFailed` results
 
-While the physical gate is blocked, only work that does not choose the player path may continue. No production player implementation begins until automatic catalog access produces real evidence.
+The exact execution and stop rules live in [MUSIC-SOURCE-RESOLUTION-SPEC.md](MUSIC-SOURCE-RESOLUTION-SPEC.md). No production player implementation begins until the exact-profile catalog request produces real evidence. A repeated token failure selects local files rather than opening a backend or second-provider project.
 
 ## Milestone boundary
 

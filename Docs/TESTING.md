@@ -84,7 +84,13 @@ The `Samadhi MusicKit Gate` scheme verifies that the harness and framework calls
 - Direct library preview coverage: failed at 0 of 10 in every sample
 - ISRC catalog retry: blocked because all 40 sampled tracks omitted ISRC
 - Equivalent-ID catalog retry: blocked by 40 `.developerTokenRequestFailed` results before catalog response
+- Installed development profiles: only Xcode-managed wildcard `ZL5U59XBJ6.*` found; no exact Samadhi profile is installed
+- Spotify adaptive playback: rejected by documented platform capability and policy review; no code spike warranted
 - Listening, screen-lock background, controlled interruption, and route-loss checks: not proven
+
+## Next source gate
+
+Create a fresh development profile for the exact Samadhi App ID, sign and install a clean harness build, inspect the embedded identity, and run one minimal catalog request. Save the trace under `Evidence/Device/`. A real catalog response passes the token gate. A repeated `developerTokenRequestFailed` result after one clean reinstall fails it and selects local-file playback.
 
 ## Known environment behavior
 

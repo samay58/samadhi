@@ -339,7 +339,7 @@ The milestone requires all of the following:
 
 ### Where we are now
 
-Milestones 0 and 1 are complete. Milestone 2 source-neutral models, adaptation policy, cadence filtering, Core Motion boundary, honest summary measurement, and device harness are built. The signed harness installs and launches on a physical iPhone 17 Pro. Authorization, library loading, decoded-preview coverage, real playback, listening quality, background continuity, interruptions, and route loss remain unproven. No production music source has been chosen.
+Milestones 0 and 1 are complete. Milestone 2 source-neutral models, adaptation policy, cadence filtering, Core Motion boundary, honest summary measurement, and device harness are built. The signed harness installs and launches on a physical iPhone 17 Pro. Authorization, library loading, real playback, live rate writes, pause, and resume pass. Direct preview coverage fails at 0 of 10. Catalog resolution is blocked by automatic developer-token failure. Spotify has been evaluated and rejected for adaptive playback. One exact-App-ID profile retry now decides whether the remaining Apple gates continue or the local-file fallback begins. See [MUSIC-SOURCE-RESOLUTION-SPEC.md](MUSIC-SOURCE-RESOLUTION-SPEC.md).
 
 ### Build order
 
