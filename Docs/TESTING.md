@@ -96,7 +96,7 @@ The `Samadhi MusicKit Gate` scheme verifies that the harness and framework calls
 - Physical device signing, build, installation, and launch: passed
 - Focused body-to-music exact-profile build, installation, and launch argument: passed
 - Physical cadence seam: passed for a 29-second walk with changing cadence and a 142 SPM average
-- Automatic cadence-driven rate response: not yet observed; the first walk was incompatible with the original 170.25 BPM fixture and the 139.5 BPM follow-up produced no perceptible change
+- Automatic cadence-driven rate response: passed; the corrected 59-second physical run averaged 155 SPM and measured 98 percent tempo matched from MusicKit read-back
 - Focused rate diagnostics: target, pending feedback, and MusicKit read-back are shown separately; commanded values are no longer echoed as applied
 - Contextual Music authorization and 40-playlist loading: passed
 - Real playback plus 0.94, 1.00, and 1.06 rate writes: passed mechanically
@@ -116,7 +116,7 @@ The `Samadhi MusicKit Gate` scheme verifies that the harness and framework calls
 
 ## Next implementation gate
 
-Run one brief walk or jog with focused catalog fixture `1558215042`, estimated at 149.75 BPM. Confirm the diagnostic target and applied rates move below 1.00, then note whether the speed change sounds natural. Cadence display has already passed and does not need a separate repeat. If read-back and listening pass, start playlist import and persistence. Before Milestone 2 completion, record one concise Bluetooth listening note and prove five screen-locked minutes, next track, controlled interruption, and route loss.
+Build playlist import and persistence, then analyze at least three selected tracks through the existing local analyzer. Connect real progress and transitions without changing the normal app's visual language. Before Milestone 2 completion, record one concise Bluetooth listening note and prove five screen-locked minutes, next track, controlled interruption, and route loss.
 
 ## Known environment behavior
 

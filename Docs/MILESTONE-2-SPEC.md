@@ -335,16 +335,15 @@ The milestone requires all of the following:
 
 ### Where we are now
 
-Milestones 0 and 1 are complete. Apple Music is the selected Milestone 2 source. A validated 149.75 BPM fixture, Core Motion cadence, bounded reducer adaptation, identified MusicKit read-back, and honest measurement are connected in the focused core-loop scheme. Analyzer version 2 uses Accelerate spectral flux and fractional-lag autocorrelation and passes the narrow 12-preview corpus. A 29-second physical walk produced changing cadence and a 142 SPM average. A 139.5 BPM follow-up produced no perceptible speed change, so the focused build now shows target and read-back separately. The normal app remains simulated until import is connected. Automatic rate response remains unproven.
+Milestones 0 and 1 are complete. Apple Music is the selected Milestone 2 source. A validated 149.75 BPM fixture, Core Motion cadence, bounded reducer adaptation, identified MusicKit read-back, and honest measurement pass together in the focused core-loop scheme. The corrected 59-second physical run averaged 155 SPM and measured 98 percent tempo matched. Analyzer version 2 uses Accelerate spectral flux and fractional-lag autocorrelation and passes the narrow 12-preview corpus. The normal app remains simulated until import is connected.
 
 ### Build order
 
-1. Prove the connected fixture, physical cadence, and automatic rate response with one brief walk or jog.
-2. Connect playlist import, persistence, real progress, and track transitions.
-3. Expand analyzer coverage only when new real tracks expose a specific failure.
-4. Complete repeatable automated gates.
-5. Run cadence calibration, listening, background, recovery, and the outdoor completion gate.
-6. Save evidence, update active documentation, and push main.
+1. Connect playlist import, persistence, real progress, and track transitions.
+2. Expand analyzer coverage only when new real tracks expose a specific failure.
+3. Complete repeatable automated gates.
+4. Run cadence calibration, listening, background, recovery, and the outdoor completion gate.
+5. Save evidence, update active documentation, and push main.
 
 Do not redesign the app before the source decision and core audio loop pass. Do not build playlist generation before imported music works. Do not keep a failed player path “for later.”
 

@@ -163,6 +163,14 @@
 - Passed 44 package tests, 2 app-model tests, 4 UI tests, formatter lint, documentation links, and the exact-profile iPhone build
 - Left physical installation open because the iPhone became unavailable to Xcode
 
+## 2026-07-16. Automatic rate response
+
+- Installed and launched the corrected build after the iPhone reconnected
+- Completed a 59-second focused run with a 155 SPM average, one song, and 98 percent tempo matched
+- Confirmed the result depends on MusicKit read-back; a fixed 1.00 rate on the 149.75 BPM fixture cannot satisfy the three-SPM match tolerance at the observed cadence
+- Saved the user-supplied completed-run frame with a checksum and confirmed direct device capture is available for future live checks
+- Closed the automatic rate-response gate
+
 ## Current checkpoint
 
-Milestones 0 and 1 are complete. Apple Music is the selected Milestone 2 source. Live Core Motion cadence has passed a brief physical observation. A compatible 149.75 BPM fixture, bounded adaptation, and identified MusicKit read-back are connected in the focused core loop. The narrow 12-preview corpus passes. The normal app remains deterministic until import is connected. Next comes one objective automatic rate-response observation, then playlist import and persistence. Long-form background and recovery checks remain before Milestone 2 completion.
+Milestones 0 and 1 are complete. Apple Music is the selected Milestone 2 source. Live Core Motion cadence and automatic MusicKit rate response pass together on the physical iPhone. The narrow 12-preview corpus passes. The normal app remains deterministic until import is connected. Next comes playlist import and persistence, followed by three-track analysis, real progress, and transitions. Long-form background and recovery checks remain before Milestone 2 completion.

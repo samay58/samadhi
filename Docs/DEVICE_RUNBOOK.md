@@ -40,11 +40,11 @@ The app build used by `Samadhi Apple Music Core Loop` is installed on Samay's iP
 1. Unlock the phone and leave it awake.
 2. Launch `Samadhi Apple Music Core Loop` from Xcode, or launch the installed app through `devicectl` with `--apple-music-core-loop`.
 3. Press Start, secure the phone in the declared right-front pocket placement, then walk or jog briefly.
-4. In the temporary `Core loop` panel, confirm target rate appears and applied rate follows it below 1.00. `feedback pending` should settle after MusicKit is read back.
+4. In the temporary `Core loop` panel, confirm target rate appears and applied rate follows it. `feedback pending` should settle after MusicKit is read back.
 5. Listen for a natural speed response without clicks, gaps, pitch jump, or rapid hunting.
-6. Record target rate, applied rate, route, whether music speed responded, and any audible problem.
+6. Capture the device screen programmatically before finishing, or persist the focused trace. Record target rate, applied rate, route, whether music speed responded, and any audible problem.
 
-Live cadence already passed during a 29-second walk with a 142 SPM average. A 139.5 BPM follow-up produced no perceptible change. This final short check uses a clearer safe ramp and objective read-back to prove only the automatic rate-response seam. It does not replace later calibration or the Milestone 2 completion run.
+Live cadence passed during a 29-second walk with a 142 SPM average. Automatic rate response then passed during a corrected 59-second run with a 155 SPM average and 98 percent tempo matched from MusicKit read-back. The focused check does not replace later calibration or the Milestone 2 completion run.
 
 ## Automated tempo corpus
 

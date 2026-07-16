@@ -20,11 +20,10 @@ Milestone 2 turns the interaction prototype into a useful music product.
 
 Build in this order:
 
-1. Prove automatic rate response with the connected 149.75 BPM fixture and MusicKit read-back in one brief physical walk or jog. Live Core Motion cadence has passed.
-2. Import and analyze at least three usable playlist tracks.
-3. Connect persistent selection, real progress, track transitions, honest lock, and summary.
-4. Complete five locked minutes, next track, interruption, route loss, accessibility, and recovery checks.
-5. Pass cadence calibration, listening, and the outdoor-run gate.
+1. Import and analyze at least three usable playlist tracks.
+2. Connect persistent selection, real progress, track transitions, honest lock, and summary.
+3. Complete five locked minutes, next track, interruption, route loss, accessibility, and recovery checks.
+4. Pass cadence calibration, listening, and the outdoor-run gate.
 
 ## Current gate state
 
@@ -37,8 +36,8 @@ Build in this order:
 - Source-neutral domain and adaptation rules: complete for the current slice
 - Cadence boundary, deterministic filter, and Core Motion adapter: connected in the focused core loop; a 29-second walk produced live cadence and a 142 SPM average, but calibration and the normal run flow remain open
 - Production playback: validated catalog fixture `1558215042`, live cadence updates, bounded reducer effects, identified MusicKit read-back, and honest measurement are connected
-- Automated body-to-music gate: 44 package tests, 2 app-model tests, 4 UI tests, formatter, and exact-profile build pass; the corrected diagnostic build awaits installation because the iPhone is offline
-- Physical body-to-music observation: cadence passed; a 139.5 BPM follow-up produced no perceptible speed change, so automatic rate response remains open pending the objective read-back check
+- Automated body-to-music gate: 44 package tests, 2 app-model tests, 4 UI tests, formatter, exact-profile build, installation, and launch pass
+- Physical body-to-music observation: passed; the corrected 59-second run averaged 155 SPM and measured 98 percent tempo matched from MusicKit read-back
 - Device harness: exact-profile catalog search, strict identity resolution, temporary preview download, local PCM decoding, playback, rate controls, route observation, and trace export remain available on the physical iPhone 17 Pro
 
 The source decision and deferred reliability requirements live in [MUSIC-SOURCE-RESOLUTION-SPEC.md](MUSIC-SOURCE-RESOLUTION-SPEC.md). A later reliability failure must be fixed before Milestone 2 completion. It does not reopen Spotify or a second-provider project.
