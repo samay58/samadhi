@@ -50,9 +50,11 @@ Run a physical Apple Music feasibility gate first because MusicKit exposes libra
 
 Milestone 2 matches music tempo to stable cadence. It does not claim beat-perfect footfall phase. Rename the measured summary to tempo matched and defer a true in-step percentage until individual foot-strike timing exists.
 
-## Gate remains open without a device
+## Initial gate blocker
 
-No physical iPhone, Apple development team, Apple Music account, playlist, or headphone route was available during the first Milestone 2 pass. The source decision remains open. A compiling Simulator harness is preparation, not feasibility proof.
+No physical iPhone, Apple development team, Apple Music account, playlist, or headphone route was available during the first Milestone 2 pass. A compiling Simulator harness was preparation, not feasibility proof.
+
+The blocker was partially cleared on 2026-07-15. Team `ZL5U59XBJ6` is saved in the project, the explicit App ID is registered, the MusicKit App Service is user-confirmed as enabled, and the signed harness builds, installs, and launches on an iPhone 17 Pro. The source decision remains open until the physical media and listening checks finish.
 
 ## MusicKit service configuration
 

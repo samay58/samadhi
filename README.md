@@ -8,7 +8,7 @@ Samadhi is a native iPhone music experience that lets a runner's cadence and mus
 
 ## Current state
 
-Milestones 0 and 1 are complete. Milestone 2 is in progress. The Apple Music source decision is blocked until a signed physical iPhone, Apple Music account, real playlist, and headphone route are available. Safe source-neutral work has started without choosing a production player early.
+Milestones 0 and 1 are complete. Milestone 2 is in progress. The source-neutral adaptation and cadence groundwork is built. Apple signing, physical installation, and gate launch pass on an iPhone 17 Pro. The Apple Music source decision remains open while authorization, playlist, decoded-preview, playback, listening, background, interruption, and route checks run.
 
 Start with [product ethos](Docs/PRODUCT.md), then read [current status](Docs/STATUS.md), [next plan](Docs/PLAN.md), and the [Milestone 2 specification](Docs/MILESTONE-2-SPEC.md).
 

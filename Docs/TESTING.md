@@ -77,7 +77,8 @@ The `Samadhi MusicKit Gate` scheme verifies that the harness and framework calls
 - Normal Simulator app: launched and visually checked
 - MusicKit harness Simulator app: launched and visually checked
 - Background audio entry in built Info.plist: verified as an array containing `audio`
-- Physical device and listening checks: blocked
+- Physical device signing, build, installation, and launch: passed
+- Authorization, media, listening, background, interruption, and route checks: in progress
 
 ## Known environment behavior
 
