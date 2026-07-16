@@ -69,7 +69,9 @@ Production services need:
 
 Apple Music is the selected production player. `AppleMusicPlaybackController` is main-actor owned in the app target and implements the source-neutral `MusicPlaybackProviding` boundary. The codebase does not contain a second production player.
 
-The debug-only MusicKit harness sits in the app target and is not a production player. It resolves opaque library tracks through strict title, artist, album, and duration agreement, downloads each preview into temporary storage, passes the local file through `TempoAnalyzing`, records the estimate, and deletes the file. `LocalTempoAnalyzer` owns off-main PCM decoding. `TempoEstimator` owns versioned onset and autocorrelation behavior behind a small value interface. The normal app still composes simulation until import is connected.
+The debug-only MusicKit harness sits in the app target and is not a production player. It resolves opaque library tracks through strict title, artist, album, and duration agreement, downloads each preview into temporary storage, passes the local file through `TempoAnalyzing`, records the estimate, and deletes the file. `LocalTempoAnalyzer` owns off-main PCM decoding. `TempoEstimator` owns versioned Accelerate spectral-flux and fractional-lag autocorrelation behavior behind the same small interface.
+
+`TempoCorpusValidator` is an opt-in development executable. It validates fixed catalog identities whose published titles declare tempo, analyzes temporary provider-hosted previews, writes JSON evidence, and removes the audio. Normal automated tests remain offline. The normal app still composes simulation until import is connected.
 
 ## Invariants
 

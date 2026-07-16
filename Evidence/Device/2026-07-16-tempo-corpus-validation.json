@@ -1,0 +1,144 @@
+{
+  "allowedFamilyError" : 0.02,
+  "generatedAt" : "2026-07-16T15:10:26Z",
+  "passed" : true,
+  "passedCount" : 12,
+  "referenceBasis" : "The exact Apple catalog title declares the reference tempo",
+  "requiredPassCount" : 10,
+  "results" : [
+    {
+      "analysisVersion" : 2,
+      "artist" : "Power Music Workout",
+      "catalogID" : "1598194487",
+      "confidence" : 1,
+      "estimatedBPM" : 130.25,
+      "familyError" : 0.0019230769230769232,
+      "passed" : true,
+      "referenceBPM" : 130,
+      "title" : "Friday (Workout Remix 130 BPM)"
+    },
+    {
+      "analysisVersion" : 2,
+      "artist" : "Power Music Workout",
+      "catalogID" : "1383986831",
+      "confidence" : 0.8438480137922788,
+      "estimatedBPM" : 65,
+      "familyError" : 0,
+      "passed" : true,
+      "referenceBPM" : 130,
+      "title" : "Beast (Workout Remix 130 BPM)"
+    },
+    {
+      "analysisVersion" : 2,
+      "artist" : "Power Music Workout",
+      "catalogID" : "1434921088",
+      "confidence" : 1,
+      "estimatedBPM" : 139.5,
+      "familyError" : 0.0035714285714285713,
+      "passed" : true,
+      "referenceBPM" : 140,
+      "title" : "Can't Stop the Feeling! (Workout Remix 140 BPM)"
+    },
+    {
+      "analysisVersion" : 2,
+      "artist" : "Power Music Workout",
+      "catalogID" : "1434921085",
+      "confidence" : 1,
+      "estimatedBPM" : 139.5,
+      "familyError" : 0.0035714285714285713,
+      "passed" : true,
+      "referenceBPM" : 140,
+      "title" : "Level Up (Workout Remix 140 BPM)"
+    },
+    {
+      "analysisVersion" : 2,
+      "artist" : "Power Music Workout",
+      "catalogID" : "1558215042",
+      "confidence" : 1,
+      "estimatedBPM" : 149.75,
+      "familyError" : 0.0016666666666666668,
+      "passed" : true,
+      "referenceBPM" : 150,
+      "title" : "Astronaut In the Ocean (Workout Remix 150 BPM)"
+    },
+    {
+      "analysisVersion" : 2,
+      "artist" : "Power Music Workout",
+      "catalogID" : "1585442488",
+      "confidence" : 1,
+      "estimatedBPM" : 74.75,
+      "familyError" : 0.0033333333333333335,
+      "passed" : true,
+      "referenceBPM" : 150,
+      "title" : "Industry Baby (Workout Remix 150 BPM)"
+    },
+    {
+      "analysisVersion" : 2,
+      "artist" : "Power Music Workout",
+      "catalogID" : "1323303912",
+      "confidence" : 1,
+      "estimatedBPM" : 79.75,
+      "familyError" : 0.003125,
+      "passed" : true,
+      "referenceBPM" : 160,
+      "title" : "Feel It Still (Workout Remix 160 BPM)"
+    },
+    {
+      "analysisVersion" : 2,
+      "artist" : "Power Music Workout",
+      "catalogID" : "1323303916",
+      "confidence" : 1,
+      "estimatedBPM" : 160.75,
+      "familyError" : 0.0046875,
+      "passed" : true,
+      "referenceBPM" : 160,
+      "title" : "Rockstar (Workout Remix 160 BPM)"
+    },
+    {
+      "analysisVersion" : 2,
+      "artist" : "Hanna",
+      "catalogID" : "1066177773",
+      "confidence" : 1,
+      "estimatedBPM" : 170.25,
+      "familyError" : 0.0014705882352941176,
+      "passed" : true,
+      "referenceBPM" : 170,
+      "title" : "Shake It Off (Workout Remix 170 Bpm)"
+    },
+    {
+      "analysisVersion" : 2,
+      "artist" : "Speedmaster",
+      "catalogID" : "1066177779",
+      "confidence" : 1,
+      "estimatedBPM" : 170.25,
+      "familyError" : 0.0014705882352941176,
+      "passed" : true,
+      "referenceBPM" : 170,
+      "title" : "Try (Workout Remix 170 Bpm)"
+    },
+    {
+      "analysisVersion" : 2,
+      "artist" : "Power Music Workout",
+      "catalogID" : "1441808823",
+      "confidence" : 1,
+      "estimatedBPM" : 89.5,
+      "familyError" : 0.005555555555555556,
+      "passed" : true,
+      "referenceBPM" : 180,
+      "title" : "Somebody Told Me (Workout Remix 180 BPM)"
+    },
+    {
+      "analysisVersion" : 2,
+      "artist" : "Power Music Workout",
+      "catalogID" : "1307211987",
+      "confidence" : 1,
+      "estimatedBPM" : 181.25,
+      "familyError" : 0.006944444444444444,
+      "passed" : true,
+      "referenceBPM" : 180,
+      "title" : "Believer (Workout Remix 180 BPM)"
+    }
+  ],
+  "source" : "Apple catalog lookup and provider-hosted preview assets",
+  "totalCount" : 12
+}

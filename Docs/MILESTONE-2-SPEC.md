@@ -17,7 +17,7 @@ A useful version needs both halves of the loop:
 
 Building playlist browsing without adaptive playback would create a conventional music player. Building adaptive playback around one bundled test file would prove engineering but still leave the product awkward to use. This milestone must connect an imported collection to real cadence and real playback.
 
-Apple Music is the selected production player. Its song metadata does not include tempo, so Samadhi resolves preview audio, analyzes it locally, and applies the result to Apple Music playback. Real-music tempo accuracy, physical cadence, adaptation, and long-form reliability remain the open product risks.
+Apple Music is the selected production player. Its song metadata does not include tempo, so Samadhi resolves preview audio, analyzes it locally, and applies the result to Apple Music playback. A narrow 12-preview reference corpus now passes. Broad music accuracy, physical cadence, adaptation, and long-form reliability remain the open product risks.
 
 Tempo matching is also narrower than beat-perfect synchronization. Live pedometer cadence provides steps per minute, not a reliable timestamp for every foot strike. Milestone 2 matches the music's tempo to stable cadence. It does not claim that each footfall lands on a specific beat.
 
@@ -141,7 +141,7 @@ Analysis rules:
 - Cache successful analysis by stable track identity plus analysis version.
 - Run analysis before the run and off the main actor.
 
-The validation corpus contains generated metronome and syncopation fixtures plus at least twelve legally usable music excerpts with known tempos. At least ten of twelve music excerpts must land within 2 percent of the accepted tempo or its half/double equivalent. The analyzer must reject rather than mislabel at least 90 percent of deliberately ambiguous fixtures.
+The validation corpus contains generated metronome and syncopation fixtures plus twelve provider-hosted Apple previews whose exact catalog titles declare tempos from 130 through 180 BPM. The validator downloads those previews temporarily and does not redistribute them. At least ten of twelve music excerpts must land within 2 percent of the accepted tempo or its half/double equivalent. The analyzer must reject rather than confidently mislabel deliberately ambiguous fixtures. Public-distribution permission for preview analysis remains a separate requirement.
 
 ### Cadence acquisition
 
@@ -283,7 +283,7 @@ Run physical calibration at 160, 170, and 180 SPM for 60 seconds each. The locke
 
 Use generated fixtures for exact tempo, half-time ambiguity, syncopation, silence, long intro, tempo drift, and low confidence. Add legally usable music excerpts with documented reference tempo.
 
-The corpus gate is at least ten of twelve music excerpts within 2 percent of accepted tempo or its half/double equivalent. A confident wrong answer fails harder than a rejection.
+The corpus gate is at least ten of twelve music excerpts within 2 percent of accepted tempo or its half/double equivalent. Version 2 passes 12 of 12 tempo-declared Apple previews. A confident wrong answer still fails harder than a rejection, so broader music coverage remains conservative.
 
 ### Audio tests
 
@@ -335,15 +335,15 @@ The milestone requires all of the following:
 
 ### Where we are now
 
-Milestones 0 and 1 are complete. Apple Music is the selected Milestone 2 source. Source-neutral models, adaptation policy, cadence filtering, Core Motion seam, honest measurement, production playback contract, deterministic player, Apple Music adapter, PCM tempo-analysis interface, generated validation scaffold, and focused device harness are built. The first estimator uses onset energy and autocorrelation; real music still needs spectral refinement and corpus validation. The normal app remains simulated until import is connected.
+Milestones 0 and 1 are complete. Apple Music is the selected Milestone 2 source. Source-neutral models, adaptation policy, cadence filtering, Core Motion seam, honest measurement, production playback contract, deterministic player, Apple Music adapter, PCM tempo-analysis interface, real-preview validation tool, and focused device harness are built. Analyzer version 2 uses Accelerate spectral flux and fractional-lag autocorrelation and passes the narrow 12-preview corpus. The normal app remains simulated until import is connected.
 
 ### Build order
 
-1. Validate the estimator on real previews and choose one verified-tempo catalog track.
-2. Run that track through the Apple Music adapter and connect Core Motion cadence with the bounded adaptation policy.
-3. Complete spectral refinement and the legally usable music corpus.
-4. Connect playlist import, persistence, real progress, and track transitions.
-5. Connect honest lock and summary measurement to applied player state.
+1. Run verified catalog fixture `1066177773` through the Apple Music adapter.
+2. Connect Core Motion cadence with the bounded adaptation policy.
+3. Connect playlist import, persistence, real progress, and track transitions.
+4. Connect honest lock and summary measurement to applied player state.
+5. Expand analyzer coverage only when new real tracks expose a specific failure.
 6. Complete repeatable automated gates.
 7. Run cadence calibration, listening, background, recovery, and the outdoor completion gate.
 8. Save evidence, update active documentation, and push main.

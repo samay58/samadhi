@@ -20,8 +20,8 @@ Milestone 2 turns the interaction prototype into a useful music product.
 
 Build in this order:
 
-1. Validate the local estimator on resolved Apple Music previews and choose one verified-tempo catalog fixture.
-2. Run that fixture through the Apple Music adapter, then connect Core Motion and bounded rate adaptation through the existing reducer seam.
+1. Run the verified 170 BPM fixture through the Apple Music adapter.
+2. Connect Core Motion and bounded rate adaptation through the existing reducer seam.
 3. Import and analyze at least three usable playlist tracks.
 4. Connect persistent selection, real progress, track transitions, honest lock, and summary.
 5. Complete five locked minutes, next track, interruption, route loss, accessibility, and recovery checks.
@@ -31,13 +31,13 @@ Build in this order:
 
 - Apple Music feasibility: authorization, library loading, automatic token generation, strict catalog resolution, 10 of 10 local preview decodes, playback, rate writes, pause, and resume passed
 - Token remediation: complete; exact profile `Samadhi Development` fixed catalog access
-- Tempo-source feasibility: passed for City Pocket at 10 of 10 decoded previews; analyzer accuracy remains a later gate
-- Tempo-analysis implementation: PCM file analyzer and generated corpus built; real-music corpus and spectral refinement remain open
+- Tempo-source feasibility: passed for City Pocket at 10 of 10 decoded previews
+- Tempo-analysis implementation: version 2 uses Accelerate spectral flux and fractional-lag autocorrelation; 12 of 12 tempo-declared Apple previews pass the narrow corpus gate
 - Spotify feasibility: rejected for adaptive playback; it cannot supply the required app-owned, analyzable, rate-controlled audio path
 - Source decision: Apple Music selected on 2026-07-16; remaining manual drills moved to the reliability gate
 - Source-neutral domain and adaptation rules: complete for the current slice
 - Cadence boundary, deterministic filter, and Core Motion adapter: built but not physically calibrated or connected to the normal run flow
-- Production playback: source-neutral contract, deterministic player, Apple Music adapter, identified events, real duration progress, and a core-loop scheme are built
+- Production playback: source-neutral contract, deterministic player, Apple Music adapter, identified events, real duration progress, and a core-loop scheme are built around verified catalog fixture `1066177773`
 - Device harness: exact-profile catalog search, strict identity resolution, temporary preview download, local PCM decoding, playback, rate controls, route observation, and trace export remain available on the physical iPhone 17 Pro
 
 The source decision and deferred reliability requirements live in [MUSIC-SOURCE-RESOLUTION-SPEC.md](MUSIC-SOURCE-RESOLUTION-SPEC.md). A later reliability failure must be fixed before Milestone 2 completion. It does not reopen Spotify or a second-provider project.
