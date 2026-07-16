@@ -6,6 +6,18 @@ struct RootView: View {
     @State private var model = RunPresentationModel()
 
     var body: some View {
+        #if DEBUG
+            if ProcessInfo.processInfo.arguments.contains("--music-feasibility") {
+                MusicKitFeasibilityView()
+            } else {
+                samadhiScreen
+            }
+        #else
+            samadhiScreen
+        #endif
+    }
+
+    private var samadhiScreen: some View {
         SamadhiScreen(state: model.viewState) { action in
             model.send(action)
         }

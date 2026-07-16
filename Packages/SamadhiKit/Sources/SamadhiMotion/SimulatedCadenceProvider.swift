@@ -33,3 +33,26 @@ public struct SimulatedCadenceProvider: Sendable {
         }
     }
 }
+
+extension SimulatedCadenceProvider: CadenceProviding {
+    public func events() -> AsyncStream<CadenceProviderEvent> {
+        AsyncStream { continuation in
+            let task = Task {
+                for await sample in samples() {
+                    switch sample {
+                    case .acquiring:
+                        continuation.yield(
+                            .observation(CadenceObservation(stepsPerMinute: nil, elapsedSeconds: 0))
+                        )
+                    case let .locked(spm):
+                        continuation.yield(
+                            .observation(CadenceObservation(stepsPerMinute: Double(spm), elapsedSeconds: 0))
+                        )
+                    }
+                }
+                continuation.finish()
+            }
+            continuation.onTermination = { _ in task.cancel() }
+        }
+    }
+}

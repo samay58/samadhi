@@ -46,6 +46,19 @@
 - Corrected the measurement boundary from implied footfall phase to honest tempo matching
 - Updated active product, plan, architecture, decisions, status, and repository guide
 
+## 2026-07-15. Milestone 2 safe groundwork
+
+- Inspected the actual Xcode 27 SDK, signing state, connected-device list, and project capabilities
+- Found no connected physical iPhone and no configured Apple development team, so the Apple Music gate remains open
+- Added source-neutral music, tempo, cadence, progress, adaptation, and honest measurement models
+- Added deterministic adaptation tests for normalization, bounds, ramping, deadband, confidence loss, incompatible tracks, and match timing
+- Added a cadence-provider boundary, deterministic filter, Core Motion adapter, and motion tests
+- Renamed the summary measurement to tempo matched and made fixed rhythm report Not measured
+- Added music and motion permission text and verified background audio configuration
+- Added the source-controlled `Samadhi MusicKit Gate` scheme and debug harness with JSON evidence export
+- Passed Simulator and unsigned generic iPhone builds; recorded the exact physical and signing blocker
+- Passed formatter, 29 package tests, 2 app-model tests, and 4 UI tests on the final tree
+
 ## Current checkpoint
 
-Milestones 0 and 1 complete. Milestone 2 is specified and ready to begin with the Apple Music feasibility gate.
+Milestones 0 and 1 are complete. Milestone 2 safe groundwork is built. The next action is a physical run of the Apple Music harness after an iPhone is connected and the Apple development team is configured. No production source has been chosen.

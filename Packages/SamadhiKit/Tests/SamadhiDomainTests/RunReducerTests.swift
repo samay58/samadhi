@@ -10,16 +10,16 @@ private let reducer = RunReducer()
     state = reducer.reduce(state: state, event: .authorizationResolved(sessionID: 7, .authorized)).0
     state = reducer.reduce(state: state, event: .playbackPrepared(sessionID: 7)).0
 
-    state = reducer.reduce(state: state, event: .activeSecond).0
+    state = reducer.reduce(state: state, event: .activeSecond(tempoMatched: true)).0
     #expect(state.session?.elapsedActiveSeconds == 0)
 
     state = reducer.reduce(state: state, event: .cadenceLocked(sessionID: 7, acquisitionID: 1, spm: 168)).0
-    state = reducer.reduce(state: state, event: .activeSecond).0
-    state = reducer.reduce(state: state, event: .activeSecond).0
+    state = reducer.reduce(state: state, event: .activeSecond(tempoMatched: true)).0
+    state = reducer.reduce(state: state, event: .activeSecond(tempoMatched: true)).0
 
     #expect(state.session?.elapsedActiveSeconds == 2)
     #expect(state.session?.summary.averageCadence == 168)
-    #expect(state.session?.summary.timeInStepPercent == 100)
+    #expect(state.session?.summary.tempoMatchedPercent == 100)
 }
 
 @Test func staleCadenceAndTimeoutTokensDoNothing() {
@@ -40,7 +40,7 @@ private let reducer = RunReducer()
     var state = lockedRun()
     state = reducer.reduce(state: state, event: .surfaceTapped(timeoutID: 2)).0
     state = reducer.reduce(state: state, event: .pauseTapped).0
-    state = reducer.reduce(state: state, event: .activeSecond).0
+    state = reducer.reduce(state: state, event: .activeSecond(tempoMatched: nil)).0
     #expect(state.session?.elapsedActiveSeconds == 0)
 
     state = reducer.reduce(state: state, event: .resumeTapped(acquisitionID: 8, timeoutID: 9)).0
@@ -152,20 +152,27 @@ private let reducer = RunReducer()
 
 @Test func finishingBuildsMixedSummaryMetrics() {
     var session = RunSession(id: 21)
-    session.recordSecond(cadence: 160, inStep: true)
-    session.recordSecond(cadence: 180, inStep: false)
+    session.recordSecond(cadence: 160, tempoMatched: true)
+    session.recordSecond(cadence: 180, tempoMatched: false)
     session.songCount = 3
 
     let result = reducer.reduce(state: .finishing(session), event: .finishCompleted(sessionID: 21))
-    let expected = RunSummary(durationSeconds: 2, averageCadence: 170, timeInStepPercent: 50, songCount: 3)
+    let expected = RunSummary(durationSeconds: 2, averageCadence: 170, tempoMatchedPercent: 50, songCount: 3)
     #expect(result.0 == .summary(expected))
     #expect(result.1.isEmpty)
 }
 
+@Test func fixedRhythmSummaryDoesNotPretendTempoWasMeasured() {
+    var session = RunSession(id: 22, mode: .fixed)
+    session.recordSecond(cadence: nil, tempoMatched: nil)
+
+    #expect(session.summary.tempoMatchedPercent == nil)
+}
+
 @Test func changingTracksResetsSongProgress() {
     var state = lockedRun()
-    state = reducer.reduce(state: state, event: .activeSecond).0
-    state = reducer.reduce(state: state, event: .activeSecond).0
+    state = reducer.reduce(state: state, event: .activeSecond(tempoMatched: true)).0
+    state = reducer.reduce(state: state, event: .activeSecond(tempoMatched: true)).0
     #expect(state.session?.trackElapsedSeconds == 2)
 
     let result = reducer.reduce(state: state, event: .skipTapped)

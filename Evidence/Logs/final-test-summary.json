@@ -1,9 +1,9 @@
 {
-  "testedAt": "2026-07-15T18:49:51-04:00",
+  "testedAt": "2026-07-15T21:07:34-04:00",
   "deviceName": "iPhone 17 Pro",
   "osVersion": "27.0",
   "swiftPackageTests": {
-    "passed": 15,
+    "passed": 29,
     "failed": 0
   },
   "xcodeTests": {
@@ -11,6 +11,10 @@
     "failed": 0,
     "skipped": 0
   },
-  "xcresult": "Test-Samadhi-2026.07.15_18-48-51--0400.xcresult",
+  "xcresult": "Test-Samadhi-2026.07.15_21-06-36--0400.xcresult",
+  "log": "milestone-2-safe-groundwork-test.log",
+  "formatter": "Passed",
+  "unsignedGenericIPhoneBuild": "Passed",
+  "signedGenericIPhoneBuild": "Blocked: development team is blank",
   "result": "Passed"
 }

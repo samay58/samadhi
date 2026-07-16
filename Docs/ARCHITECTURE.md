@@ -20,8 +20,8 @@ Reducer owns product state transitions. App shell owns time, UIKit, haptics, tas
 
 | Module | Responsibility |
 | --- | --- |
-| SamadhiDomain | Run models, state, events, effects, reducer, summary |
-| SamadhiMotion | Cadence provider boundary and current deterministic simulation |
+| SamadhiDomain | Run models, source-neutral music and cadence values, adaptation policy, state, events, effects, reducer, summary |
+| SamadhiMotion | Cadence provider boundary, deterministic filtering and simulation, Core Motion adapter |
 | SamadhiAudio | Beat timing boundary and current deterministic simulation |
 | SamadhiDesign | Screens, controls, fluid field, aperture, previews, tokens |
 | App target | Presentation mapping, effect execution, UIKit, task ownership |
@@ -69,6 +69,8 @@ Production services need:
 
 The music-source feasibility gate selects one production player. The codebase must not retain both Apple Music and local file playback as competing implementations after the decision.
 
+The debug-only MusicKit harness sits in the app target and is not a production player. It exists only to settle the source decision on a physical iPhone. The normal app still composes simulation.
+
 ## Invariants
 
 - UI reports capability honestly
@@ -77,4 +79,5 @@ The music-source feasibility gate selects one production player. The codebase mu
 - Finish requires visible control plus hold
 - Progress resets on track navigation
 - Reduce Motion freezes ambient motion
-- No production network dependency
+- No Samadhi backend; Apple Music is the only allowed production network path if it passes the physical gate
+- Tempo match measurement enters the reducer as evidence from the app shell; the reducer does not infer a match from cadence alone

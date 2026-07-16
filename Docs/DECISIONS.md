@@ -49,3 +49,15 @@ Run a physical Apple Music feasibility gate first because MusicKit exposes libra
 ## Honest tempo matching
 
 Milestone 2 matches music tempo to stable cadence. It does not claim beat-perfect footfall phase. Rename the measured summary to tempo matched and defer a true in-step percentage until individual foot-strike timing exists.
+
+## Gate remains open without a device
+
+No physical iPhone, Apple development team, Apple Music account, playlist, or headphone route was available during the first Milestone 2 pass. The source decision remains open. A compiling Simulator harness is preparation, not feasibility proof.
+
+## MusicKit service configuration
+
+MusicKit uses an App Service enabled for the bundle identifier in the Apple developer portal. Do not add a fabricated `com.apple.developer.musickit` entitlement. The app does require `NSAppleMusicUsageDescription` and background audio mode.
+
+## Policy before adapters
+
+Tempo normalization, compatibility, rate bounds, ramping, deadband, confidence loss, and honest measurement live in SamadhiDomain. Core Motion emits source-neutral cadence events. Production callbacks still enter the reducer through the app shell.

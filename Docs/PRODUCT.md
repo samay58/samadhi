@@ -71,8 +71,8 @@ Design benchmark research lives in [DESIGN-BENCHMARKS.md](DESIGN-BENCHMARKS.md).
 
 Current build answers one question: can complete run interaction feel calm, legible, and coherent before real sensing and audio exist?
 
-Answer: yes in Simulator. Physical cadence and adaptive audio remain unproven.
+Answer: yes in Simulator. The adaptation rules and cadence boundary now exist, but physical cadence and adaptive audio remain unproven.
 
 ## Current exclusions
 
-Core Motion, production audio, music import, Apple Music, Spotify, GPS, maps, pace, distance, coaching, plans, social features, accounts, analytics, subscriptions, and backend remain outside current build.
+Core Motion is present behind an unwired production boundary. Production audio, music import, Apple Music in the normal app flow, Spotify, GPS, maps, pace, distance, coaching, plans, social features, accounts, analytics, subscriptions, and backend remain outside the useful product build.

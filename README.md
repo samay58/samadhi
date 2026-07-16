@@ -4,11 +4,11 @@
 
 *music in stride*
 
-Samadhi is a native iPhone music experience that lets a runner's cadence and music settle into one rhythm. The current build proves complete interaction with deterministic simulated cadence and beat timing. Milestone 2 is specified to add playlist import, real cadence, and adaptive audio.
+Samadhi is a native iPhone music experience that lets a runner's cadence and music settle into one rhythm. The current build proves complete interaction and now includes the source-neutral Milestone 2 policy, cadence boundary, Core Motion adapter, and a focused Apple Music device harness. Production music and physical cadence remain unproven.
 
 ## Current state
 
-Milestones 0 and 1 are complete. The app builds for iOS 26, covers the full run flow, preserves calm recovery behavior, supports accessibility states, and passes automated domain, presentation, and UI tests. Milestone 2 implementation has not started.
+Milestones 0 and 1 are complete. Milestone 2 is in progress. The Apple Music source decision is blocked until a signed physical iPhone, Apple Music account, real playlist, and headphone route are available. Safe source-neutral work has started without choosing a production player early.
 
 Start with [product ethos](Docs/PRODUCT.md), then read [current status](Docs/STATUS.md), [next plan](Docs/PLAN.md), and the [Milestone 2 specification](Docs/MILESTONE-2-SPEC.md).
 

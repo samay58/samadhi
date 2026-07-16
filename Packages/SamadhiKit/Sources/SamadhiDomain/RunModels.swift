@@ -13,13 +13,13 @@ public enum RunMode: Sendable, Equatable {
 public struct RunSummary: Sendable, Equatable {
     public let durationSeconds: Int
     public let averageCadence: Int?
-    public let timeInStepPercent: Int
+    public let tempoMatchedPercent: Int?
     public let songCount: Int
 
-    public init(durationSeconds: Int, averageCadence: Int?, timeInStepPercent: Int, songCount: Int) {
+    public init(durationSeconds: Int, averageCadence: Int?, tempoMatchedPercent: Int?, songCount: Int) {
         self.durationSeconds = durationSeconds
         self.averageCadence = averageCadence
-        self.timeInStepPercent = timeInStepPercent
+        self.tempoMatchedPercent = tempoMatchedPercent
         self.songCount = songCount
     }
 }
@@ -30,8 +30,8 @@ public struct RunSession: Sendable, Equatable {
     public var elapsedActiveSeconds: Int
     public var cadenceTotal: Int
     public var cadenceSamples: Int
-    public var inStepSamples: Int
-    public var eligibleInStepSamples: Int
+    public var tempoMatchedSamples: Int
+    public var eligibleTempoMatchSamples: Int
     public var songCount: Int
     public var trackIndex: Int
     public var trackElapsedSeconds: Int
@@ -42,23 +42,23 @@ public struct RunSession: Sendable, Equatable {
         elapsedActiveSeconds = 0
         cadenceTotal = 0
         cadenceSamples = 0
-        inStepSamples = 0
-        eligibleInStepSamples = 0
+        tempoMatchedSamples = 0
+        eligibleTempoMatchSamples = 0
         songCount = 1
         trackIndex = 0
         trackElapsedSeconds = 0
     }
 
-    public mutating func recordSecond(cadence: Int?, inStep: Bool?) {
+    public mutating func recordSecond(cadence: Int?, tempoMatched: Bool?) {
         elapsedActiveSeconds += 1
         trackElapsedSeconds += 1
         if let cadence {
             cadenceTotal += cadence
             cadenceSamples += 1
         }
-        if let inStep {
-            eligibleInStepSamples += 1
-            if inStep { inStepSamples += 1 }
+        if let tempoMatched {
+            eligibleTempoMatchSamples += 1
+            if tempoMatched { tempoMatchedSamples += 1 }
         }
     }
 
@@ -66,7 +66,9 @@ public struct RunSession: Sendable, Equatable {
         RunSummary(
             durationSeconds: elapsedActiveSeconds,
             averageCadence: cadenceSamples == 0 ? nil : cadenceTotal / cadenceSamples,
-            timeInStepPercent: eligibleInStepSamples == 0 ? 0 : (inStepSamples * 100) / eligibleInStepSamples,
+            tempoMatchedPercent: mode == .fixed
+                ? nil
+                : eligibleTempoMatchSamples == 0 ? 0 : (tempoMatchedSamples * 100) / eligibleTempoMatchSamples,
             songCount: songCount
         )
     }
@@ -203,7 +205,7 @@ public enum RunEvent: Sendable, Equatable {
     case audioRouteLost
     case audioRouteRestored
     case routeResumeTapped(acquisitionID: Int, timeoutID: Int)
-    case activeSecond
+    case activeSecond(tempoMatched: Bool?)
     case finishCompleted(sessionID: Int)
     case summaryDismissed
 }

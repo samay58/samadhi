@@ -283,15 +283,15 @@ public struct RunReducer: Sendable {
                 effects
             )
 
-        case let (.active(active), .activeSecond):
+        case let (.active(active), .activeSecond(tempoMatched)):
             // Only stable playback enters the summary. Paused and cadence-acquisition time is excluded.
             guard case let .playing(rhythm, _) = active.activity else { return (state, []) }
             var next = active
             switch rhythm {
             case let .locked(spm):
-                next.session.recordSecond(cadence: spm, inStep: true)
+                next.session.recordSecond(cadence: spm, tempoMatched: tempoMatched)
             case .fixed:
-                next.session.recordSecond(cadence: nil, inStep: nil)
+                next.session.recordSecond(cadence: nil, tempoMatched: nil)
             case .acquiring:
                 return (state, [])
             }
