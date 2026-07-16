@@ -9,7 +9,7 @@
 
 Scripts/test.sh runs Swift package tests, app-model tests, and UI tests serially on iPhone 17 Pro Simulator.
 
-The 2026-07-16 full serial gate passed 44 package tests, 2 app-model tests, and 4 UI tests.
+The 2026-07-16 full serial gate passed 48 package tests, 7 app-model tests, and 8 UI tests.
 
 Formatter gate:
 
@@ -45,6 +45,8 @@ Domain tests cover:
 - Applied-rate feedback requiring current session, operation, request, and track identity
 - Confidence loss holding the last rate, easing to 1.00, and returning to acquisition
 - Stale session feedback and cadence-provider failure
+- Imported collection order, ready-track filtering, and cache-key invalidation
+- Refusal to start a production collection without an adaptive-ready track
 
 Motion tests cover:
 
@@ -72,12 +74,16 @@ UI tests cover:
 - Motion permission recovery
 - Audio route recovery
 - Missing artwork
+- No selected collection
+- Honest analysis progress
+- Partial import with visible failures and an enabled ready-track start
+- Import failure and retry
 
-App-model tests cover ready mapping and start transition.
+App-model tests cover ready mapping, start transition, atomic store round trips, corrupt persistence, restored selection, and cancellation of stale replacement work.
 
 ## Visual proof
 
-Final frames under Evidence/Simulator/ cover ready, locked run, controls, summary, and Home Screen icon. Evidence/Previews/ covers accessibility text and state-specific visual checks.
+Final frames under Evidence/Simulator/ cover ready, imported empty and partial states, locked run, controls, summary, and Home Screen icon. Evidence/Previews/ covers accessibility text and state-specific visual checks.
 
 ## Truth boundary
 
@@ -94,6 +100,7 @@ The `Samadhi MusicKit Gate` scheme verifies that the harness and framework calls
 - MusicKit harness Simulator app: launched and visually checked
 - Background audio entry in built Info.plist: verified as an array containing `audio`
 - Physical device signing, build, installation, and launch: passed
+- Import-capable normal app exact-profile build, installation, and launch: passed
 - Focused body-to-music exact-profile build, installation, and launch argument: passed
 - Physical cadence seam: passed for a 29-second walk with changing cadence and a 142 SPM average
 - Automatic cadence-driven rate response: passed; the corrected 59-second physical run averaged 155 SPM and measured 98 percent tempo matched from MusicKit read-back
@@ -113,10 +120,11 @@ The `Samadhi MusicKit Gate` scheme verifies that the harness and framework calls
 - Bluetooth listening note: not recorded
 - Spotify adaptive playback: rejected by documented platform capability and policy review; no code spike warranted
 - Screen-lock background, next track, controlled interruption, and route-loss checks: deferred to the reliability gate
+- Real playlist with at least three ready tracks and relaunch restore: not yet physically run
 
 ## Next implementation gate
 
-Build playlist import and persistence, then analyze at least three selected tracks through the existing local analyzer. Connect real progress and transitions without changing the normal app's visual language. Before Milestone 2 completion, record one concise Bluetooth listening note and prove five screen-locked minutes, next track, controlled interruption, and route loss.
+Select one moderate real playlist in the installed normal app. Confirm at least three tracks become ready, relaunch to prove restoration, and run through a real track transition. Before Milestone 2 completion, record one concise Bluetooth listening note and prove five screen-locked minutes, controlled interruption, and route loss.
 
 ## Known environment behavior
 

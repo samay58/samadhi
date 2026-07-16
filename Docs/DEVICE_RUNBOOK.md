@@ -2,7 +2,18 @@
 
 ## Current capability
 
-Apple team `ZL5U59XBJ6` is saved in `project.yml`. Signed compilation, installation, and launch pass with an Apple Development certificate. Samay's iPhone 17 Pro is connected on iOS 27.0 with Developer Mode enabled. The explicit App ID exists and the MusicKit App Service is user-confirmed as enabled.
+Apple team `ZL5U59XBJ6` is saved in `project.yml`. Signed compilation, installation, and launch pass with an Apple Development certificate. Samay's iPhone 17 Pro runs iOS 27.0 with Developer Mode enabled. The explicit App ID exists and the MusicKit App Service is user-confirmed as enabled. The import-capable normal app was installed and launched on 2026-07-16.
+
+## Denver test build
+
+1. Open Samadhi and tap `Choose music`.
+2. Select a moderate Apple Music playlist. Keep the app open during its first analysis.
+3. Read the result honestly. Ready tracks can run; unreadable or unavailable tracks remain visible but do not enter playback.
+4. Confirm at least three tracks are ready, tap `Start`, and allow motion access if asked.
+5. Close and reopen Samadhi. Confirm the same playlist returns without another choice.
+6. During a short run, check that playback starts, cadence changes, and skip advances to another ready track.
+
+The build is suitable for product testing, not public distribution. The installed offline profile expires on 2026-07-23 UTC. Import, persistence, and partial-failure states pass automated gates, but the steps above are the remaining physical imported-collection proof.
 
 ## Completed Apple token repair
 

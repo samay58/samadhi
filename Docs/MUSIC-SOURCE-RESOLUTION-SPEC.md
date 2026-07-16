@@ -190,9 +190,9 @@ After source selection, the full serial Xcode gate must pass before a milestone 
 
 ### Immediate execution order
 
-1. Prove the connected fixture, real cadence, and bounded rate response with one brief physical walk or jog.
-2. Build playlist import, analysis persistence, progress, and transitions.
-3. Complete Bluetooth listening, five locked minutes, next track, controlled interruption, and route loss before Milestone 2 completion.
+1. Prove one real imported playlist with at least three ready tracks and relaunch restoration.
+2. Run through a real track transition and confirm progress, cadence, and applied-rate behavior.
+3. Complete Bluetooth listening, five locked minutes, controlled interruption, and route loss before Milestone 2 completion.
 
 ### Verified platform sources
 

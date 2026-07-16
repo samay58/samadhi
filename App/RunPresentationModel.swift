@@ -23,15 +23,19 @@ final class RunPresentationModel {
     @ObservationIgnored private var currentHoldID: Int?
     @ObservationIgnored private var playbackEventTask: Task<Void, Never>?
 
-    init() {
+    init(musicCollection selectedCollection: MusicCollection? = nil) {
         let configuration = SimulationConfiguration.current
         self.configuration = configuration
         musicCollection =
+            selectedCollection
+            ?? (configuration.useAppleMusicCoreLoop
+                ? AppMusicCollection.appleMusicCoreLoop
+                : AppMusicCollection.simulated)
+        let usesProductionServices =
             configuration.useAppleMusicCoreLoop
-            ? AppMusicCollection.appleMusicCoreLoop
-            : AppMusicCollection.simulated
+            || (selectedCollection != nil && !configuration.fastMode)
         musicPlayer =
-            configuration.useAppleMusicCoreLoop
+            usesProductionServices
             ? AppleMusicPlaybackController()
             : SimulatedMusicPlayer()
         reducer = RunReducer(tracks: musicCollection.tracks)
@@ -40,7 +44,7 @@ final class RunPresentationModel {
             ? .milliseconds(1_400)
             : (configuration.fastMode ? .milliseconds(340) : .milliseconds(420))
         cadenceProvider =
-            configuration.useAppleMusicCoreLoop
+            usesProductionServices
             ? CoreMotionCadenceProvider()
             : SimulatedCadenceProvider(sampleDelay: cadenceDelay)
         startPlaybackEventMonitoring()
@@ -54,6 +58,7 @@ final class RunPresentationModel {
         let track = TrackMetadata(
             title: domainTrack.title,
             artist: domainTrack.artist ?? "",
+            collection: musicCollection.name,
             durationSeconds: max(Int(domainTrack.durationSeconds.rounded()), 1)
         )
         let trackDuration = session?.trackDurationSeconds ?? track.durationSeconds
@@ -152,6 +157,8 @@ final class RunPresentationModel {
             dispatch(.routeResumeTapped(acquisitionID: token(), timeoutID: token()))
         case .done:
             dispatch(.summaryDismissed)
+        case .chooseMusic, .changeMusic:
+            break
         }
     }
 

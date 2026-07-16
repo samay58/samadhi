@@ -32,6 +32,7 @@
 
         private let player = ApplicationMusicPlayer.shared
         private let tempoAnalyzer = LocalTempoAnalyzer()
+        private let catalogResolver = AppleMusicCatalogResolver()
         private var monitoringTasks: [Task<Void, Never>] = []
         private var lastPlayerState = ""
         private var lastHeartbeat = Date.distantPast
@@ -357,19 +358,12 @@
                 return track
             }
 
-            var resolvedSong: Song?
+            let resolvedSong: Song?
             do {
-                resolvedSong = try await catalogSong(for: track)
+                resolvedSong = try await catalogResolver.resolve(track)
             } catch {
                 record("catalog_lookup_error", "\(track.title); id \(track.id); \(error)")
-            }
-
-            if resolvedSong == nil {
-                do {
-                    resolvedSong = try await catalogSongByStrictMetadata(for: track)
-                } catch {
-                    record("catalog_search_error", "\(track.title); \(error)")
-                }
+                return track
             }
 
             guard let resolvedSong else {
@@ -383,82 +377,6 @@
 
             record("catalog_preview_resolved", "\(track.title); catalog id \(resolvedSong.id)")
             return .song(resolvedSong)
-        }
-
-        private func catalogSong(for track: Track) async throws -> Song? {
-            if let isrc = track.isrc, !isrc.isEmpty {
-                var request = MusicCatalogResourceRequest<Song>(matching: \.isrc, equalTo: isrc)
-                request.limit = 1
-                if #available(iOS 26.4, *) {
-                    request.options = [.findEquivalents]
-                }
-                return try await request.response().items.first
-            }
-
-            guard #available(iOS 26.4, *) else {
-                record("catalog_lookup_skipped", "\(track.title); no ISRC or equivalent-ID support")
-                return nil
-            }
-            guard track.id.rawValue.allSatisfy(\.isNumber) else {
-                record("catalog_lookup_skipped", "\(track.title); nonnumeric library id")
-                return nil
-            }
-            var request = MusicCatalogResourceRequest<Song>(matching: \.id, equalTo: track.id)
-            request.limit = 1
-            request.options = [.findEquivalents]
-            return try await request.response().items.first
-        }
-
-        private func catalogSongByStrictMetadata(for track: Track) async throws -> Song? {
-            guard let trackDuration = track.duration,
-                let trackAlbumTitle = track.albumTitle,
-                !trackAlbumTitle.isEmpty
-            else {
-                record("catalog_search_skipped", "\(track.title); missing album or duration")
-                return nil
-            }
-
-            var request = MusicCatalogSearchRequest(
-                term: [track.title, track.artistName, trackAlbumTitle].joined(separator: " "),
-                types: [Song.self]
-            )
-            request.limit = 25
-            let response = try await request.response()
-            let matches = response.songs.compactMap { song -> (song: Song, delta: TimeInterval)? in
-                guard textMatches(song.title, track.title),
-                    textMatches(song.artistName, track.artistName),
-                    albumMatches(song.albumTitle, trackAlbumTitle),
-                    let songDuration = song.duration
-                else { return nil }
-
-                let delta = abs(songDuration - trackDuration)
-                return delta <= 3 ? (song, delta) : nil
-            }
-            .sorted { $0.delta < $1.delta }
-
-            guard let best = matches.first else {
-                record("catalog_search_empty", "\(track.title); no strict metadata match")
-                return nil
-            }
-            if matches.count > 1, matches[1].delta - best.delta < 0.5 {
-                record("catalog_search_ambiguous", "\(track.title); \(matches.count) strict matches")
-                return nil
-            }
-
-            record(
-                "catalog_search_resolved",
-                "\(track.title); catalog id \(best.song.id); duration delta \(best.delta)"
-            )
-            return best.song
-        }
-
-        private func textMatches(_ lhs: String, _ rhs: String) -> Bool {
-            lhs.compare(rhs, options: [.caseInsensitive, .diacriticInsensitive]) == .orderedSame
-        }
-
-        private func albumMatches(_ lhs: String?, _ rhs: String) -> Bool {
-            guard let lhs else { return false }
-            return textMatches(lhs, rhs)
         }
 
         private func record(_ event: String, _ detail: String) {

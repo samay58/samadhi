@@ -7,6 +7,86 @@ private let previewSend: @MainActor (RunAction) -> Void = { _ in }
     SamadhiScreen(state: RunViewState(phase: .ready), send: previewSend)
 }
 
+#Preview("Ready, choose music") {
+    SamadhiScreen(
+        state: RunViewState(phase: .ready, musicSelection: .none),
+        send: previewSend
+    )
+}
+
+#Preview("Ready, analyzing music") {
+    SamadhiScreen(
+        state: RunViewState(
+            phase: .ready,
+            musicSelection: .analyzing(
+                ImportedCollectionPresentation(
+                    name: "City Pocket",
+                    totalTrackCount: 8,
+                    readyTrackCount: 1,
+                    completedTrackCount: 2,
+                    tracks: [
+                        ImportedTrackPresentation(
+                            id: "one",
+                            title: "Soft Current",
+                            status: .ready
+                        ),
+                        ImportedTrackPresentation(
+                            id: "two",
+                            title: "Afterimage",
+                            status: .couldNotReadTempo
+                        ),
+                    ]
+                )
+            )
+        ),
+        send: previewSend
+    )
+}
+
+#Preview("Ready, partially analyzed") {
+    SamadhiScreen(
+        state: RunViewState(
+            phase: .ready,
+            musicSelection: .ready(
+                ImportedCollectionPresentation(
+                    name: "City Pocket",
+                    totalTrackCount: 3,
+                    readyTrackCount: 1,
+                    completedTrackCount: 3,
+                    tracks: [
+                        ImportedTrackPresentation(
+                            id: "one",
+                            title: "Soft Current",
+                            status: .ready
+                        ),
+                        ImportedTrackPresentation(
+                            id: "two",
+                            title: "Afterimage",
+                            status: .couldNotReadTempo
+                        ),
+                        ImportedTrackPresentation(
+                            id: "three",
+                            title: "Quiet Arcade",
+                            status: .unavailable
+                        ),
+                    ]
+                )
+            )
+        ),
+        send: previewSend
+    )
+}
+
+#Preview("Ready, music failure") {
+    SamadhiScreen(
+        state: RunViewState(
+            phase: .ready,
+            musicSelection: .failed("Your Apple Music playlist could not be analyzed.")
+        ),
+        send: previewSend
+    )
+}
+
 #Preview("Start transformation") {
     SamadhiScreen(state: RunViewState(phase: .preparing), send: previewSend)
 }

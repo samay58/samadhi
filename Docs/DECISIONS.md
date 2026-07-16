@@ -84,9 +84,17 @@ MusicKit uses an App Service enabled for the bundle identifier in the Apple deve
 
 Tempo normalization, compatibility, rate bounds, ramping, deadband, confidence loss, and honest measurement live in SamadhiDomain. Core Motion emits source-neutral cadence events. Production callbacks still enter the reducer through the app shell.
 
-## Focused body-to-music composition
+## Imported collection boundary
 
-Keep the normal app deterministic until playlist import is ready. The `Samadhi Apple Music Core Loop` scheme alone composes a validated tempo fixture, `CoreMotionCadenceProvider`, and `AppleMusicPlaybackController`.
+The normal app has one persisted selected collection. Import preserves source order and records every track as pending, ready, unreadable, or unavailable. Setup stays honest about failures, while the production player receives only adaptive-ready tracks.
+
+Tempo results are cached by numeric catalog track identity, normalized source metadata fingerprint, and analyzer version. A metadata or analyzer change cannot silently reuse stale analysis. Replacing a playlist is atomic: the prior selection remains durable until the new import completes, and stale async callbacks cannot replace newer work.
+
+The shared strict catalog resolver prefers ISRC or documented equivalent identity and falls back to exact title, artist, album, and duration agreement. Ambiguity fails closed. Provider previews are temporary inputs to the existing local file analyzer and are deleted after analysis.
+
+## Production body-to-music composition
+
+Imported ready tracks compose `CoreMotionCadenceProvider` and `AppleMusicPlaybackController` in the normal app. Deterministic music and cadence remain available only for repeatable fixtures, previews, and tests. The `Samadhi Apple Music Core Loop` scheme remains a focused diagnostic path around a validated tempo fixture.
 
 The first physical walk averaged 142 SPM. The original 170.25 BPM fixture could not reach that cadence inside the safe 0.94 through 1.06 rate range, so the honest summary reported 0 percent tempo matched. A second check with the 139.5 BPM fixture produced no perceptible speed change; its expected rate near 1.02 was too subtle to distinguish from no response.
 

@@ -69,6 +69,42 @@ final class SamadhiUITests: XCTestCase {
         XCTAssertTrue(element("run-screen").waitForExistence(timeout: 2))
     }
 
+    func testNoCollectionRequiresMusicChoice() {
+        prepareApp("-SAMADHI_MUSIC_NONE")
+        app.launch()
+
+        XCTAssertTrue(app.buttons["choose-music"].waitForExistence(timeout: 2))
+        XCTAssertFalse(app.buttons["start-run"].exists)
+    }
+
+    func testAnalysisProgressIsHonest() {
+        prepareApp("-SAMADHI_MUSIC_ANALYZING")
+        app.launch()
+
+        XCTAssertTrue(element("music-analyzing").waitForExistence(timeout: 2))
+        XCTAssertTrue(app.staticTexts["2 of 8 tracks"].exists)
+        XCTAssertFalse(app.buttons["start-run"].exists)
+    }
+
+    func testPartialCollectionCanStartWithFailuresVisible() {
+        prepareApp("-SAMADHI_MUSIC_PARTIAL")
+        app.launch()
+
+        XCTAssertTrue(element("music-ready").waitForExistence(timeout: 2))
+        XCTAssertTrue(app.staticTexts["Could not read tempo"].exists)
+        XCTAssertTrue(app.staticTexts["Unavailable"].exists)
+        XCTAssertTrue(app.buttons["start-run"].exists)
+    }
+
+    func testImportFailureOffersRetry() {
+        prepareApp("-SAMADHI_MUSIC_IMPORT_FAILURE")
+        app.launch()
+
+        XCTAssertTrue(element("music-import-failed").waitForExistence(timeout: 2))
+        XCTAssertTrue(app.buttons["choose-music"].exists)
+        XCTAssertFalse(app.buttons["start-run"].exists)
+    }
+
     private func element(_ identifier: String) -> XCUIElement {
         app.descendants(matching: .any).matching(identifier: identifier).firstMatch
     }
