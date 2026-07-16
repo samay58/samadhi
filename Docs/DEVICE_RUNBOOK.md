@@ -2,7 +2,7 @@
 
 ## Current capability
 
-A local self-signed code-signing identity is installed, but no Apple development team is configured. No physical iPhone is connected. Unsigned generic iPhone compilation passes; signed compilation stops at the missing team.
+Apple team `ZL5U59XBJ6` is saved in `project.yml`. Signed compilation, installation, and launch pass with an Apple Development certificate. Samay's iPhone 17 Pro is connected on iOS 27.0 with Developer Mode enabled. The explicit App ID exists and the MusicKit App Service is user-confirmed as enabled.
 
 ## Apple Music feasibility run
 

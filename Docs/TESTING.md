@@ -67,12 +67,13 @@ Final frames under Evidence/Simulator/ cover ready, locked run, controls, summar
 
 Simulator verifies interaction, accessibility structure, reducer behavior, resource packaging, and deterministic motion. It cannot validate physical cadence quality, real headphone route behavior, tempo adaptation, or listening artifacts.
 
-The `Samadhi MusicKit Gate` scheme verifies that the harness and framework calls compile. It does not pass authorization, library, preview coverage, playback, rate quality, background, interruption, or route gates without a physical iPhone and account.
+The `Samadhi MusicKit Gate` scheme verifies that the harness and framework calls compile. Its physical run must separately pass authorization, library, preview coverage, playback, rate quality, background, interruption, and route checks.
 
 ## Current device checks
 
 - Unsigned generic iPhone build: passed
-- Signed generic iPhone build: failed because `DEVELOPMENT_TEAM` is blank
+- Signed generic and physical iPhone builds: passed
+- Physical iPhone installation and gate launch: passed
 - Normal Simulator app: launched and visually checked
 - MusicKit harness Simulator app: launched and visually checked
 - Background audio entry in built Info.plist: verified as an array containing `audio`

@@ -61,4 +61,4 @@
 
 ## Current checkpoint
 
-Milestones 0 and 1 are complete. Milestone 2 safe groundwork is built. The next action is a physical run of the Apple Music harness after an iPhone is connected and the Apple development team is configured. No production source has been chosen.
+Milestones 0 and 1 are complete. Milestone 2 safe groundwork is built. Apple signing, physical installation, and gate launch pass. The device run is waiting on authorization, playlist, decoded-preview, playback, listening, background, interruption, and route checks. No production source has been chosen.
