@@ -14,7 +14,7 @@
 | Adaptation policy | Built, not connected to a real player | Deterministic policy tests |
 | Apple Music feasibility | Physical gate in progress | Signed harness installed and launched on iPhone 17 Pro |
 | Production player | Undecided | Physical gate required |
-| Physical run validation | Not started | Requires device and route matrix |
+| Physical run validation | MusicKit feasibility run in progress; outdoor run not started | Requires completed source decision and route matrix |
 
 ## Completed
 

@@ -339,7 +339,7 @@ The milestone requires all of the following:
 
 ### Where we are now
 
-Milestones 0 and 1 are complete. The project has a tested interaction, visual system, accessibility behavior, reducer, cancellation model, and deterministic simulations. It does not contain a production music source, real cadence provider, tempo analyzer, adaptive player, background-audio proof, or physical-run evidence.
+Milestones 0 and 1 are complete. Milestone 2 source-neutral models, adaptation policy, cadence filtering, Core Motion boundary, honest summary measurement, and device harness are built. The signed harness installs and launches on a physical iPhone 17 Pro. Authorization, library loading, decoded-preview coverage, real playback, listening quality, background continuity, interruptions, and route loss remain unproven. No production music source has been chosen.
 
 ### Build order
 
@@ -368,4 +368,3 @@ Do not redesign the app before the source decision and core audio loop pass. Do 
 - [`AVAudioPlayerNode`](https://developer.apple.com/documentation/avfaudio/avaudioplayernode) schedules audio files and exposes a player timeline.
 - [SwiftUI file import](https://developer.apple.com/documentation/swiftui/view/fileimporter%28ispresented%3Aallowedcontenttypes%3Aallowsmultipleselection%3Aoncompletion%3A%29) returns security-scoped URLs that must be accessed and released correctly.
 - Apple documents separate handling for [audio interruptions](https://developer.apple.com/documentation/avfaudio/handling-audio-interruptions) and [audio route changes](https://developer.apple.com/documentation/avfaudio/responding-to-audio-route-changes).
-

@@ -59,6 +59,15 @@
 - Passed Simulator and unsigned generic iPhone builds; recorded the exact physical and signing blocker
 - Passed formatter, 29 package tests, 2 app-model tests, and 4 UI tests on the final tree
 
+## 2026-07-15. Physical MusicKit gate opened
+
+- Registered the explicit `com.samaydhawan.Samadhi` App ID and received user confirmation that its MusicKit App Service is enabled
+- Saved Apple team `ZL5U59XBJ6` in `project.yml` and regenerated the Xcode project
+- Confirmed signed generic and physical iPhone builds with the Apple Development certificate
+- Confirmed Samay's physical iPhone 17 Pro on iOS 27.0 with Developer Mode enabled
+- Installed and launched the `Samadhi MusicKit Gate` harness on the physical phone
+- Left the source decision open pending authorization, playlist, decoded-preview, playback, listening, background, interruption, and route evidence
+
 ## Current checkpoint
 
 Milestones 0 and 1 are complete. Milestone 2 safe groundwork is built. Apple signing, physical installation, and gate launch pass. The device run is waiting on authorization, playlist, decoded-preview, playback, listening, background, interruption, and route checks. No production source has been chosen.
