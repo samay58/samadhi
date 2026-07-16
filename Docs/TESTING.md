@@ -9,7 +9,7 @@
 
 Scripts/test.sh runs Swift package tests, app-model tests, and UI tests serially on iPhone 17 Pro Simulator.
 
-The 2026-07-16 full serial gate passed 43 package tests, 2 app-model tests, and 4 UI tests.
+The 2026-07-16 full serial gate passed 44 package tests, 2 app-model tests, and 4 UI tests.
 
 Formatter gate:
 
@@ -36,6 +36,7 @@ Domain tests cover:
 - Track progress reset and configured collection wraparound
 - Half-time and double-time tempo normalization
 - Safe rate bounds, initial and ongoing ramps, deadband, and target update interval
+- The 149.75 BPM focused fixture ramping from 1.00 through 0.98 and 0.96 toward a safe 142 SPM target
 - Target recomputation when the track changes at a steady cadence
 - Confidence hold, return to normal rate, and reacquisition reset
 - Incompatible tracks and applied-rate match timing
@@ -95,7 +96,8 @@ The `Samadhi MusicKit Gate` scheme verifies that the harness and framework calls
 - Physical device signing, build, installation, and launch: passed
 - Focused body-to-music exact-profile build, installation, and launch argument: passed
 - Physical cadence seam: passed for a 29-second walk with changing cadence and a 142 SPM average
-- Automatic cadence-driven rate response: not yet observed; the first walk was incompatible with the original 170.25 BPM fixture's safe rate range
+- Automatic cadence-driven rate response: not yet observed; the first walk was incompatible with the original 170.25 BPM fixture and the 139.5 BPM follow-up produced no perceptible change
+- Focused rate diagnostics: target, pending feedback, and MusicKit read-back are shown separately; commanded values are no longer echoed as applied
 - Contextual Music authorization and 40-playlist loading: passed
 - Real playback plus 0.94, 1.00, and 1.06 rate writes: passed mechanically
 - Pause and resume observation: passed
@@ -114,7 +116,7 @@ The `Samadhi MusicKit Gate` scheme verifies that the harness and framework calls
 
 ## Next implementation gate
 
-Run one brief walk or jog with focused catalog fixture `1434921088`, estimated at 139.5 BPM. Confirm music speed responds naturally. Cadence display has already passed and does not need a separate repeat. If rate response passes, start playlist import and persistence. Before Milestone 2 completion, record one concise Bluetooth listening note and prove five screen-locked minutes, next track, controlled interruption, and route loss.
+Run one brief walk or jog with focused catalog fixture `1558215042`, estimated at 149.75 BPM. Confirm the diagnostic target and applied rates move below 1.00, then note whether the speed change sounds natural. Cadence display has already passed and does not need a separate repeat. If read-back and listening pass, start playlist import and persistence. Before Milestone 2 completion, record one concise Bluetooth listening note and prove five screen-locked minutes, next track, controlled interruption, and route loss.
 
 ## Known environment behavior
 

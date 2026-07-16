@@ -12,7 +12,7 @@
 | Audio timing | Simulated only | Deterministic beat-clock tests |
 | Playlist import | Specified, not started | Milestone 2 spec |
 | Tempo analysis | Version 2 passes a narrow 12-preview real-music corpus | Generated regression tests and opt-in Apple preview validation |
-| Adaptation policy | Connected to Apple Music in focused core loop | Identified reducer effects and deterministic feedback tests |
+| Adaptation policy | Connected; objective MusicKit read-back check pending | Identified reducer effects and deterministic feedback tests |
 | Apple Music feasibility | Source selected; Bluetooth route and rate writes passed; long-form reliability deferred | Exact-profile traces and explicit product decision |
 | Spotify feasibility | Rejected for adaptive playback | Remote-control architecture, missing music rate control, and content policy conflict |
 | Production player | Apple Music selected; verified fixture and bounded rate loop connected | Source-neutral contract, exact-profile build, and device install |
@@ -91,13 +91,17 @@
 - Connected honest tempo-matched measurement to the player-reported applied rate instead of assuming every locked second matched
 - Launched the focused configuration on the physical iPhone and observed changing Core Motion cadence during a 29-second walk
 - Recorded an honest 142 SPM average and 0 percent tempo matched because the initial 170.25 BPM fixture could not safely reach that cadence
-- Switched the focused check to validated catalog track `1434921088`, estimated at 139.5 BPM, without changing the safe rate range or stability policy
+- Switched the first follow-up to validated catalog track `1434921088`, estimated at 139.5 BPM, without changing the safe rate range or stability policy
+- Recorded no perceptible speed change during that follow-up, leaving automatic rate response unproven
+- Removed the adapter's immediate command echo so applied rate now comes from MusicKit read-back
+- Added a focused-only diagnostic panel for cadence, target rate, applied rate, and pending feedback
+- Switched the objective check to validated catalog track `1558215042`, estimated at 149.75 BPM, which produces a clearer safe ramp around the observed cadence
 
 ## Proof
 
 The current serial gate passed:
 
-- 43 Swift package tests
+- 44 Swift package tests
 - 2 app-model tests
 - 4 UI tests
 - Swift formatter lint
@@ -107,12 +111,12 @@ The current serial gate passed:
 
 Durable logs and final visual frames live under Evidence/.
 
-The MusicKit harness launches in Simulator and on the connected physical iPhone. Signing uses the Apple Development certificate for team `ZL5U59XBJ6`. Raw physical traces and their SHA-256 hashes are stored under `Evidence/Device/`.
+The MusicKit harness launches in Simulator and has launched on the physical iPhone. Signing uses the Apple Development certificate for team `ZL5U59XBJ6`. The corrected objective diagnostic build is signed and ready, but installation is pending because the iPhone became unavailable to Xcode after the 139.5 BPM observation. Raw physical traces and their SHA-256 hashes are stored under `Evidence/Device/`.
 
 ## Known limits
 
-One brief physical walk validated live cadence and produced a 142 SPM average. It did not validate automatic cadence-driven rate response because the original 170.25 BPM fixture was incompatible with that cadence inside the safe rate range. The focused build now uses a validated 139.5 BPM fixture and needs one brief listening observation. Tapping the installed icon without the focused launch argument still starts normal simulation. Built-in-speaker listening found no major pitch change or unpleasant artifacts at the safe-rate endpoints. Bluetooth routing and rate writes pass, but no separate Bluetooth listening note was recorded. The tempo estimator passes its narrow 12-preview reference corpus, but broad music accuracy and public-distribution permission for preview analysis remain open. The normal app still defaults to silent bundled media, simulated cadence, and simulated beat timing. Track change, five locked minutes, controlled interruption, and route loss remain reliability gates.
+One brief physical walk validated live cadence and produced a 142 SPM average. It did not validate automatic cadence-driven rate response because the original 170.25 BPM fixture was incompatible with that cadence inside the safe rate range. A 139.5 BPM follow-up produced no perceptible speed change. The focused build now uses a validated 149.75 BPM fixture and displays MusicKit read-back separately from target rate for one objective observation. Tapping the installed icon without the focused launch argument still starts normal simulation. Built-in-speaker listening found no major pitch change or unpleasant artifacts at the safe-rate endpoints. Bluetooth routing and rate writes pass, but no separate Bluetooth listening note was recorded. The tempo estimator passes its narrow 12-preview reference corpus, but broad music accuracy and public-distribution permission for preview analysis remain open. The normal app still defaults to silent bundled media, simulated cadence, and simulated beat timing. Track change, five locked minutes, controlled interruption, and route loss remain reliability gates.
 
 ## WHERE WE LEFT OFF
 
-Apple Music is selected. Catalog track `1434921088`, Core Motion cadence, bounded adaptation, applied-rate feedback, and honest measurement are connected in the focused core-loop scheme. Live cadence has passed on the iPhone. Next, run one brief walk or jog to prove automatic music-speed response with the compatible fixture. If that passes, build playlist import and persistence. Long-form reliability checks remain mandatory before Milestone 2 completion.
+Apple Music is selected. Catalog track `1558215042`, Core Motion cadence, bounded adaptation, MusicKit read-back, and honest measurement are connected in the focused core-loop scheme. Live cadence has passed on the iPhone. Next, run one brief walk or jog and compare the focused target and applied rates to prove automatic music-speed response objectively. If that passes, build playlist import and persistence. Long-form reliability checks remain mandatory before Milestone 2 completion.

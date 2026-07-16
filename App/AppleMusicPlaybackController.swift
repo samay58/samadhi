@@ -18,7 +18,7 @@
         private var lastState: MusicPlaybackState?
         private var lastRate: Double?
         private var lastTrackID: MusicTrackID?
-        private var latestRateRequestID: Int?
+        private var pendingRateRequest: (id: Int, trackID: MusicTrackID)?
 
         func events() -> AsyncStream<MusicPlaybackEvent> {
             AsyncStream(bufferingPolicy: .bufferingNewest(128)) { continuation in
@@ -61,7 +61,7 @@
             lastState = nil
             lastRate = nil
             lastTrackID = firstTrack.id
-            latestRateRequestID = nil
+            pendingRateRequest = nil
             continuation?.yield(.prepared(operationID: operationID, trackID: firstTrack.id))
         }
 
@@ -100,17 +100,8 @@
                 currentTrackID == trackID
             else { return }
             let boundedRate = Double(Float(min(max(rate, 0.94), 1.06)))
-            latestRateRequestID = requestID
+            pendingRateRequest = (requestID, trackID)
             player.state.playbackRate = Float(boundedRate)
-            lastRate = boundedRate
-            continuation?.yield(
-                .rateChanged(
-                    operationID: operationID,
-                    requestID: requestID,
-                    trackID: trackID,
-                    rate: boundedRate
-                )
-            )
         }
 
         func stop(operationID: Int) {
@@ -122,7 +113,7 @@
             lastState = nil
             lastRate = nil
             lastTrackID = nil
-            latestRateRequestID = nil
+            pendingRateRequest = nil
         }
 
         private func startMonitoring() {
@@ -191,12 +182,23 @@
             }
 
             let rate = Double(player.state.playbackRate)
-            if rate != lastRate {
+            if let request = pendingRateRequest {
+                pendingRateRequest = nil
                 lastRate = rate
                 continuation?.yield(
                     .rateChanged(
                         operationID: operationID,
-                        requestID: latestRateRequestID,
+                        requestID: request.id,
+                        trackID: request.trackID,
+                        rate: rate
+                    )
+                )
+            } else if rate != lastRate {
+                lastRate = rate
+                continuation?.yield(
+                    .rateChanged(
+                        operationID: operationID,
+                        requestID: nil,
                         trackID: currentTrackID,
                         rate: rate
                     )
@@ -207,6 +209,7 @@
             let trackID = MusicTrackID(itemID)
             if trackID != lastTrackID {
                 lastTrackID = trackID
+                pendingRateRequest = nil
                 continuation?.yield(.trackChanged(operationID: operationID, trackID: trackID))
             }
             guard let track = collection.tracks.first(where: { $0.id == trackID }) else { return }

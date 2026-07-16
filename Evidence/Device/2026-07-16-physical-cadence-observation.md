@@ -32,6 +32,6 @@ The original track could not match 142 SPM inside the 0.94 through 1.06 safety r
 
 ## Follow-up
 
-The focused fixture changes to catalog track `1434921088`, “Can't Stop the Feeling! (Workout Remix 140 BPM)” by Power Music Workout. Its validated estimate is 139.5 BPM with confidence 1. At the observed walking cadence, the target rate is about 1.02 and remains inside the safe range.
+The first follow-up changed the focused fixture to catalog track `1434921088`, “Can't Stop the Feeling! (Workout Remix 140 BPM)” by Power Music Workout. Its validated estimate is 139.5 BPM with confidence 1. At the observed walking cadence, the target rate was about 1.02 and remained inside the safe range. Samay reported no perceptible speed change.
 
-One final brief walk or jog is enough to observe automatic rate response before playlist import begins.
+The objective follow-up uses catalog track `1558215042`, “Astronaut In the Ocean (Workout Remix 150 BPM)” by Power Music Workout. Its validated estimate is 149.75 BPM with confidence 1. The focused build now separates target rate from MusicKit read-back and should produce a clearer safe ramp near the observed walking cadence.

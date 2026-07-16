@@ -152,6 +152,17 @@
 - Confirmed the 0 percent tempo-matched summary was honest because 142 SPM is outside the original 170.25 BPM fixture's safe rate range
 - Replaced the focused fixture with validated catalog track `1434921088`, estimated at 139.5 BPM, so the next short walk can exercise automatic rate response without weakening safety limits
 
+## 2026-07-16. Objective rate diagnostics
+
+- Recorded no perceptible speed change during the 139.5 BPM follow-up
+- Found that the Apple Music adapter immediately echoed its commanded rate as applied instead of reading MusicKit state back
+- Changed applied-rate feedback to carry MusicKit's observed playback rate with the original request and track identities
+- Added a focused-only panel showing cadence, target rate, applied rate, and pending feedback
+- Selected validated catalog track `1558215042`, estimated at 149.75 BPM, for a clearer bounded ramp around the observed 142 SPM cadence
+- Added a deterministic regression covering the expected 1.00, 0.98, 0.96, and target-rate sequence
+- Passed 44 package tests, 2 app-model tests, 4 UI tests, formatter lint, documentation links, and the exact-profile iPhone build
+- Left physical installation open because the iPhone became unavailable to Xcode
+
 ## Current checkpoint
 
-Milestones 0 and 1 are complete. Apple Music is the selected Milestone 2 source. Live Core Motion cadence has passed a brief physical observation. A compatible 139.5 BPM fixture, bounded adaptation, and identified rate feedback are connected in the focused core loop. The narrow 12-preview corpus passes. The normal app remains deterministic until import is connected. Next comes one brief automatic rate-response observation, then playlist import and persistence. Long-form background and recovery checks remain before Milestone 2 completion.
+Milestones 0 and 1 are complete. Apple Music is the selected Milestone 2 source. Live Core Motion cadence has passed a brief physical observation. A compatible 149.75 BPM fixture, bounded adaptation, and identified MusicKit read-back are connected in the focused core loop. The narrow 12-preview corpus passes. The normal app remains deterministic until import is connected. Next comes one objective automatic rate-response observation, then playlist import and persistence. Long-form background and recovery checks remain before Milestone 2 completion.

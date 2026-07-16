@@ -48,6 +48,28 @@ private let policy = AdaptationPolicy()
     #expect(ongoing.commandedRate == 1.005)
 }
 
+@Test func walkingFixtureCreatesClearSafeRamp() {
+    let target = 142.0 / 149.75
+    let first = policy.update(
+        state: .initial,
+        input: input(cadence: 142, tempo: 149.75, appliedRate: 1, deltaSeconds: 1)
+    )
+    let second = policy.update(
+        state: first.nextState,
+        input: input(cadence: 142, tempo: 149.75, appliedRate: first.commandedRate, deltaSeconds: 1)
+    )
+    let third = policy.update(
+        state: second.nextState,
+        input: input(cadence: 142, tempo: 149.75, appliedRate: second.commandedRate, deltaSeconds: 1)
+    )
+
+    #expect(first.isTrackCompatible)
+    #expect(abs((first.targetRate ?? 0) - target) < 0.000_1)
+    #expect(abs(first.commandedRate - 0.98) < 0.000_1)
+    #expect(abs(second.commandedRate - 0.96) < 0.000_1)
+    #expect(abs(third.commandedRate - target) < 0.000_1)
+}
+
 @Test func deadbandAndUpdateIntervalKeepTheCurrentTarget() {
     var state = AdaptationState.initial
     state.targetRate = 1.02
