@@ -145,6 +145,13 @@
 - Passed formatting, 43 package tests, 2 app-model tests, 4 UI tests, an unsigned iPhone build, and the exact-profile physical build
 - Installed the body-to-music-capable app build on Samay's iPhone; focused scheme launch remained blocked because the phone was locked, and direct icon launch remains the normal simulation
 
+## 2026-07-16. Physical cadence seam
+
+- Launched the focused configuration with its required device argument
+- Observed changing Core Motion cadence during a 29-second physical walk and recorded a 142 SPM average
+- Confirmed the 0 percent tempo-matched summary was honest because 142 SPM is outside the original 170.25 BPM fixture's safe rate range
+- Replaced the focused fixture with validated catalog track `1434921088`, estimated at 139.5 BPM, so the next short walk can exercise automatic rate response without weakening safety limits
+
 ## Current checkpoint
 
-Milestones 0 and 1 are complete. Apple Music is the selected Milestone 2 source. The verified fixture, Core Motion cadence, bounded adaptation, and identified rate feedback are connected in the focused core loop. The narrow 12-preview corpus passes. The normal app remains deterministic until import is connected. Next comes one brief physical body-to-music observation, then playlist import and persistence. Long-form background and recovery checks remain before Milestone 2 completion.
+Milestones 0 and 1 are complete. Apple Music is the selected Milestone 2 source. Live Core Motion cadence has passed a brief physical observation. A compatible 139.5 BPM fixture, bounded adaptation, and identified rate feedback are connected in the focused core loop. The narrow 12-preview corpus passes. The normal app remains deterministic until import is connected. Next comes one brief automatic rate-response observation, then playlist import and persistence. Long-form background and recovery checks remain before Milestone 2 completion.

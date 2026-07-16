@@ -71,7 +71,7 @@ Design benchmark research lives in [DESIGN-BENCHMARKS.md](DESIGN-BENCHMARKS.md).
 
 Current build answers one question: can complete run interaction feel calm, legible, and coherent before real sensing and audio exist?
 
-Answer: yes in Simulator. The verified 170 BPM fixture, Core Motion boundary, adaptation rules, and Apple Music adapter are connected in a focused physical-device configuration. The estimator passes a narrow 12-preview catalog corpus. Broad music accuracy and the physical body-to-music response remain unproven.
+Answer: yes in Simulator. A validated 139.5 BPM fixture, Core Motion boundary, adaptation rules, and Apple Music adapter are connected in a focused physical-device configuration. A brief physical walk produced live cadence and an honest 142 SPM average. Automatic cadence-driven rate response, broad music accuracy, and the complete outdoor loop remain unproven.
 
 ## Current exclusions
 
