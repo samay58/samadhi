@@ -26,11 +26,25 @@ import Testing
 
     try await player.prepare(collection, operationID: 41)
     try await player.play(operationID: 41)
-    player.setPlaybackRate(1.06, operationID: 41)
+    player.setPlaybackRate(
+        1.06,
+        operationID: 41,
+        requestID: 42,
+        trackID: MusicTrackID("track-1")
+    )
     player.pause(operationID: 41)
+    player.stop(operationID: 41)
 
     #expect(await events.next() == .prepared(operationID: 41, trackID: MusicTrackID("track-1")))
     #expect(await events.next() == .stateChanged(operationID: 41, state: .playing))
-    #expect(await events.next() == .rateChanged(operationID: 41, rate: 1.06))
+    #expect(
+        await events.next()
+            == .rateChanged(
+                operationID: 41,
+                requestID: 42,
+                trackID: MusicTrackID("track-1"),
+                rate: 1.06
+            ))
     #expect(await events.next() == .stateChanged(operationID: 41, state: .paused))
+    #expect(await events.next() == .stateChanged(operationID: 41, state: .stopped))
 }

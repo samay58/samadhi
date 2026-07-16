@@ -37,6 +37,11 @@ public struct RunSession: Sendable, Equatable {
     public var trackElapsedSeconds: Int
     public var trackDurationSeconds: Int?
     public var playbackOperationID: Int
+    public var currentTrackID: MusicTrackID?
+    public var cadenceAcquisitionID: Int?
+    public var adaptationState: AdaptationState
+    public var appliedPlaybackRate: Double
+    public var pendingRateRequestID: Int?
 
     public init(id: Int, mode: RunMode = .adaptive, playbackOperationID: Int? = nil) {
         self.id = id
@@ -51,6 +56,11 @@ public struct RunSession: Sendable, Equatable {
         trackElapsedSeconds = 0
         trackDurationSeconds = nil
         self.playbackOperationID = playbackOperationID ?? id
+        currentTrackID = nil
+        cadenceAcquisitionID = nil
+        adaptationState = .initial
+        appliedPlaybackRate = 1
+        pendingRateRequestID = nil
     }
 
     public mutating func recordSecond(cadence: Int?, tempoMatched: Bool?) {
@@ -181,6 +191,13 @@ public enum RunEffect: Sendable, Equatable {
     case resumePlayback(sessionID: Int)
     case previousTrack(sessionID: Int)
     case skipTrack(sessionID: Int)
+    case setPlaybackRate(
+        sessionID: Int,
+        operationID: Int,
+        requestID: Int,
+        trackID: MusicTrackID,
+        rate: Double
+    )
     case scheduleControlsTimeout(sessionID: Int, timeoutID: Int)
     case scheduleFinishHold(sessionID: Int, holdID: Int)
     case fadeAndStop(sessionID: Int)
@@ -193,8 +210,21 @@ public enum RunEvent: Sendable, Equatable {
     case startTapped(sessionID: Int)
     case authorizationResolved(sessionID: Int, MotionAuthorization)
     case useFixedRhythmTapped
-    case playbackPrepared(sessionID: Int)
-    case cadenceLocked(sessionID: Int, acquisitionID: Int, spm: Int)
+    case playbackPrepared(sessionID: Int, trackID: MusicTrackID)
+    case cadenceUpdated(
+        sessionID: Int,
+        acquisitionID: Int,
+        stepsPerMinute: Double,
+        deltaSeconds: Double,
+        rateRequestID: Int
+    )
+    case cadenceConfidenceLost(
+        sessionID: Int,
+        acquisitionID: Int,
+        deltaSeconds: Double,
+        rateRequestID: Int
+    )
+    case cadenceAcquisitionFailed(sessionID: Int, acquisitionID: Int)
     case surfaceTapped(timeoutID: Int)
     case controlsTimedOut(timeoutID: Int)
     case controlsFocusEntered
@@ -221,6 +251,19 @@ public enum RunEvent: Sendable, Equatable {
     case playbackRouteRestored(sessionID: Int, operationID: Int)
     case playbackInterrupted(sessionID: Int, operationID: Int)
     case playbackInterruptionEnded(sessionID: Int, operationID: Int)
+    case playbackRateApplied(
+        sessionID: Int,
+        operationID: Int,
+        requestID: Int,
+        trackID: MusicTrackID,
+        rate: Double
+    )
+    case playbackTrackChanged(
+        sessionID: Int,
+        operationID: Int,
+        trackID: MusicTrackID,
+        trackIndex: Int
+    )
     case playbackFailed(sessionID: Int, operationID: Int)
     case activeSecond(tempoMatched: Bool?)
     case finishCompleted(sessionID: Int)

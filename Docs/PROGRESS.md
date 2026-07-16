@@ -133,6 +133,18 @@
 - Kept provider-hosted audio temporary and stored only the corpus manifest, JSON result, checksum, and analysis
 - Passed formatting, 38 package tests, 2 app-model tests, 4 UI tests, and the exact-profile physical iPhone build
 
+## 2026-07-16. Body-to-music core loop
+
+- Connected the verified 170 BPM Apple Music fixture to Core Motion cadence in the focused core-loop scheme
+- Kept normal runs and previews on deterministic simulation
+- Continued cadence sensing after first lock so stable changes and confidence loss remain observable
+- Made the reducer own adaptation state and emit bounded rate effects through `MusicPlaybackProviding`
+- Added session, operation, rate-request, and track identity to applied-rate feedback
+- Connected tempo-matched measurement to the player-reported applied rate
+- Added deterministic coverage for stable cadence, rate feedback, confidence loss, stale callbacks, provider failure, and replacement sessions
+- Passed formatting, 43 package tests, 2 app-model tests, 4 UI tests, an unsigned iPhone build, and the exact-profile physical build
+- Installed the focused build on Samay's iPhone; physical launch remained blocked only because the phone was locked
+
 ## Current checkpoint
 
-Milestones 0 and 1 are complete. Apple Music is the selected Milestone 2 source. Playback and version 2 tempo-analysis seams are built, and the narrow 12-preview corpus passes. The normal app remains deterministic until import is connected. Next comes the verified fixture through the production adapter, Core Motion cadence, and bounded adaptation. Long-form background and recovery checks remain before Milestone 2 completion.
+Milestones 0 and 1 are complete. Apple Music is the selected Milestone 2 source. The verified fixture, Core Motion cadence, bounded adaptation, and identified rate feedback are connected in the focused core loop. The narrow 12-preview corpus passes. The normal app remains deterministic until import is connected. Next comes one brief physical body-to-music observation, then playlist import and persistence. Long-form background and recovery checks remain before Milestone 2 completion.

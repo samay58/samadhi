@@ -9,7 +9,7 @@
 
 Scripts/test.sh runs Swift package tests, app-model tests, and UI tests serially on iPhone 17 Pro Simulator.
 
-The 2026-07-16 full serial gate passed 38 package tests, 2 app-model tests, and 4 UI tests.
+The 2026-07-16 full serial gate passed 43 package tests, 2 app-model tests, and 4 UI tests.
 
 Formatter gate:
 
@@ -40,6 +40,10 @@ Domain tests cover:
 - Confidence hold, return to normal rate, and reacquisition reset
 - Incompatible tracks and applied-rate match timing
 - Honest tempo measurement and fixed-rhythm Not measured summary
+- Stable cadence producing bounded, identified playback-rate effects
+- Applied-rate feedback requiring current session, operation, request, and track identity
+- Confidence loss holding the last rate, easing to 1.00, and returning to acquisition
+- Stale session feedback and cadence-provider failure
 
 Motion tests cover:
 
@@ -89,6 +93,7 @@ The `Samadhi MusicKit Gate` scheme verifies that the harness and framework calls
 - MusicKit harness Simulator app: launched and visually checked
 - Background audio entry in built Info.plist: verified as an array containing `audio`
 - Physical device signing, build, installation, and launch: passed
+- Focused body-to-music exact-profile build and installation: passed; launch attempt was blocked because the phone was locked
 - Contextual Music authorization and 40-playlist loading: passed
 - Real playback plus 0.94, 1.00, and 1.06 rate writes: passed mechanically
 - Pause and resume observation: passed
@@ -107,7 +112,7 @@ The `Samadhi MusicKit Gate` scheme verifies that the harness and framework calls
 
 ## Next implementation gate
 
-Run verified catalog fixture `1066177773` through the production adapter, then connect Core Motion and the adaptation policy. Before Milestone 2 completion, record one concise Bluetooth listening note and prove five screen-locked minutes, next track, controlled interruption, and route loss.
+Unlock the phone and run one brief walk or jog with focused catalog fixture `1066177773`. Confirm displayed cadence appears and music speed responds naturally. If that passes, start playlist import and persistence. Before Milestone 2 completion, record one concise Bluetooth listening note and prove five screen-locked minutes, next track, controlled interruption, and route loss.
 
 ## Known environment behavior
 

@@ -24,6 +24,10 @@ import Testing
             .observation(CadenceObservation(stepsPerMinute: nil, elapsedSeconds: 0)),
             .observation(CadenceObservation(stepsPerMinute: nil, elapsedSeconds: 0)),
             .observation(CadenceObservation(stepsPerMinute: 172, elapsedSeconds: 0)),
+            .observation(CadenceObservation(stepsPerMinute: 172, elapsedSeconds: 0)),
+            .observation(CadenceObservation(stepsPerMinute: 172, elapsedSeconds: 0)),
+            .observation(CadenceObservation(stepsPerMinute: 172, elapsedSeconds: 0)),
+            .observation(CadenceObservation(stepsPerMinute: 172, elapsedSeconds: 0)),
         ]
     )
 }
