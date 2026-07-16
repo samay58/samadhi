@@ -39,6 +39,13 @@
 - Recorded the comment standard in repository instructions so later work stays readable without becoming noisy
 - Re-ran formatter, 15 package tests, 2 app-model tests, and 4 UI tests
 
+## 2026-07-15. Milestone 2 specification
+
+- Specified playlist import, real cadence, tempo analysis, adaptive playback, background continuity, recovery, and physical proof
+- Chose import before generation and one production player after an Apple Music feasibility gate
+- Corrected the measurement boundary from implied footfall phase to honest tempo matching
+- Updated active product, plan, architecture, decisions, status, and repository guide
+
 ## Current checkpoint
 
-Milestones 0 and 1 complete. Milestone 2 needs product and technical spec before implementation.
+Milestones 0 and 1 complete. Milestone 2 is specified and ready to begin with the Apple Music feasibility gate.

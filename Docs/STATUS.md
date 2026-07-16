@@ -10,7 +10,8 @@
 | State architecture | Complete for prototype | Pure reducer tests |
 | Cadence | Simulated only | Deterministic provider tests |
 | Audio timing | Simulated only | Deterministic beat-clock tests |
-| Real audio adaptation | Not started | Requires next spec |
+| Playlist import | Specified, not started | Milestone 2 spec |
+| Real audio adaptation | Specified, not started | Milestone 2 spec |
 | Physical run validation | Not started | Requires device and route matrix |
 
 ## Completed
@@ -68,4 +69,4 @@ No physical iPhone run has validated cadence quality. No listening test has vali
 
 ## WHERE WE LEFT OFF
 
-Interaction prototype is complete and cleaned. Next work starts with a focused Milestone 2 spec for one physical vertical slice: real cadence enters system, prepared local audio responds, lock remains calm, interruption stays safe, and result survives an outdoor run.
+Interaction prototype is complete and cleaned. Milestone 2 is specified in [MILESTONE-2-SPEC.md](MILESTONE-2-SPEC.md). Next work starts with the Apple Music feasibility gate on a physical iPhone. Do not redesign the interface or build playlist generation first.

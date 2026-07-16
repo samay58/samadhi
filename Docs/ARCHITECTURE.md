@@ -57,7 +57,7 @@ Reducer receives track count. App passes TrackMetadata.demoTracks.count. Domain 
 
 ## Production seams
 
-Next milestone should replace simulated motion and audio behind current boundaries. Do not bypass reducer from SwiftUI. Do not let Core Motion or audio callbacks mutate view state directly.
+Milestone 2 replaces simulated motion and audio behind current boundaries according to [MILESTONE-2-SPEC.md](MILESTONE-2-SPEC.md). Do not bypass reducer from SwiftUI. Do not let Core Motion, MusicKit, or audio callbacks mutate view state directly.
 
 Production services need:
 
@@ -66,6 +66,8 @@ Production services need:
 - Cancellation-safe teardown
 - Session identity on callbacks
 - Deterministic adapters for tests
+
+The music-source feasibility gate selects one production player. The codebase must not retain both Apple Music and local file playback as competing implementations after the decision.
 
 ## Invariants
 
