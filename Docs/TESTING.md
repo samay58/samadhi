@@ -67,7 +67,7 @@ Final frames under Evidence/Simulator/ cover ready, locked run, controls, summar
 
 Simulator verifies interaction, accessibility structure, reducer behavior, resource packaging, and deterministic motion. It cannot validate physical cadence quality, real headphone route behavior, tempo adaptation, or listening artifacts.
 
-The `Samadhi MusicKit Gate` scheme verifies that the harness and framework calls compile. Physical traces separately prove authorization, library loading, playback, mechanical rate writes, pause, and resume. Preview coverage, listening quality, background, controlled interruption, and route checks remain separate physical gates.
+The `Samadhi MusicKit Gate` scheme verifies that the harness and framework calls compile. Physical traces separately prove authorization, library loading, automatic token generation, strict catalog resolution, preview decoding, playback, mechanical rate writes, pause, and resume. Bluetooth listening, background, controlled interruption, and route checks remain separate physical gates.
 
 ## Current device checks
 
@@ -83,14 +83,17 @@ The `Samadhi MusicKit Gate` scheme verifies that the harness and framework calls
 - Pause and resume observation: passed
 - Direct library preview coverage: failed at 0 of 10 in every sample
 - ISRC catalog retry: blocked because all 40 sampled tracks omitted ISRC
-- Equivalent-ID catalog retry: blocked by 40 `.developerTokenRequestFailed` results before catalog response
-- Installed development profiles: only Xcode-managed wildcard `ZL5U59XBJ6.*` found; no exact Samadhi profile is installed
+- Exact-App-ID signing: passed with `Samadhi Development` and application identifier `ZL5U59XBJ6.com.samaydhawan.Samadhi`
+- Automatic developer token: passed with repeated direct catalog responses
+- Strict catalog resolution: passed for 10 of 10 City Pocket tracks with 0.0-second duration deltas
+- Temporary preview download and PCM decode: passed for 10 of 10 City Pocket tracks
+- Built-in-speaker listening: passed provisionally; no major pitch change or unpleasant artifacts were reported at 0.94 and 1.06
 - Spotify adaptive playback: rejected by documented platform capability and policy review; no code spike warranted
-- Listening, screen-lock background, controlled interruption, and route-loss checks: not proven
+- Bluetooth listening, screen-lock background, next track, controlled interruption, and route-loss checks: not proven
 
 ## Next source gate
 
-Create a fresh development profile for the exact Samadhi App ID, sign and install a clean harness build, inspect the embedded identity, and run one minimal catalog request. Save the trace under `Evidence/Device/`. A real catalog response passes the token gate. A repeated `developerTokenRequestFailed` result after one clean reinstall fails it and selects local-file playback.
+Repeat the speaker result on a Bluetooth headphone route at 0.94, 1.00, and 1.06, listening for pitch change, clicks, gaps, warble, or instability. If acceptable, prove five screen-locked minutes, next track, controlled interruption, and route loss. Save the trace and listening notes under `Evidence/Device/`. Mechanical rate writes do not pass the listening gate.
 
 ## Known environment behavior
 

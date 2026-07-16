@@ -1,0 +1,938 @@
+[
+  {
+    "date" : "2026-07-16T04:04:07Z",
+    "detail" : "MusicKit feasibility harness opened",
+    "device" : "iPhone",
+    "event" : "harness_started",
+    "id" : "E32B2CCE-A967-4907-ACD2-D7BBA33EDEB9",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T04:04:07Z",
+    "detail" : "stopped @ 0.0",
+    "device" : "iPhone",
+    "event" : "player_state",
+    "id" : "D0D2810F-6E07-4291-93D3-0E8E484E0FC5",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T04:04:08Z",
+    "detail" : "Catalog returned 1 song",
+    "device" : "iPhone",
+    "event" : "catalog_token_passed",
+    "id" : "F6DD55CC-2F5C-47CD-B972-96CE32EC0D90",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T04:04:09Z",
+    "detail" : ".authorized",
+    "device" : "iPhone",
+    "event" : "authorization",
+    "id" : "0902DF4F-96FF-48BE-A033-8CC0833DD959",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T04:04:09Z",
+    "detail" : "40 playlists",
+    "device" : "iPhone",
+    "event" : "playlists_loaded",
+    "id" : "3FD579CF-90EC-4121-AA86-E435575E4406",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T04:04:15Z",
+    "detail" : "Black Classical Music (feat. Venna & Charlie Stacey); id i.RBrNLaoSNM7qO; MusicDataRequest.Error(\n  status: 400,\n  code: 40005,\n  title: \"Invalid Parameter Value\",\n  detailText: \"Invalid input to equivalents filter, ids are expected to be numeric\",\n  id: \"HMJKVBR3M435ZIIME662I7JKJ4\",\n  source: .parameter(\"filter\")\n  originalResponse: MusicDataResponse(\n    data: 223 bytes,\n    urlResponse: <NSHTTPURLResponse: 0x000000014dd08300>\n  )\n)",
+    "device" : "iPhone",
+    "event" : "catalog_lookup_error",
+    "id" : "68B767F7-187F-4655-9D85-FFD2844744C7",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T04:04:16Z",
+    "detail" : "Black Classical Music (feat. Venna & Charlie Stacey); catalog id 1683439012; duration delta 0.0",
+    "device" : "iPhone",
+    "event" : "catalog_search_resolved",
+    "id" : "C46BAE66-DA57-4575-A117-1BF543383FF6",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T04:04:16Z",
+    "detail" : "Black Classical Music (feat. Venna & Charlie Stacey); catalog id 1683439012",
+    "device" : "iPhone",
+    "event" : "catalog_preview_resolved",
+    "id" : "4134E6DB-9A7F-4EC9-8BC5-0648E3CBE4A4",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T04:04:16Z",
+    "detail" : "Black Classical Music (feat. Venna & Charlie Stacey)",
+    "device" : "iPhone",
+    "event" : "preview_decoded",
+    "id" : "DDECF7E1-AFE5-4301-AA8C-32214EE59EAB",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T04:04:16Z",
+    "detail" : "Nightrider (feat. Freddie Gibbs); id i.RBrNbeYtNM7qO; MusicDataRequest.Error(\n  status: 400,\n  code: 40005,\n  title: \"Invalid Parameter Value\",\n  detailText: \"Invalid input to equivalents filter, ids are expected to be numeric\",\n  id: \"B7TW3YX7UQKH5C2GV6SMM4QWTQ\",\n  source: .parameter(\"filter\")\n  originalResponse: MusicDataResponse(\n    data: 223 bytes,\n    urlResponse: <NSHTTPURLResponse: 0x000000014e0256a0>\n  )\n)",
+    "device" : "iPhone",
+    "event" : "catalog_lookup_error",
+    "id" : "113B3FA8-9F1B-4046-A0E3-83A91FBE1BB5",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T04:04:17Z",
+    "detail" : "Nightrider (feat. Freddie Gibbs); catalog id 1497226892; duration delta 0.0",
+    "device" : "iPhone",
+    "event" : "catalog_search_resolved",
+    "id" : "BB193878-E997-47F4-8626-6A25511BE2BB",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T04:04:17Z",
+    "detail" : "Nightrider (feat. Freddie Gibbs); catalog id 1497226892",
+    "device" : "iPhone",
+    "event" : "catalog_preview_resolved",
+    "id" : "B40BCF9C-D28D-4829-807D-4209A454350F",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T04:04:17Z",
+    "detail" : "Nightrider (feat. Freddie Gibbs)",
+    "device" : "iPhone",
+    "event" : "preview_decoded",
+    "id" : "2FD324A3-B457-437A-856B-40BAA85CEA4B",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T04:04:21Z",
+    "detail" : "Come Down; id i.eoDNe05cN9Azm; MusicDataRequest.Error(\n  status: 400,\n  code: 40005,\n  title: \"Invalid Parameter Value\",\n  detailText: \"Invalid input to equivalents filter, ids are expected to be numeric\",\n  id: \"BAYMZRPZVIBMIAFLXGB5N2VRUE\",\n  source: .parameter(\"filter\")\n  originalResponse: MusicDataResponse(\n    data: 223 bytes,\n    urlResponse: <NSHTTPURLResponse: 0x000000014e027de0>\n  )\n)",
+    "device" : "iPhone",
+    "event" : "catalog_lookup_error",
+    "id" : "2C5A9BC9-D614-475D-8072-92A1949CDD59",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T04:04:21Z",
+    "detail" : "Come Down; catalog id 1065681770; duration delta 0.0",
+    "device" : "iPhone",
+    "event" : "catalog_search_resolved",
+    "id" : "6FD6EDF7-0E38-4FA1-BE6D-217FE5E51FF6",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T04:04:21Z",
+    "detail" : "Come Down; catalog id 1065681770",
+    "device" : "iPhone",
+    "event" : "catalog_preview_resolved",
+    "id" : "FA4DFDBF-8A2D-46D5-BBC0-675844CFE71B",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T04:04:22Z",
+    "detail" : "Come Down",
+    "device" : "iPhone",
+    "event" : "preview_decoded",
+    "id" : "0A643750-4F88-4A9C-A85D-0CC9AC8F2A24",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T04:04:22Z",
+    "detail" : "Photosynthesis (feat. Jean Deaux); id i.WmYNGb6TNX9Q2; MusicDataRequest.Error(\n  status: 400,\n  code: 40005,\n  title: \"Invalid Parameter Value\",\n  detailText: \"Invalid input to equivalents filter, ids are expected to be numeric\",\n  id: \"2LSHZ44VIQNX4I22T7EHKJ6SUA\",\n  source: .parameter(\"filter\")\n  originalResponse: MusicDataResponse(\n    data: 223 bytes,\n    urlResponse: <NSHTTPURLResponse: 0x000000014e0c66a0>\n  )\n)",
+    "device" : "iPhone",
+    "event" : "catalog_lookup_error",
+    "id" : "D5E8E7FF-C633-4EB3-974E-E7958B3AD074",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T04:04:22Z",
+    "detail" : "Photosynthesis (feat. Jean Deaux); catalog id 1756551981; duration delta 0.0",
+    "device" : "iPhone",
+    "event" : "catalog_search_resolved",
+    "id" : "C133887A-191B-4442-9FFD-BE37B8089225",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T04:04:22Z",
+    "detail" : "Photosynthesis (feat. Jean Deaux); catalog id 1756551981",
+    "device" : "iPhone",
+    "event" : "catalog_preview_resolved",
+    "id" : "B2DDD5CF-A9C8-4646-82ED-4020FA0780F3",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T04:04:22Z",
+    "detail" : "Photosynthesis (feat. Jean Deaux)",
+    "device" : "iPhone",
+    "event" : "preview_decoded",
+    "id" : "0AF62F0D-B7FB-4CF1-AC70-A7E85A75B995",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T04:04:23Z",
+    "detail" : "4r Da Squaw; id i.RBrNbeLFNM7qO; MusicDataRequest.Error(\n  status: 400,\n  code: 40005,\n  title: \"Invalid Parameter Value\",\n  detailText: \"Invalid input to equivalents filter, ids are expected to be numeric\",\n  id: \"6WTY6WT3DFC7JEYGZ5OFI6DR5M\",\n  source: .parameter(\"filter\")\n  originalResponse: MusicDataResponse(\n    data: 223 bytes,\n    urlResponse: <NSHTTPURLResponse: 0x000000014e0c6960>\n  )\n)",
+    "device" : "iPhone",
+    "event" : "catalog_lookup_error",
+    "id" : "3D64C9AB-74C1-47C3-B23C-DDDB6856B3B9",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T04:04:23Z",
+    "detail" : "4r Da Squaw; catalog id 1149507391; duration delta 0.0",
+    "device" : "iPhone",
+    "event" : "catalog_search_resolved",
+    "id" : "4383E141-6B9A-46F1-AFFB-6EB92A7A8DF4",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T04:04:23Z",
+    "detail" : "4r Da Squaw; catalog id 1149507391",
+    "device" : "iPhone",
+    "event" : "catalog_preview_resolved",
+    "id" : "B6EF1544-B457-4284-ABA4-3488EAA6CC31",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T04:04:23Z",
+    "detail" : "4r Da Squaw",
+    "device" : "iPhone",
+    "event" : "preview_decoded",
+    "id" : "EEFF513B-0EAB-43C8-94EE-7E5949D2D48F",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T04:04:23Z",
+    "detail" : "Meditation (feat. Jazmine Sullivan & KAYTRANADA); id i.DVE8q0kf7bWNr; MusicDataRequest.Error(\n  status: 400,\n  code: 40005,\n  title: \"Invalid Parameter Value\",\n  detailText: \"Invalid input to equivalents filter, ids are expected to be numeric\",\n  id: \"PKXCEQDVBS4R2KW3FYRLMHLPVI\",\n  source: .parameter(\"filter\")\n  originalResponse: MusicDataResponse(\n    data: 223 bytes,\n    urlResponse: <NSHTTPURLResponse: 0x000000014e0c7280>\n  )\n)",
+    "device" : "iPhone",
+    "event" : "catalog_lookup_error",
+    "id" : "17ECB792-BFB0-45D7-9F2A-B7DA977ACBAE",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T04:04:24Z",
+    "detail" : "Meditation (feat. Jazmine Sullivan & KAYTRANADA); catalog id 1215426301; duration delta 0.0",
+    "device" : "iPhone",
+    "event" : "catalog_search_resolved",
+    "id" : "2C683DE7-9105-4BCF-ABA1-48F47411E083",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T04:04:24Z",
+    "detail" : "Meditation (feat. Jazmine Sullivan & KAYTRANADA); catalog id 1215426301",
+    "device" : "iPhone",
+    "event" : "catalog_preview_resolved",
+    "id" : "B84C3A5D-BEAE-42A7-BDC3-D230A0E1707A",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T04:04:24Z",
+    "detail" : "Meditation (feat. Jazmine Sullivan & KAYTRANADA)",
+    "device" : "iPhone",
+    "event" : "preview_decoded",
+    "id" : "134429D8-B8E5-44EA-BFD0-DE08B6E0122B",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T04:04:24Z",
+    "detail" : "Vex Oh (feat. GoldLink & Ari PenSmith); id i.JL1mbORtR70VA; MusicDataRequest.Error(\n  status: 400,\n  code: 40005,\n  title: \"Invalid Parameter Value\",\n  detailText: \"Invalid input to equivalents filter, ids are expected to be numeric\",\n  id: \"DLBLKK5ZZ6AZ2CPCRVGSI2D2IA\",\n  source: .parameter(\"filter\")\n  originalResponse: MusicDataResponse(\n    data: 223 bytes,\n    urlResponse: <NSHTTPURLResponse: 0x000000014e0c6900>\n  )\n)",
+    "device" : "iPhone",
+    "event" : "catalog_lookup_error",
+    "id" : "A41E50AC-5CC3-4130-B203-EB17D92D0777",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T04:04:24Z",
+    "detail" : "Vex Oh (feat. GoldLink & Ari PenSmith); catalog id 1490036365; duration delta 0.0",
+    "device" : "iPhone",
+    "event" : "catalog_search_resolved",
+    "id" : "37F6196D-82A2-46A1-ADA3-86A4B6DBE177",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T04:04:24Z",
+    "detail" : "Vex Oh (feat. GoldLink & Ari PenSmith); catalog id 1490036365",
+    "device" : "iPhone",
+    "event" : "catalog_preview_resolved",
+    "id" : "8077F034-D7AD-4D49-B665-359EDF59D331",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T04:04:24Z",
+    "detail" : "Vex Oh (feat. GoldLink & Ari PenSmith)",
+    "device" : "iPhone",
+    "event" : "preview_decoded",
+    "id" : "BC55C91E-59E3-4534-8517-4961B218D993",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T04:04:25Z",
+    "detail" : "Topdown; id i.WmYNPx4fNX9Q2; MusicDataRequest.Error(\n  status: 400,\n  code: 40005,\n  title: \"Invalid Parameter Value\",\n  detailText: \"Invalid input to equivalents filter, ids are expected to be numeric\",\n  id: \"TMTY66UONGPYBI3XCCUYTFJXKY\",\n  source: .parameter(\"filter\")\n  originalResponse: MusicDataResponse(\n    data: 223 bytes,\n    urlResponse: <NSHTTPURLResponse: 0x000000014e0c6660>\n  )\n)",
+    "device" : "iPhone",
+    "event" : "catalog_lookup_error",
+    "id" : "804334DD-FBBC-48C9-BF2F-950CC55769A9",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T04:04:25Z",
+    "detail" : "Topdown; catalog id 1570732252; duration delta 0.0",
+    "device" : "iPhone",
+    "event" : "catalog_search_resolved",
+    "id" : "89492046-647C-4A5D-8C5C-8B8DC74C88B8",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T04:04:25Z",
+    "detail" : "Topdown; catalog id 1570732252",
+    "device" : "iPhone",
+    "event" : "catalog_preview_resolved",
+    "id" : "0C93E09E-2711-4E94-A40E-1BE142EC579F",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T04:04:25Z",
+    "detail" : "Topdown",
+    "device" : "iPhone",
+    "event" : "preview_decoded",
+    "id" : "E7E6DE7F-994C-4897-95F8-46C03EC8D613",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T04:04:25Z",
+    "detail" : "Many Times; id i.4YBoAAzI5mWKo; MusicDataRequest.Error(\n  status: 400,\n  code: 40005,\n  title: \"Invalid Parameter Value\",\n  detailText: \"Invalid input to equivalents filter, ids are expected to be numeric\",\n  id: \"Q2VAHQ6HYB7K7MU7LCIN3QGA34\",\n  source: .parameter(\"filter\")\n  originalResponse: MusicDataResponse(\n    data: 223 bytes,\n    urlResponse: <NSHTTPURLResponse: 0x000000014e0270a0>\n  )\n)",
+    "device" : "iPhone",
+    "event" : "catalog_lookup_error",
+    "id" : "4313CBC5-A8D6-4E04-851F-69893DAB76E2",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T04:04:26Z",
+    "detail" : "Many Times; catalog id 1591107489; duration delta 0.0",
+    "device" : "iPhone",
+    "event" : "catalog_search_resolved",
+    "id" : "2DEF74B7-0191-4B9B-9072-6A20CBE39466",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T04:04:26Z",
+    "detail" : "Many Times; catalog id 1591107489",
+    "device" : "iPhone",
+    "event" : "catalog_preview_resolved",
+    "id" : "94F99034-919B-4AD5-8942-03724C56B18F",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T04:04:26Z",
+    "detail" : "Many Times",
+    "device" : "iPhone",
+    "event" : "preview_decoded",
+    "id" : "B746F6CA-FFCF-4D37-9E11-383697C9C731",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T04:04:26Z",
+    "detail" : "Are You Looking Up; id i.b1JNPqPtN62vJ; MusicDataRequest.Error(\n  status: 400,\n  code: 40005,\n  title: \"Invalid Parameter Value\",\n  detailText: \"Invalid input to equivalents filter, ids are expected to be numeric\",\n  id: \"5HGAV4TDFEBU3XKXVUHBD5XJRI\",\n  source: .parameter(\"filter\")\n  originalResponse: MusicDataResponse(\n    data: 223 bytes,\n    urlResponse: <NSHTTPURLResponse: 0x000000014e026d20>\n  )\n)",
+    "device" : "iPhone",
+    "event" : "catalog_lookup_error",
+    "id" : "DF9BA56C-3C3D-4DDE-9ADB-97B0E33AC76D",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T04:04:27Z",
+    "detail" : "Are You Looking Up; catalog id 1882613148; duration delta 0.0",
+    "device" : "iPhone",
+    "event" : "catalog_search_resolved",
+    "id" : "F7201097-F55B-4CF1-B1A9-AAE1E9E6DE0F",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T04:04:27Z",
+    "detail" : "Are You Looking Up; catalog id 1882613148",
+    "device" : "iPhone",
+    "event" : "catalog_preview_resolved",
+    "id" : "673C075F-3E25-4D8C-90FB-62F04517FE64",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T04:04:27Z",
+    "detail" : "Are You Looking Up",
+    "device" : "iPhone",
+    "event" : "preview_decoded",
+    "id" : "820FBD6C-B458-48A2-8E88-694F706B1E81",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T04:04:27Z",
+    "detail" : "City Pocket, Soft Lightning -- June 2026; 25 tracks; decoded preview coverage 10 of 10",
+    "device" : "iPhone",
+    "event" : "playlist_selected",
+    "id" : "0B4FF5E7-79A3-429E-8214-6C7E10F05DE6",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T04:04:33Z",
+    "detail" : "Queue contains 25 tracks",
+    "device" : "iPhone",
+    "event" : "playback_started",
+    "id" : "044C7231-47AF-4B94-9EAA-9FE823BF45E3",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T04:04:33Z",
+    "detail" : "Audio session interruption observed",
+    "device" : "iPhone",
+    "event" : "audio_interruption",
+    "id" : "85B81900-5275-4E15-9D0D-3E667FE1A434",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T04:04:34Z",
+    "detail" : "playing @ 1.0",
+    "device" : "iPhone",
+    "event" : "player_state",
+    "id" : "C3E8DB4B-6E6E-4255-870A-EB28DC82FDFD",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T04:04:36Z",
+    "detail" : "requested 1.06; reported 1.06",
+    "device" : "iPhone",
+    "event" : "rate_written",
+    "id" : "471651F6-33BD-4E34-93EC-5DC3F085AFB1",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T04:04:36Z",
+    "detail" : "playing @ 1.06",
+    "device" : "iPhone",
+    "event" : "player_state",
+    "id" : "6548937F-F839-4EDB-A73B-35A20904A27B",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T04:04:36Z",
+    "detail" : "Pause requested",
+    "device" : "iPhone",
+    "event" : "pause",
+    "id" : "FCBE68A1-C82F-49B9-B863-2A5F9B369925",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T04:04:36Z",
+    "detail" : "Stop requested",
+    "device" : "iPhone",
+    "event" : "stop",
+    "id" : "F0245C33-E11F-465A-A9CA-18B9B3F89BEA",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T04:04:36Z",
+    "detail" : "Resume requested",
+    "device" : "iPhone",
+    "event" : "resume",
+    "id" : "D76F104D-8DCF-403D-92CE-6E4B8800A290",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T04:04:37Z",
+    "detail" : "playing @ 1.0",
+    "device" : "iPhone",
+    "event" : "player_state",
+    "id" : "6EF9C6C8-D3BF-45E9-9A3D-52323423838A",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T04:05:46Z",
+    "detail" : "requested 0.94; reported 0.94",
+    "device" : "iPhone",
+    "event" : "rate_written",
+    "id" : "661A7FA4-CD4F-4CCF-9000-5243CC510372",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T04:05:47Z",
+    "detail" : "playing @ 0.94",
+    "device" : "iPhone",
+    "event" : "player_state",
+    "id" : "6462E677-5487-4BBA-8ABC-8B01B5A4F368",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T04:05:48Z",
+    "detail" : "requested 1.06; reported 1.06",
+    "device" : "iPhone",
+    "event" : "rate_written",
+    "id" : "A6452E4B-DDCC-498F-87EF-9462FFE0A346",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T04:05:48Z",
+    "detail" : "playing @ 1.06",
+    "device" : "iPhone",
+    "event" : "player_state",
+    "id" : "98A9DF20-A127-4424-94CC-0EB71F9C3DE8",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T04:05:49Z",
+    "detail" : "requested 0.94; reported 0.94",
+    "device" : "iPhone",
+    "event" : "rate_written",
+    "id" : "BA346913-CA8D-4C70-9DE9-CFD5684B2274",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T04:05:49Z",
+    "detail" : "playing @ 0.94",
+    "device" : "iPhone",
+    "event" : "player_state",
+    "id" : "60F8F21D-3D65-4E46-BD38-EA552D3F51AA",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T04:05:53Z",
+    "detail" : "LITE SPOTS; id i.DVE8xLQf7bWNr; MusicDataRequest.Error(\n  status: 400,\n  code: 40005,\n  title: \"Invalid Parameter Value\",\n  detailText: \"Invalid input to equivalents filter, ids are expected to be numeric\",\n  id: \"JWU7FJKX4MQRYZOX4P6ZQ3TMTI\",\n  source: .parameter(\"filter\")\n  originalResponse: MusicDataResponse(\n    data: 223 bytes,\n    urlResponse: <NSHTTPURLResponse: 0x000000014e215be0>\n  )\n)",
+    "device" : "iPhone",
+    "event" : "catalog_lookup_error",
+    "id" : "1D18A71B-60F0-4725-BD96-8B5AA983E5CB",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T04:05:53Z",
+    "detail" : "LITE SPOTS; catalog id 1092027177; duration delta 0.0",
+    "device" : "iPhone",
+    "event" : "catalog_search_resolved",
+    "id" : "79C1D879-9CF3-411A-A408-9C7438AA6860",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T04:05:53Z",
+    "detail" : "LITE SPOTS; catalog id 1092027177",
+    "device" : "iPhone",
+    "event" : "catalog_preview_resolved",
+    "id" : "464CD2A5-4D60-403B-B87B-BD37C5AC291F",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T04:05:53Z",
+    "detail" : "LITE SPOTS",
+    "device" : "iPhone",
+    "event" : "preview_decoded",
+    "id" : "BF23C0E3-9111-4BD6-9112-FA56783EB032",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T04:05:53Z",
+    "detail" : "Gosh; id i.GEGg2YXCorzgd; MusicDataRequest.Error(\n  status: 400,\n  code: 40005,\n  title: \"Invalid Parameter Value\",\n  detailText: \"Invalid input to equivalents filter, ids are expected to be numeric\",\n  id: \"2G24NBZX7Y2ZLYEOTOLIWBVLXQ\",\n  source: .parameter(\"filter\")\n  originalResponse: MusicDataResponse(\n    data: 223 bytes,\n    urlResponse: <NSHTTPURLResponse: 0x000000014e217c60>\n  )\n)",
+    "device" : "iPhone",
+    "event" : "catalog_lookup_error",
+    "id" : "8D45EE69-72FB-496D-B16B-AC5139B6BCD8",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T04:05:54Z",
+    "detail" : "Gosh; catalog id 1525506452; duration delta 0.0",
+    "device" : "iPhone",
+    "event" : "catalog_search_resolved",
+    "id" : "746F362A-FC03-4658-9B86-CC99FE65FC70",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T04:05:54Z",
+    "detail" : "Gosh; catalog id 1525506452",
+    "device" : "iPhone",
+    "event" : "catalog_preview_resolved",
+    "id" : "3828300C-0859-470D-8EF0-85C69E340172",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T04:05:54Z",
+    "detail" : "Gosh",
+    "device" : "iPhone",
+    "event" : "preview_decoded",
+    "id" : "96338C31-D9C6-4553-87F6-6B50BC0C4A39",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T04:05:54Z",
+    "detail" : "So U Kno; id i.4YBoAExs5mWKo; MusicDataRequest.Error(\n  status: 400,\n  code: 40005,\n  title: \"Invalid Parameter Value\",\n  detailText: \"Invalid input to equivalents filter, ids are expected to be numeric\",\n  id: \"RCB5KSUG4IGNS3ZKNTUO5T4HO4\",\n  source: .parameter(\"filter\")\n  originalResponse: MusicDataResponse(\n    data: 223 bytes,\n    urlResponse: <NSHTTPURLResponse: 0x000000014e217da0>\n  )\n)",
+    "device" : "iPhone",
+    "event" : "catalog_lookup_error",
+    "id" : "2675A5F7-846E-44D7-BAEB-065B3CE51449",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T04:05:54Z",
+    "detail" : "So U Kno; catalog id 1658771254; duration delta 0.0",
+    "device" : "iPhone",
+    "event" : "catalog_search_resolved",
+    "id" : "EDAEADBF-6916-4F76-A0B9-5ED0BA4EAD64",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T04:05:54Z",
+    "detail" : "So U Kno; catalog id 1658771254",
+    "device" : "iPhone",
+    "event" : "catalog_preview_resolved",
+    "id" : "278D8F50-BF6E-4C83-A4DF-ABA00CF2FC64",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T04:05:54Z",
+    "detail" : "So U Kno",
+    "device" : "iPhone",
+    "event" : "preview_decoded",
+    "id" : "28D9BC64-D53E-4DCC-BB9E-DC3F3FA954A5",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T04:05:55Z",
+    "detail" : "Birth4000; id i.4YBoAxNS5mWKo; MusicDataRequest.Error(\n  status: 400,\n  code: 40005,\n  title: \"Invalid Parameter Value\",\n  detailText: \"Invalid input to equivalents filter, ids are expected to be numeric\",\n  id: \"UIJE2VI5SXOLEHJ2VYVX7KRUB4\",\n  source: .parameter(\"filter\")\n  originalResponse: MusicDataResponse(\n    data: 223 bytes,\n    urlResponse: <NSHTTPURLResponse: 0x000000014e5d7460>\n  )\n)",
+    "device" : "iPhone",
+    "event" : "catalog_lookup_error",
+    "id" : "6CD037C3-CEA2-46A5-9650-EC59FB26DE32",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T04:05:55Z",
+    "detail" : "Birth4000; catalog id 1707533778; duration delta 0.0",
+    "device" : "iPhone",
+    "event" : "catalog_search_resolved",
+    "id" : "D7EBBE86-0125-4A78-8980-6D9ADF5C53C1",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T04:05:55Z",
+    "detail" : "Birth4000; catalog id 1707533778",
+    "device" : "iPhone",
+    "event" : "catalog_preview_resolved",
+    "id" : "02C84EC2-1687-4F53-B69E-46ACC240535A",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T04:05:56Z",
+    "detail" : "Birth4000",
+    "device" : "iPhone",
+    "event" : "preview_decoded",
+    "id" : "219A0A77-904E-4B11-A50C-6FF712AA1DF5",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T04:05:56Z",
+    "detail" : "Kerala; id i.RBrNLY3tNM7qO; MusicDataRequest.Error(\n  status: 400,\n  code: 40005,\n  title: \"Invalid Parameter Value\",\n  detailText: \"Invalid input to equivalents filter, ids are expected to be numeric\",\n  id: \"C7UKIFLW3ZCUR2ILNZ7KUKXSZU\",\n  source: .parameter(\"filter\")\n  originalResponse: MusicDataResponse(\n    data: 223 bytes,\n    urlResponse: <NSHTTPURLResponse: 0x000000014e5d6460>\n  )\n)",
+    "device" : "iPhone",
+    "event" : "catalog_lookup_error",
+    "id" : "CBD9E40D-F9E1-403C-A6EB-6F922865828A",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T04:05:56Z",
+    "detail" : "Kerala; catalog id 1169246072; duration delta 0.0",
+    "device" : "iPhone",
+    "event" : "catalog_search_resolved",
+    "id" : "9E83EC2B-E188-454A-9ECE-6CD9FAA1B278",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T04:05:56Z",
+    "detail" : "Kerala; catalog id 1169246072",
+    "device" : "iPhone",
+    "event" : "catalog_preview_resolved",
+    "id" : "199D5032-9254-4A80-B544-AE455561C219",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T04:05:57Z",
+    "detail" : "Kerala",
+    "device" : "iPhone",
+    "event" : "preview_decoded",
+    "id" : "10C5BBA9-5F8F-4DF3-9C12-E184F28AB1AC",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T04:05:57Z",
+    "detail" : "Cherry; id i.eoDNVXgHN9Azm; MusicDataRequest.Error(\n  status: 400,\n  code: 40005,\n  title: \"Invalid Parameter Value\",\n  detailText: \"Invalid input to equivalents filter, ids are expected to be numeric\",\n  id: \"MJX4C56H4MUDNUQKHGOEOV3DNI\",\n  source: .parameter(\"filter\")\n  originalResponse: MusicDataResponse(\n    data: 223 bytes,\n    urlResponse: <NSHTTPURLResponse: 0x000000014e5d5920>\n  )\n)",
+    "device" : "iPhone",
+    "event" : "catalog_lookup_error",
+    "id" : "AAA7B982-49F5-4469-B817-6FB8CA2F0AAC",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T04:05:57Z",
+    "detail" : "Cherry; catalog id 1616711543; duration delta 0.0",
+    "device" : "iPhone",
+    "event" : "catalog_search_resolved",
+    "id" : "D37118BD-3EB9-4986-889D-F61A15EA4E8C",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T04:05:57Z",
+    "detail" : "Cherry; catalog id 1616711543",
+    "device" : "iPhone",
+    "event" : "catalog_preview_resolved",
+    "id" : "A905ACD0-E7B7-40F6-823F-5DDEAC0F24D9",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T04:05:57Z",
+    "detail" : "Cherry",
+    "device" : "iPhone",
+    "event" : "preview_decoded",
+    "id" : "40E9F849-9E18-4941-891E-1B19C0215064",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T04:05:58Z",
+    "detail" : "Baddy On the Floor (feat. Honey Dijon); id i.RBrNL9DtNM7qO; MusicDataRequest.Error(\n  status: 400,\n  code: 40005,\n  title: \"Invalid Parameter Value\",\n  detailText: \"Invalid input to equivalents filter, ids are expected to be numeric\",\n  id: \"DF7H7MJTEPCA7Z57EWWV2ESUKU\",\n  source: .parameter(\"filter\")\n  originalResponse: MusicDataResponse(\n    data: 223 bytes,\n    urlResponse: <NSHTTPURLResponse: 0x000000014e411880>\n  )\n)",
+    "device" : "iPhone",
+    "event" : "catalog_lookup_error",
+    "id" : "1B7F5B3B-B1FF-446E-BE9A-BF3A3877DE89",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T04:05:58Z",
+    "detail" : "Baddy On the Floor (feat. Honey Dijon); catalog id 1736774725; duration delta 0.0",
+    "device" : "iPhone",
+    "event" : "catalog_search_resolved",
+    "id" : "0E6EEB67-930D-4503-9BA1-E505D7B84C80",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T04:05:58Z",
+    "detail" : "Baddy On the Floor (feat. Honey Dijon); catalog id 1736774725",
+    "device" : "iPhone",
+    "event" : "catalog_preview_resolved",
+    "id" : "81EECA02-F57F-40F7-85DA-170020B190FA",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T04:05:58Z",
+    "detail" : "Baddy On the Floor (feat. Honey Dijon)",
+    "device" : "iPhone",
+    "event" : "preview_decoded",
+    "id" : "7ED74E9B-0822-45A0-8C42-15BF9B9666C3",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T04:05:58Z",
+    "detail" : "Glue; id i.DVEXm7Rf7bWNr; MusicDataRequest.Error(\n  status: 400,\n  code: 40005,\n  title: \"Invalid Parameter Value\",\n  detailText: \"Invalid input to equivalents filter, ids are expected to be numeric\",\n  id: \"7EIQMZC46MAGMUAR5GBDGIMLFQ\",\n  source: .parameter(\"filter\")\n  originalResponse: MusicDataResponse(\n    data: 223 bytes,\n    urlResponse: <NSHTTPURLResponse: 0x000000014e216f00>\n  )\n)",
+    "device" : "iPhone",
+    "event" : "catalog_lookup_error",
+    "id" : "3E3F58CF-80A5-40EA-B04B-C4914C8F9E42",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T04:05:59Z",
+    "detail" : "Glue; catalog id 1240586502; duration delta 0.0",
+    "device" : "iPhone",
+    "event" : "catalog_search_resolved",
+    "id" : "A0FE4532-5018-4F56-97AD-1F3303B4410D",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T04:05:59Z",
+    "detail" : "Glue; catalog id 1240586502",
+    "device" : "iPhone",
+    "event" : "catalog_preview_resolved",
+    "id" : "4DDE666D-F669-40B9-8386-F522269EE3B3",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T04:05:59Z",
+    "detail" : "Glue",
+    "device" : "iPhone",
+    "event" : "preview_decoded",
+    "id" : "A090B33D-71D1-4F11-9543-63FA7E70E99B",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T04:05:59Z",
+    "detail" : "Never Come Back (Four Tet Remix); id i.b1JNoX9fN62vJ; MusicDataRequest.Error(\n  status: 400,\n  code: 40005,\n  title: \"Invalid Parameter Value\",\n  detailText: \"Invalid input to equivalents filter, ids are expected to be numeric\",\n  id: \"5FKDVYYCYB6MWX6ZCPUUJHQJOU\",\n  source: .parameter(\"filter\")\n  originalResponse: MusicDataResponse(\n    data: 223 bytes,\n    urlResponse: <NSHTTPURLResponse: 0x000000014dd0a840>\n  )\n)",
+    "device" : "iPhone",
+    "event" : "catalog_lookup_error",
+    "id" : "9C381CD7-0632-4B48-B171-3323482BEFDB",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T04:05:59Z",
+    "detail" : "Never Come Back (Four Tet Remix); catalog id 1839150586; duration delta 0.0",
+    "device" : "iPhone",
+    "event" : "catalog_search_resolved",
+    "id" : "2BD4C973-0C7B-451A-9FE3-904C82C77C8D",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T04:05:59Z",
+    "detail" : "Never Come Back (Four Tet Remix); catalog id 1839150586",
+    "device" : "iPhone",
+    "event" : "catalog_preview_resolved",
+    "id" : "F676961A-99CC-4097-AA80-80DBB3C26D92",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T04:06:00Z",
+    "detail" : "Never Come Back (Four Tet Remix)",
+    "device" : "iPhone",
+    "event" : "preview_decoded",
+    "id" : "5D6412AD-4D25-46E5-A7E2-5E34B2C4DD12",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T04:06:00Z",
+    "detail" : "Loved; id i.ldDNW0Qt5dQOl; MusicDataRequest.Error(\n  status: 400,\n  code: 40005,\n  title: \"Invalid Parameter Value\",\n  detailText: \"Invalid input to equivalents filter, ids are expected to be numeric\",\n  id: \"QIQDIEOBZH722JYM6LF2HXEDEA\",\n  source: .parameter(\"filter\")\n  originalResponse: MusicDataResponse(\n    data: 223 bytes,\n    urlResponse: <NSHTTPURLResponse: 0x000000014e0c69e0>\n  )\n)",
+    "device" : "iPhone",
+    "event" : "catalog_lookup_error",
+    "id" : "27435F38-C4D2-4B86-AB89-DA11AE70C308",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T04:06:00Z",
+    "detail" : "Loved; catalog id 1720154478; duration delta 0.0",
+    "device" : "iPhone",
+    "event" : "catalog_search_resolved",
+    "id" : "46EB4F1D-B3B3-49F3-893C-2F2C84D0E82D",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T04:06:00Z",
+    "detail" : "Loved; catalog id 1720154478",
+    "device" : "iPhone",
+    "event" : "catalog_preview_resolved",
+    "id" : "E5AAB0FF-D9BC-4CA0-95DA-6FE46DDDFA32",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T04:06:00Z",
+    "detail" : "Loved",
+    "device" : "iPhone",
+    "event" : "preview_decoded",
+    "id" : "94539DDB-5D56-4997-83E0-66BCB365E65F",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T04:06:00Z",
+    "detail" : "This Week: Rhythmic Mind Reset; 25 tracks; decoded preview coverage 10 of 10",
+    "device" : "iPhone",
+    "event" : "playlist_selected",
+    "id" : "20540817-0EB9-4EE6-95DF-AD0F0E12C349",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T04:06:00Z",
+    "detail" : "requested 1.06; reported 1.06",
+    "device" : "iPhone",
+    "event" : "rate_written",
+    "id" : "A3E73115-DDEF-40C7-B214-93826D6541A9",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T04:06:00Z",
+    "detail" : "playing @ 1.06",
+    "device" : "iPhone",
+    "event" : "player_state",
+    "id" : "EA642CC4-894D-4D90-93DD-BCA44B12ECF5",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  }
+]

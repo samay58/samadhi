@@ -1,22 +1,24 @@
 # Music source resolution specification
 
-Status: Ready for the final Apple Music token gate
+Status: Token and tempo-source gates passed; listening and recovery gates active
 
 ## Problem Statement
 
 Samadhi needs one production music source that can import a runner's collection, expose or support local tempo analysis, play in the background, and change playback rate from 0.94 through 1.06 without audible damage.
 
-The physical MusicKit harness has already proved authorization, library playlist loading, real playback, live rate writes, pause, and resume. Direct library songs exposed no usable previews, sampled tracks exposed no ISRC, and catalog equivalent-ID requests stopped before a response with `developerTokenRequestFailed`. Apple Music is therefore blocked at automatic developer-token generation. It has not yet failed the catalog-preview requirement.
+The physical MusicKit harness has proved authorization, library playlist loading, automatic token generation, strict catalog resolution, 10 of 10 local preview decodes, real playback, live rate writes, pause, and resume. The exact Samadhi development profile fixed the earlier `developerTokenRequestFailed` blocker. Apple Music remains the active candidate while headphone listening, background, track-change, interruption, and route gates remain open.
 
 Spotify was considered as another streaming source. It is not a viable adaptive-audio player for this milestone. Spotify's iOS SDK remotely controls the Spotify app rather than giving Samadhi an app-owned audio signal. Its documented player APIs do not offer music playback-rate control, and Spotify's Developer Policy prohibits altering or analyzing Spotify content. A Spotify playlist could provide metadata, but it would not close the adaptive playback loop and would add OAuth, account, and provider complexity.
 
-The decision must remain bounded. Samadhi will perform one clean Apple identity and signing repair. If automatic token generation still fails, or if any later load-bearing MusicKit gate fails, the production source becomes DRM-free multi-file import with `AVAudioEngine` and `AVAudioUnitTimePitch`. Samadhi will not build a token backend, embed a Media Services private key, or maintain two production players.
+The identity repair is complete. If any remaining load-bearing MusicKit gate fails, the production source becomes DRM-free multi-file import with `AVAudioEngine` and `AVAudioUnitTimePitch`. Samadhi will not build a token backend, embed a Media Services private key, or maintain two production players.
 
 ## Solution
 
 Resolve the source in four gates. Each gate produces durable physical-device evidence. The first failure ends the Apple Music path.
 
 ### Token identity gate
+
+Result: Passed on 2026-07-16. The exact `Samadhi Development` profile produced repeated real catalog responses.
 
 1. Confirm the exact App ID `com.samaydhawan.Samadhi` exists under team `ZL5U59XBJ6` and its MusicKit App Service is enabled.
 2. Replace the current wildcard development provisioning profile with a fresh development profile bound to the exact App ID.
@@ -30,15 +32,19 @@ If the gate fails, record Apple Music as rejected for Milestone 2 and begin loca
 
 ### Tempo-source gate
 
+Result: Passed on 2026-07-16 for City Pocket. Strict title, artist, album, and duration agreement resolved all ten tracks to numeric catalog IDs. All ten remote previews downloaded into temporary app storage and yielded decoded PCM.
+
 After the token gate passes, select one real library playlist and resolve ten chosen tracks to catalog songs. Attempt decoded local analysis using the documented preview or another documented local tempo source.
 
-Pass requires analyzable audio or documented tempo for at least eight of ten tracks. Titles, artists, and durations may be used to report evidence, but fuzzy title matching is not an accepted production identity strategy. External BPM databases are not part of this milestone.
+Pass requires analyzable audio or documented tempo for at least eight of ten tracks. A strict title, artist, album, and duration match may resolve an opaque library identity to a provider-stable catalog identifier. Ambiguous results fail closed, and the returned numeric catalog identifier becomes the persisted identity. Fuzzy title matching and external BPM databases are not accepted.
 
 Fail means fewer than eight of ten tracks can be analyzed reliably. The Apple Music path ends because Samadhi cannot make an honest adaptation decision without track tempo.
 
 ### Playback quality gate
 
 Use one known-tempo track and `ApplicationMusicPlayer` on the same physical iPhone and headphone route. Exercise 0.94, 1.00, and 1.06 while listening through transitions and steady playback.
+
+Current result: Built-in-speaker listening passed provisionally. The rate changes sounded like genuine speedup and slowdown without major pitch change or unpleasant artifacts. Repeat on Bluetooth headphones before passing this gate.
 
 Pass requires pitch-stable listening without clicks, gaps, obvious warble, or unstable rate writes. Mechanical assignment alone is not proof. Record the route, source track, starting tempo, requested rates, observed behavior, and listening notes.
 
@@ -95,9 +101,13 @@ The production behavior seam remains:
 
 Audio and motion callbacks return through identified `RunEvent` values. SwiftUI does not call MusicKit, AVFAudio, or Core Motion directly. The reducer does not import platform frameworks.
 
+### Calibration controls are not the product interaction
+
+The 0.94, 1.00, and 1.06 buttons exist only in the device harness. The production app continuously derives a target rate from stable cadence, applies bounded ramps, ignores changes inside the deadband, returns calmly toward 1.00 when confidence falls, and skips or leaves incompatible tracks unchanged. The initial safe range is evidence-based, not a claim that adaptation must remain visually or behaviorally static. Prefer selecting a more compatible next track over stretching one song far beyond the proven range.
+
 ### Automatic Apple token generation only
 
-MusicKit's automatic token generation is the only accepted Apple catalog authentication path for this milestone. The exact App ID and a fresh exact-ID development profile are the final configuration test.
+MusicKit's automatic token generation is the only accepted Apple catalog authentication path for this milestone. The exact App ID and `Samadhi Development` profile passed that configuration test.
 
 Do not:
 
@@ -126,7 +136,7 @@ Spotify playlist metadata import is also deferred. It would create a second acco
 
 ### Tempo identity
 
-The production collection persists provider-stable identifiers, not fuzzy title matches. Derived tempo metadata records algorithm version, confidence, analysis source, and date. Reanalysis invalidates stale results explicitly.
+The production collection persists provider-stable identifiers, not search strings. Strict metadata agreement may resolve an opaque library track once, but the returned numeric catalog identifier is stored after resolution. Derived tempo metadata records algorithm version, confidence, analysis source, and date. Reanalysis invalidates stale results explicitly.
 
 ### Failure is a product decision
 
@@ -188,11 +198,10 @@ After source selection, the full serial Xcode gate must pass before a milestone 
 
 ### Immediate execution order
 
-1. Create or refresh an iOS App Development profile for the exact Samadhi App ID.
-2. Sign a clean physical build with that profile and inspect the embedded identity.
-3. Run one minimal catalog request and save the trace.
-4. If it succeeds, run the ten-track tempo-source gate and then the remaining listening and recovery checks.
-5. If it fails, record Apple Music as rejected, remove the spike, and implement local multi-file import plus the local audio engine.
+1. Complete headphone listening at 0.94, 1.00, and 1.06.
+2. Prove five screen-locked minutes, next track, controlled interruption, and route loss.
+3. If every check passes, record Apple Music as the one production source.
+4. If any load-bearing check fails, record Apple Music as rejected, remove the spike, and implement local multi-file import plus the local audio engine.
 
 ### Verified platform sources
 
@@ -203,4 +212,3 @@ After source selection, the full serial Xcode gate must pass before a milestone 
 - [Spotify iOS SDK getting started](https://developer.spotify.com/documentation/ios/getting-started)
 - [Spotify Developer Policy](https://developer.spotify.com/policy)
 - [Spotify February 2026 development-mode changes](https://developer.spotify.com/documentation/web-api/tutorials/february-2026-migration-guide)
-

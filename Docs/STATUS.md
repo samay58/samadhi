@@ -12,7 +12,7 @@
 | Audio timing | Simulated only | Deterministic beat-clock tests |
 | Playlist import | Specified, not started | Milestone 2 spec |
 | Adaptation policy | Built, not connected to a real player | Deterministic policy tests |
-| Apple Music feasibility | Final exact-App-ID token repair specified | Five saved traces from iPhone 17 Pro |
+| Apple Music feasibility | Token and tempo-source passed; speaker listening passed; headphones and recovery open | Exact-profile trace with 10 of 10 decoded previews |
 | Spotify feasibility | Rejected for adaptive playback | Remote-control architecture, missing music rate control, and content policy conflict |
 | Production player | Undecided | Physical gate required |
 | Physical run validation | MusicKit feasibility run in progress; outdoor run not started | Requires completed source decision and route matrix |
@@ -65,13 +65,15 @@
 - Renamed the summary measurement to tempo matched and made fixed rhythm report Not measured
 - Added a debug-only MusicKit gate scheme with playlist loading, decoded PCM preview coverage, playback, rate controls, route and interruption observation, and JSON trace export
 - Added music and motion permission text plus verified background audio mode
-- Saved three physical-device traces proving authorization, 40-playlist loading, real playback, live 0.94, 1.00, and 1.06 rate writes, pause, and resume
-- Found 0 of 10 direct-library preview coverage across every sample
-- Found no ISRC on 40 sampled library tracks, then exercised equivalent-ID catalog lookup
-- Observed 40 `.developerTokenRequestFailed` results before any catalog response, so catalog preview coverage remains blocked rather than failed
-- Verified that the Mac has only the Xcode-managed wildcard profile `ZL5U59XBJ6.*`; no exact Samadhi development profile is installed, making one fresh exact-App-ID profile the final bounded Apple token test
+- Saved five early physical-device traces proving authorization, 40-playlist loading, real playback, live 0.94, 1.00, and 1.06 rate writes, pause, and resume
+- Used the early traces to isolate two blockers: library tracks had no direct previews or ISRC, and the wildcard profile could not obtain Apple's automatic developer token
 - Evaluated Spotify and rejected it as a production source because it does not provide an app-owned audio signal or documented music rate control, and its policy prohibits altering or analyzing Spotify content
 - Added a source-resolution spec with explicit token, tempo-source, listening, background, and fallback gates
+- Installed exact profile `Samadhi Development` and verified the signed application identifier `ZL5U59XBJ6.com.samaydhawan.Samadhi`
+- Passed automatic developer-token generation with repeated direct catalog responses
+- Added strict title, artist, album, and duration catalog resolution that fails closed on ambiguity and persists the returned numeric catalog ID
+- Downloaded remote preview assets into temporary app storage and decoded 10 of 10 City Pocket previews to PCM
+- Recorded a clean built-in-speaker listening pass across the safe-rate endpoints; Bluetooth listening remains required
 
 ## Proof
 
@@ -91,8 +93,8 @@ The MusicKit harness launches in Simulator and on the connected physical iPhone.
 
 ## Known limits
 
-No physical run has validated cadence quality. No listening test has validated tempo changes or audio artifacts. The normal app still uses silent bundled media, simulated cadence, and simulated beat timing. Music authorization, library loading, playback, live rate writes, pause, and resume pass. Direct library previews fail at 0 of 10. Catalog resolution is blocked by automatic developer-token failure. Spotify is not a viable substitute for adaptive playback. Track change, screen-lock playback, controlled interruption, and route loss remain unproven.
+No physical run has validated cadence quality. Built-in-speaker listening found no major pitch change or unpleasant artifacts at the safe-rate endpoints, but Bluetooth listening remains open. The normal app still uses silent bundled media, simulated cadence, and simulated beat timing. Apple authorization, library loading, automatic token generation, catalog resolution, 10 of 10 preview decodes, playback, live rate writes, pause, and resume pass. Spotify is not a viable substitute for adaptive playback. Track change, screen-lock playback, controlled interruption, and route loss remain unproven.
 
 ## WHERE WE LEFT OFF
 
-Milestone 2 safe groundwork is built. Five physical traces are saved. Authorization, playlist loading, playback, rate writes, pause, and resume pass. Direct library previews fail. Equivalent-ID catalog requests cannot obtain Apple's automatic developer token in the current wildcard-profile build. Spotify is rejected. Create one fresh development profile bound to `com.samaydhawan.Samadhi`, sign and inspect a clean physical build, then run one minimal catalog request. If that request still returns `developerTokenRequestFailed`, record Apple Music as rejected and begin the local-file player. The full decision is in [MUSIC-SOURCE-RESOLUTION-SPEC.md](MUSIC-SOURCE-RESOLUTION-SPEC.md).
+Milestone 2 safe groundwork is built. The exact Samadhi profile fixed automatic token generation. City Pocket passed strict catalog resolution and local PCM decoding at 10 of 10 tracks. Apple Music remains the active candidate. Complete headphone listening at 0.94, 1.00, and 1.06, then prove five locked minutes, next track, controlled interruption, and route loss. Any load-bearing failure still selects local files. The full decision is in [MUSIC-SOURCE-RESOLUTION-SPEC.md](MUSIC-SOURCE-RESOLUTION-SPEC.md).
