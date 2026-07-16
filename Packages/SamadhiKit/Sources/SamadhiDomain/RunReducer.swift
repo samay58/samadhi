@@ -1,9 +1,19 @@
 // Product behavior lives here as value-state transitions. The reducer returns outside work but never performs it.
 public struct RunReducer: Sendable {
     private let trackCount: Int
+    let tracks: [MusicTrack]
+    let adaptationPolicy: AdaptationPolicy
 
     public init(trackCount: Int = 3) {
         self.trackCount = max(trackCount, 1)
+        tracks = []
+        adaptationPolicy = AdaptationPolicy()
+    }
+
+    public init(tracks: [MusicTrack]) {
+        self.tracks = tracks
+        trackCount = max(tracks.count, 1)
+        adaptationPolicy = AdaptationPolicy()
     }
 
     public func reduce(state: RunState, event: RunEvent) -> (RunState, [RunEffect]) {
@@ -34,12 +44,17 @@ public struct RunReducer: Sendable {
                 [.preparePlayback(sessionID: session.id, mode: .fixed)]
             )
 
-        case let (.preparing(preparation), .playbackPrepared(sessionID))
+        case let (.preparing(preparation), .playbackPrepared(sessionID, trackID))
         where preparation.session.id == sessionID:
-            let session = preparation.session
+            guard tracks.isEmpty || tracks.contains(where: { $0.id == trackID }) else {
+                return (state, [])
+            }
+            var session = preparation.session
+            session.currentTrackID = trackID
             switch preparation.stage {
             case .playback(.adaptive):
                 let acquisitionID = 1
+                session.cadenceAcquisitionID = acquisitionID
                 return (
                     .active(
                         ActiveRun(
@@ -76,15 +91,48 @@ public struct RunReducer: Sendable {
             && preparation.session.playbackOperationID == operationID:
             return (.ready, [.cancelAllTasks(sessionID: sessionID)])
 
-        case let (.active(active), .cadenceLocked(sessionID, acquisitionID, spm)):
-            // Both IDs must match because an old sensor callback can arrive after a restart.
-            guard active.session.id == sessionID,
-                case let .playing(.acquiring(_, currentID), controls) = active.activity,
-                currentID == acquisitionID
-            else { return (state, []) }
-            var next = active
-            next.activity = .playing(rhythm: .locked(spm: spm), controls: controls)
-            return (.active(next), [.emitHaptic(.lock), .cancelTask(sessionID: sessionID, .acquisition)])
+        case let (
+            .active(active),
+            .cadenceUpdated(
+                sessionID,
+                acquisitionID,
+                stepsPerMinute,
+                deltaSeconds,
+                rateRequestID
+            )
+        ):
+            return reduceCadenceUpdate(
+                active: active,
+                sessionID: sessionID,
+                acquisitionID: acquisitionID,
+                stepsPerMinute: stepsPerMinute,
+                deltaSeconds: deltaSeconds,
+                rateRequestID: rateRequestID
+            )
+
+        case let (
+            .active(active),
+            .cadenceConfidenceLost(
+                sessionID,
+                acquisitionID,
+                deltaSeconds,
+                rateRequestID
+            )
+        ):
+            return reduceCadenceConfidenceLoss(
+                active: active,
+                sessionID: sessionID,
+                acquisitionID: acquisitionID,
+                deltaSeconds: deltaSeconds,
+                rateRequestID: rateRequestID
+            )
+
+        case let (.active(active), .cadenceAcquisitionFailed(sessionID, acquisitionID)):
+            return reduceCadenceFailure(
+                active: active,
+                sessionID: sessionID,
+                acquisitionID: acquisitionID
+            )
 
         case let (.active(active), .surfaceTapped(timeoutID)):
             guard case let .playing(rhythm, _) = active.activity else { return (state, []) }
@@ -169,6 +217,7 @@ public struct RunReducer: Sendable {
                 ]
             }
             var next = active
+            next.session.cadenceAcquisitionID = resumedRhythm == .fixed ? nil : acquisitionID
             next.activity = .playing(rhythm: resumedRhythm, controls: .timed(timeoutID: timeoutID))
             return (
                 .active(next),
@@ -180,6 +229,10 @@ public struct RunReducer: Sendable {
         case let (.active(active), .skipTapped):
             var next = active
             next.session.trackIndex = (next.session.trackIndex + 1) % trackCount
+            if tracks.indices.contains(next.session.trackIndex) {
+                next.session.currentTrackID = tracks[next.session.trackIndex].id
+            }
+            next.session.pendingRateRequestID = nil
             next.session.songCount += 1
             next.session.trackElapsedSeconds = 0
             next.session.trackDurationSeconds = nil
@@ -188,6 +241,10 @@ public struct RunReducer: Sendable {
         case let (.active(active), .previousTapped):
             var next = active
             next.session.trackIndex = (next.session.trackIndex - 1 + trackCount) % trackCount
+            if tracks.indices.contains(next.session.trackIndex) {
+                next.session.currentTrackID = tracks[next.session.trackIndex].id
+            }
+            next.session.pendingRateRequestID = nil
             next.session.trackElapsedSeconds = 0
             next.session.trackDurationSeconds = nil
             return (.active(next), [.previousTrack(sessionID: active.session.id)])
@@ -280,10 +337,12 @@ public struct RunReducer: Sendable {
             effects.append(
                 .scheduleControlsTimeout(sessionID: recovery.session.id, timeoutID: timeoutID)
             )
+            var resumedSession = recovery.session
+            resumedSession.cadenceAcquisitionID = nextRhythm == .fixed ? nil : acquisitionID
             return (
                 .active(
                     ActiveRun(
-                        session: recovery.session,
+                        session: resumedSession,
                         activity: .playing(
                             rhythm: nextRhythm,
                             controls: .timed(timeoutID: timeoutID)
@@ -314,6 +373,51 @@ public struct RunReducer: Sendable {
             }
             next.session.trackElapsedSeconds = max(elapsedSeconds, 0)
             next.session.trackDurationSeconds = max(durationSeconds, 0)
+            return (.active(next), [])
+
+        case let (
+            .active(active),
+            .playbackRateApplied(
+                sessionID,
+                operationID,
+                requestID,
+                trackID,
+                rate
+            )
+        ):
+            guard active.session.id == sessionID,
+                active.session.playbackOperationID == operationID,
+                active.session.pendingRateRequestID == requestID,
+                active.session.currentTrackID == trackID
+            else { return (state, []) }
+            var next = active
+            next.session.appliedPlaybackRate = min(max(rate, 0.94), 1.06)
+            next.session.pendingRateRequestID = nil
+            return (.active(next), [])
+
+        case let (
+            .active(active),
+            .playbackTrackChanged(
+                sessionID,
+                operationID,
+                trackID,
+                trackIndex
+            )
+        ):
+            guard active.session.id == sessionID,
+                active.session.playbackOperationID == operationID,
+                (0..<trackCount).contains(trackIndex),
+                tracks.isEmpty || tracks[trackIndex].id == trackID
+            else { return (state, []) }
+            var next = active
+            if next.session.trackIndex != trackIndex {
+                next.session.songCount += 1
+            }
+            next.session.trackIndex = trackIndex
+            next.session.currentTrackID = trackID
+            next.session.trackElapsedSeconds = 0
+            next.session.trackDurationSeconds = nil
+            next.session.pendingRateRequestID = nil
             return (.active(next), [])
 
         case let (
@@ -386,4 +490,5 @@ public struct RunReducer: Sendable {
             ]
         )
     }
+
 }

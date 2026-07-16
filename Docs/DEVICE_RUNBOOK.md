@@ -33,6 +33,18 @@ Do not create a Media Services key, embed a developer token, or add a token back
 
 Physical cadence remains unproven. Bluetooth routing and rate writes pass, but a dedicated Bluetooth listening note and the long-form recovery checks remain open. Simulator evidence must never be described as a real-run result.
 
+## Focused body-to-music check
+
+The `Samadhi Apple Music Core Loop` build is installed on Samay's iPhone. It uses catalog fixture `1066177773`, Core Motion cadence, and bounded automatic rate changes.
+
+1. Unlock the phone and open the installed Samadhi build.
+2. Press Start, secure the phone in the declared right-front pocket placement, then walk or jog briefly.
+3. Confirm a cadence value appears and changes with movement.
+4. Listen for a natural speed response without clicks, gaps, pitch jump, or rapid hunting.
+5. Record only observed cadence, whether music speed responded, route, and any audible problem.
+
+This short check proves the implementation seam only. It does not replace later calibration or the Milestone 2 completion run.
+
 ## Automated tempo corpus
 
 The real-preview accuracy check does not need device interaction. Run the opt-in `TempoCorpusValidator` from the package and provide an output path under `Evidence/Device/`. It verifies fixed Apple catalog metadata, downloads each preview into temporary storage, analyzes it, deletes it, and fails below 10 of 12 accepted tempo-family results. Normal automated tests do not use the network.

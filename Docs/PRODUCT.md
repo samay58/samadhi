@@ -71,8 +71,8 @@ Design benchmark research lives in [DESIGN-BENCHMARKS.md](DESIGN-BENCHMARKS.md).
 
 Current build answers one question: can complete run interaction feel calm, legible, and coherent before real sensing and audio exist?
 
-Answer: yes in Simulator. The adaptation rules, cadence boundary, player adapter, and local tempo estimator now exist. The estimator passes a narrow 12-preview catalog corpus. Broad music accuracy, physical cadence, and adaptive audio remain unproven.
+Answer: yes in Simulator. The verified 170 BPM fixture, Core Motion boundary, adaptation rules, and Apple Music adapter are connected in a focused physical-device configuration. The estimator passes a narrow 12-preview catalog corpus. Broad music accuracy and the physical body-to-music response remain unproven.
 
 ## Current exclusions
 
-Core Motion is present behind an unwired production boundary. The Apple Music adapter is wired through a focused development scheme, not the normal run flow. Music import, Spotify, GPS, maps, pace, distance, coaching, plans, social features, accounts, analytics, subscriptions, and backend remain outside the useful product build.
+Core Motion and the Apple Music adapter are wired through a focused development scheme, not the normal run flow. Music import, Spotify, GPS, maps, pace, distance, coaching, plans, social features, accounts, analytics, subscriptions, and backend remain outside the useful product build.

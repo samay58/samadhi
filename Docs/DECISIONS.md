@@ -83,3 +83,9 @@ MusicKit uses an App Service enabled for the bundle identifier in the Apple deve
 ## Policy before adapters
 
 Tempo normalization, compatibility, rate bounds, ramping, deadband, confidence loss, and honest measurement live in SamadhiDomain. Core Motion emits source-neutral cadence events. Production callbacks still enter the reducer through the app shell.
+
+## Focused body-to-music composition
+
+Keep the normal app deterministic until playlist import is ready. The `Samadhi Apple Music Core Loop` scheme alone composes the verified 170 BPM fixture, `CoreMotionCadenceProvider`, and `AppleMusicPlaybackController`.
+
+The reducer owns adaptation state and rate decisions. Each rate effect carries session, operation, request, and track identity. The player reports the applied rate through the same identities, and stale feedback is ignored. Cadence sensing continues after lock so the existing confidence hold, gradual return to 1.00, and reacquisition rules can run instead of freezing the first estimate.

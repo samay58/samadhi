@@ -8,14 +8,14 @@
 | Visual system | Complete prototype | Final Simulator frames |
 | Accessibility | Covered in prototype | Dynamic Type, Reduce Motion, contrast, VoiceOver behavior |
 | State architecture | Complete for prototype | Pure reducer tests |
-| Cadence | Production boundary and Core Motion adapter built; app still simulated | Deterministic filter tests and generic iPhone build |
+| Cadence | Core Motion connected in focused core loop; physical quality unproven | Deterministic filter tests and exact-profile iPhone build |
 | Audio timing | Simulated only | Deterministic beat-clock tests |
 | Playlist import | Specified, not started | Milestone 2 spec |
 | Tempo analysis | Version 2 passes a narrow 12-preview real-music corpus | Generated regression tests and opt-in Apple preview validation |
-| Adaptation policy | Built, not connected to a real player | Deterministic policy tests |
+| Adaptation policy | Connected to Apple Music in focused core loop | Identified reducer effects and deterministic feedback tests |
 | Apple Music feasibility | Source selected; Bluetooth route and rate writes passed; long-form reliability deferred | Exact-profile traces and explicit product decision |
 | Spotify feasibility | Rejected for adaptive playback | Remote-control architecture, missing music rate control, and content policy conflict |
-| Production player | Apple Music selected; adapter built behind a core-loop launch path | Source-neutral contract and generic iPhone build |
+| Production player | Apple Music selected; verified fixture and bounded rate loop connected | Source-neutral contract, exact-profile build, and device install |
 | Physical run validation | Source feasibility complete; outdoor run not started | Requires tempo, cadence, adaptation, and route evidence |
 
 ## Completed
@@ -84,12 +84,17 @@
 - Replaced frame-energy onset detection with Accelerate spectral flux and fractional-lag autocorrelation after real previews exposed a confident triple-meter error
 - Added an opt-in 12-track Apple preview corpus with published tempo references; version 2 passed 12 of 12 within the accepted tempo family
 - Selected catalog track `1066177773` as the verified 170 BPM core-loop fixture
+- Connected the focused core-loop scheme to `CoreMotionCadenceProvider` while preserving simulation for normal runs and repeatable tests
+- Kept cadence sensing alive after first lock so stable updates, confidence loss, and reacquisition continue through the run
+- Made the reducer own adaptation state and emit bounded, identified playback-rate effects
+- Required session, operation, request, and track identity before applied-rate feedback can change run state
+- Connected honest tempo-matched measurement to the player-reported applied rate instead of assuming every locked second matched
 
 ## Proof
 
 The current serial gate passed:
 
-- 38 Swift package tests
+- 43 Swift package tests
 - 2 app-model tests
 - 4 UI tests
 - Swift formatter lint
@@ -103,8 +108,8 @@ The MusicKit harness launches in Simulator and on the connected physical iPhone.
 
 ## Known limits
 
-No physical run has validated cadence quality. Built-in-speaker listening found no major pitch change or unpleasant artifacts at the safe-rate endpoints. Bluetooth routing and rate writes pass, but no separate Bluetooth listening note was recorded. The tempo estimator passes its narrow 12-preview reference corpus, but broad music accuracy and public-distribution permission for preview analysis remain open. The normal app still defaults to silent bundled media, simulated cadence, and simulated beat timing. Track change, five locked minutes, controlled interruption, and route loss remain reliability gates.
+No physical run has validated cadence quality or automatic cadence-driven rate response. The focused body-to-music build passes automated tests, exact-profile signing, and installation on Samay's iPhone, but launch was blocked while the phone was locked. Built-in-speaker listening found no major pitch change or unpleasant artifacts at the safe-rate endpoints. Bluetooth routing and rate writes pass, but no separate Bluetooth listening note was recorded. The tempo estimator passes its narrow 12-preview reference corpus, but broad music accuracy and public-distribution permission for preview analysis remain open. The normal app still defaults to silent bundled media, simulated cadence, and simulated beat timing. Track change, five locked minutes, controlled interruption, and route loss remain reliability gates.
 
 ## WHERE WE LEFT OFF
 
-Apple Music is selected. The player contract, Apple Music adapter, version 2 tempo analyzer, 12-preview validation corpus, real progress events, and focused core-loop scheme are built. Catalog track `1066177773` is the verified 170 BPM fixture. Next, run that fixture through the production adapter, then connect Core Motion and bounded adaptation. Long-form reliability checks remain mandatory before Milestone 2 completion, but no longer block implementation.
+Apple Music is selected. Catalog track `1066177773`, Core Motion cadence, bounded adaptation, applied-rate feedback, and honest measurement are connected in the focused core-loop scheme. The exact-profile build passes and is installed on the iPhone. Next, unlock the phone and run one brief walk or jog to prove displayed cadence and automatic music-speed response. If that passes, build playlist import and persistence. Long-form reliability checks remain mandatory before Milestone 2 completion.

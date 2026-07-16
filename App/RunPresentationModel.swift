@@ -15,7 +15,7 @@ final class RunPresentationModel {
 
     @ObservationIgnored private let reducer: RunReducer
     @ObservationIgnored private let configuration: SimulationConfiguration
-    @ObservationIgnored private let cadenceProvider: SimulatedCadenceProvider
+    @ObservationIgnored private let cadenceProvider: any CadenceProviding
     @ObservationIgnored private let musicPlayer: any MusicPlaybackProviding
     @ObservationIgnored private let musicCollection: MusicCollection
     @ObservationIgnored private let taskStore = RunTaskStore()
@@ -34,14 +34,15 @@ final class RunPresentationModel {
             configuration.useAppleMusicCoreLoop
             ? AppleMusicPlaybackController()
             : SimulatedMusicPlayer()
-        reducer = RunReducer(trackCount: musicCollection.tracks.count)
+        reducer = RunReducer(tracks: musicCollection.tracks)
         let cadenceDelay: Duration =
             configuration.extendedAcquisitionWindow
             ? .milliseconds(1_400)
             : (configuration.fastMode ? .milliseconds(340) : .milliseconds(420))
-        cadenceProvider = SimulatedCadenceProvider(
-            sampleDelay: cadenceDelay
-        )
+        cadenceProvider =
+            configuration.useAppleMusicCoreLoop
+            ? CoreMotionCadenceProvider()
+            : SimulatedCadenceProvider(sampleDelay: cadenceDelay)
         startPlaybackEventMonitoring()
     }
 
@@ -167,7 +168,12 @@ final class RunPresentationModel {
             state = newState
         }
 
-        if case .cadenceLocked = event, newState != oldState {
+        if case .cadenceUpdated = event,
+            case let .active(oldActive) = oldState,
+            case .playing(.acquiring, _) = oldActive.activity,
+            case let .active(newActive) = newState,
+            case .playing(.locked, _) = newActive.activity
+        {
             showLockBrief = true
             taskStore.replace(.lockBrief) { [weak self] in
                 try? await Task.sleep(for: .milliseconds(1_200))
@@ -207,7 +213,8 @@ final class RunPresentationModel {
                 do {
                     try await musicPlayer.prepare(musicCollection, operationID: sessionID)
                     guard !Task.isCancelled else { return }
-                    dispatch(.playbackPrepared(sessionID: sessionID))
+                    guard let firstTrackID = musicCollection.tracks.first?.id else { return }
+                    dispatch(.playbackPrepared(sessionID: sessionID, trackID: firstTrackID))
                 } catch {
                     dispatch(.playbackFailed(sessionID: sessionID, operationID: sessionID))
                 }
@@ -241,17 +248,61 @@ final class RunPresentationModel {
                 }
             }
 
-        case let .beginCadenceAcquisition(sessionID, acquisitionID, _):
+        case let .beginCadenceAcquisition(sessionID, acquisitionID, priorSPM):
             taskStore.replace(.acquisition) { [weak self, cadenceProvider] in
-                for await sample in cadenceProvider.samples() {
+                var filter = CadenceFilter(priorSPM: priorSPM.map(Double.init))
+                var lastElapsedSeconds: Double?
+                var hasLocked = false
+
+                for await event in cadenceProvider.events() {
                     guard !Task.isCancelled else { return }
-                    if case let .locked(spm) = sample {
-                        self?.dispatch(
-                            .cadenceLocked(
+                    guard let self else { return }
+
+                    switch event {
+                    case let .observation(observation):
+                        let rawDelta =
+                            lastElapsedSeconds.map {
+                                observation.elapsedSeconds - $0
+                            } ?? 1
+                        let deltaSeconds =
+                            rawDelta > 0
+                            ? min(rawDelta, 2)
+                            : 1
+                        lastElapsedSeconds = observation.elapsedSeconds
+
+                        switch filter.ingest(observation) {
+                        case let .locked(stepsPerMinute):
+                            hasLocked = true
+                            dispatch(
+                                .cadenceUpdated(
+                                    sessionID: sessionID,
+                                    acquisitionID: acquisitionID,
+                                    stepsPerMinute: stepsPerMinute,
+                                    deltaSeconds: deltaSeconds,
+                                    rateRequestID: token()
+                                )
+                            )
+                        case .acquiring where hasLocked:
+                            dispatch(
+                                .cadenceConfidenceLost(
+                                    sessionID: sessionID,
+                                    acquisitionID: acquisitionID,
+                                    deltaSeconds: deltaSeconds,
+                                    rateRequestID: token()
+                                )
+                            )
+                        case .acquiring:
+                            break
+                        }
+
+                    case .unavailable:
+                        dispatch(
+                            .cadenceAcquisitionFailed(
                                 sessionID: sessionID,
-                                acquisitionID: acquisitionID,
-                                spm: spm
-                            ))
+                                acquisitionID: acquisitionID
+                            )
+                        )
+                        return
                     }
                 }
             }
@@ -288,6 +339,21 @@ final class RunPresentationModel {
                     self?.dispatch(.playbackFailed(sessionID: sessionID, operationID: sessionID))
                 }
             }
+
+        case let .setPlaybackRate(
+            sessionID,
+            operationID,
+            requestID,
+            trackID,
+            rate
+        ):
+            guard state.session?.id == sessionID else { return }
+            musicPlayer.setPlaybackRate(
+                rate,
+                operationID: operationID,
+                requestID: requestID,
+                trackID: trackID
+            )
 
         case let .scheduleControlsTimeout(_, timeoutID):
             let delay: Duration = configuration.fastMode ? .seconds(3) : .seconds(5)
@@ -367,7 +433,31 @@ final class RunPresentationModel {
         case let .failed(operationID, _):
             dispatch(.playbackFailed(sessionID: session.id, operationID: operationID))
 
-        case .prepared, .stateChanged, .rateChanged, .trackChanged:
+        case let .rateChanged(operationID, requestID, trackID, rate):
+            guard let requestID, let trackID else { return }
+            dispatch(
+                .playbackRateApplied(
+                    sessionID: session.id,
+                    operationID: operationID,
+                    requestID: requestID,
+                    trackID: trackID,
+                    rate: rate
+                )
+            )
+
+        case let .trackChanged(operationID, trackID):
+            guard let trackIndex = musicCollection.tracks.firstIndex(where: { $0.id == trackID })
+            else { return }
+            dispatch(
+                .playbackTrackChanged(
+                    sessionID: session.id,
+                    operationID: operationID,
+                    trackID: trackID,
+                    trackIndex: trackIndex
+                )
+            )
+
+        case .prepared, .stateChanged:
             break
         }
     }
@@ -378,17 +468,27 @@ final class RunPresentationModel {
                 try? await Task.sleep(for: .seconds(1))
                 guard !Task.isCancelled else { return }
                 guard self?.state.session?.id == sessionID else { return }
-                let tempoMatched: Bool?
-                if case let .active(active) = self?.state,
-                    case .playing(.locked, _) = active.activity
-                {
-                    tempoMatched = true
-                } else {
-                    tempoMatched = nil
-                }
-                self?.dispatch(.activeSecond(tempoMatched: tempoMatched))
+                guard let self else { return }
+                let tempoMatched = currentTempoMatch()
+                dispatch(.activeSecond(tempoMatched: tempoMatched))
             }
         }
+    }
+
+    private func currentTempoMatch() -> Bool? {
+        guard case let .active(active) = state,
+            case let .playing(.locked(spm), _) = active.activity,
+            let trackID = active.session.currentTrackID,
+            let tempo = musicCollection.tracks.first(where: { $0.id == trackID })?.tempo
+        else { return nil }
+
+        return TempoMatchEvaluator.measure(
+            cadenceSPM: Double(spm),
+            cadenceReliable: true,
+            baseTempoBPM: tempo.baseBPM,
+            appliedRate: active.session.appliedPlaybackRate,
+            playbackActive: true
+        )
     }
 
     private func emitHaptic(_ event: HapticEvent) {

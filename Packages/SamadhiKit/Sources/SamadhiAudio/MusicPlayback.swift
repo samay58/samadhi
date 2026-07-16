@@ -9,7 +9,12 @@ public enum MusicPlaybackState: Sendable, Equatable {
 public enum MusicPlaybackEvent: Sendable, Equatable {
     case prepared(operationID: Int, trackID: MusicTrackID)
     case stateChanged(operationID: Int, state: MusicPlaybackState)
-    case rateChanged(operationID: Int, rate: Double)
+    case rateChanged(
+        operationID: Int,
+        requestID: Int?,
+        trackID: MusicTrackID?,
+        rate: Double
+    )
     case progress(operationID: Int, PlaybackProgress)
     case trackChanged(operationID: Int, trackID: MusicTrackID)
     case interruptionBegan(operationID: Int)
@@ -33,7 +38,12 @@ public protocol MusicPlaybackProviding: AnyObject {
     func resume(operationID: Int) async throws
     func skipToPrevious(operationID: Int) async throws
     func skipToNext(operationID: Int) async throws
-    func setPlaybackRate(_ rate: Double, operationID: Int)
+    func setPlaybackRate(
+        _ rate: Double,
+        operationID: Int,
+        requestID: Int,
+        trackID: MusicTrackID
+    )
     func stop(operationID: Int)
 }
 
@@ -92,10 +102,22 @@ public final class SimulatedMusicPlayer: MusicPlaybackProviding {
         )
     }
 
-    public func setPlaybackRate(_ rate: Double, operationID: Int) {
-        guard isCurrent(operationID) else { return }
+    public func setPlaybackRate(
+        _ rate: Double,
+        operationID: Int,
+        requestID: Int,
+        trackID: MusicTrackID
+    ) {
+        guard isCurrent(operationID),
+            collection?.tracks[trackIndex].id == trackID
+        else { return }
         continuation?.yield(
-            .rateChanged(operationID: operationID, rate: min(max(rate, 0.94), 1.06))
+            .rateChanged(
+                operationID: operationID,
+                requestID: requestID,
+                trackID: trackID,
+                rate: min(max(rate, 0.94), 1.06)
+            )
         )
     }
 

@@ -45,9 +45,16 @@ extension SimulatedCadenceProvider: CadenceProviding {
                             .observation(CadenceObservation(stepsPerMinute: nil, elapsedSeconds: 0))
                         )
                     case let .locked(spm):
-                        continuation.yield(
-                            .observation(CadenceObservation(stepsPerMinute: Double(spm), elapsedSeconds: 0))
-                        )
+                        for _ in 0..<5 {
+                            continuation.yield(
+                                .observation(
+                                    CadenceObservation(
+                                        stepsPerMinute: Double(spm),
+                                        elapsedSeconds: 0
+                                    )
+                                )
+                            )
+                        }
                     }
                 }
                 continuation.finish()

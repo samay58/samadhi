@@ -67,7 +67,9 @@ Production services need:
 - Session identity on callbacks
 - Deterministic adapters for tests
 
-Apple Music is the selected production player. `AppleMusicPlaybackController` is main-actor owned in the app target and implements the source-neutral `MusicPlaybackProviding` boundary. The codebase does not contain a second production player.
+Apple Music is the selected production player. `AppleMusicPlaybackController` is main-actor owned in the app target and implements the source-neutral `MusicPlaybackProviding` boundary. The focused core-loop composition uses `CoreMotionCadenceProvider`; normal runs and automated tests keep deterministic simulation. The codebase does not contain a second production player.
+
+Stable cadence enters the reducer with session and acquisition identity. The reducer owns `AdaptationState`, evaluates the current track's tempo, and emits a bounded rate effect carrying session, playback operation, rate request, and track identity. Player feedback must match all four identities before the reducer records the applied rate. Cadence sensing continues after lock so confidence loss can hold, ease toward normal speed, and return to acquisition without direct platform mutation.
 
 The debug-only MusicKit harness sits in the app target and is not a production player. It resolves opaque library tracks through strict title, artist, album, and duration agreement, downloads each preview into temporary storage, passes the local file through `TempoAnalyzing`, records the estimate, and deletes the file. `LocalTempoAnalyzer` owns off-main PCM decoding. `TempoEstimator` owns versioned Accelerate spectral-flux and fractional-lag autocorrelation behavior behind the same small interface.
 
@@ -84,3 +86,4 @@ The debug-only MusicKit harness sits in the app target and is not a production p
 - No Samadhi backend; Apple Music is the only allowed production network path if it passes the physical gate
 - Tempo match measurement enters the reducer as evidence from the app shell; the reducer does not infer a match from cadence alone
 - Playback progress and recovery callbacks carry session and operation identity before entering the reducer
+- Applied-rate callbacks also carry request and track identity; stale feedback cannot alter a replacement run
