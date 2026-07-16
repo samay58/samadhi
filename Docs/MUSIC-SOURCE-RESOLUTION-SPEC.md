@@ -6,7 +6,7 @@ Status: Apple Music selected; long-form reliability checks deferred
 
 Samadhi needs one production music source that can import a runner's collection, expose or support local tempo analysis, play in the background, and change playback rate from 0.94 through 1.06 without audible damage.
 
-The physical MusicKit harness has proved authorization, library playlist loading, automatic token generation, strict catalog resolution, 10 of 10 local preview decodes, real playback, live rate writes, pause, and resume. It also reached a Beoplay Eleven Bluetooth A2DP route and applied 0.94, 1.00, and 1.06 during playback. The exact Samadhi development profile fixed the earlier `developerTokenRequestFailed` blocker.
+The physical MusicKit harness has proved authorization, library playlist loading, automatic token generation, strict catalog resolution, 10 of 10 local preview decodes, real playback, live rate writes, pause, and resume. It also reached a Beoplay Eleven Bluetooth A2DP route and applied 0.94, 1.00, and 1.06 during playback. The exact Samadhi development profile fixed the earlier `developerTokenRequestFailed` blocker. A separate opt-in validator now passes 12 of 12 tempo-declared Apple previews through analyzer version 2.
 
 Spotify was considered as another streaming source. It is not a viable adaptive-audio player for this milestone. Spotify's iOS SDK remotely controls the Spotify app rather than giving Samadhi an app-owned audio signal. Its documented player APIs do not offer music playback-rate control, and Spotify's Developer Policy prohibits altering or analyzing Spotify content. A Spotify playlist could provide metadata, but it would not close the adaptive playback loop and would add OAuth, account, and provider complexity.
 
@@ -153,7 +153,7 @@ Keep deterministic coverage for:
 - Honest tempo-matched measurement
 - Fixed rhythm as Not measured
 
-The chosen provider receives contract tests at the app boundary using fakes. Local analysis receives a versioned validation corpus with expected tempo ranges and explicit octave-error tolerance.
+The chosen provider receives contract tests at the app boundary using fakes. Local analysis has generated offline fixtures plus an opt-in 12-preview Apple corpus with expected tempo ranges and explicit octave-error tolerance. Provider-hosted audio remains temporary.
 
 ### Physical evidence
 
@@ -190,8 +190,8 @@ After source selection, the full serial Xcode gate must pass before a milestone 
 
 ### Immediate execution order
 
-1. Validate resolved previews through the local estimator and choose one verified-tempo catalog fixture.
-2. Run that fixture through the production adapter, then connect real cadence and bounded adaptation.
+1. Run verified catalog fixture `1066177773` through the production adapter.
+2. Connect real cadence and bounded adaptation.
 3. Build playlist import, analysis persistence, progress, and transitions.
 4. Complete Bluetooth listening, five locked minutes, next track, controlled interruption, and route loss before Milestone 2 completion.
 

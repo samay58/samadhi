@@ -71,7 +71,7 @@ Design benchmark research lives in [DESIGN-BENCHMARKS.md](DESIGN-BENCHMARKS.md).
 
 Current build answers one question: can complete run interaction feel calm, legible, and coherent before real sensing and audio exist?
 
-Answer: yes in Simulator. The adaptation rules, cadence boundary, player adapter, and first local tempo estimator now exist. Real-music tempo accuracy, physical cadence, and adaptive audio remain unproven.
+Answer: yes in Simulator. The adaptation rules, cadence boundary, player adapter, and local tempo estimator now exist. The estimator passes a narrow 12-preview catalog corpus. Broad music accuracy, physical cadence, and adaptive audio remain unproven.
 
 ## Current exclusions
 

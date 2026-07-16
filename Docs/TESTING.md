@@ -9,7 +9,7 @@
 
 Scripts/test.sh runs Swift package tests, app-model tests, and UI tests serially on iPhone 17 Pro Simulator.
 
-The 2026-07-16 full serial gate passed 37 package tests, 2 app-model tests, and 4 UI tests.
+The 2026-07-16 full serial gate passed 38 package tests, 2 app-model tests, and 4 UI tests.
 
 Formatter gate:
 
@@ -55,10 +55,11 @@ Tempo-analysis tests cover:
 - Periodic onset detection at 120, 150, 168, and 190 BPM
 - Half and double tempo equivalence within 2 percent
 - Alternating accents
+- Strong every-third-beat accents reject instead of producing a confident triple-meter error
 - Silence and irregular-onset rejection
 - Mono and stereo audio-file decoding through the public analysis interface
 
-These generated fixtures validate the module seam, not music accuracy. The twelve-excerpt real-music corpus remains open.
+These generated fixtures validate the module seam. The opt-in `TempoCorpusValidator` adds network evidence against 12 provider-hosted Apple previews whose catalog titles declare tempos from 130 through 180 BPM. Version 2 passed 12 of 12 within 2 percent of the reference or its half or double. No preview audio is committed, and normal tests remain offline.
 
 UI tests cover:
 
@@ -104,9 +105,9 @@ The `Samadhi MusicKit Gate` scheme verifies that the harness and framework calls
 - Spotify adaptive playback: rejected by documented platform capability and policy review; no code spike warranted
 - Screen-lock background, next track, controlled interruption, and route-loss checks: deferred to the reliability gate
 
-## Next source gate
+## Next implementation gate
 
-Run resolved catalog previews through the estimator and compare them with known references. Choose one verified-tempo fixture, run it through the production adapter, then connect Core Motion and the adaptation policy. Before Milestone 2 completion, record one concise Bluetooth listening note and prove five screen-locked minutes, next track, controlled interruption, and route loss.
+Run verified catalog fixture `1066177773` through the production adapter, then connect Core Motion and the adaptation policy. Before Milestone 2 completion, record one concise Bluetooth listening note and prove five screen-locked minutes, next track, controlled interruption, and route loss.
 
 ## Known environment behavior
 

@@ -27,10 +27,16 @@ enum AppMusicCollection {
         name: "Apple Music core loop",
         tracks: [
             MusicTrack(
-                id: MusicTrackID("1092027177"),
-                title: "LITE SPOTS",
-                artist: "KAYTRANADA",
-                durationSeconds: 0
+                id: MusicTrackID("1066177773"),
+                title: "Shake It Off (Workout Remix 170 Bpm)",
+                artist: "Hanna",
+                durationSeconds: 248.442,
+                tempo: TempoAnalysis(
+                    baseBPM: 170.25,
+                    confidence: 1,
+                    analyzedDurationSeconds: 30,
+                    version: 2
+                )
             )
         ]
     )

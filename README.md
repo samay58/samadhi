@@ -4,11 +4,11 @@
 
 *music in stride*
 
-Samadhi is a native iPhone music experience that lets a runner's cadence and music settle into one rhythm. The current build proves complete interaction and now includes the source-neutral Milestone 2 policy, cadence boundary, Core Motion adapter, local tempo-analysis module, production playback boundary, and Apple Music adapter. Production music is not connected to the normal run flow yet, and physical cadence remains unproven.
+Samadhi is a native iPhone music experience that lets a runner's cadence and music settle into one rhythm. The current build proves complete interaction and now includes the source-neutral Milestone 2 policy, cadence boundary, Core Motion adapter, validated local tempo-analysis module, production playback boundary, and Apple Music adapter. Production music is not connected to the normal run flow yet, and physical cadence remains unproven.
 
 ## Current state
 
-Milestones 0 and 1 are complete. Milestone 2 is in progress. Apple Music is the selected production source. Exact-App-ID signing fixed catalog access, City Pocket passed 10 of 10 local preview decodes, and real playback reached a Beoplay Eleven Bluetooth route with live 0.94, 1.00, and 1.06 writes. A local file analyzer now produces versioned tempo estimates through one interface and rejects low-confidence input. Real-music accuracy, playlist import, physical cadence, and the adaptive loop remain open.
+Milestones 0 and 1 are complete. Milestone 2 is in progress. Apple Music is the selected production source. Exact-App-ID signing fixed catalog access, City Pocket passed 10 of 10 local preview decodes, and real playback reached a Beoplay Eleven Bluetooth route with live 0.94, 1.00, and 1.06 writes. Analyzer version 2 passes 12 of 12 tempo-declared Apple music previews through the public file interface. Broad music accuracy, playlist import, physical cadence, and the adaptive loop remain open.
 
 Start with [product ethos](Docs/PRODUCT.md), then read [current status](Docs/STATUS.md), [next plan](Docs/PLAN.md), the [Milestone 2 specification](Docs/MILESTONE-2-SPEC.md), and the active [music-source resolution specification](Docs/MUSIC-SOURCE-RESOLUTION-SPEC.md).
 

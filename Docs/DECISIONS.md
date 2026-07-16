@@ -52,7 +52,9 @@ The adapter stays behind a source-neutral main-actor contract. MusicKit's async 
 
 ## One local tempo-analysis interface
 
-Preview audio and future imported files both become a local audio-file URL before analysis. `LocalTempoAnalyzer` hides off-main PCM decoding and returns a versioned source-neutral result. `TempoEstimator` contains the current onset and autocorrelation implementation. Generated fixtures prove tempo-family behavior and rejection only; real-music accuracy remains a separate corpus gate.
+Preview audio and future imported files both become a local audio-file URL before analysis. `LocalTempoAnalyzer` hides off-main PCM decoding and returns a versioned source-neutral result. `TempoEstimator` version 2 contains Accelerate spectral flux, fractional-lag autocorrelation, and conservative triple-meter rejection.
+
+Version 1 passed 11 of 12 tempo-declared Apple workout previews but confidently labelled one 180 BPM mix as 60 BPM. Version 2 passes 12 of 12. The opt-in validator downloads provider-hosted previews temporarily and commits only metadata and results. This is an engineering accuracy result, not public-distribution permission for preview analysis.
 
 ## Honest tempo matching
 

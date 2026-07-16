@@ -122,6 +122,17 @@
 - Kept real-music accuracy and the twelve-excerpt corpus explicitly open
 - Passed formatting, 37 package tests, 2 app-model tests, 4 UI tests, and the exact-profile physical iPhone build
 
+## 2026-07-16. Real-preview tempo validation
+
+- Built an opt-in 12-track Apple preview corpus using catalog titles that declare tempos from 130 through 180 BPM
+- Found that analyzer version 1 passed 11 of 12 but confidently labelled one 180 BPM mix as 60 BPM
+- Replaced frame-energy onset detection with Accelerate spectral flux and fractional-lag autocorrelation
+- Added a public-seam regression for the triple-meter failure and conservative rejection when the correct tempo family lacks support
+- Passed 12 of 12 real previews within 2 percent of the published tempo or its half or double
+- Selected catalog track `1066177773` as the verified 170 BPM core-loop fixture
+- Kept provider-hosted audio temporary and stored only the corpus manifest, JSON result, checksum, and analysis
+- Passed formatting, 38 package tests, 2 app-model tests, 4 UI tests, and the exact-profile physical iPhone build
+
 ## Current checkpoint
 
-Milestones 0 and 1 are complete. Apple Music is the selected Milestone 2 source. Playback and local tempo-analysis seams are built, while the normal app remains deterministic until import is connected. Next comes real-preview validation, one verified-tempo catalog fixture, Core Motion cadence, and bounded adaptation. Long-form background and recovery checks remain before Milestone 2 completion.
+Milestones 0 and 1 are complete. Apple Music is the selected Milestone 2 source. Playback and version 2 tempo-analysis seams are built, and the narrow 12-preview corpus passes. The normal app remains deterministic until import is connected. Next comes the verified fixture through the production adapter, Core Motion cadence, and bounded adaptation. Long-form background and recovery checks remain before Milestone 2 completion.

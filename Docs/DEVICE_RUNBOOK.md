@@ -32,3 +32,13 @@ Do not create a Media Services key, embed a developer token, or add a token back
 9. Save the result as the selected Apple Music adapter's reliability evidence. The source decision is already closed.
 
 Physical cadence remains unproven. Bluetooth routing and rate writes pass, but a dedicated Bluetooth listening note and the long-form recovery checks remain open. Simulator evidence must never be described as a real-run result.
+
+## Automated tempo corpus
+
+The real-preview accuracy check does not need device interaction. Run the opt-in `TempoCorpusValidator` from the package and provide an output path under `Evidence/Device/`. It verifies fixed Apple catalog metadata, downloads each preview into temporary storage, analyzes it, deletes it, and fails below 10 of 12 accepted tempo-family results. Normal automated tests do not use the network.
+
+~~~sh
+DEVELOPER_DIR=/Applications/Xcode-beta.app/Contents/Developer \
+  swift run --package-path Packages/SamadhiKit TempoCorpusValidator \
+  --output Evidence/Device/YYYY-MM-DD-tempo-corpus-validation.json
+~~~

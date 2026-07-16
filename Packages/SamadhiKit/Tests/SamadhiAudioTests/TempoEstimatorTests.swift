@@ -61,6 +61,22 @@ func generatedTempoCorpusStaysInsideTwoPercent(_ referenceBPM: Double) async thr
     #expect(tempoFamilyError(result?.baseBPM ?? 0, referenceBPM: 150) <= 0.02)
 }
 
+@Test func aStrongEveryThirdBeatAccentIsRejectedRatherThanMislabelled() async throws {
+    let sampleRate = 8_000.0
+    let samples = pulseTrain(
+        bpm: 180,
+        durationSeconds: 24,
+        sampleRate: sampleRate,
+        accentEveryThirdBeat: true
+    )
+
+    let result = try await analyze(samples: samples, sampleRate: sampleRate)
+
+    if let result {
+        #expect(tempoFamilyError(result.baseBPM, referenceBPM: 180) <= 0.02)
+    }
+}
+
 private func analyze(
     samples: [Float],
     sampleRate: Double,
@@ -79,7 +95,8 @@ private func pulseTrain(
     bpm: Double,
     durationSeconds: Double,
     sampleRate: Double,
-    accentEveryOtherBeat: Bool = false
+    accentEveryOtherBeat: Bool = false,
+    accentEveryThirdBeat: Bool = false
 ) -> [Float] {
     let sampleCount = Int(durationSeconds * sampleRate)
     let samplesPerBeat = sampleRate * 60 / bpm
@@ -88,7 +105,12 @@ private func pulseTrain(
     var beatIndex = 0
     while Int(beat) < sampleCount {
         let start = Int(beat)
-        let amplitude: Float = accentEveryOtherBeat && !beatIndex.isMultiple(of: 2) ? 0.45 : 1
+        let amplitude: Float
+        if accentEveryThirdBeat {
+            amplitude = beatIndex.isMultiple(of: 3) ? 1 : 0.12
+        } else {
+            amplitude = accentEveryOtherBeat && !beatIndex.isMultiple(of: 2) ? 0.45 : 1
+        }
         for offset in 0..<min(8, sampleCount - start) {
             samples[start + offset] = amplitude * (1 - (Float(offset) / 8))
         }

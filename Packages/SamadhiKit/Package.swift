@@ -15,6 +15,12 @@ let package = Package(
         .target(name: "SamadhiMotion", dependencies: ["SamadhiDomain"]),
         .target(name: "SamadhiAudio", dependencies: ["SamadhiDomain"]),
         .target(name: "SamadhiDesign", dependencies: ["SamadhiDomain", "SamadhiAudio"]),
+        .executableTarget(
+            name: "TempoCorpusValidator",
+            dependencies: ["SamadhiAudio", "SamadhiDomain"],
+            path: "Tools/TempoCorpusValidator",
+            resources: [.process("Corpus.json")]
+        ),
         .testTarget(name: "SamadhiDomainTests", dependencies: ["SamadhiDomain"]),
         .testTarget(name: "SamadhiAudioTests", dependencies: ["SamadhiAudio", "SamadhiDomain"]),
         .testTarget(name: "SamadhiMotionTests", dependencies: ["SamadhiMotion"]),
