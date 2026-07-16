@@ -1,11 +1,13 @@
 // Product behavior lives here as value-state transitions. The reducer returns outside work but never performs it.
 public struct RunReducer: Sendable {
     private let trackCount: Int
+    private let requiresAdaptiveReadyTrack: Bool
     let tracks: [MusicTrack]
     let adaptationPolicy: AdaptationPolicy
 
     public init(trackCount: Int = 3) {
         self.trackCount = max(trackCount, 1)
+        requiresAdaptiveReadyTrack = false
         tracks = []
         adaptationPolicy = AdaptationPolicy()
     }
@@ -13,12 +15,16 @@ public struct RunReducer: Sendable {
     public init(tracks: [MusicTrack]) {
         self.tracks = tracks
         trackCount = max(tracks.count, 1)
+        requiresAdaptiveReadyTrack = true
         adaptationPolicy = AdaptationPolicy()
     }
 
     public func reduce(state: RunState, event: RunEvent) -> (RunState, [RunEffect]) {
         switch (state, event) {
         case let (.ready, .startTapped(sessionID)):
+            guard !requiresAdaptiveReadyTrack || tracks.contains(where: \.isAdaptiveReady) else {
+                return (state, [])
+            }
             let session = RunSession(id: sessionID)
             return (
                 .preparing(Preparation(session: session, stage: .authorization)),

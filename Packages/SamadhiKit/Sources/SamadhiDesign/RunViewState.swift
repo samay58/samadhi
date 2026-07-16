@@ -33,6 +33,55 @@ public enum RunVisualPhase: Sendable, Equatable {
     case summary(RunSummary)
 }
 
+public enum MusicTrackImportPresentation: Sendable, Equatable {
+    case pending
+    case ready
+    case couldNotReadTempo
+    case unavailable
+}
+
+public struct ImportedTrackPresentation: Sendable, Equatable, Identifiable {
+    public let id: String
+    public let title: String
+    public let status: MusicTrackImportPresentation
+
+    public init(id: String, title: String, status: MusicTrackImportPresentation) {
+        self.id = id
+        self.title = title
+        self.status = status
+    }
+}
+
+public struct ImportedCollectionPresentation: Sendable, Equatable {
+    public let name: String
+    public let totalTrackCount: Int
+    public let readyTrackCount: Int
+    public let completedTrackCount: Int
+    public let tracks: [ImportedTrackPresentation]
+
+    public init(
+        name: String,
+        totalTrackCount: Int,
+        readyTrackCount: Int,
+        completedTrackCount: Int,
+        tracks: [ImportedTrackPresentation]
+    ) {
+        self.name = name
+        self.totalTrackCount = totalTrackCount
+        self.readyTrackCount = readyTrackCount
+        self.completedTrackCount = completedTrackCount
+        self.tracks = tracks
+    }
+}
+
+public enum MusicSelectionPresentation: Sendable, Equatable {
+    case none
+    case loadingPlaylists
+    case analyzing(ImportedCollectionPresentation)
+    case ready(ImportedCollectionPresentation)
+    case failed(String)
+}
+
 public struct RunViewState: Sendable, Equatable {
     public var phase: RunVisualPhase
     public var controlsVisible: Bool
@@ -44,6 +93,7 @@ public struct RunViewState: Sendable, Equatable {
     public var showLockBrief: Bool
     public var forceReduceMotion: Bool
     public var forceIncreasedContrast: Bool
+    public var musicSelection: MusicSelectionPresentation
 
     public init(
         phase: RunVisualPhase,
@@ -55,7 +105,16 @@ public struct RunViewState: Sendable, Equatable {
         hasArtwork: Bool = true,
         showLockBrief: Bool = false,
         forceReduceMotion: Bool = false,
-        forceIncreasedContrast: Bool = false
+        forceIncreasedContrast: Bool = false,
+        musicSelection: MusicSelectionPresentation = .ready(
+            ImportedCollectionPresentation(
+                name: "Night Motion",
+                totalTrackCount: 3,
+                readyTrackCount: 3,
+                completedTrackCount: 3,
+                tracks: []
+            )
+        )
     ) {
         self.phase = phase
         self.controlsVisible = controlsVisible
@@ -67,6 +126,7 @@ public struct RunViewState: Sendable, Equatable {
         self.showLockBrief = showLockBrief
         self.forceReduceMotion = forceReduceMotion
         self.forceIncreasedContrast = forceIncreasedContrast
+        self.musicSelection = musicSelection
     }
 }
 
@@ -86,4 +146,6 @@ public enum RunAction: Sendable, Equatable {
     case openSettings
     case routeResume
     case done
+    case chooseMusic
+    case changeMusic
 }

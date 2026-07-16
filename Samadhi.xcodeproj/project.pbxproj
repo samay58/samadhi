@@ -9,7 +9,9 @@
 /* Begin PBXBuildFile section */
 		08C7CAABAD85AB4BC3C88E80 /* SamadhiDomain in Frameworks */ = {isa = PBXBuildFile; productRef = FCB42BF9FF49F690F8EEE5F2 /* SamadhiDomain */; };
 		3901FBCDBFF2D76C7111DF07 /* SamadhiAudio in Frameworks */ = {isa = PBXBuildFile; productRef = 17821AD6BA1BB0FB3F9794E0 /* SamadhiAudio */; };
+		4CC1E7BC6F5ADA92EA7F4637 /* AppleMusicCatalogResolver.swift in Sources */ = {isa = PBXBuildFile; fileRef = F120283C071A83D9D7B2824A /* AppleMusicCatalogResolver.swift */; };
 		4CDD1CED415564CC371BD9F1 /* MusicKitFeasibilityModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54135107A419A0D2E9DC0C01 /* MusicKitFeasibilityModel.swift */; };
+		4DF6F900AB14574D241956D6 /* MusicCollectionStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3F20844D8B2427EC13193D1 /* MusicCollectionStore.swift */; };
 		59F6A7F42EF07136C8A749D2 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A28146360481C17881F591C3 /* RootView.swift */; };
 		5E251FAC2B1E45BD32CE4F33 /* MusicKitFeasibilityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 288FFDAAC404B6DC56E04D4B /* MusicKitFeasibilityView.swift */; };
 		5F50657EDDD9980B6A3AB8ED /* AppleMusicPlaybackController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CA2C5D0E9C7986791DAA0C1 /* AppleMusicPlaybackController.swift */; };
@@ -18,13 +20,16 @@
 		78FAE03DF8A4D42BD14A7DD8 /* silent-loop.wav in Resources */ = {isa = PBXBuildFile; fileRef = CDFAF5B2DD68CC941F094A15 /* silent-loop.wav */; };
 		8E48AE66560F367C401395CF /* SamadhiMotion in Frameworks */ = {isa = PBXBuildFile; productRef = 87200EBB3D911863E80E185E /* SamadhiMotion */; };
 		A592E055654CAC8DE4DBEAD1 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8200E148AF4ABACA3B47ADA2 /* Assets.xcassets */; };
+		A6119D5C479BC3D9A3864252 /* AppleMusicImportService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19CC6F42797A33234816ED73 /* AppleMusicImportService.swift */; };
 		A9FE8C130C33F60BB2C2925B /* SamadhiTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 131DED91DED56986EDD4FE9B /* SamadhiTests.swift */; };
+		AA09908690CAEFD7301A8CE1 /* PlaylistPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68062F4BB4E7FDBE2A2EEEC0 /* PlaylistPickerView.swift */; };
 		AADD64A3B49FF8F3E42C941C /* RunTaskStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 475C0E9AEDB57921D9893CA3 /* RunTaskStore.swift */; };
 		AE8168A594751E431F59C263 /* AppMusicCollection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22DE37CDF525C7843D5F365B /* AppMusicCollection.swift */; };
 		BFB93B5F0188CF63A19E30CB /* RunPresentationModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27E4457C2F93694193D8E85D /* RunPresentationModel.swift */; };
 		D2DEE5D8F696BC6339CA819B /* SimulationConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95B076E4388E9E61360A6215 /* SimulationConfiguration.swift */; };
 		D80D703E28BBEBEDC8A9AE3A /* SamadhiDesign in Frameworks */ = {isa = PBXBuildFile; productRef = A48F446192EFBD7579C7BF67 /* SamadhiDesign */; };
 		EC41CEFCE78C60A45AD5680A /* SamadhiApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1CE55560A18BCBFBAF13E01 /* SamadhiApp.swift */; };
+		F23869DE2A691630025E7D19 /* MusicSelectionModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43016700FEA62148736FD0BB /* MusicSelectionModel.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -47,12 +52,15 @@
 /* Begin PBXFileReference section */
 		0CA2C5D0E9C7986791DAA0C1 /* AppleMusicPlaybackController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppleMusicPlaybackController.swift; sourceTree = "<group>"; };
 		131DED91DED56986EDD4FE9B /* SamadhiTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SamadhiTests.swift; sourceTree = "<group>"; };
+		19CC6F42797A33234816ED73 /* AppleMusicImportService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppleMusicImportService.swift; sourceTree = "<group>"; };
 		22DE37CDF525C7843D5F365B /* AppMusicCollection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppMusicCollection.swift; sourceTree = "<group>"; };
 		27E4457C2F93694193D8E85D /* RunPresentationModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RunPresentationModel.swift; sourceTree = "<group>"; };
 		288FFDAAC404B6DC56E04D4B /* MusicKitFeasibilityView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicKitFeasibilityView.swift; sourceTree = "<group>"; };
+		43016700FEA62148736FD0BB /* MusicSelectionModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicSelectionModel.swift; sourceTree = "<group>"; };
 		475C0E9AEDB57921D9893CA3 /* RunTaskStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RunTaskStore.swift; sourceTree = "<group>"; };
 		54135107A419A0D2E9DC0C01 /* MusicKitFeasibilityModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicKitFeasibilityModel.swift; sourceTree = "<group>"; };
 		64781032C8A2BA5D5DD7DF6C /* Samadhi.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Samadhi.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		68062F4BB4E7FDBE2A2EEEC0 /* PlaylistPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaylistPickerView.swift; sourceTree = "<group>"; };
 		8200E148AF4ABACA3B47ADA2 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		84DEE35021BD9A5D2A7F5F45 /* SamadhiUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SamadhiUITests.swift; sourceTree = "<group>"; };
 		95B076E4388E9E61360A6215 /* SimulationConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SimulationConfiguration.swift; sourceTree = "<group>"; };
@@ -62,6 +70,8 @@
 		C583155850D54880F50B821C /* SamadhiUITests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = SamadhiUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		CDFAF5B2DD68CC941F094A15 /* silent-loop.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = "silent-loop.wav"; sourceTree = "<group>"; };
 		E0461D97FCA914A69C6B5C69 /* SamadhiTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = SamadhiTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		E3F20844D8B2427EC13193D1 /* MusicCollectionStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicCollectionStore.swift; sourceTree = "<group>"; };
+		F120283C071A83D9D7B2824A /* AppleMusicCatalogResolver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppleMusicCatalogResolver.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -153,10 +163,15 @@
 		C7AB60613785D7A5C926458F /* App */ = {
 			isa = PBXGroup;
 			children = (
+				F120283C071A83D9D7B2824A /* AppleMusicCatalogResolver.swift */,
+				19CC6F42797A33234816ED73 /* AppleMusicImportService.swift */,
 				0CA2C5D0E9C7986791DAA0C1 /* AppleMusicPlaybackController.swift */,
 				22DE37CDF525C7843D5F365B /* AppMusicCollection.swift */,
+				E3F20844D8B2427EC13193D1 /* MusicCollectionStore.swift */,
 				54135107A419A0D2E9DC0C01 /* MusicKitFeasibilityModel.swift */,
 				288FFDAAC404B6DC56E04D4B /* MusicKitFeasibilityView.swift */,
+				43016700FEA62148736FD0BB /* MusicSelectionModel.swift */,
+				68062F4BB4E7FDBE2A2EEEC0 /* PlaylistPickerView.swift */,
 				A28146360481C17881F591C3 /* RootView.swift */,
 				27E4457C2F93694193D8E85D /* RunPresentationModel.swift */,
 				475C0E9AEDB57921D9893CA3 /* RunTaskStore.swift */,
@@ -318,9 +333,14 @@
 			buildActionMask = 2147483647;
 			files = (
 				AE8168A594751E431F59C263 /* AppMusicCollection.swift in Sources */,
+				4CC1E7BC6F5ADA92EA7F4637 /* AppleMusicCatalogResolver.swift in Sources */,
+				A6119D5C479BC3D9A3864252 /* AppleMusicImportService.swift in Sources */,
 				5F50657EDDD9980B6A3AB8ED /* AppleMusicPlaybackController.swift in Sources */,
+				4DF6F900AB14574D241956D6 /* MusicCollectionStore.swift in Sources */,
 				4CDD1CED415564CC371BD9F1 /* MusicKitFeasibilityModel.swift in Sources */,
 				5E251FAC2B1E45BD32CE4F33 /* MusicKitFeasibilityView.swift in Sources */,
+				F23869DE2A691630025E7D19 /* MusicSelectionModel.swift in Sources */,
+				AA09908690CAEFD7301A8CE1 /* PlaylistPickerView.swift in Sources */,
 				59F6A7F42EF07136C8A749D2 /* RootView.swift in Sources */,
 				BFB93B5F0188CF63A19E30CB /* RunPresentationModel.swift in Sources */,
 				AADD64A3B49FF8F3E42C941C /* RunTaskStore.swift in Sources */,

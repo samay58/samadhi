@@ -4,9 +4,30 @@ import SwiftUI
 
 struct RootView: View {
     // RootView owns the app's one presentation model. Screens receive rendered state and send intent back.
-    @State private var model = RunPresentationModel()
+    @State private var runModel = RunPresentationModel()
+    @State private var musicModel = MusicSelectionModel()
 
     var body: some View {
+        @Bindable var musicModel = musicModel
+
+        rootContent
+            .sheet(item: $musicModel.playlistSheet) { sheet in
+                PlaylistPickerView(
+                    presentation: sheet,
+                    select: self.musicModel.selectPlaylist
+                )
+            }
+            .task {
+                await self.musicModel.restore()
+                installSelectedCollection()
+            }
+            .onChange(of: self.musicModel.selectedCollection) {
+                installSelectedCollection()
+            }
+    }
+
+    @ViewBuilder
+    private var rootContent: some View {
         #if DEBUG
             if ProcessInfo.processInfo.arguments.contains("--music-feasibility") {
                 MusicKitFeasibilityView()
@@ -19,22 +40,41 @@ struct RootView: View {
     }
 
     private var samadhiScreen: some View {
-        ZStack(alignment: .topLeading) {
-            SamadhiScreen(state: model.viewState) { action in
-                model.send(action)
+        var state = runModel.viewState
+        state.musicSelection = musicModel.presentation
+
+        return ZStack(alignment: .topLeading) {
+            SamadhiScreen(state: state) { action in
+                send(action)
             }
 
             #if DEBUG
                 if ProcessInfo.processInfo.arguments.contains("--apple-music-core-loop") {
                     CoreLoopDiagnosticsView(
-                        cadenceSPM: model.viewState.cadenceSPM,
-                        targetRate: model.state.session?.adaptationState.targetRate,
-                        appliedRate: model.state.session?.appliedPlaybackRate,
-                        awaitingFeedback: model.state.session?.pendingRateRequestID != nil
+                        cadenceSPM: runModel.viewState.cadenceSPM,
+                        targetRate: runModel.state.session?.adaptationState.targetRate,
+                        appliedRate: runModel.state.session?.appliedPlaybackRate,
+                        awaitingFeedback: runModel.state.session?.pendingRateRequestID != nil
                     )
                 }
             #endif
         }
+    }
+
+    private func send(_ action: RunAction) {
+        switch action {
+        case .chooseMusic, .changeMusic:
+            musicModel.beginChoosing()
+        default:
+            runModel.send(action)
+        }
+    }
+
+    private func installSelectedCollection() {
+        guard let collection = musicModel.selectedCollection?.adaptiveReadyCollection,
+            !collection.tracks.isEmpty
+        else { return }
+        runModel = RunPresentationModel(musicCollection: collection)
     }
 }
 

@@ -34,25 +34,76 @@ public struct TempoAnalysis: Sendable, Equatable, Codable {
     }
 }
 
+public enum TrackAnalysisFailure: String, Sendable, Equatable, Codable {
+    case couldNotReadTempo
+    case unavailable
+}
+
+public enum MusicTrackAnalysisState: Sendable, Equatable, Codable {
+    case pending
+    case ready(TempoAnalysis)
+    case failed(TrackAnalysisFailure)
+}
+
+public struct TempoAnalysisCacheKey: Sendable, Hashable, Codable {
+    public let trackID: MusicTrackID
+    public let sourceFingerprint: String
+    public let analyzerVersion: Int
+
+    public init(
+        trackID: MusicTrackID,
+        sourceFingerprint: String,
+        analyzerVersion: Int
+    ) {
+        self.trackID = trackID
+        self.sourceFingerprint = sourceFingerprint
+        self.analyzerVersion = analyzerVersion
+    }
+}
+
 public struct MusicTrack: Sendable, Equatable, Codable {
     public let id: MusicTrackID
     public let title: String
     public let artist: String?
     public let durationSeconds: Double
-    public let tempo: TempoAnalysis?
+    public let sourceFingerprint: String
+    public let analysisState: MusicTrackAnalysisState
 
     public init(
         id: MusicTrackID,
         title: String,
         artist: String? = nil,
         durationSeconds: Double,
-        tempo: TempoAnalysis? = nil
+        tempo: TempoAnalysis? = nil,
+        sourceFingerprint: String = ""
     ) {
         self.id = id
         self.title = title
         self.artist = artist
         self.durationSeconds = max(durationSeconds, 0)
-        self.tempo = tempo
+        self.sourceFingerprint = sourceFingerprint
+        analysisState = tempo.map(MusicTrackAnalysisState.ready) ?? .pending
+    }
+
+    public init(
+        id: MusicTrackID,
+        title: String,
+        artist: String? = nil,
+        durationSeconds: Double,
+        sourceFingerprint: String,
+        analysisState: MusicTrackAnalysisState
+    ) {
+        self.id = id
+        self.title = title
+        self.artist = artist
+        self.durationSeconds = max(durationSeconds, 0)
+        self.sourceFingerprint = sourceFingerprint
+        self.analysisState = analysisState
+    }
+
+    public var tempo: TempoAnalysis? {
+        guard case let .ready(analysis) = analysisState else { return nil }
+        return analysis
     }
 
     public var isAdaptiveReady: Bool {
@@ -73,6 +124,14 @@ public struct MusicCollection: Sendable, Equatable, Codable {
 
     public var readyTrackCount: Int {
         tracks.count { $0.isAdaptiveReady }
+    }
+
+    public var adaptiveReadyCollection: MusicCollection {
+        MusicCollection(
+            id: id,
+            name: name,
+            tracks: tracks.filter(\.isAdaptiveReady)
+        )
     }
 }
 

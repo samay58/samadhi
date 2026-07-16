@@ -9,13 +9,13 @@
 | Accessibility | Covered in prototype | Dynamic Type, Reduce Motion, contrast, VoiceOver behavior |
 | State architecture | Complete for prototype | Pure reducer tests |
 | Cadence | Core Motion connected; brief physical observation passed | Deterministic filter tests and 29-second iPhone walk |
-| Audio timing | Simulated only | Deterministic beat-clock tests |
-| Playlist import | Specified, not started | Milestone 2 spec |
+| Audio timing | Real for imported ready tracks; deterministic in fixtures | Production player contract and beat-clock tests |
+| Playlist import | Implemented; physical playlist result open | Import model tests and Simulator states |
 | Tempo analysis | Version 2 passes a narrow 12-preview real-music corpus | Generated regression tests and opt-in Apple preview validation |
 | Adaptation policy | Physical automatic rate-response check passed | Identified reducer effects, deterministic feedback tests, and 59-second device result |
 | Apple Music feasibility | Source selected; Bluetooth route and rate writes passed; long-form reliability deferred | Exact-profile traces and explicit product decision |
 | Spotify feasibility | Rejected for adaptive playback | Remote-control architecture, missing music rate control, and content policy conflict |
-| Production player | Apple Music selected; verified fixture and bounded rate loop connected | Source-neutral contract, exact-profile build, and device install |
+| Production player | Apple Music selected; imported ready tracks enter the real player | Source-neutral contract, exact-profile build, and device install |
 | Physical run validation | Source feasibility complete; outdoor run not started | Requires tempo, cadence, adaptation, and route evidence |
 
 ## Completed
@@ -98,14 +98,23 @@
 - Switched the objective check to validated catalog track `1558215042`, estimated at 149.75 BPM, which produces a clearer safe ramp around the observed cadence
 - Installed and launched the corrected build after the iPhone reconnected
 - Completed a 59-second run averaging 155 SPM with 98 percent tempo matched from MusicKit read-back
+- Added contextual Apple Music playlist selection using the native library response
+- Preserved playlist order while resolving each track strictly to a numeric catalog identity
+- Added sequential, cancellation-aware preview analysis with honest ready, unreadable, and unavailable states
+- Added versioned tempo caching keyed by track identity, source fingerprint, and analyzer version
+- Added atomic selected-collection persistence under Application Support
+- Filtered the production queue to adaptive-ready tracks without hiding failed tracks from setup
+- Connected restored imported music to `AppleMusicPlaybackController` and `CoreMotionCadenceProvider` in the normal app
+- Added deterministic empty, loading, analyzing, partial, authorization-failure, and import-failure states
+- Installed and launched the import-capable test build on the physical iPhone
 
 ## Proof
 
 The current serial gate passed:
 
-- 44 Swift package tests
-- 2 app-model tests
-- 4 UI tests
+- 48 Swift package tests
+- 7 app-model tests
+- 8 UI tests
 - Swift formatter lint
 - Resource-inclusive Simulator build
 - Unsigned generic iPhone build
@@ -113,12 +122,12 @@ The current serial gate passed:
 
 Durable logs and final visual frames live under Evidence/.
 
-The MusicKit harness launches in Simulator and on the physical iPhone. Signing uses the Apple Development certificate for team `ZL5U59XBJ6`. The corrected objective diagnostic build is installed and its rate-response result is saved under `Evidence/Device/`.
+The MusicKit harness and normal app launch in Simulator and on the physical iPhone. Signing uses the Apple Development certificate for team `ZL5U59XBJ6`. The import-capable normal build is installed. Its build and installation record is under `Evidence/Device/`.
 
 ## Known limits
 
-Live cadence and automatic cadence-driven rate response pass on the physical iPhone. The completed summary releases transient target and applied values, so future exact diagnostics should be captured during the run or persisted by the focused harness. Tapping the installed icon without the focused launch argument still starts normal simulation. Built-in-speaker listening found no major pitch change or unpleasant artifacts at the safe-rate endpoints. Bluetooth routing and rate writes pass, but no separate Bluetooth listening note was recorded. The tempo estimator passes its narrow 12-preview reference corpus, but broad music accuracy and public-distribution permission for preview analysis remain open. The normal app still defaults to silent bundled media, simulated cadence, and simulated beat timing. Playlist import, persistence, track change, five locked minutes, controlled interruption, and route loss remain open.
+Live cadence and automatic cadence-driven rate response pass on the physical iPhone. The completed summary releases transient target and applied values, so future exact diagnostics should be captured during the run or persisted by the focused harness. Built-in-speaker listening found no major pitch change or unpleasant artifacts at the safe-rate endpoints. Bluetooth routing and rate writes pass, but no separate Bluetooth listening note was recorded. The tempo estimator passes its narrow 12-preview reference corpus, but broad music accuracy and public-distribution permission for preview analysis remain open. Import and persistence pass deterministic gates, but one real playlist with at least three ready tracks and relaunch restore is not yet physically proven. Five locked minutes, controlled interruption, next track, route loss, accessibility on imported states, and the outdoor run remain open.
 
 ## WHERE WE LEFT OFF
 
-Apple Music is selected. Catalog track `1558215042`, Core Motion cadence, bounded adaptation, MusicKit read-back, and honest measurement pass together on the physical iPhone. Next, build playlist import and persistence, then analyze at least three selected tracks and connect real progress and transitions. Long-form reliability checks remain mandatory before Milestone 2 completion.
+Apple Music is selected. Playlist import, local analysis, persistence, ready-track filtering, and the normal real-player composition are implemented and installed on Samay's iPhone. Automated gates pass. Next, select one moderate real playlist, confirm at least three tracks become ready, relaunch to prove restore, and run those tracks. Long-form reliability checks remain mandatory before Milestone 2 completion.

@@ -40,4 +40,42 @@ enum AppMusicCollection {
             )
         ]
     )
+
+    static let partialImportFixture = MusicCollection(
+        id: MusicCollectionID("partial-import"),
+        name: "City Pocket",
+        tracks: [
+            MusicTrack(
+                id: MusicTrackID("fixture-ready"),
+                title: "Soft Current",
+                artist: "North Window",
+                durationSeconds: 210,
+                sourceFingerprint: "fixture-ready-v1",
+                analysisState: .ready(
+                    TempoAnalysis(
+                        baseBPM: 168,
+                        confidence: 0.94,
+                        analyzedDurationSeconds: 30,
+                        version: 2
+                    )
+                )
+            ),
+            MusicTrack(
+                id: MusicTrackID("fixture-unreadable"),
+                title: "Afterimage",
+                artist: "Static Gardens",
+                durationSeconds: 190,
+                sourceFingerprint: "fixture-unreadable-v1",
+                analysisState: .failed(.couldNotReadTempo)
+            ),
+            MusicTrack(
+                id: MusicTrackID("fixture-unavailable"),
+                title: "Quiet Arcade",
+                artist: "Paper Cinema",
+                durationSeconds: 198,
+                sourceFingerprint: "fixture-unavailable-v1",
+                analysisState: .failed(.unavailable)
+            ),
+        ]
+    )
 }

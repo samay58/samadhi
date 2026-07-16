@@ -4,11 +4,11 @@
 
 *music in stride*
 
-Samadhi is a native iPhone music experience that lets a runner's cadence and music settle into one rhythm. The current build proves complete interaction and now connects a verified Apple Music fixture, Core Motion cadence, bounded adaptation policy, and production playback adapter in one focused device configuration. The normal app remains deterministic until playlist import is connected.
+Samadhi is a native iPhone music experience that lets a runner's cadence and music settle into one rhythm. The current build imports an Apple Music playlist, analyzes available previews locally, remembers the selection, and sends every ready track through the real cadence-driven run. Deterministic fixtures remain available for repeatable tests and previews.
 
 ## Current state
 
-Milestones 0 and 1 are complete. Milestone 2 is in progress. Apple Music is the selected production source. Exact-App-ID signing fixed catalog access, City Pocket passed 10 of 10 local preview decodes, and real playback reached a Beoplay Eleven Bluetooth route with live 0.94, 1.00, and 1.06 writes. Analyzer version 2 passes 12 of 12 tempo-declared Apple music previews through the public file interface. Live Core Motion cadence and automatic MusicKit rate response now pass together on the physical iPhone: the corrected 59-second run averaged 155 SPM and measured 98 percent tempo matched from player read-back. Playlist import and persistence are next.
+Milestones 0 and 1 are complete. Milestone 2 is in progress. Apple Music is the selected production source. Exact-App-ID signing fixed catalog access, analyzer version 2 passes a narrow 12-preview corpus, and a 59-second physical run averaged 155 SPM with 98 percent tempo matched from player read-back. Playlist selection, strict catalog resolution, local tempo analysis, versioned caching, persistence, and the normal production run composition are implemented. The test build is installed on Samay's iPhone. One real imported playlist, relaunch restore, long-form background playback, and recovery still need physical proof.
 
 Start with [product ethos](Docs/PRODUCT.md), then read [current status](Docs/STATUS.md), [next plan](Docs/PLAN.md), the [Milestone 2 specification](Docs/MILESTONE-2-SPEC.md), and the active [music-source resolution specification](Docs/MUSIC-SOURCE-RESOLUTION-SPEC.md).
 

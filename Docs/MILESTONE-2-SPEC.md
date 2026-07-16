@@ -335,13 +335,13 @@ The milestone requires all of the following:
 
 ### Where we are now
 
-Milestones 0 and 1 are complete. Apple Music is the selected Milestone 2 source. A validated 149.75 BPM fixture, Core Motion cadence, bounded reducer adaptation, identified MusicKit read-back, and honest measurement pass together in the focused core-loop scheme. The corrected 59-second physical run averaged 155 SPM and measured 98 percent tempo matched. Analyzer version 2 uses Accelerate spectral flux and fractional-lag autocorrelation and passes the narrow 12-preview corpus. The normal app remains simulated until import is connected.
+Milestones 0 and 1 are complete. Apple Music is the selected Milestone 2 source. A validated 149.75 BPM fixture, Core Motion cadence, bounded reducer adaptation, identified MusicKit read-back, and honest measurement pass together in the focused core-loop scheme. The corrected 59-second physical run averaged 155 SPM and measured 98 percent tempo matched. Analyzer version 2 uses Accelerate spectral flux and fractional-lag autocorrelation and passes the narrow 12-preview corpus. Playlist import, analysis persistence, ready-track filtering, and the normal production composition are implemented and installed.
 
 ### Build order
 
-1. Connect playlist import, persistence, real progress, and track transitions.
-2. Expand analyzer coverage only when new real tracks expose a specific failure.
-3. Complete repeatable automated gates.
+1. Prove one real imported playlist with at least three ready tracks and relaunch restoration.
+2. Run the multi-track production flow and verify real progress and transitions.
+3. Expand analyzer coverage only when new real tracks expose a specific failure.
 4. Run cadence calibration, listening, background, recovery, and the outdoor completion gate.
 5. Save evidence, update active documentation, and push main.
 

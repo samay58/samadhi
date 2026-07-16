@@ -71,8 +71,8 @@ Design benchmark research lives in [DESIGN-BENCHMARKS.md](DESIGN-BENCHMARKS.md).
 
 Current build answers one question: can complete run interaction feel calm, legible, and coherent before real sensing and audio exist?
 
-Answer: yes in Simulator, and the focused body-to-music loop now passes on the physical iPhone. A corrected 59-second run averaged 155 SPM and measured 98 percent tempo matched from MusicKit read-back. Broad music accuracy, playlist import, and the complete outdoor loop remain unproven.
+Answer: yes in Simulator, and the focused body-to-music loop now passes on the physical iPhone. A corrected 59-second run averaged 155 SPM and measured 98 percent tempo matched from MusicKit read-back. Playlist import is implemented and installed; one real imported collection, broad music accuracy, and the complete outdoor loop remain unproven.
 
 ## Current exclusions
 
-Core Motion and the Apple Music adapter are wired through a focused development scheme, not the normal run flow. Music import, Spotify, GPS, maps, pace, distance, coaching, plans, social features, accounts, analytics, subscriptions, and backend remain outside the useful product build.
+Core Motion and the Apple Music adapter now enter the normal run flow when an imported collection has ready tracks. Spotify, GPS, maps, pace, distance, coaching, plans, social features, accounts, analytics, subscriptions, and backend remain outside the useful product build.

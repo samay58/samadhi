@@ -171,6 +171,20 @@
 - Saved the user-supplied completed-run frame with a checksum and confirmed direct device capture is available for future live checks
 - Closed the automatic rate-response gate
 
+## 2026-07-16. Imported collection
+
+- Added native Apple Music playlist choice, strict catalog resolution, and sequential local preview analysis
+- Preserved source order and made pending, ready, unreadable, and unavailable states explicit
+- Added versioned tempo caching and atomic selected-collection persistence
+- Ignored stale import callbacks and preserved the prior durable selection until replacement completed
+- Filtered the production queue to ready tracks while keeping failures visible during setup
+- Connected restored imported music to real Apple Music playback and Core Motion cadence in the normal app
+- Added deterministic empty, loading, analyzing, partial, authorization-failure, and import-failure states
+- Added two reviewed Simulator frames for the empty and partial states
+- Passed formatter lint, 48 package tests, 7 app-model tests, and 8 UI tests
+- Built with the exact development profile, installed the normal test build, and launched it on Samay's iPhone
+- Left one real playlist, three ready tracks, relaunch restore, and multi-track playback open for physical proof
+
 ## Current checkpoint
 
-Milestones 0 and 1 are complete. Apple Music is the selected Milestone 2 source. Live Core Motion cadence and automatic MusicKit rate response pass together on the physical iPhone. The narrow 12-preview corpus passes. The normal app remains deterministic until import is connected. Next comes playlist import and persistence, followed by three-track analysis, real progress, and transitions. Long-form background and recovery checks remain before Milestone 2 completion.
+Milestones 0 and 1 are complete. Apple Music is the selected Milestone 2 source. Live Core Motion cadence and automatic MusicKit rate response pass together on the physical iPhone. The narrow 12-preview corpus passes. Import, persistence, ready-track filtering, and the normal real-player composition are implemented and installed. Next comes one real playlist with three ready tracks, relaunch restore, and multi-track physical playback. Long-form background and recovery checks remain before Milestone 2 completion.

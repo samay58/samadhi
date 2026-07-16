@@ -20,9 +20,9 @@ Milestone 2 turns the interaction prototype into a useful music product.
 
 Build in this order:
 
-1. Import and analyze at least three usable playlist tracks.
-2. Connect persistent selection, real progress, track transitions, honest lock, and summary.
-3. Complete five locked minutes, next track, interruption, route loss, accessibility, and recovery checks.
+1. Physically prove one imported playlist with at least three ready tracks and relaunch restore.
+2. Verify real progress, track transitions, honest lock, and summary across those tracks.
+3. Complete five locked minutes, interruption, route loss, accessibility, and recovery checks.
 4. Pass cadence calibration, listening, and the outdoor-run gate.
 
 ## Current gate state
@@ -34,10 +34,13 @@ Build in this order:
 - Spotify feasibility: rejected for adaptive playback; it cannot supply the required app-owned, analyzable, rate-controlled audio path
 - Source decision: Apple Music selected on 2026-07-16; remaining manual drills moved to the reliability gate
 - Source-neutral domain and adaptation rules: complete for the current slice
-- Cadence boundary, deterministic filter, and Core Motion adapter: connected in the focused core loop; a 29-second walk produced live cadence and a 142 SPM average, but calibration and the normal run flow remain open
+- Cadence boundary, deterministic filter, and Core Motion adapter: connected in the focused core loop and normal imported run; a 29-second walk produced live cadence and a 142 SPM average, but calibration remains open
 - Production playback: validated catalog fixture `1558215042`, live cadence updates, bounded reducer effects, identified MusicKit read-back, and honest measurement are connected
-- Automated body-to-music gate: 44 package tests, 2 app-model tests, 4 UI tests, formatter, exact-profile build, installation, and launch pass
+- Playlist import and persistence: implemented with strict resolution, local preview analysis, versioned cache keys, atomic replacement, honest per-track states, and ready-only production filtering
+- Normal run composition: restored imported tracks use Apple Music playback and Core Motion; deterministic fixtures remain available for tests and previews
+- Automated body-to-music gate: 48 package tests, 7 app-model tests, 8 UI tests, formatter, exact-profile build, installation, and launch pass
 - Physical body-to-music observation: passed; the corrected 59-second run averaged 155 SPM and measured 98 percent tempo matched from MusicKit read-back
+- Physical imported-collection gate: test build installed; real playlist analysis, three-ready-track threshold, relaunch restore, and multi-track run remain open
 - Device harness: exact-profile catalog search, strict identity resolution, temporary preview download, local PCM decoding, playback, rate controls, route observation, and trace export remain available on the physical iPhone 17 Pro
 
 The source decision and deferred reliability requirements live in [MUSIC-SOURCE-RESOLUTION-SPEC.md](MUSIC-SOURCE-RESOLUTION-SPEC.md). A later reliability failure must be fixed before Milestone 2 completion. It does not reopen Spotify or a second-provider project.
