@@ -12,7 +12,7 @@
 | Audio timing | Simulated only | Deterministic beat-clock tests |
 | Playlist import | Specified, not started | Milestone 2 spec |
 | Adaptation policy | Built, not connected to a real player | Deterministic policy tests |
-| Apple Music feasibility | Harness ready; physical gate blocked | Device evidence record |
+| Apple Music feasibility | Physical gate in progress | Signed harness installed and launched on iPhone 17 Pro |
 | Production player | Undecided | Physical gate required |
 | Physical run validation | Not started | Requires device and route matrix |
 
@@ -56,7 +56,8 @@
 ### Milestone 2 groundwork
 
 - Inspected Xcode 27, iOS 27 SDK interfaces, signing, connected devices, and current project capabilities
-- Confirmed no physical iPhone is connected and a signed build has no development team
+- Configured Apple team `ZL5U59XBJ6`, registered the explicit App ID, and received user confirmation that the MusicKit App Service is enabled
+- Built, signed, installed, and launched the gate harness on a physical iPhone 17 Pro with Developer Mode enabled
 - Added source-neutral collection, track, tempo, cadence, progress, adaptation, and tempo-measurement models
 - Added bounded adaptation with half and double tempo normalization, ramp limits, deadband, update interval, confidence hold, and calm return to normal speed
 - Added cadence-provider events, deterministic cadence filtering, and a Core Motion provider that compiles for iPhone
@@ -74,15 +75,16 @@ The current serial gate passed:
 - Swift formatter lint
 - Resource-inclusive Simulator build
 - Unsigned generic iPhone build
+- Signed physical iPhone build and install
 
 Durable logs and final visual frames live under Evidence/.
 
-The MusicKit harness also launches in Simulator. The signed generic iPhone build reaches the expected blocker because the project has no Apple development team.
+The MusicKit harness launches in Simulator and on the connected physical iPhone. Signing uses the Apple Development certificate for team `ZL5U59XBJ6`.
 
 ## Known limits
 
-No physical iPhone run has validated cadence quality. No listening test has validated tempo changes or audio artifacts. The normal app still uses silent bundled media, simulated cadence, and simulated beat timing. The MusicKit harness compiles but has not touched a real account or library. UI demonstrates intended behavior, not production sensing or playback.
+No physical run has validated cadence quality. No listening test has validated tempo changes or audio artifacts. The normal app still uses silent bundled media, simulated cadence, and simulated beat timing. The MusicKit harness is running on a physical iPhone, but authorization, library loading, preview decoding, playback, and recovery remain unproven.
 
 ## WHERE WE LEFT OFF
 
-Milestone 2 safe groundwork is built. The Apple Music gate remains blocked because no physical iPhone is connected and the project has no Apple development team. Next work is one physical run of the `Samadhi MusicKit Gate` scheme. Do not choose a player, redesign the interface, or build playlist generation before that evidence exists.
+Milestone 2 safe groundwork is built. The signed `Samadhi MusicKit Gate` harness is installed and running on Samay's physical iPhone. Next work is authorization, one ten-track playlist, decoded preview coverage, playback-rate listening, background playback, interruption, and route-loss checks. Do not choose a player before that evidence exists.

@@ -15,6 +15,6 @@
   "log": "milestone-2-safe-groundwork-test.log",
   "formatter": "Passed",
   "unsignedGenericIPhoneBuild": "Passed",
-  "signedGenericIPhoneBuild": "Blocked: development team is blank",
+  "signedGenericIPhoneBuild": "Passed with Apple team ZL5U59XBJ6",
   "result": "Passed"
 }

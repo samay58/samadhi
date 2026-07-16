@@ -239,15 +239,15 @@
 				LastUpgradeCheck = 1430;
 				TargetAttributes = {
 					17E89907A038C366CC3AB648 = {
-						DevelopmentTeam = "";
+						DevelopmentTeam = ZL5U59XBJ6;
 						ProvisioningStyle = Automatic;
 					};
 					42554D0466317DE33DB5F46F = {
-						DevelopmentTeam = "";
+						DevelopmentTeam = ZL5U59XBJ6;
 						TestTargetID = 17E89907A038C366CC3AB648;
 					};
 					F92AFD6664D5A580F202CBE6 = {
-						DevelopmentTeam = "";
+						DevelopmentTeam = ZL5U59XBJ6;
 					};
 				};
 			};
@@ -386,7 +386,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = dwarf;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = ZL5U59XBJ6;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -484,7 +484,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = ZL5U59XBJ6;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
