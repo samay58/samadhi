@@ -27,12 +27,12 @@ enum AppMusicCollection {
         name: "Apple Music core loop",
         tracks: [
             MusicTrack(
-                id: MusicTrackID("1434921088"),
-                title: "Can't Stop the Feeling! (Workout Remix 140 BPM)",
+                id: MusicTrackID("1558215042"),
+                title: "Astronaut In the Ocean (Workout Remix 150 BPM)",
                 artist: "Power Music Workout",
-                durationSeconds: 281.143,
+                durationSeconds: 176,
                 tempo: TempoAnalysis(
-                    baseBPM: 139.5,
+                    baseBPM: 149.75,
                     confidence: 1,
                     analyzedDurationSeconds: 30,
                     version: 2

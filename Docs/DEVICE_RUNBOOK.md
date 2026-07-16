@@ -35,15 +35,16 @@ A brief physical walk proved live cadence reaches the app. Full placement calibr
 
 ## Focused body-to-music check
 
-The app build used by `Samadhi Apple Music Core Loop` is installed on Samay's iPhone. The focused scheme uses catalog fixture `1434921088`, estimated at 139.5 BPM, Core Motion cadence, and bounded automatic rate changes. Tapping the icon directly starts normal simulation because the focused configuration is selected by a launch argument.
+The app build used by `Samadhi Apple Music Core Loop` is installed on Samay's iPhone. The focused scheme uses catalog fixture `1558215042`, estimated at 149.75 BPM, Core Motion cadence, and bounded automatic rate changes. Tapping the icon directly starts normal simulation because the focused configuration is selected by a launch argument.
 
 1. Unlock the phone and leave it awake.
 2. Launch `Samadhi Apple Music Core Loop` from Xcode, or launch the installed app through `devicectl` with `--apple-music-core-loop`.
 3. Press Start, secure the phone in the declared right-front pocket placement, then walk or jog briefly.
-4. Listen for a natural speed response without clicks, gaps, pitch jump, or rapid hunting.
-5. Record only whether music speed responded, route, and any audible problem.
+4. In the temporary `Core loop` panel, confirm target rate appears and applied rate follows it below 1.00. `feedback pending` should settle after MusicKit is read back.
+5. Listen for a natural speed response without clicks, gaps, pitch jump, or rapid hunting.
+6. Record target rate, applied rate, route, whether music speed responded, and any audible problem.
 
-Live cadence already passed during a 29-second walk with a 142 SPM average. This final short check proves only the automatic rate-response seam. It does not replace later calibration or the Milestone 2 completion run.
+Live cadence already passed during a 29-second walk with a 142 SPM average. A 139.5 BPM follow-up produced no perceptible change. This final short check uses a clearer safe ramp and objective read-back to prove only the automatic rate-response seam. It does not replace later calibration or the Milestone 2 completion run.
 
 ## Automated tempo corpus
 

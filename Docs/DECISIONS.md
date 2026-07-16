@@ -88,6 +88,10 @@ Tempo normalization, compatibility, rate bounds, ramping, deadband, confidence l
 
 Keep the normal app deterministic until playlist import is ready. The `Samadhi Apple Music Core Loop` scheme alone composes a validated tempo fixture, `CoreMotionCadenceProvider`, and `AppleMusicPlaybackController`.
 
-The first physical walk averaged 142 SPM. The original 170.25 BPM fixture could not reach that cadence inside the safe 0.94 through 1.06 rate range, so the honest summary reported 0 percent tempo matched. The focused fixture now uses catalog track `1434921088`, estimated at 139.5 BPM, because it can exercise a bounded rate change at the observed walking cadence. The safe range and stability policy remain unchanged.
+The first physical walk averaged 142 SPM. The original 170.25 BPM fixture could not reach that cadence inside the safe 0.94 through 1.06 rate range, so the honest summary reported 0 percent tempo matched. A second check with the 139.5 BPM fixture produced no perceptible speed change; its expected rate near 1.02 was too subtle to distinguish from no response.
+
+The focused fixture now uses catalog track `1558215042`, estimated at 149.75 BPM. At 142 SPM it should ramp from 1.00 through 0.98 and 0.96 toward about 0.948, remaining inside the same safety limits. The focused build shows target rate and MusicKit read-back without changing the normal app.
+
+`AppleMusicPlaybackController` must not call a commanded rate applied. It stores the request identity, writes MusicKit, then reports the value read from `ApplicationMusicPlayer.state.playbackRate`. The reducer accepts that read-back only when session, operation, request, and track identities still match.
 
 The reducer owns adaptation state and rate decisions. Each rate effect carries session, operation, request, and track identity. The player reports the applied rate through the same identities, and stale feedback is ignored. Cadence sensing continues after lock so the existing confidence hold, gradual return to 1.00, and reacquisition rules can run instead of freezing the first estimate.

@@ -335,7 +335,7 @@ The milestone requires all of the following:
 
 ### Where we are now
 
-Milestones 0 and 1 are complete. Apple Music is the selected Milestone 2 source. A validated 139.5 BPM fixture, Core Motion cadence, bounded reducer adaptation, identified applied-rate feedback, and honest measurement are connected in the focused core-loop scheme. Analyzer version 2 uses Accelerate spectral flux and fractional-lag autocorrelation and passes the narrow 12-preview corpus. A 29-second physical walk produced changing cadence and a 142 SPM average. The normal app remains simulated until import is connected. Automatic rate response remains unproven.
+Milestones 0 and 1 are complete. Apple Music is the selected Milestone 2 source. A validated 149.75 BPM fixture, Core Motion cadence, bounded reducer adaptation, identified MusicKit read-back, and honest measurement are connected in the focused core-loop scheme. Analyzer version 2 uses Accelerate spectral flux and fractional-lag autocorrelation and passes the narrow 12-preview corpus. A 29-second physical walk produced changing cadence and a 142 SPM average. A 139.5 BPM follow-up produced no perceptible speed change, so the focused build now shows target and read-back separately. The normal app remains simulated until import is connected. Automatic rate response remains unproven.
 
 ### Build order
 
