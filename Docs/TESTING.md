@@ -93,7 +93,7 @@ The `Samadhi MusicKit Gate` scheme verifies that the harness and framework calls
 - MusicKit harness Simulator app: launched and visually checked
 - Background audio entry in built Info.plist: verified as an array containing `audio`
 - Physical device signing, build, installation, and launch: passed
-- Focused body-to-music exact-profile build and installation: passed; launch attempt was blocked because the phone was locked
+- Focused body-to-music exact-profile build and installation: passed; scheme launch attempt was blocked because the phone was locked, and direct icon launch remains the normal simulation
 - Contextual Music authorization and 40-playlist loading: passed
 - Real playback plus 0.94, 1.00, and 1.06 rate writes: passed mechanically
 - Pause and resume observation: passed

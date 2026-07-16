@@ -35,13 +35,14 @@ Physical cadence remains unproven. Bluetooth routing and rate writes pass, but a
 
 ## Focused body-to-music check
 
-The `Samadhi Apple Music Core Loop` build is installed on Samay's iPhone. It uses catalog fixture `1066177773`, Core Motion cadence, and bounded automatic rate changes.
+The app build used by `Samadhi Apple Music Core Loop` is installed on Samay's iPhone. The focused scheme uses catalog fixture `1066177773`, Core Motion cadence, and bounded automatic rate changes. Tapping the icon directly starts normal simulation because the focused configuration is selected by a launch argument.
 
-1. Unlock the phone and open the installed Samadhi build.
-2. Press Start, secure the phone in the declared right-front pocket placement, then walk or jog briefly.
-3. Confirm a cadence value appears and changes with movement.
-4. Listen for a natural speed response without clicks, gaps, pitch jump, or rapid hunting.
-5. Record only observed cadence, whether music speed responded, route, and any audible problem.
+1. Unlock the phone and leave it awake.
+2. Launch `Samadhi Apple Music Core Loop` from Xcode, or launch the installed app through `devicectl` with `--apple-music-core-loop`.
+3. Press Start, secure the phone in the declared right-front pocket placement, then walk or jog briefly.
+4. Confirm a cadence value appears and changes with movement.
+5. Listen for a natural speed response without clicks, gaps, pitch jump, or rapid hunting.
+6. Record only observed cadence, whether music speed responded, route, and any audible problem.
 
 This short check proves the implementation seam only. It does not replace later calibration or the Milestone 2 completion run.
 
