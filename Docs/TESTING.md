@@ -52,7 +52,7 @@ Motion tests cover:
 - Three-observation resume lock with the prior estimate as a smoothing seed
 - Walking-range rejection, isolated spike rejection, and sustained missing cadence
 
-The Core Motion adapter compiles for a generic iPhone target. Its sensor quality is not covered by automated tests.
+The Core Motion adapter compiles for a generic iPhone target. A 29-second physical walk produced changing cadence and a 142 SPM average. Full placement calibration is not covered by this observation or automated tests.
 
 Tempo-analysis tests cover:
 
@@ -93,7 +93,9 @@ The `Samadhi MusicKit Gate` scheme verifies that the harness and framework calls
 - MusicKit harness Simulator app: launched and visually checked
 - Background audio entry in built Info.plist: verified as an array containing `audio`
 - Physical device signing, build, installation, and launch: passed
-- Focused body-to-music exact-profile build and installation: passed; scheme launch attempt was blocked because the phone was locked, and direct icon launch remains the normal simulation
+- Focused body-to-music exact-profile build, installation, and launch argument: passed
+- Physical cadence seam: passed for a 29-second walk with changing cadence and a 142 SPM average
+- Automatic cadence-driven rate response: not yet observed; the first walk was incompatible with the original 170.25 BPM fixture's safe rate range
 - Contextual Music authorization and 40-playlist loading: passed
 - Real playback plus 0.94, 1.00, and 1.06 rate writes: passed mechanically
 - Pause and resume observation: passed
@@ -112,7 +114,7 @@ The `Samadhi MusicKit Gate` scheme verifies that the harness and framework calls
 
 ## Next implementation gate
 
-Unlock the phone and run one brief walk or jog with focused catalog fixture `1066177773`. Confirm displayed cadence appears and music speed responds naturally. If that passes, start playlist import and persistence. Before Milestone 2 completion, record one concise Bluetooth listening note and prove five screen-locked minutes, next track, controlled interruption, and route loss.
+Run one brief walk or jog with focused catalog fixture `1434921088`, estimated at 139.5 BPM. Confirm music speed responds naturally. Cadence display has already passed and does not need a separate repeat. If rate response passes, start playlist import and persistence. Before Milestone 2 completion, record one concise Bluetooth listening note and prove five screen-locked minutes, next track, controlled interruption, and route loss.
 
 ## Known environment behavior
 

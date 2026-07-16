@@ -20,7 +20,7 @@ Milestone 2 turns the interaction prototype into a useful music product.
 
 Build in this order:
 
-1. Prove the connected 170 BPM body-to-music loop with one brief physical walk or jog.
+1. Prove automatic rate response with the connected 139.5 BPM fixture in one brief physical walk or jog. Live Core Motion cadence has passed.
 2. Import and analyze at least three usable playlist tracks.
 3. Connect persistent selection, real progress, track transitions, honest lock, and summary.
 4. Complete five locked minutes, next track, interruption, route loss, accessibility, and recovery checks.
@@ -35,10 +35,10 @@ Build in this order:
 - Spotify feasibility: rejected for adaptive playback; it cannot supply the required app-owned, analyzable, rate-controlled audio path
 - Source decision: Apple Music selected on 2026-07-16; remaining manual drills moved to the reliability gate
 - Source-neutral domain and adaptation rules: complete for the current slice
-- Cadence boundary, deterministic filter, and Core Motion adapter: connected in the focused core loop but not physically calibrated or connected to the normal run flow
-- Production playback: verified catalog fixture `1066177773`, live cadence updates, bounded reducer effects, identified applied-rate feedback, and honest measurement are connected
+- Cadence boundary, deterministic filter, and Core Motion adapter: connected in the focused core loop; a 29-second walk produced live cadence and a 142 SPM average, but calibration and the normal run flow remain open
+- Production playback: validated catalog fixture `1434921088`, live cadence updates, bounded reducer effects, identified applied-rate feedback, and honest measurement are connected
 - Automated body-to-music gate: 43 package tests, 2 app-model tests, 4 UI tests, formatter, unsigned iPhone build, exact-profile build, and device installation pass
-- Physical body-to-music observation: blocked only because the focused scheme could not auto-launch while the phone was locked; tapping the icon without its launch argument starts simulation
+- Physical body-to-music observation: cadence passed; automatic rate response remains open because the first 142 SPM walk was incompatible with the original 170.25 BPM fixture's safe rate range
 - Device harness: exact-profile catalog search, strict identity resolution, temporary preview download, local PCM decoding, playback, rate controls, route observation, and trace export remain available on the physical iPhone 17 Pro
 
 The source decision and deferred reliability requirements live in [MUSIC-SOURCE-RESOLUTION-SPEC.md](MUSIC-SOURCE-RESOLUTION-SPEC.md). A later reliability failure must be fixed before Milestone 2 completion. It does not reopen Spotify or a second-provider project.

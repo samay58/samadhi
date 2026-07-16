@@ -86,6 +86,8 @@ Tempo normalization, compatibility, rate bounds, ramping, deadband, confidence l
 
 ## Focused body-to-music composition
 
-Keep the normal app deterministic until playlist import is ready. The `Samadhi Apple Music Core Loop` scheme alone composes the verified 170 BPM fixture, `CoreMotionCadenceProvider`, and `AppleMusicPlaybackController`.
+Keep the normal app deterministic until playlist import is ready. The `Samadhi Apple Music Core Loop` scheme alone composes a validated tempo fixture, `CoreMotionCadenceProvider`, and `AppleMusicPlaybackController`.
+
+The first physical walk averaged 142 SPM. The original 170.25 BPM fixture could not reach that cadence inside the safe 0.94 through 1.06 rate range, so the honest summary reported 0 percent tempo matched. The focused fixture now uses catalog track `1434921088`, estimated at 139.5 BPM, because it can exercise a bounded rate change at the observed walking cadence. The safe range and stability policy remain unchanged.
 
 The reducer owns adaptation state and rate decisions. Each rate effect carries session, operation, request, and track identity. The player reports the applied rate through the same identities, and stale feedback is ignored. Cadence sensing continues after lock so the existing confidence hold, gradual return to 1.00, and reacquisition rules can run instead of freezing the first estimate.

@@ -27,12 +27,12 @@ enum AppMusicCollection {
         name: "Apple Music core loop",
         tracks: [
             MusicTrack(
-                id: MusicTrackID("1066177773"),
-                title: "Shake It Off (Workout Remix 170 Bpm)",
-                artist: "Hanna",
-                durationSeconds: 248.442,
+                id: MusicTrackID("1434921088"),
+                title: "Can't Stop the Feeling! (Workout Remix 140 BPM)",
+                artist: "Power Music Workout",
+                durationSeconds: 281.143,
                 tempo: TempoAnalysis(
-                    baseBPM: 170.25,
+                    baseBPM: 139.5,
                     confidence: 1,
                     analyzedDurationSeconds: 30,
                     version: 2

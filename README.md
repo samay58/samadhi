@@ -4,11 +4,11 @@
 
 *music in stride*
 
-Samadhi is a native iPhone music experience that lets a runner's cadence and music settle into one rhythm. The current build proves complete interaction and now connects the verified Apple Music fixture, Core Motion cadence, bounded adaptation policy, and production playback adapter in one focused device configuration. The normal app remains deterministic until playlist import is connected, and physical cadence remains unproven.
+Samadhi is a native iPhone music experience that lets a runner's cadence and music settle into one rhythm. The current build proves complete interaction and now connects a verified Apple Music fixture, Core Motion cadence, bounded adaptation policy, and production playback adapter in one focused device configuration. The normal app remains deterministic until playlist import is connected.
 
 ## Current state
 
-Milestones 0 and 1 are complete. Milestone 2 is in progress. Apple Music is the selected production source. Exact-App-ID signing fixed catalog access, City Pocket passed 10 of 10 local preview decodes, and real playback reached a Beoplay Eleven Bluetooth route with live 0.94, 1.00, and 1.06 writes. Analyzer version 2 passes 12 of 12 tempo-declared Apple music previews through the public file interface. The focused core loop now compiles, passes deterministic adaptation tests, and its app build is installed on the physical iPhone. The focused scheme still needs to be launched from Xcode or Codex after the phone is unlocked. One brief physical walk or jog then needs to prove real cadence and automatic rate response before playlist import begins.
+Milestones 0 and 1 are complete. Milestone 2 is in progress. Apple Music is the selected production source. Exact-App-ID signing fixed catalog access, City Pocket passed 10 of 10 local preview decodes, and real playback reached a Beoplay Eleven Bluetooth route with live 0.94, 1.00, and 1.06 writes. Analyzer version 2 passes 12 of 12 tempo-declared Apple music previews through the public file interface. A 29-second physical walk produced live cadence and an honest 142 SPM average. The original 170 BPM fixture correctly remained unmatched because it could not safely reach that walking cadence. The focused build now uses a validated 139.5 BPM fixture so one final brief check can prove automatic rate response before playlist import begins.
 
 Start with [product ethos](Docs/PRODUCT.md), then read [current status](Docs/STATUS.md), [next plan](Docs/PLAN.md), the [Milestone 2 specification](Docs/MILESTONE-2-SPEC.md), and the active [music-source resolution specification](Docs/MUSIC-SOURCE-RESOLUTION-SPEC.md).
 
