@@ -143,7 +143,7 @@
 - Connected tempo-matched measurement to the player-reported applied rate
 - Added deterministic coverage for stable cadence, rate feedback, confidence loss, stale callbacks, provider failure, and replacement sessions
 - Passed formatting, 43 package tests, 2 app-model tests, 4 UI tests, an unsigned iPhone build, and the exact-profile physical build
-- Installed the focused build on Samay's iPhone; physical launch remained blocked only because the phone was locked
+- Installed the body-to-music-capable app build on Samay's iPhone; focused scheme launch remained blocked because the phone was locked, and direct icon launch remains the normal simulation
 
 ## Current checkpoint
 

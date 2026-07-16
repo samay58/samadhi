@@ -38,7 +38,7 @@ Build in this order:
 - Cadence boundary, deterministic filter, and Core Motion adapter: connected in the focused core loop but not physically calibrated or connected to the normal run flow
 - Production playback: verified catalog fixture `1066177773`, live cadence updates, bounded reducer effects, identified applied-rate feedback, and honest measurement are connected
 - Automated body-to-music gate: 43 package tests, 2 app-model tests, 4 UI tests, formatter, unsigned iPhone build, exact-profile build, and device installation pass
-- Physical body-to-music observation: blocked only because the installed app could not auto-launch while the phone was locked
+- Physical body-to-music observation: blocked only because the focused scheme could not auto-launch while the phone was locked; tapping the icon without its launch argument starts simulation
 - Device harness: exact-profile catalog search, strict identity resolution, temporary preview download, local PCM decoding, playback, rate controls, route observation, and trace export remain available on the physical iPhone 17 Pro
 
 The source decision and deferred reliability requirements live in [MUSIC-SOURCE-RESOLUTION-SPEC.md](MUSIC-SOURCE-RESOLUTION-SPEC.md). A later reliability failure must be fixed before Milestone 2 completion. It does not reopen Spotify or a second-provider project.

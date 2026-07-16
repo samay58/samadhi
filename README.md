@@ -8,7 +8,7 @@ Samadhi is a native iPhone music experience that lets a runner's cadence and mus
 
 ## Current state
 
-Milestones 0 and 1 are complete. Milestone 2 is in progress. Apple Music is the selected production source. Exact-App-ID signing fixed catalog access, City Pocket passed 10 of 10 local preview decodes, and real playback reached a Beoplay Eleven Bluetooth route with live 0.94, 1.00, and 1.06 writes. Analyzer version 2 passes 12 of 12 tempo-declared Apple music previews through the public file interface. The focused core loop now compiles, passes deterministic adaptation tests, and is installed on the physical iPhone. One brief physical walk or jog still needs to prove real cadence and automatic rate response before playlist import begins.
+Milestones 0 and 1 are complete. Milestone 2 is in progress. Apple Music is the selected production source. Exact-App-ID signing fixed catalog access, City Pocket passed 10 of 10 local preview decodes, and real playback reached a Beoplay Eleven Bluetooth route with live 0.94, 1.00, and 1.06 writes. Analyzer version 2 passes 12 of 12 tempo-declared Apple music previews through the public file interface. The focused core loop now compiles, passes deterministic adaptation tests, and its app build is installed on the physical iPhone. The focused scheme still needs to be launched from Xcode or Codex after the phone is unlocked. One brief physical walk or jog then needs to prove real cadence and automatic rate response before playlist import begins.
 
 Start with [product ethos](Docs/PRODUCT.md), then read [current status](Docs/STATUS.md), [next plan](Docs/PLAN.md), the [Milestone 2 specification](Docs/MILESTONE-2-SPEC.md), and the active [music-source resolution specification](Docs/MUSIC-SOURCE-RESOLUTION-SPEC.md).
 
