@@ -1,0 +1,596 @@
+[
+  {
+    "date" : "2026-07-16T03:23:55Z",
+    "detail" : "MusicKit feasibility harness opened",
+    "device" : "iPhone",
+    "event" : "harness_started",
+    "id" : "1D072CEF-5AFA-4D81-B0EA-3C65D7FA7603",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:23:55Z",
+    "detail" : "stopped @ 0.0",
+    "device" : "iPhone",
+    "event" : "player_state",
+    "id" : "ACDBBCBA-BA0E-421A-94E0-FD5E572BD3AB",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:25:13Z",
+    "detail" : ".authorized",
+    "device" : "iPhone",
+    "event" : "authorization",
+    "id" : "170B84DD-03E5-4CCD-8FA0-697338E4B029",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:25:13Z",
+    "detail" : "40 playlists",
+    "device" : "iPhone",
+    "event" : "playlists_loaded",
+    "id" : "C5CC7822-4368-4254-A3D7-F902CCC62C32",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:25:19Z",
+    "detail" : "Glue",
+    "device" : "iPhone",
+    "event" : "preview_unavailable",
+    "id" : "3747DDCA-2355-455A-8430-7094F7954E76",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:25:19Z",
+    "detail" : "Innerbloom (Radio Edit)",
+    "device" : "iPhone",
+    "event" : "preview_unavailable",
+    "id" : "DDBE2012-0166-491F-B7B5-3319FBE64A7E",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:25:19Z",
+    "detail" : "Delilah (pull me out of this)",
+    "device" : "iPhone",
+    "event" : "preview_unavailable",
+    "id" : "13387B7A-E1BE-4AA6-B7BF-93B237AB021B",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:25:19Z",
+    "detail" : "Marea (We’ve Lost Dancing)",
+    "device" : "iPhone",
+    "event" : "preview_unavailable",
+    "id" : "E3E504C0-B723-4341-8970-2F2896DD25A0",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:25:19Z",
+    "detail" : "Move (feat. Adam Port, Keinemusik & Orso)",
+    "device" : "iPhone",
+    "event" : "preview_unavailable",
+    "id" : "2F8E7A06-38F0-4A31-9E0F-9EE73A2400C0",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:25:19Z",
+    "detail" : "Yamore (feat. Cesária Evora, Benja (NL) & Franc Fala)",
+    "device" : "iPhone",
+    "event" : "preview_unavailable",
+    "id" : "B1DBD5D2-1128-4982-B100-3B9E26A7705A",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:25:19Z",
+    "detail" : "Tadow",
+    "device" : "iPhone",
+    "event" : "preview_unavailable",
+    "id" : "5D511C37-C658-4C65-A817-A4936116C7A9",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:25:19Z",
+    "detail" : "LITE SPOTS",
+    "device" : "iPhone",
+    "event" : "preview_unavailable",
+    "id" : "E5EEB9A2-4E5A-4545-9736-7F1DB8A43FC3",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:25:19Z",
+    "detail" : "Free Mind",
+    "device" : "iPhone",
+    "event" : "preview_unavailable",
+    "id" : "F342921B-672D-4185-B9ED-B235AAB61C44",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:25:19Z",
+    "detail" : "Ojitos Lindos",
+    "device" : "iPhone",
+    "event" : "preview_unavailable",
+    "id" : "DD7893AF-F618-4783-B249-E66A87A1F3CC",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:25:19Z",
+    "detail" : "Aligned: Edge, Flow, Barcelona Sun; 25 tracks; decoded preview coverage 0 of 10",
+    "device" : "iPhone",
+    "event" : "playlist_selected",
+    "id" : "77CF45F2-0221-4492-947D-72AEE31B5BAC",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:25:19Z",
+    "detail" : "Glue",
+    "device" : "iPhone",
+    "event" : "preview_unavailable",
+    "id" : "77FF6F13-8CF0-4499-A5BB-B34C67985E37",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:25:19Z",
+    "detail" : "Innerbloom (Radio Edit)",
+    "device" : "iPhone",
+    "event" : "preview_unavailable",
+    "id" : "454B7143-DEF7-4C0C-9871-8556A3AC00EC",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:25:19Z",
+    "detail" : "Delilah (pull me out of this)",
+    "device" : "iPhone",
+    "event" : "preview_unavailable",
+    "id" : "DC826948-3141-4CA1-83E2-B1C379CDCC5D",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:25:19Z",
+    "detail" : "Marea (We’ve Lost Dancing)",
+    "device" : "iPhone",
+    "event" : "preview_unavailable",
+    "id" : "79FE70E0-E8F9-4376-89E4-953813BBDEE8",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:25:19Z",
+    "detail" : "Move (feat. Adam Port, Keinemusik & Orso)",
+    "device" : "iPhone",
+    "event" : "preview_unavailable",
+    "id" : "C9BC04E8-90BD-46DD-A138-D76538C691A3",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:25:19Z",
+    "detail" : "Yamore (feat. Cesária Evora, Benja (NL) & Franc Fala)",
+    "device" : "iPhone",
+    "event" : "preview_unavailable",
+    "id" : "1F8DEBF1-7A9A-4D8E-A600-208546EAF0CB",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:25:19Z",
+    "detail" : "Tadow",
+    "device" : "iPhone",
+    "event" : "preview_unavailable",
+    "id" : "5F22494F-9B0C-4F8E-A8F1-76A20A855911",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:25:19Z",
+    "detail" : "LITE SPOTS",
+    "device" : "iPhone",
+    "event" : "preview_unavailable",
+    "id" : "48DCB42D-67E8-459B-A807-4D472C9D3FC8",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:25:19Z",
+    "detail" : "Free Mind",
+    "device" : "iPhone",
+    "event" : "preview_unavailable",
+    "id" : "10057EF4-5C22-4F9B-9D5A-29FCD09DFDA3",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:25:19Z",
+    "detail" : "Ojitos Lindos",
+    "device" : "iPhone",
+    "event" : "preview_unavailable",
+    "id" : "0EB61722-3F87-46A5-BEFC-8F6292EBECF3",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:25:19Z",
+    "detail" : "Aligned: Edge, Flow, Barcelona Sun; 25 tracks; decoded preview coverage 0 of 10",
+    "device" : "iPhone",
+    "event" : "playlist_selected",
+    "id" : "DD31F458-11BE-43C0-8F4C-7965B9E65160",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:25:24Z",
+    "detail" : "requested 1.0; reported 1.0",
+    "device" : "iPhone",
+    "event" : "rate_written",
+    "id" : "E90B36C0-078B-4300-998D-ED0AB473E830",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:25:24Z",
+    "detail" : "stopped @ 1.0",
+    "device" : "iPhone",
+    "event" : "player_state",
+    "id" : "94EF0692-EE25-426A-BAF2-D1D009EEEDDA",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:25:25Z",
+    "detail" : "requested 1.0; reported 1.0",
+    "device" : "iPhone",
+    "event" : "rate_written",
+    "id" : "24E526C2-F154-4E87-9012-8577D08798B3",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:25:32Z",
+    "detail" : ".authorized",
+    "device" : "iPhone",
+    "event" : "authorization",
+    "id" : "F10DFDD9-15E3-442E-A4A3-3E2604DECFB2",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:25:32Z",
+    "detail" : "40 playlists",
+    "device" : "iPhone",
+    "event" : "playlists_loaded",
+    "id" : "428B55A1-72F1-426C-BC44-8B2B2320A261",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:25:34Z",
+    "detail" : "Quite Frankly",
+    "device" : "iPhone",
+    "event" : "preview_unavailable",
+    "id" : "02CC7AD5-61EE-46C7-BBF2-14895D44933D",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:25:34Z",
+    "detail" : "Deep Reverence (feat. Nipsey Hussle)",
+    "device" : "iPhone",
+    "event" : "preview_unavailable",
+    "id" : "E234E464-CCB4-4879-982E-B2F6B9D08B5D",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:25:34Z",
+    "detail" : "Wolves (feat. Post Malone)",
+    "device" : "iPhone",
+    "event" : "preview_unavailable",
+    "id" : "792E4F0C-96B7-47AE-BE5C-D5C1E69B64FE",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:25:34Z",
+    "detail" : "Body Language (feat. Ty Dolla $ign & Jhené Aiko)",
+    "device" : "iPhone",
+    "event" : "preview_unavailable",
+    "id" : "C52427D4-9D21-4B04-80C8-802BD45BF73F",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:25:34Z",
+    "detail" : "Harder Than My Demons",
+    "device" : "iPhone",
+    "event" : "preview_unavailable",
+    "id" : "9861DB8F-26E7-4393-B07F-E60781A8F8ED",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:25:34Z",
+    "detail" : "ZTFO",
+    "device" : "iPhone",
+    "event" : "preview_unavailable",
+    "id" : "4AA2CDC4-5861-4236-A708-A698D7B85ECF",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:25:34Z",
+    "detail" : "Lithuania (feat. Travis Scott)",
+    "device" : "iPhone",
+    "event" : "preview_unavailable",
+    "id" : "B7C80347-2145-4A0B-A9B7-36AB8D3C2B6C",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:25:34Z",
+    "detail" : "girl in red on “Serotonin”",
+    "device" : "iPhone",
+    "event" : "preview_unavailable",
+    "id" : "FB848D06-D3CF-4D41-9EB7-4D725042D316",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:25:34Z",
+    "detail" : "Nail Tech",
+    "device" : "iPhone",
+    "event" : "preview_unavailable",
+    "id" : "3E262AAE-B31F-4234-9BCA-C262EADFFD27",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:25:34Z",
+    "detail" : "First Class",
+    "device" : "iPhone",
+    "event" : "preview_unavailable",
+    "id" : "A332E818-2294-47E1-A079-E86D3C53EB19",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:25:34Z",
+    "detail" : "Music Videos; 13 tracks; decoded preview coverage 0 of 10",
+    "device" : "iPhone",
+    "event" : "playlist_selected",
+    "id" : "219642E4-C9E7-4EB0-9694-34B861E06F38",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:25:34Z",
+    "detail" : "Quite Frankly",
+    "device" : "iPhone",
+    "event" : "preview_unavailable",
+    "id" : "5F274011-AA14-4FD2-A1B2-4106ECE25E27",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:25:34Z",
+    "detail" : "Deep Reverence (feat. Nipsey Hussle)",
+    "device" : "iPhone",
+    "event" : "preview_unavailable",
+    "id" : "64249775-0B0B-4183-A1FA-52ABB3B6C17D",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:25:34Z",
+    "detail" : "Wolves (feat. Post Malone)",
+    "device" : "iPhone",
+    "event" : "preview_unavailable",
+    "id" : "825747AB-E77C-4079-ADF4-BAFAAB4A1121",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:25:34Z",
+    "detail" : "Body Language (feat. Ty Dolla $ign & Jhené Aiko)",
+    "device" : "iPhone",
+    "event" : "preview_unavailable",
+    "id" : "A1012D7A-3B6A-45A0-954A-83BAEEF1CD76",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:25:34Z",
+    "detail" : "Harder Than My Demons",
+    "device" : "iPhone",
+    "event" : "preview_unavailable",
+    "id" : "021117C0-878B-4CD6-A728-1422AC094A4D",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:25:34Z",
+    "detail" : "ZTFO",
+    "device" : "iPhone",
+    "event" : "preview_unavailable",
+    "id" : "4C99D400-9801-4EEA-8192-62CE2F9C3220",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:25:34Z",
+    "detail" : "Lithuania (feat. Travis Scott)",
+    "device" : "iPhone",
+    "event" : "preview_unavailable",
+    "id" : "E6C07F92-31E2-435A-9B17-48954E6D3430",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:25:34Z",
+    "detail" : "girl in red on “Serotonin”",
+    "device" : "iPhone",
+    "event" : "preview_unavailable",
+    "id" : "D0D733E9-173C-4877-B6CC-24F43FF0DDDF",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:25:34Z",
+    "detail" : "Nail Tech",
+    "device" : "iPhone",
+    "event" : "preview_unavailable",
+    "id" : "6388D79A-5CB9-452E-9DDE-CD09D4F86706",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:25:34Z",
+    "detail" : "First Class",
+    "device" : "iPhone",
+    "event" : "preview_unavailable",
+    "id" : "626981BE-EB70-498C-B8A7-1EE0F3ED9B31",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:25:34Z",
+    "detail" : "Music Videos; 13 tracks; decoded preview coverage 0 of 10",
+    "device" : "iPhone",
+    "event" : "playlist_selected",
+    "id" : "1160F0B8-097F-4CD1-889C-4BE189B30E2C",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:25:35Z",
+    "detail" : "My Top Rated; 0 tracks; decoded preview coverage No tracks",
+    "device" : "iPhone",
+    "event" : "playlist_selected",
+    "id" : "417A690E-4357-4CE1-B761-670BE428EE93",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:25:39Z",
+    "detail" : "Pause requested",
+    "device" : "iPhone",
+    "event" : "pause",
+    "id" : "2E495F4F-0072-496B-9FB0-BCEFB3C2A4DE",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:25:39Z",
+    "detail" : "Stop requested",
+    "device" : "iPhone",
+    "event" : "stop",
+    "id" : "77A54FDC-F5A3-4B67-A849-61DC3B51F64E",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:25:39Z",
+    "detail" : "Error Domain=MPMusicPlayerControllerErrorDomain Code=1 \"(null)\"",
+    "device" : "iPhone",
+    "event" : "error",
+    "id" : "56F589B0-B409-4149-AA9D-1D5B1BAC823C",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:25:40Z",
+    "detail" : "Pause requested",
+    "device" : "iPhone",
+    "event" : "pause",
+    "id" : "851B67B2-8CE3-43CB-AD62-57B96A69E3A9",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:25:40Z",
+    "detail" : "Stop requested",
+    "device" : "iPhone",
+    "event" : "stop",
+    "id" : "AC5CF2B4-869B-491B-9FE0-F4C7D0CD942A",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:25:40Z",
+    "detail" : "Error Domain=MPMusicPlayerControllerErrorDomain Code=1 \"(null)\"",
+    "device" : "iPhone",
+    "event" : "error",
+    "id" : "D99E56CC-D6E0-4C01-9C6E-213B8F130ED9",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:25:41Z",
+    "detail" : "Pause requested",
+    "device" : "iPhone",
+    "event" : "pause",
+    "id" : "6DABEC47-8288-4A63-A13D-74115F5AC18D",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:25:41Z",
+    "detail" : "Stop requested",
+    "device" : "iPhone",
+    "event" : "stop",
+    "id" : "EA8F028E-0AFB-423A-A101-39D8199EEABA",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:25:41Z",
+    "detail" : "Error Domain=MPMusicPlayerControllerErrorDomain Code=1 \"(null)\"",
+    "device" : "iPhone",
+    "event" : "error",
+    "id" : "24E7856A-DB88-41F4-952D-D20B4001BE93",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:25:42Z",
+    "detail" : "Pause requested",
+    "device" : "iPhone",
+    "event" : "pause",
+    "id" : "B7F46630-892F-400C-8A70-4175D0236D5C",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:25:42Z",
+    "detail" : "Stop requested",
+    "device" : "iPhone",
+    "event" : "stop",
+    "id" : "934A2093-1C76-4D18-BBBB-22FF582CBC20",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:25:42Z",
+    "detail" : "Error Domain=MPMusicPlayerControllerErrorDomain Code=1 \"(null)\"",
+    "device" : "iPhone",
+    "event" : "error",
+    "id" : "B658DDB2-8EB9-4384-AF49-46D8B5B523D0",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  }
+]

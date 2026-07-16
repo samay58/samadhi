@@ -2,7 +2,7 @@
 
 Date: 2026-07-15
 
-Status: Physical gate in progress. No source decision has been made.
+Status: Physical gate blocked by automatic MusicKit developer-token acquisition. No source decision has been made.
 
 ## Configuration
 
@@ -19,15 +19,20 @@ Status: Physical gate in progress. No source decision has been made.
 | Installation | Passed |
 | Gate launch | Passed with `--music-feasibility` |
 
-## Remaining checks
+## Passed checks
 
 - Contextual Music authorization
-- One library playlist with at least ten tracks
-- Decoded PCM preview coverage of at least eight of ten tracks
+- Loading 40 library playlists and multiple playlists with at least ten tracks
 - Real `ApplicationMusicPlayer` playback
-- Live rate writes at 0.94, 1.00, and 1.06
+- Mechanical live rate writes at 0.94, 1.00, and 1.06
+- Pause and resume observation
+
+## Open or failing checks
+
+- Decoded PCM preview coverage is 0 of 10 across every direct-library sample.
+- Catalog resolution is blocked because every equivalent-ID request returns `.developerTokenRequestFailed`.
 - Pitch stability without clicks, gaps, or obvious warble
 - Five minutes of screen-locked playback
-- Pause, resume, track change, interruption, and route loss
+- Track change, controlled interruption, and route loss
 
-The device gate is not passed until every remaining check has physical evidence.
+The device gate is not passed until automatic catalog access works and every remaining check has physical evidence.

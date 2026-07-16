@@ -54,7 +54,9 @@ Milestone 2 matches music tempo to stable cadence. It does not claim beat-perfec
 
 No physical iPhone, Apple development team, Apple Music account, playlist, or headphone route was available during the first Milestone 2 pass. A compiling Simulator harness was preparation, not feasibility proof.
 
-The blocker was partially cleared on 2026-07-15. Team `ZL5U59XBJ6` is saved in the project, the explicit App ID is registered, the MusicKit App Service is user-confirmed as enabled, and the signed harness builds, installs, and launches on an iPhone 17 Pro. The source decision remains open until the physical media and listening checks finish.
+The blocker was partially cleared on 2026-07-15. Team `ZL5U59XBJ6` is saved in the project, the explicit App ID is registered, the MusicKit App Service is user-confirmed as enabled, and the signed harness builds, installs, and launches on an iPhone 17 Pro. Authorization, library loading, playback, mechanical rate writes, pause, and resume pass. Direct previews fail, and sampled library tracks omit ISRC. Equivalent-ID catalog requests are blocked by automatic developer-token failure, so the source decision remains open.
+
+Do not interpret `.developerTokenRequestFailed` as evidence that catalog previews are unavailable. Retry after service recognition or explicit-App-ID signing is corrected. Manual Media Services keys and custom token infrastructure are outside this gate unless automatic generation is deliberately abandoned.
 
 ## MusicKit service configuration
 

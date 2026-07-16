@@ -68,6 +68,17 @@
 - Installed and launched the `Samadhi MusicKit Gate` harness on the physical phone
 - Left the source decision open pending authorization, playlist, decoded-preview, playback, listening, background, interruption, and route evidence
 
+## 2026-07-15. Physical MusicKit traces
+
+- Saved five JSON traces from the iPhone with checksums and a durable evidence analysis
+- Passed contextual Music authorization, 40-playlist loading, real playback, live 0.94, 1.00, and 1.06 rate writes, pause, and resume
+- Observed 0 of 10 direct-library preview coverage across every tested sample
+- Added one focused ISRC-based catalog-resolution check because the installed SDK supports catalog lookup and catalog songs may carry previews absent from library tracks
+- Built, signed, installed, and launched the retry harness on the same physical iPhone
+- Found no ISRC on 40 sampled tracks and added the SDK's equivalent-ID lookup as the final documented catalog path
+- Pulled the live trace directly from the phone and matched it byte-for-byte to the user export
+- Recorded 40 `.developerTokenRequestFailed` results, leaving catalog preview feasibility honestly blocked rather than passed or failed
+
 ## Current checkpoint
 
-Milestones 0 and 1 are complete. Milestone 2 safe groundwork is built. Apple signing, physical installation, and gate launch pass. The device run is waiting on authorization, playlist, decoded-preview, playback, listening, background, interruption, and route checks. No production source has been chosen.
+Milestones 0 and 1 are complete. Milestone 2 safe groundwork is built. Authorization, library import, playback, mechanical rate writes, pause, and resume pass. Direct preview coverage fails. Catalog resolution is blocked by automatic developer-token failure. Listening quality, background playback, controlled interruption, route loss, and the production source remain open.

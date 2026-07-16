@@ -1,0 +1,1046 @@
+[
+  {
+    "date" : "2026-07-16T03:35:57Z",
+    "detail" : "MusicKit feasibility harness opened",
+    "device" : "iPhone",
+    "event" : "harness_started",
+    "id" : "A80DD9D6-F772-4A3D-ABCC-F03B57B5279F",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:35:57Z",
+    "detail" : "stopped @ 0.0",
+    "device" : "iPhone",
+    "event" : "player_state",
+    "id" : "E46C20C8-4243-41F1-9664-B7002E7236C0",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:36:26Z",
+    "detail" : ".authorized",
+    "device" : "iPhone",
+    "event" : "authorization",
+    "id" : "8D8E8BEB-293A-4F04-803A-0EE8ED5BD8AB",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:36:26Z",
+    "detail" : "40 playlists",
+    "device" : "iPhone",
+    "event" : "playlists_loaded",
+    "id" : "4D1B9FC2-C6E6-416B-9C9A-9D4B721AC0D1",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:36:28Z",
+    "detail" : "Anderson Paak - Malibu (2016); 0 tracks; decoded preview coverage No tracks",
+    "device" : "iPhone",
+    "event" : "playlist_selected",
+    "id" : "20D67D16-AC24-4505-9C7B-AC336A61F912",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:36:31Z",
+    "detail" : "00-red_hot_chili_peppers-the_getaway-2016-web; 0 tracks; decoded preview coverage No tracks",
+    "device" : "iPhone",
+    "event" : "playlist_selected",
+    "id" : "DBA15A23-1D05-4F0A-80CC-4611FCC6E492",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:36:32Z",
+    "detail" : "00-red_hot_chili_peppers-the_getaway-2016-web; 0 tracks; decoded preview coverage No tracks",
+    "device" : "iPhone",
+    "event" : "playlist_selected",
+    "id" : "F6239B73-4716-4ADA-98EF-120F3FEBBB6E",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:36:32Z",
+    "detail" : "00-red_hot_chili_peppers-the_getaway-2016-web; 0 tracks; decoded preview coverage No tracks",
+    "device" : "iPhone",
+    "event" : "playlist_selected",
+    "id" : "82AB406C-172C-4BBB-9336-124D9761B6DD",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:36:32Z",
+    "detail" : "00-red_hot_chili_peppers-the_getaway-2016-web; 0 tracks; decoded preview coverage No tracks",
+    "device" : "iPhone",
+    "event" : "playlist_selected",
+    "id" : "B0DED741-1A73-4DC9-B508-4387E0F4EC38",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:36:34Z",
+    "detail" : "00-red_hot_chili_peppers-the_getaway-2016-web; 0 tracks; decoded preview coverage No tracks",
+    "device" : "iPhone",
+    "event" : "playlist_selected",
+    "id" : "0F3A0ACA-D216-41EF-91F1-98FCAEF310CA",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:36:34Z",
+    "detail" : "00-red_hot_chili_peppers-the_getaway-2016-web; 0 tracks; decoded preview coverage No tracks",
+    "device" : "iPhone",
+    "event" : "playlist_selected",
+    "id" : "F5F23F46-DBBA-44D9-9249-9C34A7DB4DCA",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:36:35Z",
+    "detail" : "00-red_hot_chili_peppers-the_getaway-2016-web; 0 tracks; decoded preview coverage No tracks",
+    "device" : "iPhone",
+    "event" : "playlist_selected",
+    "id" : "08AF6D52-C7F5-4A17-A8F3-78BB359BB9A5",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:36:36Z",
+    "detail" : "00-red_hot_chili_peppers-the_getaway-2016-web; 0 tracks; decoded preview coverage No tracks",
+    "device" : "iPhone",
+    "event" : "playlist_selected",
+    "id" : "13D07016-70AB-4EBC-8DAD-D41F3A8F4EE8",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:36:37Z",
+    "detail" : "requested 1.0; reported 1.0",
+    "device" : "iPhone",
+    "event" : "rate_written",
+    "id" : "3CC3F9F6-B9EC-4850-826A-AA3FA68AF1E7",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:36:37Z",
+    "detail" : "requested 1.0; reported 1.0",
+    "device" : "iPhone",
+    "event" : "rate_written",
+    "id" : "A6954B7C-72FD-4DF0-94C5-0D471049AE31",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:36:37Z",
+    "detail" : "stopped @ 1.0",
+    "device" : "iPhone",
+    "event" : "player_state",
+    "id" : "E795A8DB-6E6A-47E8-B00B-683CDA121F3C",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:36:41Z",
+    "detail" : "Von dutch; id i.JL1m9NafR70VA; .developerTokenRequestFailed",
+    "device" : "iPhone",
+    "event" : "catalog_lookup_error",
+    "id" : "55D99870-9248-46BA-AE35-9CC31ECE0D54",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:36:41Z",
+    "detail" : "Von dutch; id i.JL1m9NafR70VA; isrc none",
+    "device" : "iPhone",
+    "event" : "preview_unavailable",
+    "id" : "1853FAD6-271B-423B-82C3-642F66911156",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:36:41Z",
+    "detail" : "360; id i.4YBo9o3T5mWKo; .developerTokenRequestFailed",
+    "device" : "iPhone",
+    "event" : "catalog_lookup_error",
+    "id" : "198E9E9E-3894-4EE3-AF18-6F3ADAC6E768",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:36:41Z",
+    "detail" : "360; id i.4YBo9o3T5mWKo; isrc none",
+    "device" : "iPhone",
+    "event" : "preview_unavailable",
+    "id" : "B704296A-45FC-4D9F-BC0B-DF31873BF804",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:36:41Z",
+    "detail" : "BIRDS OF A FEATHER; id i.DVE89ZPH7bWNr; .developerTokenRequestFailed",
+    "device" : "iPhone",
+    "event" : "catalog_lookup_error",
+    "id" : "11F34726-3E62-4B3A-89BD-8A717D92E8B0",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:36:41Z",
+    "detail" : "BIRDS OF A FEATHER; id i.DVE89ZPH7bWNr; isrc none",
+    "device" : "iPhone",
+    "event" : "preview_unavailable",
+    "id" : "9A6A5A67-D409-4C27-86AF-5DD51B29AE02",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:36:41Z",
+    "detail" : "Not Like Us; id i.XMDN1x9sNDK6Y; .developerTokenRequestFailed",
+    "device" : "iPhone",
+    "event" : "catalog_lookup_error",
+    "id" : "A840C43E-180D-40C6-921C-69DC7B48D827",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:36:41Z",
+    "detail" : "Not Like Us; id i.XMDN1x9sNDK6Y; isrc none",
+    "device" : "iPhone",
+    "event" : "preview_unavailable",
+    "id" : "9BEE6EF0-2981-4CAD-9509-D8D5BC5C6BFA",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:36:41Z",
+    "detail" : "Like That; id i.b1JN7AAiN62vJ; .developerTokenRequestFailed",
+    "device" : "iPhone",
+    "event" : "catalog_lookup_error",
+    "id" : "F4DBAA72-EA47-4F05-A572-F79BB264EC92",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:36:41Z",
+    "detail" : "Like That; id i.b1JN7AAiN62vJ; isrc none",
+    "device" : "iPhone",
+    "event" : "preview_unavailable",
+    "id" : "9B6DF1B4-A357-43D8-97A2-071697AD335E",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:36:41Z",
+    "detail" : "redrum; id i.b1JN7WxUN62vJ; .developerTokenRequestFailed",
+    "device" : "iPhone",
+    "event" : "catalog_lookup_error",
+    "id" : "209568CC-6801-41E5-8DC9-3D041D277E8D",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:36:41Z",
+    "detail" : "redrum; id i.b1JN7WxUN62vJ; isrc none",
+    "device" : "iPhone",
+    "event" : "preview_unavailable",
+    "id" : "362837B7-6DE5-423D-AB56-6795160201B5",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:36:41Z",
+    "detail" : "TEXAS HOLD 'EM; id i.GEGg9MRUorzgd; .developerTokenRequestFailed",
+    "device" : "iPhone",
+    "event" : "catalog_lookup_error",
+    "id" : "F822D0D6-1216-4ABD-BA4F-97FB7C7A6394",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:36:41Z",
+    "detail" : "TEXAS HOLD 'EM; id i.GEGg9MRUorzgd; isrc none",
+    "device" : "iPhone",
+    "event" : "preview_unavailable",
+    "id" : "4F27BDC3-138C-4950-9591-5742CA34643A",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:36:41Z",
+    "detail" : "Saturn; id i.WmYN9YvfNX9Q2; .developerTokenRequestFailed",
+    "device" : "iPhone",
+    "event" : "catalog_lookup_error",
+    "id" : "8366A2B4-8F68-4414-AF4C-7790B520C58C",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:36:41Z",
+    "detail" : "Saturn; id i.WmYN9YvfNX9Q2; isrc none",
+    "device" : "iPhone",
+    "event" : "preview_unavailable",
+    "id" : "EBE4E650-222F-40A4-823A-B801557C4AA4",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:36:41Z",
+    "detail" : "FE!N (feat. Playboi Carti); id i.mmpNKdZTarbY7; .developerTokenRequestFailed",
+    "device" : "iPhone",
+    "event" : "catalog_lookup_error",
+    "id" : "0299D10B-5780-4B94-98BA-149F91B11788",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:36:41Z",
+    "detail" : "FE!N (feat. Playboi Carti); id i.mmpNKdZTarbY7; isrc none",
+    "device" : "iPhone",
+    "event" : "preview_unavailable",
+    "id" : "8B27DC51-3928-4C49-95FD-B2E75AF4D61D",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:36:41Z",
+    "detail" : "Houdini; id i.DVE89gPH7bWNr; .developerTokenRequestFailed",
+    "device" : "iPhone",
+    "event" : "catalog_lookup_error",
+    "id" : "7CC747C6-1A63-4C39-A653-5FC2D8D59408",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:36:41Z",
+    "detail" : "Houdini; id i.DVE89gPH7bWNr; isrc none",
+    "device" : "iPhone",
+    "event" : "preview_unavailable",
+    "id" : "D6E93658-9FC8-4A51-8C28-A322A872156E",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:36:41Z",
+    "detail" : "This Week: No Skips, Full Voltage; 25 tracks; decoded preview coverage 0 of 10",
+    "device" : "iPhone",
+    "event" : "playlist_selected",
+    "id" : "8C8CE82D-725F-41A0-8679-8609E1510C9A",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:36:42Z",
+    "detail" : ".authorized",
+    "device" : "iPhone",
+    "event" : "authorization",
+    "id" : "83DAE272-2F44-4AD7-A625-5605CBB8B3E4",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:36:42Z",
+    "detail" : "40 playlists",
+    "device" : "iPhone",
+    "event" : "playlists_loaded",
+    "id" : "E92F1B88-431F-4B5B-8A70-14A63E30662D",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:36:43Z",
+    "detail" : ".authorized",
+    "device" : "iPhone",
+    "event" : "authorization",
+    "id" : "AC775ABF-6D4E-4AAE-912F-AA5840A1BF53",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:36:43Z",
+    "detail" : "40 playlists",
+    "device" : "iPhone",
+    "event" : "playlists_loaded",
+    "id" : "71992A33-8733-4C4F-A8B5-83406F88916D",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:36:44Z",
+    "detail" : ".authorized",
+    "device" : "iPhone",
+    "event" : "authorization",
+    "id" : "9C9A362A-A0AF-4B5E-8482-DD8F1781029E",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:36:44Z",
+    "detail" : "40 playlists",
+    "device" : "iPhone",
+    "event" : "playlists_loaded",
+    "id" : "38EF6016-1AA6-4ABB-8159-B2AE69073B0A",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:36:45Z",
+    "detail" : "Cello Suite No. 1 in G Major, BWV 1007: I. Prélude; id i.RBrNbqYUNM7qO; .developerTokenRequestFailed",
+    "device" : "iPhone",
+    "event" : "catalog_lookup_error",
+    "id" : "525ED6E1-E1F0-48B6-842B-36CD0406C9AA",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:36:45Z",
+    "detail" : "Cello Suite No. 1 in G Major, BWV 1007: I. Prélude; id i.RBrNbqYUNM7qO; isrc none",
+    "device" : "iPhone",
+    "event" : "preview_unavailable",
+    "id" : "F93B718F-CC18-438C-8409-88CEC825F092",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:36:45Z",
+    "detail" : "String Quartet in F Major, M. 35: II. Assez vif - Très rythmé; id i.b1JNbK8TN62vJ; .developerTokenRequestFailed",
+    "device" : "iPhone",
+    "event" : "catalog_lookup_error",
+    "id" : "096C2FEB-874F-46F2-A96C-840370DA9ACD",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:36:45Z",
+    "detail" : "String Quartet in F Major, M. 35: II. Assez vif - Très rythmé; id i.b1JNbK8TN62vJ; isrc none",
+    "device" : "iPhone",
+    "event" : "preview_unavailable",
+    "id" : "A7502A7E-FB28-4631-AC84-9FECC826B03A",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:36:45Z",
+    "detail" : "Partita for 8 Singers: 1. Allemande; id i.GEGgbNYtorzgd; .developerTokenRequestFailed",
+    "device" : "iPhone",
+    "event" : "catalog_lookup_error",
+    "id" : "025FA1F9-1AEE-4FFE-9962-417F783E4409",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:36:45Z",
+    "detail" : "Partita for 8 Singers: 1. Allemande; id i.GEGgbNYtorzgd; isrc none",
+    "device" : "iPhone",
+    "event" : "preview_unavailable",
+    "id" : "21A7891C-5833-4830-B5BF-F090DBD71F79",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:36:45Z",
+    "detail" : "Music for 18 Musicians: Pulses; id i.WmYNqmXiNX9Q2; .developerTokenRequestFailed",
+    "device" : "iPhone",
+    "event" : "catalog_lookup_error",
+    "id" : "01724DEB-0494-455C-BB64-BF730B69AB05",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:36:45Z",
+    "detail" : "Music for 18 Musicians: Pulses; id i.WmYNqmXiNX9Q2; isrc none",
+    "device" : "iPhone",
+    "event" : "preview_unavailable",
+    "id" : "2D80D07D-6A50-4B03-8BF4-12ECC135337A",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:36:45Z",
+    "detail" : "Drumming: Part I; id i.4YBo12As5mWKo; .developerTokenRequestFailed",
+    "device" : "iPhone",
+    "event" : "catalog_lookup_error",
+    "id" : "C5C6B318-6F4E-40DD-8753-4416F6775EE4",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:36:45Z",
+    "detail" : "Drumming: Part I; id i.4YBo12As5mWKo; isrc none",
+    "device" : "iPhone",
+    "event" : "preview_unavailable",
+    "id" : "5371E78E-D828-49A3-9DE6-09F0F20BE2BF",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:36:45Z",
+    "detail" : "Shaker Loops: I. Shaking and trembling; id i.eoDNeA5uN9Azm; .developerTokenRequestFailed",
+    "device" : "iPhone",
+    "event" : "catalog_lookup_error",
+    "id" : "260D9A4F-E7D5-49B5-BEF1-80EFCC0C3FF1",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:36:45Z",
+    "detail" : "Shaker Loops: I. Shaking and trembling; id i.eoDNeA5uN9Azm; isrc none",
+    "device" : "iPhone",
+    "event" : "preview_unavailable",
+    "id" : "B9E8B15D-3B4A-4F09-9FA8-32AC50046B73",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:36:45Z",
+    "detail" : "Aheym; id i.XMDN8AxTNDK6Y; .developerTokenRequestFailed",
+    "device" : "iPhone",
+    "event" : "catalog_lookup_error",
+    "id" : "0C6C20D6-B0AA-4411-A902-C62C0284AAC7",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:36:45Z",
+    "detail" : "Aheym; id i.XMDN8AxTNDK6Y; isrc none",
+    "device" : "iPhone",
+    "event" : "preview_unavailable",
+    "id" : "B691D6CC-559A-4DB0-A1CD-947CCF5B0413",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:36:45Z",
+    "detail" : "Opening; id i.WmYN9M6HNX9Q2; .developerTokenRequestFailed",
+    "device" : "iPhone",
+    "event" : "catalog_lookup_error",
+    "id" : "CF737C31-4A5C-4EF8-A0B8-9DE7631624B1",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:36:45Z",
+    "detail" : "Opening; id i.WmYN9M6HNX9Q2; isrc none",
+    "device" : "iPhone",
+    "event" : "preview_unavailable",
+    "id" : "BB5F39DE-F8ED-4C5A-B759-9881825573A7",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:36:45Z",
+    "detail" : "Mad Rush; id i.JL1mbQRTR70VA; .developerTokenRequestFailed",
+    "device" : "iPhone",
+    "event" : "catalog_lookup_error",
+    "id" : "ACC01DF0-76D1-474B-8004-5FDFA9CC9CDF",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:36:45Z",
+    "detail" : "Mad Rush; id i.JL1mbQRTR70VA; isrc none",
+    "device" : "iPhone",
+    "event" : "preview_unavailable",
+    "id" : "4A6609CF-E9ED-474B-ADF4-FF643C29C7FA",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:36:45Z",
+    "detail" : "On The Nature Of Daylight; id i.DVE8k6NF7bWNr; .developerTokenRequestFailed",
+    "device" : "iPhone",
+    "event" : "catalog_lookup_error",
+    "id" : "2E699033-51EA-4177-B32C-E20554496A2F",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:36:45Z",
+    "detail" : "On The Nature Of Daylight; id i.DVE8k6NF7bWNr; isrc none",
+    "device" : "iPhone",
+    "event" : "preview_unavailable",
+    "id" : "9EE5F6F8-178F-4BDF-937C-5A613A328B8B",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:36:45Z",
+    "detail" : "Cathedral Current -- June 2026; 25 tracks; decoded preview coverage 0 of 10",
+    "device" : "iPhone",
+    "event" : "playlist_selected",
+    "id" : "3C1B128E-C471-4E91-A7BD-B70CF5D4F2DC",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:36:46Z",
+    "detail" : "Cello Suite No. 1 in G Major, BWV 1007: I. Prélude; id i.RBrNbqYUNM7qO; .developerTokenRequestFailed",
+    "device" : "iPhone",
+    "event" : "catalog_lookup_error",
+    "id" : "AEB49615-AEE9-4B33-BD8E-09E08DE0B137",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:36:46Z",
+    "detail" : "Cello Suite No. 1 in G Major, BWV 1007: I. Prélude; id i.RBrNbqYUNM7qO; isrc none",
+    "device" : "iPhone",
+    "event" : "preview_unavailable",
+    "id" : "385482E8-CDF4-4226-B236-C32CF34063C1",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:36:46Z",
+    "detail" : "String Quartet in F Major, M. 35: II. Assez vif - Très rythmé; id i.b1JNbK8TN62vJ; .developerTokenRequestFailed",
+    "device" : "iPhone",
+    "event" : "catalog_lookup_error",
+    "id" : "F45610CF-2EF2-46BE-AE65-58B0B237EA23",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:36:46Z",
+    "detail" : "String Quartet in F Major, M. 35: II. Assez vif - Très rythmé; id i.b1JNbK8TN62vJ; isrc none",
+    "device" : "iPhone",
+    "event" : "preview_unavailable",
+    "id" : "FE22045D-D91A-48A7-86F1-C10E1305324E",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:36:46Z",
+    "detail" : "Partita for 8 Singers: 1. Allemande; id i.GEGgbNYtorzgd; .developerTokenRequestFailed",
+    "device" : "iPhone",
+    "event" : "catalog_lookup_error",
+    "id" : "816FD0D9-B98B-444A-A9DA-3150D8D07925",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:36:46Z",
+    "detail" : "Partita for 8 Singers: 1. Allemande; id i.GEGgbNYtorzgd; isrc none",
+    "device" : "iPhone",
+    "event" : "preview_unavailable",
+    "id" : "C4304E5E-EBDF-4941-AEBB-3CBA881951F4",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:36:46Z",
+    "detail" : "Music for 18 Musicians: Pulses; id i.WmYNqmXiNX9Q2; .developerTokenRequestFailed",
+    "device" : "iPhone",
+    "event" : "catalog_lookup_error",
+    "id" : "C8A94602-D44C-46D1-84A6-EEFFEFE37B31",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:36:46Z",
+    "detail" : "Music for 18 Musicians: Pulses; id i.WmYNqmXiNX9Q2; isrc none",
+    "device" : "iPhone",
+    "event" : "preview_unavailable",
+    "id" : "E897A1A5-D044-4B21-8A14-8022DC2EB234",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:36:46Z",
+    "detail" : "Drumming: Part I; id i.4YBo12As5mWKo; .developerTokenRequestFailed",
+    "device" : "iPhone",
+    "event" : "catalog_lookup_error",
+    "id" : "4692C84E-5C3D-4C6C-B1CF-83B4BF929A20",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:36:46Z",
+    "detail" : "Drumming: Part I; id i.4YBo12As5mWKo; isrc none",
+    "device" : "iPhone",
+    "event" : "preview_unavailable",
+    "id" : "59DA232C-963D-4C96-BFEF-23954BCDDDC6",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:36:46Z",
+    "detail" : "Shaker Loops: I. Shaking and trembling; id i.eoDNeA5uN9Azm; .developerTokenRequestFailed",
+    "device" : "iPhone",
+    "event" : "catalog_lookup_error",
+    "id" : "232B104A-AA78-46AA-89A1-616EB4DB35B6",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:36:46Z",
+    "detail" : "Shaker Loops: I. Shaking and trembling; id i.eoDNeA5uN9Azm; isrc none",
+    "device" : "iPhone",
+    "event" : "preview_unavailable",
+    "id" : "FF64D7B8-1439-4021-842A-0E43D41792D1",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:36:46Z",
+    "detail" : "Aheym; id i.XMDN8AxTNDK6Y; .developerTokenRequestFailed",
+    "device" : "iPhone",
+    "event" : "catalog_lookup_error",
+    "id" : "0A39D40D-3948-4922-AB24-67AF825E6C3D",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:36:46Z",
+    "detail" : "Aheym; id i.XMDN8AxTNDK6Y; isrc none",
+    "device" : "iPhone",
+    "event" : "preview_unavailable",
+    "id" : "F8295C9B-BD4B-4482-BEA7-192507A9F19A",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:36:46Z",
+    "detail" : "Opening; id i.WmYN9M6HNX9Q2; .developerTokenRequestFailed",
+    "device" : "iPhone",
+    "event" : "catalog_lookup_error",
+    "id" : "650326F9-5D70-4F95-A7E6-F4EB6BD3A21B",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:36:46Z",
+    "detail" : "Opening; id i.WmYN9M6HNX9Q2; isrc none",
+    "device" : "iPhone",
+    "event" : "preview_unavailable",
+    "id" : "ED952FE4-F260-4C7E-9A64-ED76822B8E52",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:36:46Z",
+    "detail" : "Mad Rush; id i.JL1mbQRTR70VA; .developerTokenRequestFailed",
+    "device" : "iPhone",
+    "event" : "catalog_lookup_error",
+    "id" : "860D8A6E-0CDD-4196-B249-B0ACE17AEBD3",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:36:46Z",
+    "detail" : "Mad Rush; id i.JL1mbQRTR70VA; isrc none",
+    "device" : "iPhone",
+    "event" : "preview_unavailable",
+    "id" : "1332E3EA-08FA-4EAB-BEFE-DB1B20031CD4",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:36:46Z",
+    "detail" : "On The Nature Of Daylight; id i.DVE8k6NF7bWNr; .developerTokenRequestFailed",
+    "device" : "iPhone",
+    "event" : "catalog_lookup_error",
+    "id" : "12C82E2A-E77A-4838-9210-DA49DECCB41B",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:36:46Z",
+    "detail" : "On The Nature Of Daylight; id i.DVE8k6NF7bWNr; isrc none",
+    "device" : "iPhone",
+    "event" : "preview_unavailable",
+    "id" : "6F40F9B3-3630-41CF-B3B4-8DB32B76DF8A",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:36:46Z",
+    "detail" : "Cathedral Current -- June 2026; 25 tracks; decoded preview coverage 0 of 10",
+    "device" : "iPhone",
+    "event" : "playlist_selected",
+    "id" : "F9627F05-C30E-48AD-9B8A-89335099F322",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:36:46Z",
+    "detail" : "Cello Suite No. 1 in G Major, BWV 1007: I. Prélude; id i.RBrNbqYUNM7qO; .developerTokenRequestFailed",
+    "device" : "iPhone",
+    "event" : "catalog_lookup_error",
+    "id" : "9F74872F-F61D-4E5D-B1CD-7CAFEA7974AF",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:36:46Z",
+    "detail" : "Cello Suite No. 1 in G Major, BWV 1007: I. Prélude; id i.RBrNbqYUNM7qO; isrc none",
+    "device" : "iPhone",
+    "event" : "preview_unavailable",
+    "id" : "16BF48E6-A9AA-4FA4-99DD-FA1DD9D7BC5D",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:36:46Z",
+    "detail" : "String Quartet in F Major, M. 35: II. Assez vif - Très rythmé; id i.b1JNbK8TN62vJ; .developerTokenRequestFailed",
+    "device" : "iPhone",
+    "event" : "catalog_lookup_error",
+    "id" : "FA8D6F81-22F4-4F1C-8D93-FA2A35445791",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:36:46Z",
+    "detail" : "String Quartet in F Major, M. 35: II. Assez vif - Très rythmé; id i.b1JNbK8TN62vJ; isrc none",
+    "device" : "iPhone",
+    "event" : "preview_unavailable",
+    "id" : "E30700C4-CE5B-4B33-837C-D5AB22598FE7",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:36:46Z",
+    "detail" : "Partita for 8 Singers: 1. Allemande; id i.GEGgbNYtorzgd; .developerTokenRequestFailed",
+    "device" : "iPhone",
+    "event" : "catalog_lookup_error",
+    "id" : "8D0A1AE3-3576-4E46-AC30-5341CF5A48D3",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:36:46Z",
+    "detail" : "Partita for 8 Singers: 1. Allemande; id i.GEGgbNYtorzgd; isrc none",
+    "device" : "iPhone",
+    "event" : "preview_unavailable",
+    "id" : "A372631B-1798-468B-879D-42E570BA2AE9",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:36:46Z",
+    "detail" : "Music for 18 Musicians: Pulses; id i.WmYNqmXiNX9Q2; .developerTokenRequestFailed",
+    "device" : "iPhone",
+    "event" : "catalog_lookup_error",
+    "id" : "AD7DB252-B88C-4E2A-8CB8-3EFF97B0A813",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:36:46Z",
+    "detail" : "Music for 18 Musicians: Pulses; id i.WmYNqmXiNX9Q2; isrc none",
+    "device" : "iPhone",
+    "event" : "preview_unavailable",
+    "id" : "C04A7E2A-C1D1-4DC2-96B3-05E4E0507606",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:36:46Z",
+    "detail" : "Drumming: Part I; id i.4YBo12As5mWKo; .developerTokenRequestFailed",
+    "device" : "iPhone",
+    "event" : "catalog_lookup_error",
+    "id" : "5C9D31A8-5A94-4961-9ED4-C5EFDCC19137",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:36:46Z",
+    "detail" : "Drumming: Part I; id i.4YBo12As5mWKo; isrc none",
+    "device" : "iPhone",
+    "event" : "preview_unavailable",
+    "id" : "313DAB09-8B38-460C-88FF-000FEE8D99BF",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:36:46Z",
+    "detail" : "Shaker Loops: I. Shaking and trembling; id i.eoDNeA5uN9Azm; .developerTokenRequestFailed",
+    "device" : "iPhone",
+    "event" : "catalog_lookup_error",
+    "id" : "567EAB9F-B30F-47ED-8BEA-12852B0CFB5C",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:36:46Z",
+    "detail" : "Shaker Loops: I. Shaking and trembling; id i.eoDNeA5uN9Azm; isrc none",
+    "device" : "iPhone",
+    "event" : "preview_unavailable",
+    "id" : "8FEA454C-21D8-40A8-BC0D-E65F9EBC2A12",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:36:46Z",
+    "detail" : "Aheym; id i.XMDN8AxTNDK6Y; .developerTokenRequestFailed",
+    "device" : "iPhone",
+    "event" : "catalog_lookup_error",
+    "id" : "BD3E556D-0A19-4F41-9440-6535D369E12E",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:36:46Z",
+    "detail" : "Aheym; id i.XMDN8AxTNDK6Y; isrc none",
+    "device" : "iPhone",
+    "event" : "preview_unavailable",
+    "id" : "076B1F47-28B8-420F-95C9-2672946166FF",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:36:46Z",
+    "detail" : "Opening; id i.WmYN9M6HNX9Q2; .developerTokenRequestFailed",
+    "device" : "iPhone",
+    "event" : "catalog_lookup_error",
+    "id" : "A1B565A2-7F7D-49C3-8B7C-8D340C9155B4",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:36:46Z",
+    "detail" : "Opening; id i.WmYN9M6HNX9Q2; isrc none",
+    "device" : "iPhone",
+    "event" : "preview_unavailable",
+    "id" : "72C25370-C174-4C3B-8985-63A20771EC42",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:36:46Z",
+    "detail" : "Mad Rush; id i.JL1mbQRTR70VA; .developerTokenRequestFailed",
+    "device" : "iPhone",
+    "event" : "catalog_lookup_error",
+    "id" : "0C1C1FD9-04D7-43AB-A0AA-22C36516CA31",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:36:46Z",
+    "detail" : "Mad Rush; id i.JL1mbQRTR70VA; isrc none",
+    "device" : "iPhone",
+    "event" : "preview_unavailable",
+    "id" : "2AB5BB32-9EB2-4145-AF95-863E98F037C5",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:36:46Z",
+    "detail" : "On The Nature Of Daylight; id i.DVE8k6NF7bWNr; .developerTokenRequestFailed",
+    "device" : "iPhone",
+    "event" : "catalog_lookup_error",
+    "id" : "20773594-4473-4C29-BBED-3D7ED46D5D9F",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:36:46Z",
+    "detail" : "On The Nature Of Daylight; id i.DVE8k6NF7bWNr; isrc none",
+    "device" : "iPhone",
+    "event" : "preview_unavailable",
+    "id" : "6F4E1168-FE66-491B-BC2A-6D71BC223F8C",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:36:46Z",
+    "detail" : "Cathedral Current -- June 2026; 25 tracks; decoded preview coverage 0 of 10",
+    "device" : "iPhone",
+    "event" : "playlist_selected",
+    "id" : "CBF87EC2-C2F2-417E-AE0A-A36127926B46",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:36:49Z",
+    "detail" : "paused @ 0.0",
+    "device" : "iPhone",
+    "event" : "player_state",
+    "id" : "C9AF4CAA-9A2D-4CA2-A0F0-A5DBFB248D5A",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:36:49Z",
+    "detail" : "Queue contains 25 tracks",
+    "device" : "iPhone",
+    "event" : "playback_started",
+    "id" : "A822DB72-E7AC-45CA-A34E-C6EB7767947D",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:36:49Z",
+    "detail" : "Audio session interruption observed",
+    "device" : "iPhone",
+    "event" : "audio_interruption",
+    "id" : "6857C390-BF10-4BE2-869B-DB2C1B500CFC",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:36:50Z",
+    "detail" : "playing @ 1.0",
+    "device" : "iPhone",
+    "event" : "player_state",
+    "id" : "323B3CE8-B8B0-4981-AEFB-4C1E95D8E9E5",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:36:53Z",
+    "detail" : "requested 1.06; reported 1.06",
+    "device" : "iPhone",
+    "event" : "rate_written",
+    "id" : "390F9572-9E53-4AF5-BA75-E7209EB7FF4E",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:36:53Z",
+    "detail" : "playing @ 1.06",
+    "device" : "iPhone",
+    "event" : "player_state",
+    "id" : "8040B3AE-EBEC-4510-8CDA-ADB0F8F3E130",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:36:54Z",
+    "detail" : "Pause requested",
+    "device" : "iPhone",
+    "event" : "pause",
+    "id" : "949C22A2-3DD8-4230-8563-C82C89487009",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:36:54Z",
+    "detail" : "Stop requested",
+    "device" : "iPhone",
+    "event" : "stop",
+    "id" : "9D045E11-982F-4809-9DFA-05087B4E3DF1",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:36:54Z",
+    "detail" : "Resume requested",
+    "device" : "iPhone",
+    "event" : "resume",
+    "id" : "D003489F-6600-4883-A9FC-0DB40ED62F33",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:36:55Z",
+    "detail" : "playing @ 1.0",
+    "device" : "iPhone",
+    "event" : "player_state",
+    "id" : "3E91E3D3-8703-4FB2-A29A-0041AB345C4D",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  }
+]

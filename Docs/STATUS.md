@@ -12,7 +12,7 @@
 | Audio timing | Simulated only | Deterministic beat-clock tests |
 | Playlist import | Specified, not started | Milestone 2 spec |
 | Adaptation policy | Built, not connected to a real player | Deterministic policy tests |
-| Apple Music feasibility | Physical gate in progress | Signed harness installed and launched on iPhone 17 Pro |
+| Apple Music feasibility | Physical gate blocked by automatic developer-token failure | Five saved traces from iPhone 17 Pro |
 | Production player | Undecided | Physical gate required |
 | Physical run validation | MusicKit feasibility run in progress; outdoor run not started | Requires completed source decision and route matrix |
 
@@ -64,6 +64,10 @@
 - Renamed the summary measurement to tempo matched and made fixed rhythm report Not measured
 - Added a debug-only MusicKit gate scheme with playlist loading, decoded PCM preview coverage, playback, rate controls, route and interruption observation, and JSON trace export
 - Added music and motion permission text plus verified background audio mode
+- Saved three physical-device traces proving authorization, 40-playlist loading, real playback, live 0.94, 1.00, and 1.06 rate writes, pause, and resume
+- Found 0 of 10 direct-library preview coverage across every sample
+- Found no ISRC on 40 sampled library tracks, then exercised equivalent-ID catalog lookup
+- Observed 40 `.developerTokenRequestFailed` results before any catalog response, so catalog preview coverage remains blocked rather than failed
 
 ## Proof
 
@@ -79,12 +83,12 @@ The current serial gate passed:
 
 Durable logs and final visual frames live under Evidence/.
 
-The MusicKit harness launches in Simulator and on the connected physical iPhone. Signing uses the Apple Development certificate for team `ZL5U59XBJ6`.
+The MusicKit harness launches in Simulator and on the connected physical iPhone. Signing uses the Apple Development certificate for team `ZL5U59XBJ6`. Raw physical traces and their SHA-256 hashes are stored under `Evidence/Device/`.
 
 ## Known limits
 
-No physical run has validated cadence quality. No listening test has validated tempo changes or audio artifacts. The normal app still uses silent bundled media, simulated cadence, and simulated beat timing. The MusicKit harness is running on a physical iPhone, but authorization, library loading, preview decoding, playback, and recovery remain unproven.
+No physical run has validated cadence quality. No listening test has validated tempo changes or audio artifacts. The normal app still uses silent bundled media, simulated cadence, and simulated beat timing. Music authorization, library loading, playback, live rate writes, pause, and resume pass. Direct library previews fail at 0 of 10. Catalog resolution is blocked by automatic developer-token failure. Track change, screen-lock playback, controlled interruption, and route loss remain unproven.
 
 ## WHERE WE LEFT OFF
 
-Milestone 2 safe groundwork is built. The signed `Samadhi MusicKit Gate` harness is installed and running on Samay's physical iPhone. Next work is authorization, one ten-track playlist, decoded preview coverage, playback-rate listening, background playback, interruption, and route-loss checks. Do not choose a player before that evidence exists.
+Milestone 2 safe groundwork is built. Five physical traces are saved. Authorization, playlist loading, playback, rate writes, pause, and resume pass. Direct library previews fail. Equivalent-ID catalog requests cannot yet obtain Apple’s automatic developer token, so the source decision remains open. Retry one populated playlist after the MusicKit App Service recognizes this bundle identifier. Do not build either production player before that result.
