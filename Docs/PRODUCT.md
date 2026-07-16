@@ -46,9 +46,9 @@ Raw sensor changes never drive frantic UI. Product should feel composed when inp
 
 Never imply beat-perfect adaptation, real cadence quality, or audio quality before physical proof exists.
 
-### Local by default
+### No Samadhi backend
 
-No account, cloud backend, remote listening history, analytics SDK, ad identifier, or model call.
+No Samadhi account, cloud backend, remote listening history, analytics SDK, ad identifier, or model call. Music provider access is allowed only when the runner selects it. Tempo analysis and Samadhi persistence remain local.
 
 ### No product inflation
 
