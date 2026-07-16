@@ -4,7 +4,22 @@
 
 Apple team `ZL5U59XBJ6` is saved in `project.yml`. Signed compilation, installation, and launch pass with an Apple Development certificate. Samay's iPhone 17 Pro is connected on iOS 27.0 with Developer Mode enabled. The explicit App ID exists and the MusicKit App Service is user-confirmed as enabled.
 
-## Apple Music feasibility run
+## Final Apple token repair
+
+The Mac currently has only the Xcode-managed wildcard profile `ZL5U59XBJ6.*`. No exact Samadhi development profile is installed.
+
+1. In Certificates, Identifiers & Profiles, confirm MusicKit remains enabled for the explicit App ID `com.samaydhawan.Samadhi`.
+2. Create a new iOS App Development provisioning profile for that exact App ID, the current Apple Development certificate, and Samay's registered iPhone.
+3. Download and open the profile so Xcode installs it.
+4. In the Samadhi target's Signing & Capabilities screen, keep team `ZL5U59XBJ6` and bundle identifier `com.samaydhawan.Samadhi`. Select the exact profile manually for the gate build if automatic signing continues to choose a wildcard profile.
+5. Clean the build folder, delete the gate app from the phone, build, and install again.
+6. Inspect the built app's embedded profile. Confirm its application identifier ends in `com.samaydhawan.Samadhi` and record the profile name and UUID.
+7. Run one minimal catalog request in the `Samadhi MusicKit Gate` harness and export the JSON trace.
+8. One clean reinstall retry is allowed for a transient failure. If the same build still reports `developerTokenRequestFailed`, record Apple Music as rejected and begin the local-file path in [MUSIC-SOURCE-RESOLUTION-SPEC.md](MUSIC-SOURCE-RESOLUTION-SPEC.md).
+
+Do not create a Media Services key, embed a developer token, or add a token backend for this gate.
+
+## Apple Music feasibility run after token pass
 
 1. Connect and trust an unlocked iPhone, then confirm Developer Mode is enabled.
 2. Confirm the phone appears in `xcrun devicectl list devices` as a physical device.

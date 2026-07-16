@@ -58,6 +58,16 @@ The blocker was partially cleared on 2026-07-15. Team `ZL5U59XBJ6` is saved in t
 
 Do not interpret `.developerTokenRequestFailed` as evidence that catalog previews are unavailable. Retry after service recognition or explicit-App-ID signing is corrected. Manual Media Services keys and custom token infrastructure are outside this gate unless automatic generation is deliberately abandoned.
 
+## Final automatic-token repair
+
+The current signed development build used an Xcode-managed wildcard provisioning profile. Run one final Apple token test with a newly created development profile bound to the exact `com.samaydhawan.Samadhi` App ID. Inspect the embedded profile and signed identity before the request. If a clean physical build still returns `developerTokenRequestFailed`, reject Apple Music for Milestone 2 and select local files. Do not add a token backend, embed a private key, or commit a developer token.
+
+## Spotify is not an adaptive-audio fallback
+
+Do not build a Spotify spike. Spotify's iOS SDK remotely controls the Spotify app and does not expose an app-owned audio signal or documented music playback-rate control. Its Developer Policy prohibits analyzing Spotify content and requires audio content to remain in its original form. Playlist metadata alone does not close Samadhi's adaptive playback loop. Spotify import and playback are outside Milestone 2.
+
+The complete source decision and pass thresholds live in [MUSIC-SOURCE-RESOLUTION-SPEC.md](MUSIC-SOURCE-RESOLUTION-SPEC.md).
+
 ## MusicKit service configuration
 
 MusicKit uses an App Service enabled for the bundle identifier in the Apple developer portal. Do not add a fabricated `com.apple.developer.musickit` entitlement. The app does require `NSAppleMusicUsageDescription` and background audio mode.

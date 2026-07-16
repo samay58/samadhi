@@ -81,4 +81,14 @@
 
 ## Current checkpoint
 
-Milestones 0 and 1 are complete. Milestone 2 safe groundwork is built. Authorization, library import, playback, mechanical rate writes, pause, and resume pass. Direct preview coverage fails. Catalog resolution is blocked by automatic developer-token failure. Listening quality, background playback, controlled interruption, route loss, and the production source remain open.
+Milestones 0 and 1 are complete. Milestone 2 safe groundwork is built. Authorization, library import, playback, mechanical rate writes, pause, and resume pass. Direct preview coverage fails. Catalog resolution is blocked by automatic developer-token failure. Spotify is rejected for adaptive playback. One exact-App-ID profile retry remains before the Apple Music path either continues or yields to local files.
+
+## 2026-07-15. Music source resolution
+
+- Verified current Apple Music automatic-token configuration requirements and the meaning of `developerTokenRequestFailed`
+- Audited installed profiles and found only the Xcode-managed wildcard `ZL5U59XBJ6.*`; no exact Samadhi development profile is installed
+- Limited remediation to one clean build signed with a fresh exact-App-ID development profile
+- Rejected embedded private keys, committed tokens, and a Samadhi token backend
+- Evaluated Spotify's current iOS SDK, player surface, development-mode rules, and Developer Policy
+- Rejected Spotify as an adaptive player because it cannot provide the required app-owned, analyzable, rate-controlled audio path
+- Specified token, tempo-source, listening, background, recovery, and local-file fallback gates in `MUSIC-SOURCE-RESOLUTION-SPEC.md`

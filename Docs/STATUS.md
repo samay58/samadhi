@@ -12,7 +12,8 @@
 | Audio timing | Simulated only | Deterministic beat-clock tests |
 | Playlist import | Specified, not started | Milestone 2 spec |
 | Adaptation policy | Built, not connected to a real player | Deterministic policy tests |
-| Apple Music feasibility | Physical gate blocked by automatic developer-token failure | Five saved traces from iPhone 17 Pro |
+| Apple Music feasibility | Final exact-App-ID token repair specified | Five saved traces from iPhone 17 Pro |
+| Spotify feasibility | Rejected for adaptive playback | Remote-control architecture, missing music rate control, and content policy conflict |
 | Production player | Undecided | Physical gate required |
 | Physical run validation | MusicKit feasibility run in progress; outdoor run not started | Requires completed source decision and route matrix |
 
@@ -68,6 +69,9 @@
 - Found 0 of 10 direct-library preview coverage across every sample
 - Found no ISRC on 40 sampled library tracks, then exercised equivalent-ID catalog lookup
 - Observed 40 `.developerTokenRequestFailed` results before any catalog response, so catalog preview coverage remains blocked rather than failed
+- Verified that the Mac has only the Xcode-managed wildcard profile `ZL5U59XBJ6.*`; no exact Samadhi development profile is installed, making one fresh exact-App-ID profile the final bounded Apple token test
+- Evaluated Spotify and rejected it as a production source because it does not provide an app-owned audio signal or documented music rate control, and its policy prohibits altering or analyzing Spotify content
+- Added a source-resolution spec with explicit token, tempo-source, listening, background, and fallback gates
 
 ## Proof
 
@@ -87,8 +91,8 @@ The MusicKit harness launches in Simulator and on the connected physical iPhone.
 
 ## Known limits
 
-No physical run has validated cadence quality. No listening test has validated tempo changes or audio artifacts. The normal app still uses silent bundled media, simulated cadence, and simulated beat timing. Music authorization, library loading, playback, live rate writes, pause, and resume pass. Direct library previews fail at 0 of 10. Catalog resolution is blocked by automatic developer-token failure. Track change, screen-lock playback, controlled interruption, and route loss remain unproven.
+No physical run has validated cadence quality. No listening test has validated tempo changes or audio artifacts. The normal app still uses silent bundled media, simulated cadence, and simulated beat timing. Music authorization, library loading, playback, live rate writes, pause, and resume pass. Direct library previews fail at 0 of 10. Catalog resolution is blocked by automatic developer-token failure. Spotify is not a viable substitute for adaptive playback. Track change, screen-lock playback, controlled interruption, and route loss remain unproven.
 
 ## WHERE WE LEFT OFF
 
-Milestone 2 safe groundwork is built. Five physical traces are saved. Authorization, playlist loading, playback, rate writes, pause, and resume pass. Direct library previews fail. Equivalent-ID catalog requests cannot yet obtain Apple’s automatic developer token, so the source decision remains open. Retry one populated playlist after the MusicKit App Service recognizes this bundle identifier. Do not build either production player before that result.
+Milestone 2 safe groundwork is built. Five physical traces are saved. Authorization, playlist loading, playback, rate writes, pause, and resume pass. Direct library previews fail. Equivalent-ID catalog requests cannot obtain Apple's automatic developer token in the current wildcard-profile build. Spotify is rejected. Create one fresh development profile bound to `com.samaydhawan.Samadhi`, sign and inspect a clean physical build, then run one minimal catalog request. If that request still returns `developerTokenRequestFailed`, record Apple Music as rejected and begin the local-file player. The full decision is in [MUSIC-SOURCE-RESOLUTION-SPEC.md](MUSIC-SOURCE-RESOLUTION-SPEC.md).
