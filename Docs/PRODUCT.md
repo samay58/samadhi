@@ -75,4 +75,4 @@ Answer: yes in Simulator. The adaptation rules and cadence boundary now exist, b
 
 ## Current exclusions
 
-Core Motion is present behind an unwired production boundary. Production audio, music import, Apple Music in the normal app flow, Spotify, GPS, maps, pace, distance, coaching, plans, social features, accounts, analytics, subscriptions, and backend remain outside the useful product build.
+Core Motion is present behind an unwired production boundary. The Apple Music adapter is wired through a focused development scheme, not the normal run flow. Music import, Spotify, GPS, maps, pace, distance, coaching, plans, social features, accounts, analytics, subscriptions, and backend remain outside the useful product build.

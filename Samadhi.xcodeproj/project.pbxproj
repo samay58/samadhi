@@ -8,9 +8,11 @@
 
 /* Begin PBXBuildFile section */
 		08C7CAABAD85AB4BC3C88E80 /* SamadhiDomain in Frameworks */ = {isa = PBXBuildFile; productRef = FCB42BF9FF49F690F8EEE5F2 /* SamadhiDomain */; };
+		3901FBCDBFF2D76C7111DF07 /* SamadhiAudio in Frameworks */ = {isa = PBXBuildFile; productRef = 17821AD6BA1BB0FB3F9794E0 /* SamadhiAudio */; };
 		4CDD1CED415564CC371BD9F1 /* MusicKitFeasibilityModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54135107A419A0D2E9DC0C01 /* MusicKitFeasibilityModel.swift */; };
 		59F6A7F42EF07136C8A749D2 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A28146360481C17881F591C3 /* RootView.swift */; };
 		5E251FAC2B1E45BD32CE4F33 /* MusicKitFeasibilityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 288FFDAAC404B6DC56E04D4B /* MusicKitFeasibilityView.swift */; };
+		5F50657EDDD9980B6A3AB8ED /* AppleMusicPlaybackController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CA2C5D0E9C7986791DAA0C1 /* AppleMusicPlaybackController.swift */; };
 		6D0A66115FB9B31D7C320CBA /* SamadhiUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84DEE35021BD9A5D2A7F5F45 /* SamadhiUITests.swift */; };
 		7447DD9A496F5085B1D37B6B /* SamadhiDomain in Frameworks */ = {isa = PBXBuildFile; productRef = C461B57BEEA896BE3B7CAC5B /* SamadhiDomain */; };
 		78FAE03DF8A4D42BD14A7DD8 /* silent-loop.wav in Resources */ = {isa = PBXBuildFile; fileRef = CDFAF5B2DD68CC941F094A15 /* silent-loop.wav */; };
@@ -18,6 +20,7 @@
 		A592E055654CAC8DE4DBEAD1 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8200E148AF4ABACA3B47ADA2 /* Assets.xcassets */; };
 		A9FE8C130C33F60BB2C2925B /* SamadhiTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 131DED91DED56986EDD4FE9B /* SamadhiTests.swift */; };
 		AADD64A3B49FF8F3E42C941C /* RunTaskStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 475C0E9AEDB57921D9893CA3 /* RunTaskStore.swift */; };
+		AE8168A594751E431F59C263 /* AppMusicCollection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22DE37CDF525C7843D5F365B /* AppMusicCollection.swift */; };
 		BFB93B5F0188CF63A19E30CB /* RunPresentationModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27E4457C2F93694193D8E85D /* RunPresentationModel.swift */; };
 		D2DEE5D8F696BC6339CA819B /* SimulationConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95B076E4388E9E61360A6215 /* SimulationConfiguration.swift */; };
 		D80D703E28BBEBEDC8A9AE3A /* SamadhiDesign in Frameworks */ = {isa = PBXBuildFile; productRef = A48F446192EFBD7579C7BF67 /* SamadhiDesign */; };
@@ -42,7 +45,9 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		0CA2C5D0E9C7986791DAA0C1 /* AppleMusicPlaybackController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppleMusicPlaybackController.swift; sourceTree = "<group>"; };
 		131DED91DED56986EDD4FE9B /* SamadhiTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SamadhiTests.swift; sourceTree = "<group>"; };
+		22DE37CDF525C7843D5F365B /* AppMusicCollection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppMusicCollection.swift; sourceTree = "<group>"; };
 		27E4457C2F93694193D8E85D /* RunPresentationModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RunPresentationModel.swift; sourceTree = "<group>"; };
 		288FFDAAC404B6DC56E04D4B /* MusicKitFeasibilityView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicKitFeasibilityView.swift; sourceTree = "<group>"; };
 		475C0E9AEDB57921D9893CA3 /* RunTaskStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RunTaskStore.swift; sourceTree = "<group>"; };
@@ -75,6 +80,7 @@
 				7447DD9A496F5085B1D37B6B /* SamadhiDomain in Frameworks */,
 				D80D703E28BBEBEDC8A9AE3A /* SamadhiDesign in Frameworks */,
 				8E48AE66560F367C401395CF /* SamadhiMotion in Frameworks */,
+				3901FBCDBFF2D76C7111DF07 /* SamadhiAudio in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -147,6 +153,8 @@
 		C7AB60613785D7A5C926458F /* App */ = {
 			isa = PBXGroup;
 			children = (
+				0CA2C5D0E9C7986791DAA0C1 /* AppleMusicPlaybackController.swift */,
+				22DE37CDF525C7843D5F365B /* AppMusicCollection.swift */,
 				54135107A419A0D2E9DC0C01 /* MusicKitFeasibilityModel.swift */,
 				288FFDAAC404B6DC56E04D4B /* MusicKitFeasibilityView.swift */,
 				A28146360481C17881F591C3 /* RootView.swift */,
@@ -186,6 +194,7 @@
 				C461B57BEEA896BE3B7CAC5B /* SamadhiDomain */,
 				A48F446192EFBD7579C7BF67 /* SamadhiDesign */,
 				87200EBB3D911863E80E185E /* SamadhiMotion */,
+				17821AD6BA1BB0FB3F9794E0 /* SamadhiAudio */,
 			);
 			productName = Samadhi;
 			productReference = 64781032C8A2BA5D5DD7DF6C /* Samadhi.app */;
@@ -308,6 +317,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				AE8168A594751E431F59C263 /* AppMusicCollection.swift in Sources */,
+				5F50657EDDD9980B6A3AB8ED /* AppleMusicPlaybackController.swift in Sources */,
 				4CDD1CED415564CC371BD9F1 /* MusicKitFeasibilityModel.swift in Sources */,
 				5E251FAC2B1E45BD32CE4F33 /* MusicKitFeasibilityView.swift in Sources */,
 				59F6A7F42EF07136C8A749D2 /* RootView.swift in Sources */,
@@ -610,6 +621,10 @@
 /* End XCLocalSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		17821AD6BA1BB0FB3F9794E0 /* SamadhiAudio */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = SamadhiAudio;
+		};
 		87200EBB3D911863E80E185E /* SamadhiMotion */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = SamadhiMotion;

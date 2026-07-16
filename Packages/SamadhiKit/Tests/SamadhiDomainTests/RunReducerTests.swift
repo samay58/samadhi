@@ -192,6 +192,59 @@ private let reducer = RunReducer()
     #expect(state.session?.trackIndex == 0)
 }
 
+@Test func playbackProgressRequiresCurrentSessionAndOperation() {
+    let state = lockedRun()
+    let stale = reducer.reduce(
+        state: state,
+        event: .playbackProgress(
+            sessionID: 1,
+            operationID: 999,
+            trackIndex: 1,
+            elapsedSeconds: 42,
+            durationSeconds: 180
+        )
+    ).0
+    #expect(stale == state)
+
+    let current = reducer.reduce(
+        state: state,
+        event: .playbackProgress(
+            sessionID: 1,
+            operationID: 1,
+            trackIndex: 1,
+            elapsedSeconds: 42,
+            durationSeconds: 180
+        )
+    ).0
+    #expect(current.session?.trackIndex == 1)
+    #expect(current.session?.trackElapsedSeconds == 42)
+    #expect(current.session?.trackDurationSeconds == 180)
+    #expect(current.session?.songCount == 2)
+}
+
+@Test func playbackPreparationFailureReturnsToReadyOnlyForCurrentOperation() {
+    var state = reducer.reduce(state: .ready, event: .startTapped(sessionID: 51)).0
+    state =
+        reducer.reduce(
+            state: state,
+            event: .authorizationResolved(sessionID: 51, .authorized)
+        ).0
+
+    let stale = reducer.reduce(
+        state: state,
+        event: .playbackFailed(sessionID: 51, operationID: 50)
+    )
+    #expect(stale.0 == state)
+    #expect(stale.1.isEmpty)
+
+    let current = reducer.reduce(
+        state: state,
+        event: .playbackFailed(sessionID: 51, operationID: 51)
+    )
+    #expect(current.0 == .ready)
+    #expect(current.1 == [.cancelAllTasks(sessionID: 51)])
+}
+
 private func lockedRun() -> RunState {
     let session = RunSession(id: 1)
     return .active(ActiveRun(session: session, activity: .playing(rhythm: .locked(spm: 168), controls: .hidden)))

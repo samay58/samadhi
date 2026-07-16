@@ -1,20 +1,20 @@
 # Music source resolution specification
 
-Status: Token and tempo-source gates passed; listening and recovery gates active
+Status: Apple Music selected; long-form reliability checks deferred
 
 ## Problem Statement
 
 Samadhi needs one production music source that can import a runner's collection, expose or support local tempo analysis, play in the background, and change playback rate from 0.94 through 1.06 without audible damage.
 
-The physical MusicKit harness has proved authorization, library playlist loading, automatic token generation, strict catalog resolution, 10 of 10 local preview decodes, real playback, live rate writes, pause, and resume. The exact Samadhi development profile fixed the earlier `developerTokenRequestFailed` blocker. Apple Music remains the active candidate while headphone listening, background, track-change, interruption, and route gates remain open.
+The physical MusicKit harness has proved authorization, library playlist loading, automatic token generation, strict catalog resolution, 10 of 10 local preview decodes, real playback, live rate writes, pause, and resume. It also reached a Beoplay Eleven Bluetooth A2DP route and applied 0.94, 1.00, and 1.06 during playback. The exact Samadhi development profile fixed the earlier `developerTokenRequestFailed` blocker.
 
 Spotify was considered as another streaming source. It is not a viable adaptive-audio player for this milestone. Spotify's iOS SDK remotely controls the Spotify app rather than giving Samadhi an app-owned audio signal. Its documented player APIs do not offer music playback-rate control, and Spotify's Developer Policy prohibits altering or analyzing Spotify content. A Spotify playlist could provide metadata, but it would not close the adaptive playback loop and would add OAuth, account, and provider complexity.
 
-The identity repair is complete. If any remaining load-bearing MusicKit gate fails, the production source becomes DRM-free multi-file import with `AVAudioEngine` and `AVAudioUnitTimePitch`. Samadhi will not build a token backend, embed a Media Services private key, or maintain two production players.
+On 2026-07-16, Samay explicitly tabled further repetitive manual drills so implementation could continue. Apple Music became the one production source. Five locked minutes, track change, controlled interruption, route loss, and a dedicated Bluetooth listening note remain required before Milestone 2 completion. Samadhi will not build a token backend, embed a Media Services private key, maintain two production players, or reopen Spotify.
 
 ## Solution
 
-Resolve the source in four gates. Each gate produces durable physical-device evidence. The first failure ends the Apple Music path.
+The source was resolved after the token, tempo-source, real-playback, speaker-listening, Bluetooth-route, and live-rate results removed the load-bearing feasibility unknowns. Remaining manual work is now a reliability gate for the selected adapter.
 
 ### Token identity gate
 
@@ -44,7 +44,7 @@ Fail means fewer than eight of ten tracks can be analyzed reliably. The Apple Mu
 
 Use one known-tempo track and `ApplicationMusicPlayer` on the same physical iPhone and headphone route. Exercise 0.94, 1.00, and 1.06 while listening through transitions and steady playback.
 
-Current result: Built-in-speaker listening passed provisionally. The rate changes sounded like genuine speedup and slowdown without major pitch change or unpleasant artifacts. Repeat on Bluetooth headphones before passing this gate.
+Current result: Built-in-speaker listening passed provisionally. The rate changes sounded like genuine speedup and slowdown without major pitch change or unpleasant artifacts. Bluetooth routing and rate writes pass on Beoplay Eleven. A separate Bluetooth listening note remains open.
 
 Pass requires pitch-stable listening without clicks, gaps, obvious warble, or unstable rate writes. Mechanical assignment alone is not proof. Record the route, source track, starting tempo, requested rates, observed behavior, and listening notes.
 
@@ -52,9 +52,9 @@ Fail means any required rate is audibly unacceptable or cannot remain applied. A
 
 ### Background and recovery gate
 
-Prove five screen-locked minutes, pause, resume, next track, one controlled interruption, and one route loss. Every callback must carry identity into `RunEvent`; stale callbacks must be ignored by the reducer.
+Before Milestone 2 completion, prove five screen-locked minutes, pause, resume, next track, one controlled interruption, and one route loss. Every callback must carry identity into `RunEvent`; stale callbacks must be ignored by the reducer.
 
-Pass requires continuous background audio, correct observable state, no unauthorized auto-resume after route loss, and a clean return to the run experience. If all four gates pass, Apple Music becomes the one production player.
+Pass requires continuous background audio, correct observable state, no unauthorized auto-resume after route loss, and a clean return to the run experience. Apple Music is already the selected production player, but Milestone 2 cannot complete until this gate passes.
 
 ### Local-file fallback
 
@@ -198,10 +198,10 @@ After source selection, the full serial Xcode gate must pass before a milestone 
 
 ### Immediate execution order
 
-1. Complete headphone listening at 0.94, 1.00, and 1.06.
-2. Prove five screen-locked minutes, next track, controlled interruption, and route loss.
-3. If every check passes, record Apple Music as the one production source.
-4. If any load-bearing check fails, record Apple Music as rejected, remove the spike, and implement local multi-file import plus the local audio engine.
+1. Run one catalog track with a verified tempo through the production adapter.
+2. Connect real cadence and bounded adaptation.
+3. Build playlist import, analysis, persistence, progress, and transitions.
+4. Complete Bluetooth listening, five locked minutes, next track, controlled interruption, and route loss before Milestone 2 completion.
 
 ### Verified platform sources
 

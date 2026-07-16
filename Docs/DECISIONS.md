@@ -46,6 +46,10 @@ Playlist import is required before playlist generation, recommendations, or cata
 
 Run a physical Apple Music feasibility gate first because MusicKit exposes library playlists and writable playback rate. Continue with Apple Music only if tempo sourcing, listening quality, background playback, and recovery pass. Otherwise use imported DRM-free files and `AVAudioEngine`. Do not maintain both production players in Milestone 2.
 
+On 2026-07-16, Apple Music became the selected production player. Authorization, import, token generation, strict catalog identity, preview decoding, real playback, speaker listening, Bluetooth routing, and live rate writes had passed. Samay explicitly deferred the repetitive five-minute and recovery drills so implementation could continue. Those drills remain milestone completion requirements, not source-selection blockers.
+
+The adapter stays behind a source-neutral main-actor contract. MusicKit's async player methods do not yet carry complete sendability in the installed SDK, so the app uses a narrow `@preconcurrency` import. Every player access remains main-actor owned. Remove that compatibility import when the SDK annotations make it unnecessary.
+
 ## Honest tempo matching
 
 Milestone 2 matches music tempo to stable cadence. It does not claim beat-perfect footfall phase. Rename the measured summary to tempo matched and defer a true in-step percentage until individual foot-strike timing exists.
@@ -58,7 +62,7 @@ The exact `Samadhi Development` profile fixed automatic developer-token generati
 
 Library tracks still expose opaque nonnumeric identifiers, no ISRC, and no direct preview. Strict title, artist, album, and duration agreement resolved all ten City Pocket tracks to numeric catalog identifiers. Ambiguous results fail closed. The harness downloads each catalog preview into temporary app storage, decodes it locally, and deletes it immediately. Ten of ten previews yielded PCM, so the tempo-source feasibility threshold passed.
 
-Apple Music remains a candidate until Bluetooth listening, locked background playback, track change, interruption, and route recovery pass on the physical iPhone.
+The remaining Bluetooth listening note, locked background playback, track change, interruption, and route recovery checks now sit in the Milestone 2 reliability gate. They no longer block source selection, but Milestone 2 cannot close without them.
 
 ## Spotify is not an adaptive-audio fallback
 

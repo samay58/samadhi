@@ -4,11 +4,11 @@
 
 *music in stride*
 
-Samadhi is a native iPhone music experience that lets a runner's cadence and music settle into one rhythm. The current build proves complete interaction and now includes the source-neutral Milestone 2 policy, cadence boundary, Core Motion adapter, and a focused Apple Music device harness. Production music and physical cadence remain unproven.
+Samadhi is a native iPhone music experience that lets a runner's cadence and music settle into one rhythm. The current build proves complete interaction and now includes the source-neutral Milestone 2 policy, cadence boundary, Core Motion adapter, production playback boundary, and Apple Music adapter. Production music is not connected to the normal run flow yet, and physical cadence remains unproven.
 
 ## Current state
 
-Milestones 0 and 1 are complete. Milestone 2 is in progress. The source-neutral adaptation and cadence groundwork is built. Exact-App-ID signing fixed Apple catalog access. Authorization, 40-playlist loading, strict catalog resolution, 10 of 10 local preview decodes, real playback, rate writes, pause, and resume now pass on an iPhone 17 Pro. Spotify is rejected for adaptive playback. Apple Music still needs headphone listening, background, track-change, interruption, and route-recovery proof before it becomes the production source.
+Milestones 0 and 1 are complete. Milestone 2 is in progress. Apple Music is the selected production source. Exact-App-ID signing fixed catalog access, City Pocket passed 10 of 10 local preview decodes, and real playback reached a Beoplay Eleven Bluetooth route with live 0.94, 1.00, and 1.06 writes. The source-neutral player contract and Apple Music adapter now compile through the normal app boundary. Long-form background and recovery drills remain before Milestone 2 completion, not before continued implementation.
 
 Start with [product ethos](Docs/PRODUCT.md), then read [current status](Docs/STATUS.md), [next plan](Docs/PLAN.md), the [Milestone 2 specification](Docs/MILESTONE-2-SPEC.md), and the active [music-source resolution specification](Docs/MUSIC-SOURCE-RESOLUTION-SPEC.md).
 

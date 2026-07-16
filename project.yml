@@ -26,6 +26,8 @@ targets:
         product: SamadhiDesign
       - package: SamadhiKit
         product: SamadhiMotion
+      - package: SamadhiKit
+        product: SamadhiAudio
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.samaydhawan.Samadhi
@@ -81,3 +83,11 @@ schemes:
       config: Debug
       commandLineArguments:
         "--music-feasibility": true
+  Samadhi Apple Music Core Loop:
+    build:
+      targets:
+        Samadhi: all
+    run:
+      config: Debug
+      commandLineArguments:
+        "--apple-music-core-loop": true

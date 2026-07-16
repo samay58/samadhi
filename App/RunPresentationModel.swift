@@ -1,5 +1,6 @@
 import Foundation
 import Observation
+import SamadhiAudio
 import SamadhiDesign
 import SamadhiDomain
 import SamadhiMotion
@@ -12,16 +13,28 @@ final class RunPresentationModel {
     private(set) var state: RunState = .ready
     private(set) var showLockBrief = false
 
-    @ObservationIgnored private let reducer = RunReducer(trackCount: TrackMetadata.demoTracks.count)
+    @ObservationIgnored private let reducer: RunReducer
     @ObservationIgnored private let configuration: SimulationConfiguration
     @ObservationIgnored private let cadenceProvider: SimulatedCadenceProvider
+    @ObservationIgnored private let musicPlayer: any MusicPlaybackProviding
+    @ObservationIgnored private let musicCollection: MusicCollection
     @ObservationIgnored private let taskStore = RunTaskStore()
     @ObservationIgnored private var nextToken = 1
     @ObservationIgnored private var currentHoldID: Int?
+    @ObservationIgnored private var playbackEventTask: Task<Void, Never>?
 
     init() {
         let configuration = SimulationConfiguration.current
         self.configuration = configuration
+        musicCollection =
+            configuration.useAppleMusicCoreLoop
+            ? AppMusicCollection.appleMusicCoreLoop
+            : AppMusicCollection.simulated
+        musicPlayer =
+            configuration.useAppleMusicCoreLoop
+            ? AppleMusicPlaybackController()
+            : SimulatedMusicPlayer()
+        reducer = RunReducer(trackCount: musicCollection.tracks.count)
         let cadenceDelay: Duration =
             configuration.extendedAcquisitionWindow
             ? .milliseconds(1_400)
@@ -29,13 +42,20 @@ final class RunPresentationModel {
         cadenceProvider = SimulatedCadenceProvider(
             sampleDelay: cadenceDelay
         )
+        startPlaybackEventMonitoring()
     }
 
     var viewState: RunViewState {
         // UI-only choices live here so the domain module never needs SwiftUI.
         let session = state.session
         let trackIndex = session?.trackIndex ?? 0
-        let track = TrackMetadata.demoTracks[trackIndex % TrackMetadata.demoTracks.count]
+        let domainTrack = musicCollection.tracks[trackIndex % musicCollection.tracks.count]
+        let track = TrackMetadata(
+            title: domainTrack.title,
+            artist: domainTrack.artist ?? "",
+            durationSeconds: max(Int(domainTrack.durationSeconds.rounded()), 1)
+        )
+        let trackDuration = session?.trackDurationSeconds ?? track.durationSeconds
         var phase: RunVisualPhase = .ready
         var controlsVisible = false
         var cadence: Int?
@@ -81,7 +101,10 @@ final class RunPresentationModel {
             controlsVisible: controlsVisible,
             cadenceSPM: cadence,
             trackElapsedSeconds: session?.trackElapsedSeconds ?? 0,
-            trackProgress: min(Double(session?.trackElapsedSeconds ?? 0) / Double(track.durationSeconds), 1),
+            trackProgress: min(
+                Double(session?.trackElapsedSeconds ?? 0) / Double(max(trackDuration, 1)),
+                1
+            ),
             track: track,
             hasArtwork: !configuration.missingArtwork,
             showLockBrief: showLockBrief
@@ -159,7 +182,7 @@ final class RunPresentationModel {
     }
 
     private func execute(_ effect: RunEffect) {
-        // Motion and audio are simulated here for now. Production services replace this layer without changing the reducer.
+        // Platform services execute reducer effects and return identified events through dispatch.
         switch effect {
         case let .requestMotionAuthorization(sessionID):
             let delay: Duration = configuration.fastMode ? .milliseconds(60) : .milliseconds(260)
@@ -177,28 +200,44 @@ final class RunPresentationModel {
 
         case let .preparePlayback(sessionID, _):
             let delay: Duration = configuration.fastMode ? .milliseconds(70) : .milliseconds(280)
-            taskStore.replace(.preparation) { [weak self] in
+            taskStore.replace(.preparation) { [weak self, musicPlayer, musicCollection] in
                 try? await Task.sleep(for: delay)
                 guard !Task.isCancelled else { return }
                 guard let self else { return }
-                dispatch(.playbackPrepared(sessionID: sessionID))
+                do {
+                    try await musicPlayer.prepare(musicCollection, operationID: sessionID)
+                    guard !Task.isCancelled else { return }
+                    dispatch(.playbackPrepared(sessionID: sessionID))
+                } catch {
+                    dispatch(.playbackFailed(sessionID: sessionID, operationID: sessionID))
+                }
             }
 
         case let .beginPlayback(sessionID):
-            startTicker(sessionID: sessionID)
-            if configuration.simulateRouteLoss {
-                let routeLossDelay: Duration = configuration.fastMode ? .milliseconds(650) : .seconds(2)
-                let restoreDelay: Duration = configuration.fastMode ? .milliseconds(350) : .seconds(1)
-                taskStore.replace(.simulatedRoute) { [weak self] in
-                    try? await Task.sleep(for: routeLossDelay)
-                    guard !Task.isCancelled else { return }
-                    guard let self else { return }
-                    dispatch(.audioRouteLost)
-                    taskStore.replace(.simulatedRoute) { [weak self] in
-                        try? await Task.sleep(for: restoreDelay)
-                        guard !Task.isCancelled else { return }
-                        self?.dispatch(.audioRouteRestored)
+            taskStore.replace(.playbackCommand) { [weak self, musicPlayer] in
+                do {
+                    try await musicPlayer.play(operationID: sessionID)
+                    guard !Task.isCancelled, let self else { return }
+                    startTicker(sessionID: sessionID)
+                    if configuration.simulateRouteLoss {
+                        let routeLossDelay: Duration =
+                            configuration.fastMode ? .milliseconds(650) : .seconds(2)
+                        let restoreDelay: Duration =
+                            configuration.fastMode ? .milliseconds(350) : .seconds(1)
+                        taskStore.replace(.simulatedRoute) { [weak self] in
+                            try? await Task.sleep(for: routeLossDelay)
+                            guard !Task.isCancelled else { return }
+                            guard let self else { return }
+                            dispatch(.audioRouteLost)
+                            taskStore.replace(.simulatedRoute) { [weak self] in
+                                try? await Task.sleep(for: restoreDelay)
+                                guard !Task.isCancelled else { return }
+                                self?.dispatch(.audioRouteRestored)
+                            }
+                        }
                     }
+                } catch {
+                    self?.dispatch(.playbackFailed(sessionID: sessionID, operationID: sessionID))
                 }
             }
 
@@ -207,20 +246,48 @@ final class RunPresentationModel {
                 for await sample in cadenceProvider.samples() {
                     guard !Task.isCancelled else { return }
                     if case let .locked(spm) = sample {
-                        self?.dispatch(.cadenceLocked(sessionID: sessionID, acquisitionID: acquisitionID, spm: spm))
+                        self?.dispatch(
+                            .cadenceLocked(
+                                sessionID: sessionID,
+                                acquisitionID: acquisitionID,
+                                spm: spm
+                            ))
                     }
                 }
             }
 
         case let .pausePlayback(sessionID):
             taskStore.cancel(.ticker)
-            _ = sessionID
+            musicPlayer.pause(operationID: sessionID)
 
         case let .resumePlayback(sessionID):
-            startTicker(sessionID: sessionID)
+            taskStore.replace(.playbackCommand) { [weak self, musicPlayer] in
+                do {
+                    try await musicPlayer.resume(operationID: sessionID)
+                    guard !Task.isCancelled else { return }
+                    self?.startTicker(sessionID: sessionID)
+                } catch {
+                    self?.dispatch(.playbackFailed(sessionID: sessionID, operationID: sessionID))
+                }
+            }
 
-        case .previousTrack, .skipTrack:
-            break
+        case let .previousTrack(sessionID):
+            taskStore.replace(.playbackCommand) { [weak self, musicPlayer] in
+                do {
+                    try await musicPlayer.skipToPrevious(operationID: sessionID)
+                } catch {
+                    self?.dispatch(.playbackFailed(sessionID: sessionID, operationID: sessionID))
+                }
+            }
+
+        case let .skipTrack(sessionID):
+            taskStore.replace(.playbackCommand) { [weak self, musicPlayer] in
+                do {
+                    try await musicPlayer.skipToNext(operationID: sessionID)
+                } catch {
+                    self?.dispatch(.playbackFailed(sessionID: sessionID, operationID: sessionID))
+                }
+            }
 
         case let .scheduleControlsTimeout(_, timeoutID):
             let delay: Duration = configuration.fastMode ? .seconds(3) : .seconds(5)
@@ -239,6 +306,7 @@ final class RunPresentationModel {
             }
 
         case let .fadeAndStop(sessionID):
+            musicPlayer.stop(operationID: sessionID)
             taskStore.replace(.finishing) { [weak self] in
                 try? await Task.sleep(for: .milliseconds(420))
                 guard !Task.isCancelled else { return }
@@ -253,6 +321,54 @@ final class RunPresentationModel {
 
         case .cancelAllTasks:
             taskStore.cancelAll()
+        }
+    }
+
+    private func startPlaybackEventMonitoring() {
+        let events = musicPlayer.events()
+        playbackEventTask = Task { [weak self] in
+            for await event in events {
+                guard !Task.isCancelled else { return }
+                self?.handlePlaybackEvent(event)
+            }
+        }
+    }
+
+    private func handlePlaybackEvent(_ event: MusicPlaybackEvent) {
+        guard let session = state.session else { return }
+
+        switch event {
+        case let .progress(operationID, progress):
+            guard operationID == session.playbackOperationID,
+                let trackIndex = musicCollection.tracks.firstIndex(where: { $0.id == progress.trackID })
+            else { return }
+            dispatch(
+                .playbackProgress(
+                    sessionID: session.id,
+                    operationID: operationID,
+                    trackIndex: trackIndex,
+                    elapsedSeconds: Int(progress.elapsedSeconds),
+                    durationSeconds: Int(progress.durationSeconds)
+                )
+            )
+
+        case let .routeLost(operationID):
+            dispatch(.playbackRouteLost(sessionID: session.id, operationID: operationID))
+
+        case let .routeRestored(operationID):
+            dispatch(.playbackRouteRestored(sessionID: session.id, operationID: operationID))
+
+        case let .interruptionBegan(operationID):
+            dispatch(.playbackInterrupted(sessionID: session.id, operationID: operationID))
+
+        case let .interruptionEnded(operationID):
+            dispatch(.playbackInterruptionEnded(sessionID: session.id, operationID: operationID))
+
+        case let .failed(operationID, _):
+            dispatch(.playbackFailed(sessionID: session.id, operationID: operationID))
+
+        case .prepared, .stateChanged, .rateChanged, .trackChanged:
+            break
         }
     }
 
