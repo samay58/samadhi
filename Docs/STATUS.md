@@ -11,11 +11,12 @@
 | Cadence | Production boundary and Core Motion adapter built; app still simulated | Deterministic filter tests and generic iPhone build |
 | Audio timing | Simulated only | Deterministic beat-clock tests |
 | Playlist import | Specified, not started | Milestone 2 spec |
+| Tempo analysis | PCM file analyzer and generated corpus built; real music unvalidated | Deterministic tempo-family and rejection tests |
 | Adaptation policy | Built, not connected to a real player | Deterministic policy tests |
 | Apple Music feasibility | Source selected; Bluetooth route and rate writes passed; long-form reliability deferred | Exact-profile traces and explicit product decision |
 | Spotify feasibility | Rejected for adaptive playback | Remote-control architecture, missing music rate control, and content policy conflict |
 | Production player | Apple Music selected; adapter built behind a core-loop launch path | Source-neutral contract and generic iPhone build |
-| Physical run validation | MusicKit feasibility run in progress; outdoor run not started | Requires completed source decision and route matrix |
+| Physical run validation | Source feasibility complete; outdoor run not started | Requires tempo, cadence, adaptation, and route evidence |
 
 ## Completed
 
@@ -78,12 +79,14 @@
 - Selected Apple Music as the one production source after Samay explicitly deferred further repetitive manual drills
 - Added a source-neutral production player contract, deterministic player, Apple Music adapter, and identified progress and recovery events
 - Added a dedicated `Samadhi Apple Music Core Loop` scheme around catalog track `1092027177`
+- Added one local audio analysis interface, off-main PCM decoding, a versioned tempo estimator, and generated tempo and rejection fixtures
+- Connected the MusicKit harness to report estimated tempo and confidence for resolved previews
 
 ## Proof
 
 The current serial gate passed:
 
-- 32 Swift package tests
+- 37 Swift package tests
 - 2 app-model tests
 - 4 UI tests
 - Swift formatter lint
@@ -97,8 +100,8 @@ The MusicKit harness launches in Simulator and on the connected physical iPhone.
 
 ## Known limits
 
-No physical run has validated cadence quality. Built-in-speaker listening found no major pitch change or unpleasant artifacts at the safe-rate endpoints. Bluetooth routing and rate writes pass, but no separate Bluetooth listening note was recorded. The normal app still defaults to silent bundled media, simulated cadence, and simulated beat timing. The Apple Music adapter is available only through the focused core-loop scheme while import remains unfinished. Track change, five locked minutes, controlled interruption, and route loss remain reliability gates.
+No physical run has validated cadence quality. Built-in-speaker listening found no major pitch change or unpleasant artifacts at the safe-rate endpoints. Bluetooth routing and rate writes pass, but no separate Bluetooth listening note was recorded. The tempo estimator passes generated periodic, accented, silence, and irregular fixtures; no real-music accuracy claim exists yet. The normal app still defaults to silent bundled media, simulated cadence, and simulated beat timing. Track change, five locked minutes, controlled interruption, and route loss remain reliability gates.
 
 ## WHERE WE LEFT OFF
 
-Apple Music is selected. The player contract, deterministic test player, Apple Music adapter, real progress events, and focused core-loop scheme are built. Next, run one catalog track through the adapter with a verified tempo, then connect real Core Motion cadence and adaptation. Five locked minutes, track change, controlled interruption, and route loss remain mandatory before Milestone 2 completion, but no longer block implementation. The full decision is in [MUSIC-SOURCE-RESOLUTION-SPEC.md](MUSIC-SOURCE-RESOLUTION-SPEC.md).
+Apple Music is selected. The player contract, Apple Music adapter, local tempo-analysis interface, generated validation scaffold, real progress events, and focused core-loop scheme are built. Next, run resolved previews through the estimator, compare them with known references, and choose one verified-tempo fixture. Then connect Core Motion and bounded adaptation. Long-form reliability checks remain mandatory before Milestone 2 completion, but no longer block implementation.

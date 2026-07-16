@@ -22,7 +22,7 @@ Reducer owns product state transitions. App shell owns time, UIKit, haptics, tas
 | --- | --- |
 | SamadhiDomain | Run models, source-neutral music and cadence values, adaptation policy, state, events, effects, reducer, summary |
 | SamadhiMotion | Cadence provider boundary, deterministic filtering and simulation, Core Motion adapter |
-| SamadhiAudio | Source-neutral playback contract, deterministic player, beat timing, and playback events |
+| SamadhiAudio | Local tempo analysis, source-neutral playback contract, deterministic player, beat timing, and playback events |
 | SamadhiDesign | Screens, controls, fluid field, aperture, previews, tokens |
 | App target | Presentation mapping, effect execution, UIKit, task ownership |
 
@@ -69,7 +69,7 @@ Production services need:
 
 Apple Music is the selected production player. `AppleMusicPlaybackController` is main-actor owned in the app target and implements the source-neutral `MusicPlaybackProviding` boundary. The codebase does not contain a second production player.
 
-The debug-only MusicKit harness sits in the app target and is not a production player. It preserves feasibility evidence while the dedicated core-loop scheme uses the production adapter. For tempo-source feasibility, the harness resolves opaque library tracks through strict title, artist, album, and duration agreement, stores the returned numeric catalog identity, downloads the catalog preview into temporary storage, decodes local PCM, and deletes the temporary file. The normal app still composes simulation until import is connected.
+The debug-only MusicKit harness sits in the app target and is not a production player. It resolves opaque library tracks through strict title, artist, album, and duration agreement, downloads each preview into temporary storage, passes the local file through `TempoAnalyzing`, records the estimate, and deletes the file. `LocalTempoAnalyzer` owns off-main PCM decoding. `TempoEstimator` owns versioned onset and autocorrelation behavior behind a small value interface. The normal app still composes simulation until import is connected.
 
 ## Invariants
 

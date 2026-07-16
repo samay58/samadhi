@@ -17,7 +17,7 @@ A useful version needs both halves of the loop:
 
 Building playlist browsing without adaptive playback would create a conventional music player. Building adaptive playback around one bundled test file would prove engineering but still leave the product awkward to use. This milestone must connect an imported collection to real cadence and real playback.
 
-There is one platform uncertainty that must be settled before the production player is chosen. Apple Music exposes library playlists and a writable playback-rate control, but its song metadata does not include tempo. Samadhi may be able to analyze preview audio locally and apply the result to Apple Music playback. That must be proven on a physical iPhone. If it is not reliable or does not sound good, the production path becomes imported DRM-free audio files played through Samadhi's own audio engine.
+Apple Music is the selected production player. Its song metadata does not include tempo, so Samadhi resolves preview audio, analyzes it locally, and applies the result to Apple Music playback. Real-music tempo accuracy, physical cadence, adaptation, and long-form reliability remain the open product risks.
 
 Tempo matching is also narrower than beat-perfect synchronization. Live pedometer cadence provides steps per minute, not a reliable timestamp for every foot strike. Milestone 2 matches the music's tempo to stable cadence. It does not claim that each footfall lands on a specific beat.
 
@@ -41,9 +41,9 @@ Milestone 2 is complete only when one imported collection with at least three pl
 2. As an Apple Music user, I want Samadhi to request music access only after I choose Apple Music, so that permission appears in context.
 3. As an Apple Music user, I want to see my library playlists, so that I can choose music I already know.
 4. As a runner, I want to select one playlist rather than build a new queue, so that setup stays brief.
-5. As a runner without a viable Apple Music path, I want to import several DRM-free audio files from Files, so that I can still use adaptive playback.
-6. As a runner importing files, I want Samadhi to preserve their order, so that the collection behaves predictably.
-7. As a runner, I want the chosen collection to remain selected after relaunch, so that returning runs still begin with one action.
+5. As a runner, I want Samadhi to preserve playlist order, so that the collection behaves predictably.
+6. As a runner, I want the chosen collection to remain selected after relaunch, so that returning runs still begin with one action.
+7. As a runner, I want replacing the selected collection to be explicit, so that setup never changes by surprise.
 8. As a runner, I want Samadhi to analyze imported tracks before a run, so that playback does not pause for heavy work while I am moving.
 9. As a runner, I want to see simple analysis progress, so that I know whether the collection is ready.
 10. As a runner, I want unsupported or uncertain tracks identified plainly, so that Samadhi never silently pretends they are adaptive.
@@ -118,11 +118,9 @@ After the core loop passes, connect the selected source to at least three analyz
 
 Import is the product priority. Playlist generation and recommendations are deferred.
 
-If Apple Music passes, use `MusicAuthorization`, `MusicLibraryRequest<Playlist>`, playlist track relationships, and `ApplicationMusicPlayer`. Persist stable Apple Music identifiers and locally derived tempo metadata. Do not download or store protected full-track audio.
+Use `MusicAuthorization`, `MusicLibraryRequest<Playlist>`, playlist track relationships, and `ApplicationMusicPlayer`. Persist stable Apple Music identifiers and locally derived tempo metadata. Do not download or store protected full-track audio.
 
-If Apple Music fails, use SwiftUI's multi-file importer for supported audio types. Gain security-scoped access, copy each selected file into the app's Application Support directory, then release security scope immediately. Copying is deliberate: it avoids fragile long-lived bookmarks and makes offline playback deterministic. Persist a versioned collection manifest beside the copied audio.
-
-The local manifest records collection identity, display name, ordered track identities, local file name, title, artist when available, duration, base tempo, analysis confidence, analysis version, and a file fingerprint. It does not store listening history.
+The collection record stores identity, display name, ordered track identities, title, artist when available, duration, base tempo, analysis confidence, analysis version, and source fingerprint. It does not store listening history.
 
 Exactly one collection is selected at a time. Replacing it is explicit. Imported source order remains the default playback order.
 
@@ -201,9 +199,7 @@ Expose one high-level production playback boundary to the app shell. It prepares
 
 The app shell translates those events into `RunEvent`. Audio code never mutates SwiftUI state directly.
 
-If MusicKit passes, `ApplicationMusicPlayer` is the implementation. Its observable state and queue drive real progress and track changes. Rate writes go through its player state. Background audio mode is required.
-
-If local files win, build an `AVAudioEngine` graph with `AVAudioPlayerNode`, `AVAudioUnitTimePitch`, the main mixer, and output. `AVAudioUnitTimePitch` owns pitch-preserving rate changes. Track position derives from the player timeline, not a wall-clock ticker. Schedule the next track before the current file completes so normal transitions do not create a gap.
+`ApplicationMusicPlayer` is the implementation. Its observable state and queue drive real progress and track changes. Rate writes go through its player state. Background audio mode is required.
 
 Use `AVAudioSession` playback category. Observe interruptions and route changes. An interruption or lost output route pauses audio and enters existing recovery. Route restoration never auto-resumes.
 
@@ -229,7 +225,7 @@ Use existing session, acquisition, timeout, and hold identities. Add track-analy
 
 Do not add a tab bar, dashboard, settings screen, or stack of cards.
 
-When no collection exists, Ready presents “Choose music” as the primary action. Music choice opens one native sheet. If Apple Music passed, the sheet lists library playlists. If local files won, the sheet opens the system file importer.
+When no collection exists, Ready presents “Choose music” as the primary action. Music choice opens one native sheet that lists Apple Music library playlists.
 
 After selection, Ready shows the collection name, total tracks, and ready count as quiet text with a “Change” action. Start appears when one track is ready. Analysis uses a plain progress line and compact track list. Errors are written in human language, such as “Protected file,” “Unsupported format,” or “Could not read tempo.”
 
@@ -339,13 +335,13 @@ The milestone requires all of the following:
 
 ### Where we are now
 
-Milestones 0 and 1 are complete. Apple Music is the selected Milestone 2 source. Source-neutral models, adaptation policy, cadence filtering, Core Motion boundary, honest measurement, production playback contract, deterministic player, Apple Music adapter, and focused device harness are built. The adapter receives identified progress and recovery events. The normal app still defaults to simulation until import is connected. Bluetooth listening notes, background, next track, controlled interruption, and route loss remain completion gates. See [MUSIC-SOURCE-RESOLUTION-SPEC.md](MUSIC-SOURCE-RESOLUTION-SPEC.md).
+Milestones 0 and 1 are complete. Apple Music is the selected Milestone 2 source. Source-neutral models, adaptation policy, cadence filtering, Core Motion seam, honest measurement, production playback contract, deterministic player, Apple Music adapter, PCM tempo-analysis interface, generated validation scaffold, and focused device harness are built. The first estimator uses onset energy and autocorrelation; real music still needs spectral refinement and corpus validation. The normal app remains simulated until import is connected.
 
 ### Build order
 
-1. Run one verified-tempo catalog track through the Apple Music adapter.
-2. Connect Core Motion cadence and the bounded adaptation policy.
-3. Build tempo analysis and its validation corpus.
+1. Validate the estimator on real previews and choose one verified-tempo catalog track.
+2. Run that track through the Apple Music adapter and connect Core Motion cadence with the bounded adaptation policy.
+3. Complete spectral refinement and the legally usable music corpus.
 4. Connect playlist import, persistence, real progress, and track transitions.
 5. Connect honest lock and summary measurement to applied player state.
 6. Complete repeatable automated gates.

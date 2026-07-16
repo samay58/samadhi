@@ -20,9 +20,9 @@ Milestone 2 turns the interaction prototype into a useful music product.
 
 Build in this order:
 
-1. Run one catalog track with a verified tempo through the Apple Music adapter.
-2. Connect Core Motion cadence and bounded rate adaptation through the existing reducer boundary.
-3. Add tempo analysis and import at least three usable playlist tracks.
+1. Validate the local estimator on resolved Apple Music previews and choose one verified-tempo catalog fixture.
+2. Run that fixture through the Apple Music adapter, then connect Core Motion and bounded rate adaptation through the existing reducer seam.
+3. Import and analyze at least three usable playlist tracks.
 4. Connect persistent selection, real progress, track transitions, honest lock, and summary.
 5. Complete five locked minutes, next track, interruption, route loss, accessibility, and recovery checks.
 6. Pass cadence calibration, listening, and the outdoor-run gate.
@@ -32,6 +32,7 @@ Build in this order:
 - Apple Music feasibility: authorization, library loading, automatic token generation, strict catalog resolution, 10 of 10 local preview decodes, playback, rate writes, pause, and resume passed
 - Token remediation: complete; exact profile `Samadhi Development` fixed catalog access
 - Tempo-source feasibility: passed for City Pocket at 10 of 10 decoded previews; analyzer accuracy remains a later gate
+- Tempo-analysis implementation: PCM file analyzer and generated corpus built; real-music corpus and spectral refinement remain open
 - Spotify feasibility: rejected for adaptive playback; it cannot supply the required app-owned, analyzable, rate-controlled audio path
 - Source decision: Apple Music selected on 2026-07-16; remaining manual drills moved to the reliability gate
 - Source-neutral domain and adaptation rules: complete for the current slice
@@ -63,4 +64,4 @@ Excluded:
 
 ## Stop rule
 
-Do not redesign the app or build playlist generation before imported music and the physical body-to-music loop work. If Apple Music fails its gate, stop that player path. If cadence or audio quality fails, fix the core loop before adding surrounding product.
+Do not redesign the app or build playlist generation before imported music and the physical body-to-music loop work. If cadence, tempo accuracy, or audio quality fails, fix the core loop before adding surrounding product.

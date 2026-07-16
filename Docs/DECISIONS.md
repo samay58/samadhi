@@ -50,6 +50,10 @@ On 2026-07-16, Apple Music became the selected production player. Authorization,
 
 The adapter stays behind a source-neutral main-actor contract. MusicKit's async player methods do not yet carry complete sendability in the installed SDK, so the app uses a narrow `@preconcurrency` import. Every player access remains main-actor owned. Remove that compatibility import when the SDK annotations make it unnecessary.
 
+## One local tempo-analysis interface
+
+Preview audio and future imported files both become a local audio-file URL before analysis. `LocalTempoAnalyzer` hides off-main PCM decoding and returns a versioned source-neutral result. `TempoEstimator` contains the current onset and autocorrelation implementation. Generated fixtures prove tempo-family behavior and rejection only; real-music accuracy remains a separate corpus gate.
+
 ## Honest tempo matching
 
 Milestone 2 matches music tempo to stable cadence. It does not claim beat-perfect footfall phase. Rename the measured summary to tempo matched and defer a true in-step percentage until individual foot-strike timing exists.

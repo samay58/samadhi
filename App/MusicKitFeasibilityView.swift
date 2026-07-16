@@ -11,7 +11,7 @@
                 List {
                     Section("Gate state") {
                         LabeledContent("Authorization", value: model.authorization)
-                        LabeledContent("Decoded previews", value: model.analyzableCoverage)
+                        LabeledContent("Analyzed previews", value: model.analyzableCoverage)
                         LabeledContent("Output route", value: model.outputRoute)
                         LabeledContent("Current track", value: model.currentTrack)
                         if model.requiresExplicitResume {

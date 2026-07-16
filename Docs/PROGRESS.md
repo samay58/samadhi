@@ -112,6 +112,16 @@
 - Preserved the normal deterministic app flow until playlist import is ready
 - Passed formatting, 32 package tests, 2 app-model tests, and 4 UI tests on the implementation tree
 
+## 2026-07-16. Tempo-analysis seam
+
+- Added one local audio-file analysis interface for Apple Music previews and future imported files
+- Moved PCM decoding off the main actor and reduced multichannel audio to mono
+- Added a versioned onset and autocorrelation estimator
+- Added generated 120, 150, 168, and 190 BPM fixtures plus silence and irregular-onset rejection
+- Connected the MusicKit harness to record estimated BPM, confidence, and analysis version
+- Kept real-music accuracy and the twelve-excerpt corpus explicitly open
+- Passed formatting, 37 package tests, 2 app-model tests, 4 UI tests, and the exact-profile physical iPhone build
+
 ## Current checkpoint
 
-Milestones 0 and 1 are complete. Apple Music is the selected Milestone 2 source. The production player boundary and adapter are built, while the normal app remains deterministic until import is connected. Next comes one verified-tempo catalog track through the adapter, real Core Motion cadence, and bounded adaptation. Bluetooth listening notes and long-form background and recovery checks remain before Milestone 2 completion.
+Milestones 0 and 1 are complete. Apple Music is the selected Milestone 2 source. Playback and local tempo-analysis seams are built, while the normal app remains deterministic until import is connected. Next comes real-preview validation, one verified-tempo catalog fixture, Core Motion cadence, and bounded adaptation. Long-form background and recovery checks remain before Milestone 2 completion.

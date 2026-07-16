@@ -27,7 +27,7 @@ Do not create a Media Services key, embed a developer token, or add a token back
 4. In the Apple developer portal, enable the MusicKit App Service for `com.samaydhawan.Samadhi`.
 5. Select the `Samadhi MusicKit Gate` scheme and the connected iPhone.
 6. Attach one Bluetooth A2DP headphone route and open one library playlist with at least ten tracks.
-7. Run authorization, playlist loading, decoded preview coverage, playback, the 0.94, 1.00, and 1.06 rate writes, pause, resume, next track, interruption, route loss, and five screen-locked minutes.
+7. Run authorization, playlist loading, preview tempo analysis, playback, the 0.94, 1.00, and 1.06 rate writes, pause, resume, next track, interruption, route loss, and five screen-locked minutes.
 8. Share the harness JSON trace and save listening notes under `Evidence/Device/` with device, OS, route, playlist, result, and date.
 9. Save the result as the selected Apple Music adapter's reliability evidence. The source decision is already closed.
 
