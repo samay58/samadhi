@@ -94,4 +94,6 @@ The focused fixture now uses catalog track `1558215042`, estimated at 149.75 BPM
 
 `AppleMusicPlaybackController` must not call a commanded rate applied. It stores the request identity, writes MusicKit, then reports the value read from `ApplicationMusicPlayer.state.playbackRate`. The reducer accepts that read-back only when session, operation, request, and track identities still match.
 
+The corrected physical run averaged 155 SPM and measured 98 percent tempo matched across 59 seconds. A fixed 1.00 rate could not satisfy the three-SPM tolerance for the 149.75 BPM fixture, so this closes the automatic rate-response gate. Exact live diagnostics should be captured during the run because completed sessions intentionally release their transient target and applied values.
+
 The reducer owns adaptation state and rate decisions. Each rate effect carries session, operation, request, and track identity. The player reports the applied rate through the same identities, and stale feedback is ignored. Cadence sensing continues after lock so the existing confidence hold, gradual return to 1.00, and reacquisition rules can run instead of freezing the first estimate.
