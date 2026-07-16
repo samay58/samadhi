@@ -169,8 +169,10 @@
         }
 
         private func previewYieldsPCM(_ track: Track) async -> Bool {
-            guard let url = track.previewAssets?.compactMap({ $0.url ?? $0.hlsURL }).first else {
-                record("preview_unavailable", track.title)
+            let resolvedTrack = await trackWithCatalogPreview(for: track)
+            guard let url = resolvedTrack.previewAssets?.compactMap({ $0.url ?? $0.hlsURL }).first
+            else {
+                record("preview_unavailable", "\(track.title); id \(track.id); isrc \(track.isrc ?? "none")")
                 return false
             }
 
@@ -211,6 +213,50 @@
                 record("preview_error", "\(track.title); \(error)")
                 return false
             }
+        }
+
+        private func trackWithCatalogPreview(for track: Track) async -> Track {
+            if track.previewAssets?.isEmpty == false {
+                record("preview_found_in_library", track.title)
+                return track
+            }
+
+            do {
+                guard let song = try await catalogSong(for: track) else {
+                    record("catalog_lookup_empty", "\(track.title); id \(track.id); isrc \(track.isrc ?? "none")")
+                    return track
+                }
+                guard song.previewAssets?.isEmpty == false else {
+                    record("catalog_preview_unavailable", "\(track.title); catalog id \(song.id)")
+                    return .song(song)
+                }
+
+                record("catalog_preview_resolved", "\(track.title); catalog id \(song.id)")
+                return .song(song)
+            } catch {
+                record("catalog_lookup_error", "\(track.title); id \(track.id); \(error)")
+                return track
+            }
+        }
+
+        private func catalogSong(for track: Track) async throws -> Song? {
+            if let isrc = track.isrc, !isrc.isEmpty {
+                var request = MusicCatalogResourceRequest<Song>(matching: \.isrc, equalTo: isrc)
+                request.limit = 1
+                if #available(iOS 26.4, *) {
+                    request.options = [.findEquivalents]
+                }
+                return try await request.response().items.first
+            }
+
+            guard #available(iOS 26.4, *) else {
+                record("catalog_lookup_skipped", "\(track.title); no ISRC or equivalent-ID support")
+                return nil
+            }
+            var request = MusicCatalogResourceRequest<Song>(matching: \.id, equalTo: track.id)
+            request.limit = 1
+            request.options = [.findEquivalents]
+            return try await request.response().items.first
         }
 
         private func record(_ event: String, _ detail: String) {

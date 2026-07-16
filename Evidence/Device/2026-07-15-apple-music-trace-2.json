@@ -1,0 +1,1514 @@
+[
+  {
+    "date" : "2026-07-16T03:23:55Z",
+    "detail" : "MusicKit feasibility harness opened",
+    "device" : "iPhone",
+    "event" : "harness_started",
+    "id" : "1D072CEF-5AFA-4D81-B0EA-3C65D7FA7603",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:23:55Z",
+    "detail" : "stopped @ 0.0",
+    "device" : "iPhone",
+    "event" : "player_state",
+    "id" : "ACDBBCBA-BA0E-421A-94E0-FD5E572BD3AB",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:25:13Z",
+    "detail" : ".authorized",
+    "device" : "iPhone",
+    "event" : "authorization",
+    "id" : "170B84DD-03E5-4CCD-8FA0-697338E4B029",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:25:13Z",
+    "detail" : "40 playlists",
+    "device" : "iPhone",
+    "event" : "playlists_loaded",
+    "id" : "C5CC7822-4368-4254-A3D7-F902CCC62C32",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:25:19Z",
+    "detail" : "Glue",
+    "device" : "iPhone",
+    "event" : "preview_unavailable",
+    "id" : "3747DDCA-2355-455A-8430-7094F7954E76",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:25:19Z",
+    "detail" : "Innerbloom (Radio Edit)",
+    "device" : "iPhone",
+    "event" : "preview_unavailable",
+    "id" : "DDBE2012-0166-491F-B7B5-3319FBE64A7E",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:25:19Z",
+    "detail" : "Delilah (pull me out of this)",
+    "device" : "iPhone",
+    "event" : "preview_unavailable",
+    "id" : "13387B7A-E1BE-4AA6-B7BF-93B237AB021B",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:25:19Z",
+    "detail" : "Marea (We’ve Lost Dancing)",
+    "device" : "iPhone",
+    "event" : "preview_unavailable",
+    "id" : "E3E504C0-B723-4341-8970-2F2896DD25A0",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:25:19Z",
+    "detail" : "Move (feat. Adam Port, Keinemusik & Orso)",
+    "device" : "iPhone",
+    "event" : "preview_unavailable",
+    "id" : "2F8E7A06-38F0-4A31-9E0F-9EE73A2400C0",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:25:19Z",
+    "detail" : "Yamore (feat. Cesária Evora, Benja (NL) & Franc Fala)",
+    "device" : "iPhone",
+    "event" : "preview_unavailable",
+    "id" : "B1DBD5D2-1128-4982-B100-3B9E26A7705A",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:25:19Z",
+    "detail" : "Tadow",
+    "device" : "iPhone",
+    "event" : "preview_unavailable",
+    "id" : "5D511C37-C658-4C65-A817-A4936116C7A9",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:25:19Z",
+    "detail" : "LITE SPOTS",
+    "device" : "iPhone",
+    "event" : "preview_unavailable",
+    "id" : "E5EEB9A2-4E5A-4545-9736-7F1DB8A43FC3",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:25:19Z",
+    "detail" : "Free Mind",
+    "device" : "iPhone",
+    "event" : "preview_unavailable",
+    "id" : "F342921B-672D-4185-B9ED-B235AAB61C44",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:25:19Z",
+    "detail" : "Ojitos Lindos",
+    "device" : "iPhone",
+    "event" : "preview_unavailable",
+    "id" : "DD7893AF-F618-4783-B249-E66A87A1F3CC",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:25:19Z",
+    "detail" : "Aligned: Edge, Flow, Barcelona Sun; 25 tracks; decoded preview coverage 0 of 10",
+    "device" : "iPhone",
+    "event" : "playlist_selected",
+    "id" : "77CF45F2-0221-4492-947D-72AEE31B5BAC",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:25:19Z",
+    "detail" : "Glue",
+    "device" : "iPhone",
+    "event" : "preview_unavailable",
+    "id" : "77FF6F13-8CF0-4499-A5BB-B34C67985E37",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:25:19Z",
+    "detail" : "Innerbloom (Radio Edit)",
+    "device" : "iPhone",
+    "event" : "preview_unavailable",
+    "id" : "454B7143-DEF7-4C0C-9871-8556A3AC00EC",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:25:19Z",
+    "detail" : "Delilah (pull me out of this)",
+    "device" : "iPhone",
+    "event" : "preview_unavailable",
+    "id" : "DC826948-3141-4CA1-83E2-B1C379CDCC5D",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:25:19Z",
+    "detail" : "Marea (We’ve Lost Dancing)",
+    "device" : "iPhone",
+    "event" : "preview_unavailable",
+    "id" : "79FE70E0-E8F9-4376-89E4-953813BBDEE8",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:25:19Z",
+    "detail" : "Move (feat. Adam Port, Keinemusik & Orso)",
+    "device" : "iPhone",
+    "event" : "preview_unavailable",
+    "id" : "C9BC04E8-90BD-46DD-A138-D76538C691A3",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:25:19Z",
+    "detail" : "Yamore (feat. Cesária Evora, Benja (NL) & Franc Fala)",
+    "device" : "iPhone",
+    "event" : "preview_unavailable",
+    "id" : "1F8DEBF1-7A9A-4D8E-A600-208546EAF0CB",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:25:19Z",
+    "detail" : "Tadow",
+    "device" : "iPhone",
+    "event" : "preview_unavailable",
+    "id" : "5F22494F-9B0C-4F8E-A8F1-76A20A855911",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:25:19Z",
+    "detail" : "LITE SPOTS",
+    "device" : "iPhone",
+    "event" : "preview_unavailable",
+    "id" : "48DCB42D-67E8-459B-A807-4D472C9D3FC8",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:25:19Z",
+    "detail" : "Free Mind",
+    "device" : "iPhone",
+    "event" : "preview_unavailable",
+    "id" : "10057EF4-5C22-4F9B-9D5A-29FCD09DFDA3",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:25:19Z",
+    "detail" : "Ojitos Lindos",
+    "device" : "iPhone",
+    "event" : "preview_unavailable",
+    "id" : "0EB61722-3F87-46A5-BEFC-8F6292EBECF3",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:25:19Z",
+    "detail" : "Aligned: Edge, Flow, Barcelona Sun; 25 tracks; decoded preview coverage 0 of 10",
+    "device" : "iPhone",
+    "event" : "playlist_selected",
+    "id" : "DD31F458-11BE-43C0-8F4C-7965B9E65160",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:25:24Z",
+    "detail" : "requested 1.0; reported 1.0",
+    "device" : "iPhone",
+    "event" : "rate_written",
+    "id" : "E90B36C0-078B-4300-998D-ED0AB473E830",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:25:24Z",
+    "detail" : "stopped @ 1.0",
+    "device" : "iPhone",
+    "event" : "player_state",
+    "id" : "94EF0692-EE25-426A-BAF2-D1D009EEEDDA",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:25:25Z",
+    "detail" : "requested 1.0; reported 1.0",
+    "device" : "iPhone",
+    "event" : "rate_written",
+    "id" : "24E526C2-F154-4E87-9012-8577D08798B3",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:25:32Z",
+    "detail" : ".authorized",
+    "device" : "iPhone",
+    "event" : "authorization",
+    "id" : "F10DFDD9-15E3-442E-A4A3-3E2604DECFB2",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:25:32Z",
+    "detail" : "40 playlists",
+    "device" : "iPhone",
+    "event" : "playlists_loaded",
+    "id" : "428B55A1-72F1-426C-BC44-8B2B2320A261",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:25:34Z",
+    "detail" : "Quite Frankly",
+    "device" : "iPhone",
+    "event" : "preview_unavailable",
+    "id" : "02CC7AD5-61EE-46C7-BBF2-14895D44933D",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:25:34Z",
+    "detail" : "Deep Reverence (feat. Nipsey Hussle)",
+    "device" : "iPhone",
+    "event" : "preview_unavailable",
+    "id" : "E234E464-CCB4-4879-982E-B2F6B9D08B5D",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:25:34Z",
+    "detail" : "Wolves (feat. Post Malone)",
+    "device" : "iPhone",
+    "event" : "preview_unavailable",
+    "id" : "792E4F0C-96B7-47AE-BE5C-D5C1E69B64FE",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:25:34Z",
+    "detail" : "Body Language (feat. Ty Dolla $ign & Jhené Aiko)",
+    "device" : "iPhone",
+    "event" : "preview_unavailable",
+    "id" : "C52427D4-9D21-4B04-80C8-802BD45BF73F",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:25:34Z",
+    "detail" : "Harder Than My Demons",
+    "device" : "iPhone",
+    "event" : "preview_unavailable",
+    "id" : "9861DB8F-26E7-4393-B07F-E60781A8F8ED",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:25:34Z",
+    "detail" : "ZTFO",
+    "device" : "iPhone",
+    "event" : "preview_unavailable",
+    "id" : "4AA2CDC4-5861-4236-A708-A698D7B85ECF",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:25:34Z",
+    "detail" : "Lithuania (feat. Travis Scott)",
+    "device" : "iPhone",
+    "event" : "preview_unavailable",
+    "id" : "B7C80347-2145-4A0B-A9B7-36AB8D3C2B6C",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:25:34Z",
+    "detail" : "girl in red on “Serotonin”",
+    "device" : "iPhone",
+    "event" : "preview_unavailable",
+    "id" : "FB848D06-D3CF-4D41-9EB7-4D725042D316",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:25:34Z",
+    "detail" : "Nail Tech",
+    "device" : "iPhone",
+    "event" : "preview_unavailable",
+    "id" : "3E262AAE-B31F-4234-9BCA-C262EADFFD27",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:25:34Z",
+    "detail" : "First Class",
+    "device" : "iPhone",
+    "event" : "preview_unavailable",
+    "id" : "A332E818-2294-47E1-A079-E86D3C53EB19",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:25:34Z",
+    "detail" : "Music Videos; 13 tracks; decoded preview coverage 0 of 10",
+    "device" : "iPhone",
+    "event" : "playlist_selected",
+    "id" : "219642E4-C9E7-4EB0-9694-34B861E06F38",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:25:34Z",
+    "detail" : "Quite Frankly",
+    "device" : "iPhone",
+    "event" : "preview_unavailable",
+    "id" : "5F274011-AA14-4FD2-A1B2-4106ECE25E27",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:25:34Z",
+    "detail" : "Deep Reverence (feat. Nipsey Hussle)",
+    "device" : "iPhone",
+    "event" : "preview_unavailable",
+    "id" : "64249775-0B0B-4183-A1FA-52ABB3B6C17D",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:25:34Z",
+    "detail" : "Wolves (feat. Post Malone)",
+    "device" : "iPhone",
+    "event" : "preview_unavailable",
+    "id" : "825747AB-E77C-4079-ADF4-BAFAAB4A1121",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:25:34Z",
+    "detail" : "Body Language (feat. Ty Dolla $ign & Jhené Aiko)",
+    "device" : "iPhone",
+    "event" : "preview_unavailable",
+    "id" : "A1012D7A-3B6A-45A0-954A-83BAEEF1CD76",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:25:34Z",
+    "detail" : "Harder Than My Demons",
+    "device" : "iPhone",
+    "event" : "preview_unavailable",
+    "id" : "021117C0-878B-4CD6-A728-1422AC094A4D",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:25:34Z",
+    "detail" : "ZTFO",
+    "device" : "iPhone",
+    "event" : "preview_unavailable",
+    "id" : "4C99D400-9801-4EEA-8192-62CE2F9C3220",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:25:34Z",
+    "detail" : "Lithuania (feat. Travis Scott)",
+    "device" : "iPhone",
+    "event" : "preview_unavailable",
+    "id" : "E6C07F92-31E2-435A-9B17-48954E6D3430",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:25:34Z",
+    "detail" : "girl in red on “Serotonin”",
+    "device" : "iPhone",
+    "event" : "preview_unavailable",
+    "id" : "D0D733E9-173C-4877-B6CC-24F43FF0DDDF",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:25:34Z",
+    "detail" : "Nail Tech",
+    "device" : "iPhone",
+    "event" : "preview_unavailable",
+    "id" : "6388D79A-5CB9-452E-9DDE-CD09D4F86706",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:25:34Z",
+    "detail" : "First Class",
+    "device" : "iPhone",
+    "event" : "preview_unavailable",
+    "id" : "626981BE-EB70-498C-B8A7-1EE0F3ED9B31",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:25:34Z",
+    "detail" : "Music Videos; 13 tracks; decoded preview coverage 0 of 10",
+    "device" : "iPhone",
+    "event" : "playlist_selected",
+    "id" : "1160F0B8-097F-4CD1-889C-4BE189B30E2C",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:25:35Z",
+    "detail" : "My Top Rated; 0 tracks; decoded preview coverage No tracks",
+    "device" : "iPhone",
+    "event" : "playlist_selected",
+    "id" : "417A690E-4357-4CE1-B761-670BE428EE93",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:25:39Z",
+    "detail" : "Pause requested",
+    "device" : "iPhone",
+    "event" : "pause",
+    "id" : "2E495F4F-0072-496B-9FB0-BCEFB3C2A4DE",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:25:39Z",
+    "detail" : "Stop requested",
+    "device" : "iPhone",
+    "event" : "stop",
+    "id" : "77A54FDC-F5A3-4B67-A849-61DC3B51F64E",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:25:39Z",
+    "detail" : "Error Domain=MPMusicPlayerControllerErrorDomain Code=1 \"(null)\"",
+    "device" : "iPhone",
+    "event" : "error",
+    "id" : "56F589B0-B409-4149-AA9D-1D5B1BAC823C",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:25:40Z",
+    "detail" : "Pause requested",
+    "device" : "iPhone",
+    "event" : "pause",
+    "id" : "851B67B2-8CE3-43CB-AD62-57B96A69E3A9",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:25:40Z",
+    "detail" : "Stop requested",
+    "device" : "iPhone",
+    "event" : "stop",
+    "id" : "AC5CF2B4-869B-491B-9FE0-F4C7D0CD942A",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:25:40Z",
+    "detail" : "Error Domain=MPMusicPlayerControllerErrorDomain Code=1 \"(null)\"",
+    "device" : "iPhone",
+    "event" : "error",
+    "id" : "D99E56CC-D6E0-4C01-9C6E-213B8F130ED9",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:25:41Z",
+    "detail" : "Pause requested",
+    "device" : "iPhone",
+    "event" : "pause",
+    "id" : "6DABEC47-8288-4A63-A13D-74115F5AC18D",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:25:41Z",
+    "detail" : "Stop requested",
+    "device" : "iPhone",
+    "event" : "stop",
+    "id" : "EA8F028E-0AFB-423A-A101-39D8199EEABA",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:25:41Z",
+    "detail" : "Error Domain=MPMusicPlayerControllerErrorDomain Code=1 \"(null)\"",
+    "device" : "iPhone",
+    "event" : "error",
+    "id" : "24E7856A-DB88-41F4-952D-D20B4001BE93",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:25:42Z",
+    "detail" : "Pause requested",
+    "device" : "iPhone",
+    "event" : "pause",
+    "id" : "B7F46630-892F-400C-8A70-4175D0236D5C",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:25:42Z",
+    "detail" : "Stop requested",
+    "device" : "iPhone",
+    "event" : "stop",
+    "id" : "934A2093-1C76-4D18-BBBB-22FF582CBC20",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:25:42Z",
+    "detail" : "Error Domain=MPMusicPlayerControllerErrorDomain Code=1 \"(null)\"",
+    "device" : "iPhone",
+    "event" : "error",
+    "id" : "B658DDB2-8EB9-4384-AF49-46D8B5B523D0",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:26:58Z",
+    "detail" : ".authorized",
+    "device" : "iPhone",
+    "event" : "authorization",
+    "id" : "0A8B7113-A25F-4F9B-9645-90ECA92BC866",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:26:58Z",
+    "detail" : "40 playlists",
+    "device" : "iPhone",
+    "event" : "playlists_loaded",
+    "id" : "9A7A4FEE-6726-4C48-B1FF-31280C2BA862",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:26:59Z",
+    "detail" : ".authorized",
+    "device" : "iPhone",
+    "event" : "authorization",
+    "id" : "7BDC0350-F42E-4CEC-8C43-5B7E95CA9F19",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:26:59Z",
+    "detail" : "40 playlists",
+    "device" : "iPhone",
+    "event" : "playlists_loaded",
+    "id" : "5771C222-529F-450D-BD44-5B1C2A1194FB",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:27:00Z",
+    "detail" : "Recently Played; 0 tracks; decoded preview coverage No tracks",
+    "device" : "iPhone",
+    "event" : "playlist_selected",
+    "id" : "24556549-EAB8-47CE-AC12-1EA029863F7B",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:27:00Z",
+    "detail" : "Recently Played; 0 tracks; decoded preview coverage No tracks",
+    "device" : "iPhone",
+    "event" : "playlist_selected",
+    "id" : "5A1A6478-48C0-4C73-BA69-5ABFD7576ED8",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:27:00Z",
+    "detail" : "Recently Played; 0 tracks; decoded preview coverage No tracks",
+    "device" : "iPhone",
+    "event" : "playlist_selected",
+    "id" : "D967DA79-B4E4-4109-8C4B-CE608DD0C490",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:27:01Z",
+    "detail" : "Recently Played; 0 tracks; decoded preview coverage No tracks",
+    "device" : "iPhone",
+    "event" : "playlist_selected",
+    "id" : "848B76A1-2A97-475B-823C-BD40E8D791DD",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:27:03Z",
+    "detail" : "The Way Life Goes (feat. Oh Wonder)",
+    "device" : "iPhone",
+    "event" : "preview_unavailable",
+    "id" : "21BE6530-1E67-4B9A-BD24-167BF1931962",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:27:03Z",
+    "detail" : "Ikuyo (feat. 2 Chainz & Sophia Black)",
+    "device" : "iPhone",
+    "event" : "preview_unavailable",
+    "id" : "CC962BDB-CEF6-4407-8B63-A643EC1A47EF",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:27:03Z",
+    "detail" : "Killamonjaro",
+    "device" : "iPhone",
+    "event" : "preview_unavailable",
+    "id" : "D1FC11B7-AD94-4180-A00C-76938ADB8D1E",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:27:03Z",
+    "detail" : "X (feat. Future)",
+    "device" : "iPhone",
+    "event" : "preview_unavailable",
+    "id" : "6BF84F1E-C5A0-4531-8744-608FE54FBAAC",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:27:03Z",
+    "detail" : "Fire Squad",
+    "device" : "iPhone",
+    "event" : "preview_unavailable",
+    "id" : "761187D1-C06E-47C2-8457-8DA05351DCA8",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:27:03Z",
+    "detail" : "The Story of O.J.",
+    "device" : "iPhone",
+    "event" : "preview_unavailable",
+    "id" : "D72CCF1C-EF45-4FFA-8EE8-20E68C695878",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:27:03Z",
+    "detail" : "4 da Gang",
+    "device" : "iPhone",
+    "event" : "preview_unavailable",
+    "id" : "AF4DD42B-E5DD-4493-9622-C85431599A5A",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:27:03Z",
+    "detail" : "Throw It In the Bag (feat. The-Dream)",
+    "device" : "iPhone",
+    "event" : "preview_unavailable",
+    "id" : "DBA6DA43-A110-4DAC-A36D-099FC9570BE0",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:27:03Z",
+    "detail" : "My Mind",
+    "device" : "iPhone",
+    "event" : "preview_unavailable",
+    "id" : "99A6A399-68EA-4A43-A74B-13774FE6E5F0",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:27:03Z",
+    "detail" : "Bounce Back",
+    "device" : "iPhone",
+    "event" : "preview_unavailable",
+    "id" : "1A9E615B-0AD6-470C-B597-D5905ED7A599",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:27:03Z",
+    "detail" : "Your Essentials; 25 tracks; decoded preview coverage 0 of 10",
+    "device" : "iPhone",
+    "event" : "playlist_selected",
+    "id" : "7F71B6D1-C2B8-4CE4-B90A-5E6BB60948C0",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:27:04Z",
+    "detail" : "The Way Life Goes (feat. Oh Wonder)",
+    "device" : "iPhone",
+    "event" : "preview_unavailable",
+    "id" : "03D1821F-1608-4743-ABE9-395FAF322C79",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:27:04Z",
+    "detail" : "Ikuyo (feat. 2 Chainz & Sophia Black)",
+    "device" : "iPhone",
+    "event" : "preview_unavailable",
+    "id" : "2707A860-0C0C-4876-B012-2F5857E42E79",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:27:04Z",
+    "detail" : "Killamonjaro",
+    "device" : "iPhone",
+    "event" : "preview_unavailable",
+    "id" : "ACE98D7D-0470-4E35-8B95-9CBFC6FF031D",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:27:04Z",
+    "detail" : "X (feat. Future)",
+    "device" : "iPhone",
+    "event" : "preview_unavailable",
+    "id" : "EFCF79F8-02FE-4FCF-8128-6A3EAD64BA7B",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:27:04Z",
+    "detail" : "Fire Squad",
+    "device" : "iPhone",
+    "event" : "preview_unavailable",
+    "id" : "81240750-12F3-4464-AADD-CFDAD1C126A2",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:27:04Z",
+    "detail" : "The Story of O.J.",
+    "device" : "iPhone",
+    "event" : "preview_unavailable",
+    "id" : "B283234A-5551-4F5A-849D-700BA954ADE5",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:27:04Z",
+    "detail" : "4 da Gang",
+    "device" : "iPhone",
+    "event" : "preview_unavailable",
+    "id" : "029D393B-2A96-424E-A232-672887D79631",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:27:04Z",
+    "detail" : "Throw It In the Bag (feat. The-Dream)",
+    "device" : "iPhone",
+    "event" : "preview_unavailable",
+    "id" : "013D825E-C4AD-41BD-9F2A-01D1A543CF55",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:27:04Z",
+    "detail" : "My Mind",
+    "device" : "iPhone",
+    "event" : "preview_unavailable",
+    "id" : "535F9F83-8D01-4582-9459-34F94276F8FF",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:27:04Z",
+    "detail" : "Bounce Back",
+    "device" : "iPhone",
+    "event" : "preview_unavailable",
+    "id" : "8BD39E25-11E4-4744-B545-B94A7374BB68",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:27:04Z",
+    "detail" : "Your Essentials; 25 tracks; decoded preview coverage 0 of 10",
+    "device" : "iPhone",
+    "event" : "playlist_selected",
+    "id" : "92BA14B5-DDB7-46F0-BA57-140851972F9C",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:27:05Z",
+    "detail" : "paused @ 0.0",
+    "device" : "iPhone",
+    "event" : "player_state",
+    "id" : "9CA5A8A9-7DC9-4781-B4DB-0D23B05F9650",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:27:07Z",
+    "detail" : "Queue contains 25 tracks",
+    "device" : "iPhone",
+    "event" : "playback_started",
+    "id" : "2D7E8E19-62E7-4CDC-BCFE-2719D7277582",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:27:07Z",
+    "detail" : "Audio session interruption observed",
+    "device" : "iPhone",
+    "event" : "audio_interruption",
+    "id" : "8448A6D6-47D8-47D4-9007-DCC2B7E9605B",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:27:07Z",
+    "detail" : "playing @ 1.0",
+    "device" : "iPhone",
+    "event" : "player_state",
+    "id" : "09C031BC-B263-484D-BE09-16066301A8E3",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:27:07Z",
+    "detail" : "Am I Wrong (feat. ScHoolboy Q)",
+    "device" : "iPhone",
+    "event" : "preview_unavailable",
+    "id" : "12E606B3-066E-4830-ABAE-B213EB5C41D1",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:27:07Z",
+    "detail" : "LITE SPOTS",
+    "device" : "iPhone",
+    "event" : "preview_unavailable",
+    "id" : "043F2C44-C39F-4659-A483-50DDD3C4B234",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:27:07Z",
+    "detail" : "Topdown",
+    "device" : "iPhone",
+    "event" : "preview_unavailable",
+    "id" : "2F58EBA7-F2A6-45F9-9F02-0EE21589400E",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:27:07Z",
+    "detail" : "Meditation (feat. Jazmine Sullivan & KAYTRANADA)",
+    "device" : "iPhone",
+    "event" : "preview_unavailable",
+    "id" : "6FFD7579-5792-4DE3-875E-7933663C0594",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:27:07Z",
+    "detail" : "4EVA",
+    "device" : "iPhone",
+    "event" : "preview_unavailable",
+    "id" : "102B4AB3-E342-427E-915E-661CA0B9E274",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:27:07Z",
+    "detail" : "Super Bounce (feat. EARTHGANG)",
+    "device" : "iPhone",
+    "event" : "preview_unavailable",
+    "id" : "64E0C782-7E2F-4C1C-B524-263A8C7E18EF",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:27:07Z",
+    "detail" : "Dance Now",
+    "device" : "iPhone",
+    "event" : "preview_unavailable",
+    "id" : "FEFC35A3-0E20-4A65-90A7-CE81AB5FDC0A",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:27:07Z",
+    "detail" : "Gorilla",
+    "device" : "iPhone",
+    "event" : "preview_unavailable",
+    "id" : "C6C50DEF-8E76-461A-ACC5-CBE7C8B76E11",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:27:07Z",
+    "detail" : "KLINK",
+    "device" : "iPhone",
+    "event" : "preview_unavailable",
+    "id" : "AEB9FE6D-78FD-44B2-A223-CDAB5CE10F55",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:27:07Z",
+    "detail" : "SWEET \/ I THOUGHT YOU WANTED TO DANCE (feat. Brent Faiyaz & Fana Hues)",
+    "device" : "iPhone",
+    "event" : "preview_unavailable",
+    "id" : "ED25F39C-CAD5-4632-B8E1-40F9CD3AF5CA",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:27:07Z",
+    "detail" : "Strut Frequency -- July 2026; 25 tracks; decoded preview coverage 0 of 10",
+    "device" : "iPhone",
+    "event" : "playlist_selected",
+    "id" : "CAB0200D-F96C-47A9-890B-2239C49AB2FA",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:27:10Z",
+    "detail" : "Queue contains 25 tracks",
+    "device" : "iPhone",
+    "event" : "playback_started",
+    "id" : "B125FE8E-3DE7-46E9-A1D4-188246FDB5C6",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:27:10Z",
+    "detail" : "Audio session interruption observed",
+    "device" : "iPhone",
+    "event" : "audio_interruption",
+    "id" : "40D79B64-3597-436C-B0A7-1B9CEE717744",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:27:10Z",
+    "detail" : "requested 1.0; reported 1.0",
+    "device" : "iPhone",
+    "event" : "rate_written",
+    "id" : "F67FCBC5-27B3-4F7E-8710-11037B91C455",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:27:14Z",
+    "detail" : "Pause requested",
+    "device" : "iPhone",
+    "event" : "pause",
+    "id" : "36DD0A9C-173F-4128-A556-627FF7156C76",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:27:14Z",
+    "detail" : "Stop requested",
+    "device" : "iPhone",
+    "event" : "stop",
+    "id" : "C15C03DD-838A-492F-A41F-45FDA7557664",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:27:14Z",
+    "detail" : "Resume requested",
+    "device" : "iPhone",
+    "event" : "resume",
+    "id" : "AA11C510-F853-4AB0-A807-69415E7CCA2E",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:27:15Z",
+    "detail" : "requested 1.0; reported 1.0",
+    "device" : "iPhone",
+    "event" : "rate_written",
+    "id" : "DCEDB6D8-5D13-44E5-AF77-787D04FD6B75",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:27:16Z",
+    "detail" : "requested 1.06; reported 1.06",
+    "device" : "iPhone",
+    "event" : "rate_written",
+    "id" : "131E845C-EDE1-496F-B4FD-C152E5A2203B",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:27:16Z",
+    "detail" : "playing @ 1.06",
+    "device" : "iPhone",
+    "event" : "player_state",
+    "id" : "B093B59A-D7CB-4A04-BF3B-EA762A906304",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:27:17Z",
+    "detail" : "requested 1.0; reported 1.0",
+    "device" : "iPhone",
+    "event" : "rate_written",
+    "id" : "C6C97DB9-9E53-4246-A86B-560551198DF6",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:27:18Z",
+    "detail" : "playing @ 1.0",
+    "device" : "iPhone",
+    "event" : "player_state",
+    "id" : "0C5730D2-0C0F-4934-B89F-42AB4948DDB4",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:27:18Z",
+    "detail" : "Pause requested",
+    "device" : "iPhone",
+    "event" : "pause",
+    "id" : "73E47439-13E3-48B4-8E33-210E7031CCA0",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:27:18Z",
+    "detail" : "Stop requested",
+    "device" : "iPhone",
+    "event" : "stop",
+    "id" : "EFE1734C-83E2-4E80-B4CF-5C402F266102",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:27:18Z",
+    "detail" : "Resume requested",
+    "device" : "iPhone",
+    "event" : "resume",
+    "id" : "0CC31294-14DC-411C-9CAE-0C64B0FCA64E",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:27:18Z",
+    "detail" : "requested 1.06; reported 1.06",
+    "device" : "iPhone",
+    "event" : "rate_written",
+    "id" : "2C5582B3-48B9-459E-849B-DF4753644095",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:27:19Z",
+    "detail" : "playing @ 1.06",
+    "device" : "iPhone",
+    "event" : "player_state",
+    "id" : "A26C9480-54F5-43BC-98CC-4910C6C3E450",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:27:19Z",
+    "detail" : "Pause requested",
+    "device" : "iPhone",
+    "event" : "pause",
+    "id" : "B658AB4F-39D6-427B-9713-299AD429DA03",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:27:19Z",
+    "detail" : "Stop requested",
+    "device" : "iPhone",
+    "event" : "stop",
+    "id" : "070821B6-F156-496A-8A6C-CD68AD88714E",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:27:20Z",
+    "detail" : "Resume requested",
+    "device" : "iPhone",
+    "event" : "resume",
+    "id" : "0B491F5D-BE4D-4E5D-A4CF-2B7F6713EA89",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:27:20Z",
+    "detail" : "playing @ 1.0",
+    "device" : "iPhone",
+    "event" : "player_state",
+    "id" : "7C9AE17C-790F-49B3-B5B6-A1EA8CE1772B",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:27:21Z",
+    "detail" : "Pause requested",
+    "device" : "iPhone",
+    "event" : "pause",
+    "id" : "25AD6D8D-37E6-4674-92BA-CA27FA32C1AC",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:27:21Z",
+    "detail" : "Stop requested",
+    "device" : "iPhone",
+    "event" : "stop",
+    "id" : "1717E223-2B6B-4806-A699-CA894243A023",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:27:21Z",
+    "detail" : "Resume requested",
+    "device" : "iPhone",
+    "event" : "resume",
+    "id" : "3BDA6131-F733-4F84-812B-E6643F3A7A16",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:27:21Z",
+    "detail" : "Pause requested",
+    "device" : "iPhone",
+    "event" : "pause",
+    "id" : "52961A14-4640-429B-ABBA-C02E80A9E08C",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:27:21Z",
+    "detail" : "Stop requested",
+    "device" : "iPhone",
+    "event" : "stop",
+    "id" : "90BC2191-FAF5-467B-AA09-7D6416FBB729",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:27:21Z",
+    "detail" : "Resume requested",
+    "device" : "iPhone",
+    "event" : "resume",
+    "id" : "038BC59D-32A0-41CA-A1CE-BBDD05C0290D",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:27:22Z",
+    "detail" : "Pause requested",
+    "device" : "iPhone",
+    "event" : "pause",
+    "id" : "596F2907-4D45-45D7-97F2-1575801F0858",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:27:22Z",
+    "detail" : "Stop requested",
+    "device" : "iPhone",
+    "event" : "stop",
+    "id" : "6700B7CA-C1B2-4A27-9C13-9A27D9671FF5",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:27:22Z",
+    "detail" : "Resume requested",
+    "device" : "iPhone",
+    "event" : "resume",
+    "id" : "DDCE7108-69C4-4526-B5DF-31AA51236060",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:27:22Z",
+    "detail" : "Pause requested",
+    "device" : "iPhone",
+    "event" : "pause",
+    "id" : "9A020338-3DEE-4AA9-91B6-71FAC3D773CA",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:27:22Z",
+    "detail" : "Stop requested",
+    "device" : "iPhone",
+    "event" : "stop",
+    "id" : "8997EF3F-3398-43E3-8F17-0829D32642F6",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:27:22Z",
+    "detail" : "Resume requested",
+    "device" : "iPhone",
+    "event" : "resume",
+    "id" : "6A97EAB4-276A-4CF1-9C62-A928FFDBC822",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:27:23Z",
+    "detail" : "Pause requested",
+    "device" : "iPhone",
+    "event" : "pause",
+    "id" : "62B1685E-6CD6-439C-B1FA-F52DC252E83F",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:27:23Z",
+    "detail" : "Stop requested",
+    "device" : "iPhone",
+    "event" : "stop",
+    "id" : "718288BC-987B-4B25-8341-6DE9B8E58411",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:27:23Z",
+    "detail" : "Resume requested",
+    "device" : "iPhone",
+    "event" : "resume",
+    "id" : "85C759DE-726F-4224-BD2A-B3A14AAAB5B4",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:27:24Z",
+    "detail" : "Pause requested",
+    "device" : "iPhone",
+    "event" : "pause",
+    "id" : "90A278A1-C90B-46CD-91A5-D113F268A666",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:27:24Z",
+    "detail" : "Stop requested",
+    "device" : "iPhone",
+    "event" : "stop",
+    "id" : "EB8DEBD8-D484-428B-A601-F5289058364C",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:27:24Z",
+    "detail" : "Resume requested",
+    "device" : "iPhone",
+    "event" : "resume",
+    "id" : "48B1E68A-026D-486A-B529-87E8B6639DB6",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:27:24Z",
+    "detail" : "Pause requested",
+    "device" : "iPhone",
+    "event" : "pause",
+    "id" : "2B25E338-5961-4FBC-8B58-6AAB9D746706",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:27:24Z",
+    "detail" : "Stop requested",
+    "device" : "iPhone",
+    "event" : "stop",
+    "id" : "E2A14DB4-9BD5-4B3A-A04E-544D4985A0F7",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:27:24Z",
+    "detail" : "Resume requested",
+    "device" : "iPhone",
+    "event" : "resume",
+    "id" : "60854A5D-E46D-41C3-8206-E671925C746C",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:27:25Z",
+    "detail" : "Pause requested",
+    "device" : "iPhone",
+    "event" : "pause",
+    "id" : "A8C0E3E8-1334-4561-8C69-5C9BA4ACCE7D",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:27:25Z",
+    "detail" : "Stop requested",
+    "device" : "iPhone",
+    "event" : "stop",
+    "id" : "8A873321-9353-4EA2-8D63-A858E67F5682",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:27:25Z",
+    "detail" : "Resume requested",
+    "device" : "iPhone",
+    "event" : "resume",
+    "id" : "7B7C7F54-F324-440C-BC52-4820A50F2778",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:27:26Z",
+    "detail" : "Pause requested",
+    "device" : "iPhone",
+    "event" : "pause",
+    "id" : "746460AC-683B-49BB-A362-9B72896F51D9",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:27:26Z",
+    "detail" : "Stop requested",
+    "device" : "iPhone",
+    "event" : "stop",
+    "id" : "7802AFE8-4BAF-4EE2-B072-7ACF9D990131",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:27:26Z",
+    "detail" : "Resume requested",
+    "device" : "iPhone",
+    "event" : "resume",
+    "id" : "455C1771-1800-4A9E-97AB-1C0B3E057630",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:27:28Z",
+    "detail" : "requested 1.06; reported 1.06",
+    "device" : "iPhone",
+    "event" : "rate_written",
+    "id" : "67D180B6-1AD0-4BAC-A011-364CBA0163E5",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:27:28Z",
+    "detail" : "playing @ 1.06",
+    "device" : "iPhone",
+    "event" : "player_state",
+    "id" : "48ECD20F-1C05-47AF-BC34-52E990CC5D73",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:27:29Z",
+    "detail" : "requested 0.94; reported 0.94",
+    "device" : "iPhone",
+    "event" : "rate_written",
+    "id" : "9AE8E8A5-ECD5-42C4-93E6-0F2F23BD377E",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:27:30Z",
+    "detail" : "playing @ 0.94",
+    "device" : "iPhone",
+    "event" : "player_state",
+    "id" : "0600D2C3-04FE-4C82-969B-9D4E8D543CBF",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:27:32Z",
+    "detail" : "Queue contains 25 tracks",
+    "device" : "iPhone",
+    "event" : "playback_started",
+    "id" : "4FCD3ADB-2116-4CE5-AB03-F9A51B521406",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:27:32Z",
+    "detail" : "Audio session interruption observed",
+    "device" : "iPhone",
+    "event" : "audio_interruption",
+    "id" : "AB51C456-7BDA-46BE-87BC-5F41B4432278",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:27:32Z",
+    "detail" : "playing @ 1.0",
+    "device" : "iPhone",
+    "event" : "player_state",
+    "id" : "69BC5C01-23B2-4321-943F-9288B60E28CD",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:27:34Z",
+    "detail" : "requested 1.0; reported 1.0",
+    "device" : "iPhone",
+    "event" : "rate_written",
+    "id" : "0F52BFBD-5F23-4B54-969A-BB95C1B82D7E",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:27:35Z",
+    "detail" : "requested 1.0; reported 1.0",
+    "device" : "iPhone",
+    "event" : "rate_written",
+    "id" : "066B2E5A-4310-4399-B844-C9D5DF6CF4CC",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  },
+  {
+    "date" : "2026-07-16T03:27:36Z",
+    "detail" : "requested 1.0; reported 1.0",
+    "device" : "iPhone",
+    "event" : "rate_written",
+    "id" : "B9CC2AF4-E53E-4E27-A1C5-9A577CBFE4C2",
+    "os" : "iOS 27.0",
+    "route" : "Speaker:Speaker"
+  }
+]

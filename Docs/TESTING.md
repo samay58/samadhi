@@ -67,7 +67,7 @@ Final frames under Evidence/Simulator/ cover ready, locked run, controls, summar
 
 Simulator verifies interaction, accessibility structure, reducer behavior, resource packaging, and deterministic motion. It cannot validate physical cadence quality, real headphone route behavior, tempo adaptation, or listening artifacts.
 
-The `Samadhi MusicKit Gate` scheme verifies that the harness and framework calls compile. Its physical run must separately pass authorization, library, preview coverage, playback, rate quality, background, interruption, and route checks.
+The `Samadhi MusicKit Gate` scheme verifies that the harness and framework calls compile. Physical traces separately prove authorization, library loading, playback, mechanical rate writes, pause, and resume. Preview coverage, listening quality, background, controlled interruption, and route checks remain separate physical gates.
 
 ## Current device checks
 
@@ -78,7 +78,13 @@ The `Samadhi MusicKit Gate` scheme verifies that the harness and framework calls
 - MusicKit harness Simulator app: launched and visually checked
 - Background audio entry in built Info.plist: verified as an array containing `audio`
 - Physical device signing, build, installation, and launch: passed
-- Authorization, media, listening, background, interruption, and route checks: in progress
+- Contextual Music authorization and 40-playlist loading: passed
+- Real playback plus 0.94, 1.00, and 1.06 rate writes: passed mechanically
+- Pause and resume observation: passed
+- Direct library preview coverage: failed at 0 of 10 in every sample
+- ISRC catalog retry: blocked because all 40 sampled tracks omitted ISRC
+- Equivalent-ID catalog retry: blocked by 40 `.developerTokenRequestFailed` results before catalog response
+- Listening, screen-lock background, controlled interruption, and route-loss checks: not proven
 
 ## Known environment behavior
 

@@ -29,13 +29,13 @@ Build in this order:
 
 ## Current gate state
 
-- Apple Music feasibility: physical run started; signing, installation, launch, and Developer Mode passed
+- Apple Music feasibility: authorization, library loading, playback, rate writes, pause, and resume passed; direct previews failed and catalog resolution is blocked by automatic developer-token failure
 - Source decision: open; neither Apple Music nor local files has been selected
 - Source-neutral domain and adaptation rules: complete for the current slice
 - Cadence boundary, deterministic filter, and Core Motion adapter: built but not physically calibrated or connected to the normal run flow
-- Device harness: running on a physical iPhone 17 Pro; authorization and media checks remain
+- Device harness: equivalent-ID catalog retry is installed on a physical iPhone 17 Pro and recorded 40 `.developerTokenRequestFailed` results
 
-While the physical gate is in progress, only work that does not choose the player path may continue. No production player implementation begins until the gate produces real evidence.
+While the physical gate is blocked, only work that does not choose the player path may continue. No production player implementation begins until automatic catalog access produces real evidence.
 
 ## Milestone boundary
 
