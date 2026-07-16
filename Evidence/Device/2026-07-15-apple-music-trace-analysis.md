@@ -10,7 +10,7 @@ Route: Built-in speaker
 
 Source: Apple Music library through MusicKit
 
-Status: Physical gate blocked by automatic developer-token acquisition. No production source decision has been made.
+Status: Historical blocked snapshot. Superseded by [2026-07-16-apple-music-token-preview-analysis.md](2026-07-16-apple-music-token-preview-analysis.md), where exact-profile signing fixed automatic token generation and ten of ten previews decoded locally. No production source decision has been made.
 
 ## Saved traces
 

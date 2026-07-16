@@ -50,17 +50,15 @@ Run a physical Apple Music feasibility gate first because MusicKit exposes libra
 
 Milestone 2 matches music tempo to stable cadence. It does not claim beat-perfect footfall phase. Rename the measured summary to tempo matched and defer a true in-step percentage until individual foot-strike timing exists.
 
-## Initial gate blocker
+## Apple Music gate history
 
-No physical iPhone, Apple development team, Apple Music account, playlist, or headphone route was available during the first Milestone 2 pass. A compiling Simulator harness was preparation, not feasibility proof.
+The first physical harness used an Xcode-managed wildcard profile. It could authorize Music, load 40 playlists, play music, accept rate writes, pause, and resume, but catalog requests failed with `.developerTokenRequestFailed` before Apple returned a response.
 
-The blocker was partially cleared on 2026-07-15. Team `ZL5U59XBJ6` is saved in the project, the explicit App ID is registered, the MusicKit App Service is user-confirmed as enabled, and the signed harness builds, installs, and launches on an iPhone 17 Pro. Authorization, library loading, playback, mechanical rate writes, pause, and resume pass. Direct previews fail, and sampled library tracks omit ISRC. Equivalent-ID catalog requests are blocked by automatic developer-token failure, so the source decision remains open.
+The exact `Samadhi Development` profile fixed automatic developer-token generation. No backend, embedded private key, or committed token is needed.
 
-Do not interpret `.developerTokenRequestFailed` as evidence that catalog previews are unavailable. Retry after service recognition or explicit-App-ID signing is corrected. Manual Media Services keys and custom token infrastructure are outside this gate unless automatic generation is deliberately abandoned.
+Library tracks still expose opaque nonnumeric identifiers, no ISRC, and no direct preview. Strict title, artist, album, and duration agreement resolved all ten City Pocket tracks to numeric catalog identifiers. Ambiguous results fail closed. The harness downloads each catalog preview into temporary app storage, decodes it locally, and deletes it immediately. Ten of ten previews yielded PCM, so the tempo-source feasibility threshold passed.
 
-## Final automatic-token repair
-
-The current signed development build used an Xcode-managed wildcard provisioning profile. Run one final Apple token test with a newly created development profile bound to the exact `com.samaydhawan.Samadhi` App ID. Inspect the embedded profile and signed identity before the request. If a clean physical build still returns `developerTokenRequestFailed`, reject Apple Music for Milestone 2 and select local files. Do not add a token backend, embed a private key, or commit a developer token.
+Apple Music remains a candidate until Bluetooth listening, locked background playback, track change, interruption, and route recovery pass on the physical iPhone.
 
 ## Spotify is not an adaptive-audio fallback
 

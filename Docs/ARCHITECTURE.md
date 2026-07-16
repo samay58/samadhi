@@ -69,7 +69,7 @@ Production services need:
 
 The music-source feasibility gate selects one production player. The codebase must not retain both Apple Music and local file playback as competing implementations after the decision.
 
-The debug-only MusicKit harness sits in the app target and is not a production player. It exists only to settle the source decision on a physical iPhone. The normal app still composes simulation.
+The debug-only MusicKit harness sits in the app target and is not a production player. It exists only to settle the source decision on a physical iPhone. For tempo-source feasibility, it resolves opaque library tracks through strict title, artist, album, and duration agreement, stores the returned numeric catalog identity, downloads the catalog preview into temporary storage, decodes local PCM, and deletes the temporary file. The normal app still composes simulation.
 
 ## Invariants
 

@@ -20,6 +20,10 @@
                             model.authorizeAndLoadPlaylists()
                         }
                         .disabled(model.isWorking)
+                        Button("Test catalog token") {
+                            model.testCatalogToken()
+                        }
+                        .disabled(model.isWorking)
                     }
 
                     Section("Library playlists") {
@@ -75,6 +79,9 @@
             }
             .task {
                 model.startMonitoring()
+                if ProcessInfo.processInfo.arguments.contains("--catalog-token-gate") {
+                    model.testCatalogToken()
+                }
             }
         }
 

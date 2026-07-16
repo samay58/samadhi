@@ -79,16 +79,29 @@
 - Pulled the live trace directly from the phone and matched it byte-for-byte to the user export
 - Recorded 40 `.developerTokenRequestFailed` results, leaving catalog preview feasibility honestly blocked rather than passed or failed
 
-## Current checkpoint
-
-Milestones 0 and 1 are complete. Milestone 2 safe groundwork is built. Authorization, library import, playback, mechanical rate writes, pause, and resume pass. Direct preview coverage fails. Catalog resolution is blocked by automatic developer-token failure. Spotify is rejected for adaptive playback. One exact-App-ID profile retry remains before the Apple Music path either continues or yields to local files.
-
 ## 2026-07-15. Music source resolution
 
-- Verified current Apple Music automatic-token configuration requirements and the meaning of `developerTokenRequestFailed`
-- Audited installed profiles and found only the Xcode-managed wildcard `ZL5U59XBJ6.*`; no exact Samadhi development profile is installed
+- At that checkpoint, verified Apple Music automatic-token configuration requirements and the meaning of `developerTokenRequestFailed`
+- At that checkpoint, found only the Xcode-managed wildcard `ZL5U59XBJ6.*`; the exact Samadhi profile was installed the following day
 - Limited remediation to one clean build signed with a fresh exact-App-ID development profile
 - Rejected embedded private keys, committed tokens, and a Samadhi token backend
 - Evaluated Spotify's current iOS SDK, player surface, development-mode rules, and Developer Policy
 - Rejected Spotify as an adaptive player because it cannot provide the required app-owned, analyzable, rate-controlled audio path
 - Specified token, tempo-source, listening, background, recovery, and local-file fallback gates in `MUSIC-SOURCE-RESOLUTION-SPEC.md`
+
+## 2026-07-16. Apple token and preview gates
+
+- Installed and verified the exact `Samadhi Development` profile and signed identifier
+- Passed automatic token generation with repeated direct catalog responses
+- Added a focused launch-argument token probe to the debug-only harness
+- Rejected nonnumeric library IDs as equivalent-ID inputs and added strict title, artist, album, and duration catalog resolution
+- Downloaded remote catalog previews to temporary app storage before local decoding
+- Passed strict catalog identity and decoded PCM coverage at 10 of 10 City Pocket tracks
+- Recorded a clean built-in-speaker listening result with no major pitch change or unpleasant artifacts at the safe-rate endpoints
+- Saved the user export and byte-matched device trace under `Evidence/Device/`
+- Passed the full serial test gate, rebuilt with the exact profile, and installed the final harness build on the physical iPhone
+- Left headphone listening, background, track change, controlled interruption, and route loss honestly open
+
+## Current checkpoint
+
+Milestones 0 and 1 are complete. Milestone 2 safe groundwork is built. Apple authorization, library import, automatic token generation, strict catalog resolution, 10 of 10 local preview decodes, playback, mechanical rate writes, pause, and resume pass. Spotify is rejected for adaptive playback. Headphone listening, background, track change, controlled interruption, and route loss remain before the source decision.
