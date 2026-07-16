@@ -27,6 +27,16 @@ Build in this order:
 5. Connect real progress, honest lock, summary, background playback, and recovery.
 6. Pass automated, calibration, listening, and outdoor-run gates.
 
+## Current gate state
+
+- Apple Music feasibility: blocked before physical execution because no physical iPhone is connected and no Apple development team is configured
+- Source decision: open; neither Apple Music nor local files has been selected
+- Source-neutral domain and adaptation rules: complete for the current slice
+- Cadence boundary, deterministic filter, and Core Motion adapter: built but not physically calibrated or connected to the normal run flow
+- Device harness: built as the `Samadhi MusicKit Gate` scheme
+
+While the physical gate is blocked, only work that does not choose the player path may continue. No production player implementation begins until the gate produces real evidence.
+
 ## Milestone boundary
 
 Included:

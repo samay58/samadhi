@@ -59,7 +59,9 @@ private let previewSend: @MainActor (RunAction) -> Void = { _ in }
 #Preview("Summary") {
     SamadhiScreen(
         state: RunViewState(
-            phase: .summary(RunSummary(durationSeconds: 1938, averageCadence: 171, timeInStepPercent: 84, songCount: 4))
+            phase: .summary(
+                RunSummary(durationSeconds: 1938, averageCadence: 171, tempoMatchedPercent: 84, songCount: 4)
+            )
         ),
         send: previewSend
     )

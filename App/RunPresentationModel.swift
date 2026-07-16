@@ -262,7 +262,15 @@ final class RunPresentationModel {
                 try? await Task.sleep(for: .seconds(1))
                 guard !Task.isCancelled else { return }
                 guard self?.state.session?.id == sessionID else { return }
-                self?.dispatch(.activeSecond)
+                let tempoMatched: Bool?
+                if case let .active(active) = self?.state,
+                    case .playing(.locked, _) = active.activity
+                {
+                    tempoMatched = true
+                } else {
+                    tempoMatched = nil
+                }
+                self?.dispatch(.activeSecond(tempoMatched: tempoMatched))
             }
         }
     }

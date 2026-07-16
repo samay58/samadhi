@@ -8,7 +8,9 @@
 
 /* Begin PBXBuildFile section */
 		08C7CAABAD85AB4BC3C88E80 /* SamadhiDomain in Frameworks */ = {isa = PBXBuildFile; productRef = FCB42BF9FF49F690F8EEE5F2 /* SamadhiDomain */; };
+		4CDD1CED415564CC371BD9F1 /* MusicKitFeasibilityModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54135107A419A0D2E9DC0C01 /* MusicKitFeasibilityModel.swift */; };
 		59F6A7F42EF07136C8A749D2 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A28146360481C17881F591C3 /* RootView.swift */; };
+		5E251FAC2B1E45BD32CE4F33 /* MusicKitFeasibilityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 288FFDAAC404B6DC56E04D4B /* MusicKitFeasibilityView.swift */; };
 		6D0A66115FB9B31D7C320CBA /* SamadhiUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84DEE35021BD9A5D2A7F5F45 /* SamadhiUITests.swift */; };
 		7447DD9A496F5085B1D37B6B /* SamadhiDomain in Frameworks */ = {isa = PBXBuildFile; productRef = C461B57BEEA896BE3B7CAC5B /* SamadhiDomain */; };
 		78FAE03DF8A4D42BD14A7DD8 /* silent-loop.wav in Resources */ = {isa = PBXBuildFile; fileRef = CDFAF5B2DD68CC941F094A15 /* silent-loop.wav */; };
@@ -42,7 +44,9 @@
 /* Begin PBXFileReference section */
 		131DED91DED56986EDD4FE9B /* SamadhiTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SamadhiTests.swift; sourceTree = "<group>"; };
 		27E4457C2F93694193D8E85D /* RunPresentationModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RunPresentationModel.swift; sourceTree = "<group>"; };
+		288FFDAAC404B6DC56E04D4B /* MusicKitFeasibilityView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicKitFeasibilityView.swift; sourceTree = "<group>"; };
 		475C0E9AEDB57921D9893CA3 /* RunTaskStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RunTaskStore.swift; sourceTree = "<group>"; };
+		54135107A419A0D2E9DC0C01 /* MusicKitFeasibilityModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicKitFeasibilityModel.swift; sourceTree = "<group>"; };
 		64781032C8A2BA5D5DD7DF6C /* Samadhi.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Samadhi.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		8200E148AF4ABACA3B47ADA2 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		84DEE35021BD9A5D2A7F5F45 /* SamadhiUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SamadhiUITests.swift; sourceTree = "<group>"; };
@@ -143,6 +147,8 @@
 		C7AB60613785D7A5C926458F /* App */ = {
 			isa = PBXGroup;
 			children = (
+				54135107A419A0D2E9DC0C01 /* MusicKitFeasibilityModel.swift */,
+				288FFDAAC404B6DC56E04D4B /* MusicKitFeasibilityView.swift */,
 				A28146360481C17881F591C3 /* RootView.swift */,
 				27E4457C2F93694193D8E85D /* RunPresentationModel.swift */,
 				475C0E9AEDB57921D9893CA3 /* RunTaskStore.swift */,
@@ -302,6 +308,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4CDD1CED415564CC371BD9F1 /* MusicKitFeasibilityModel.swift in Sources */,
+				5E251FAC2B1E45BD32CE4F33 /* MusicKitFeasibilityView.swift in Sources */,
 				59F6A7F42EF07136C8A749D2 /* RootView.swift in Sources */,
 				BFB93B5F0188CF63A19E30CB /* RunPresentationModel.swift in Sources */,
 				AADD64A3B49FF8F3E42C941C /* RunTaskStore.swift in Sources */,
@@ -504,10 +512,8 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = Samadhi;
-				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
-				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = "Config/Samadhi-Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -542,10 +548,8 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = Samadhi;
-				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
-				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = "Config/Samadhi-Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",

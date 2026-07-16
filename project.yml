@@ -31,10 +31,8 @@ targets:
         PRODUCT_BUNDLE_IDENTIFIER: com.samaydhawan.Samadhi
         PRODUCT_NAME: Samadhi
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
-        GENERATE_INFOPLIST_FILE: YES
-        INFOPLIST_KEY_CFBundleDisplayName: Samadhi
-        INFOPLIST_KEY_UILaunchScreen_Generation: YES
-        INFOPLIST_KEY_UIApplicationSceneManifest_Generation: YES
+        GENERATE_INFOPLIST_FILE: NO
+        INFOPLIST_FILE: Config/Samadhi-Info.plist
         TARGETED_DEVICE_FAMILY: "1"
         CODE_SIGN_STYLE: Automatic
   SamadhiTests:
@@ -61,3 +59,25 @@ targets:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.samaydhawan.SamadhiUITests
         GENERATE_INFOPLIST_FILE: YES
+schemes:
+  Samadhi:
+    build:
+      targets:
+        Samadhi: all
+        SamadhiTests: [test]
+        SamadhiUITests: [test]
+    run:
+      config: Debug
+    test:
+      config: Debug
+      targets:
+        - SamadhiTests
+        - SamadhiUITests
+  Samadhi MusicKit Gate:
+    build:
+      targets:
+        Samadhi: all
+    run:
+      config: Debug
+      commandLineArguments:
+        "--music-feasibility": true

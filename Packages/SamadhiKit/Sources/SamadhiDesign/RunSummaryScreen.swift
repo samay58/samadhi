@@ -26,7 +26,7 @@ struct RunSummaryScreen: View {
                     .font(.caption.weight(.medium))
                     .foregroundStyle(SamadhiColor.ink.opacity(0.62))
 
-                SummaryRhythmGauge(progress: Double(summary.timeInStepPercent) / 100)
+                SummaryRhythmGauge(percent: summary.tempoMatchedPercent)
                     .frame(maxWidth: 330)
                     .padding(.top, Space.x8)
 
@@ -161,15 +161,19 @@ private struct SummaryMetric: View {
 }
 
 private struct SummaryRhythmGauge: View {
-    let progress: Double
+    let percent: Int?
+
+    private var progress: Double {
+        Double(percent ?? 0) / 100
+    }
 
     var body: some View {
         VStack(spacing: Space.x2) {
             HStack(alignment: .firstTextBaseline) {
-                Text("Rhythm held")
+                Text("Tempo matched")
                     .font(.callout.weight(.semibold))
                 Spacer()
-                Text("\(Int(progress * 100))%")
+                Text(percent.map { "\($0)%" } ?? "Not measured")
                     .font(.title3.monospacedDigit().weight(.bold))
             }
 
@@ -207,6 +211,9 @@ private struct SummaryRhythmGauge: View {
         }
         .dynamicTypeSize(...DynamicTypeSize.accessibility2)
         .accessibilityElement(children: .ignore)
-        .accessibilityLabel("Rhythm held for \(Int(progress * 100)) percent of the run")
+        .accessibilityLabel(
+            percent.map { "Tempo matched for \($0) percent of the run" }
+                ?? "Tempo matching not measured"
+        )
     }
 }
