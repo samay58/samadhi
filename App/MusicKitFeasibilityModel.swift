@@ -25,10 +25,15 @@
         private(set) var analyzableCoverage = "Not checked"
         private(set) var entries: [FeasibilityTraceEntry] = []
         private(set) var isWorking = false
+        private(set) var currentTrack = "None"
+        private(set) var outputRoute = "none"
+        private(set) var requiresExplicitResume = false
 
         private let player = ApplicationMusicPlayer.shared
         private var monitoringTasks: [Task<Void, Never>] = []
         private var lastPlayerState = ""
+        private var lastHeartbeat = Date.distantPast
+        private var lastObservedRoute = "none"
 
         var traceURL: URL? {
             FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first?
@@ -37,25 +42,49 @@
 
         func startMonitoring() {
             guard monitoringTasks.isEmpty else { return }
-            record("harness_started", "MusicKit feasibility harness opened")
+            player.stop()
+            player.state.playbackRate = 1
+            outputRoute = currentRoute
+            lastObservedRoute = outputRoute
+            record("harness_started", "MusicKit feasibility harness opened with playback reset")
 
             monitoringTasks.append(
                 Task { [weak self] in
-                    for await _ in NotificationCenter.default.notifications(
+                    for await notification in NotificationCenter.default.notifications(
                         named: AVAudioSession.interruptionNotification)
                     {
                         guard !Task.isCancelled else { return }
-                        self?.record("audio_interruption", "Audio session interruption observed")
+                        self?.handleInterruption(notification)
+                    }
+                }
+            )
+            monitoringTasks.append(
+                Task { [weak self] in
+                    for await notification in NotificationCenter.default.notifications(
+                        named: AVAudioSession.routeChangeNotification)
+                    {
+                        guard !Task.isCancelled else { return }
+                        self?.handleRouteChange(notification)
                     }
                 }
             )
             monitoringTasks.append(
                 Task { [weak self] in
                     for await _ in NotificationCenter.default.notifications(
-                        named: AVAudioSession.routeChangeNotification)
+                        named: UIApplication.didEnterBackgroundNotification)
                     {
                         guard !Task.isCancelled else { return }
-                        self?.record("route_changed", "Audio route notification observed")
+                        self?.record("app_backgrounded", self?.playerSnapshot ?? "unknown")
+                    }
+                }
+            )
+            monitoringTasks.append(
+                Task { [weak self] in
+                    for await _ in NotificationCenter.default.notifications(
+                        named: UIApplication.didBecomeActiveNotification)
+                    {
+                        guard !Task.isCancelled else { return }
+                        self?.record("app_became_active", self?.playerSnapshot ?? "unknown")
                     }
                 }
             )
@@ -63,13 +92,19 @@
                 Task { [weak self] in
                     while !Task.isCancelled {
                         guard let self else { return }
-                        let snapshot =
-                            "\(String(describing: player.state.playbackStatus)) @ \(player.state.playbackRate)"
-                        if snapshot != lastPlayerState {
-                            lastPlayerState = snapshot
-                            record("player_state", snapshot)
+                        let state = playerStateSignature
+                        if state != lastPlayerState {
+                            lastPlayerState = state
+                            record("player_state", playerSnapshot)
                         }
-                        try? await Task.sleep(for: .milliseconds(500))
+                        if player.state.playbackStatus == .playing,
+                            Date().timeIntervalSince(lastHeartbeat) >= 15
+                        {
+                            lastHeartbeat = Date()
+                            record("playback_heartbeat", playerSnapshot)
+                        }
+                        observeRoute()
+                        try? await Task.sleep(for: .seconds(1))
                     }
                 }
             )
@@ -133,12 +168,13 @@
                     self.record("playback_blocked", "Select a playlist with tracks first")
                     return
                 }
-                let session = AVAudioSession.sharedInstance()
-                try session.setCategory(.playback, mode: .default)
-                try session.setActive(true)
                 self.player.queue = ApplicationMusicPlayer.Queue(for: self.tracks)
                 try await self.player.play()
-                self.record("playback_started", "Queue contains \(self.tracks.count) tracks")
+                self.requiresExplicitResume = false
+                self.record(
+                    "playback_started",
+                    "Queue contains \(self.tracks.count) tracks; \(self.playerSnapshot)"
+                )
             }
         }
 
@@ -155,20 +191,107 @@
         func resume() {
             run {
                 try await self.player.play()
-                self.record("resume", "Resume requested")
+                self.requiresExplicitResume = false
+                self.record("explicit_resume", "Resume requested; \(self.playerSnapshot)")
             }
         }
 
         func next() {
             run {
+                let previousTrack = self.currentTrack
                 try await self.player.skipToNextEntry()
-                self.record("next_track", "Skip requested")
+                try? await Task.sleep(for: .seconds(1))
+                self.updatePlayerPresentation()
+                self.record(
+                    "next_track_observed",
+                    "\(previousTrack) -> \(self.currentTrack); \(self.playerSnapshot)"
+                )
             }
         }
 
         func stop() {
             player.stop()
             record("stop", "Stop requested")
+        }
+
+        private func handleInterruption(_ notification: Notification) {
+            let rawType = notification.userInfo?[AVAudioSessionInterruptionTypeKey] as? UInt
+            let type = rawType.flatMap(AVAudioSession.InterruptionType.init(rawValue:))
+            let rawOptions = notification.userInfo?[AVAudioSessionInterruptionOptionKey] as? UInt ?? 0
+            let options = AVAudioSession.InterruptionOptions(rawValue: rawOptions)
+            let rawReason = notification.userInfo?[AVAudioSessionInterruptionReasonKey] as? UInt
+
+            if type == .began {
+                player.pause()
+                requiresExplicitResume = true
+            }
+            record(
+                type == .began ? "interruption_began" : "interruption_ended",
+                "type \(rawType.map(String.init) ?? "none"); reason \(rawReason.map(String.init) ?? "none"); options \(options.rawValue); explicit resume \(requiresExplicitResume)"
+            )
+        }
+
+        private func handleRouteChange(_ notification: Notification) {
+            let rawReason = notification.userInfo?[AVAudioSessionRouteChangeReasonKey] as? UInt
+            let reason = rawReason.flatMap(AVAudioSession.RouteChangeReason.init(rawValue:))
+            let previousRoute =
+                (notification.userInfo?[AVAudioSessionRouteChangePreviousRouteKey] as? AVAudioSessionRouteDescription)
+                .map(routeDescription) ?? "unknown"
+
+            outputRoute = currentRoute
+            lastObservedRoute = outputRoute
+            if reason == .oldDeviceUnavailable {
+                player.pause()
+                requiresExplicitResume = true
+                record(
+                    "route_lost",
+                    "\(previousRoute) -> \(outputRoute); paused; explicit resume required"
+                )
+                return
+            }
+            record(
+                "route_changed",
+                "reason \(routeChangeReasonName(reason)); \(previousRoute) -> \(outputRoute); explicit resume \(requiresExplicitResume)"
+            )
+        }
+
+        private func observeRoute() {
+            let observedRoute = currentRoute
+            guard observedRoute != lastObservedRoute else { return }
+
+            let previousRoute = lastObservedRoute
+            lastObservedRoute = observedRoute
+            outputRoute = observedRoute
+            if previousRoute.contains("BluetoothA2DPOutput"),
+                !observedRoute.contains("BluetoothA2DPOutput")
+            {
+                player.pause()
+                requiresExplicitResume = true
+                record(
+                    "route_lost",
+                    "\(previousRoute) -> \(observedRoute); paused; explicit resume required"
+                )
+            } else {
+                record(
+                    "route_observed",
+                    "\(previousRoute) -> \(observedRoute); explicit resume \(requiresExplicitResume)"
+                )
+            }
+        }
+
+        private func routeChangeReasonName(_ reason: AVAudioSession.RouteChangeReason?) -> String {
+            switch reason {
+            case .newDeviceAvailable: "newDeviceAvailable"
+            case .oldDeviceUnavailable: "oldDeviceUnavailable"
+            case .categoryChange: "categoryChange"
+            case .override: "override"
+            case .wakeFromSleep: "wakeFromSleep"
+            case .noSuitableRouteForCategory: "noSuitableRouteForCategory"
+            case .routeConfigurationChange: "routeConfigurationChange"
+            case .unknown: "unknown"
+            case nil: "none"
+            @unknown default: "unrecognized"
+            }
         }
 
         private func run(_ operation: @escaping @MainActor () async throws -> Void) {
@@ -361,6 +484,7 @@
 
         private func record(_ event: String, _ detail: String) {
             let device = UIDevice.current
+            updatePlayerPresentation()
             entries.append(
                 FeasibilityTraceEntry(
                     id: UUID(),
@@ -376,9 +500,32 @@
         }
 
         private var currentRoute: String {
-            let outputs = AVAudioSession.sharedInstance().currentRoute.outputs
+            routeDescription(AVAudioSession.sharedInstance().currentRoute)
+        }
+
+        private func routeDescription(_ route: AVAudioSessionRouteDescription) -> String {
+            let outputs = route.outputs
             guard !outputs.isEmpty else { return "none" }
             return outputs.map { "\($0.portType.rawValue):\($0.portName)" }.joined(separator: ", ")
+        }
+
+        private var playerSnapshot: String {
+            let entry = player.queue.currentEntry
+            let title = entry?.title ?? "none"
+            let id = entry?.id ?? "none"
+            return
+                "\(String(describing: player.state.playbackStatus)) @ \(player.state.playbackRate); \(title); id \(id); time \(String(format: "%.1f", player.playbackTime))"
+        }
+
+        private var playerStateSignature: String {
+            let entryID = player.queue.currentEntry?.id ?? "none"
+            return
+                "\(String(describing: player.state.playbackStatus)) @ \(player.state.playbackRate); \(entryID)"
+        }
+
+        private func updatePlayerPresentation() {
+            currentTrack = player.queue.currentEntry?.title ?? "None"
+            outputRoute = currentRoute
         }
 
         private func saveTrace() {

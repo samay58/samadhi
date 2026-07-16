@@ -25,11 +25,11 @@ Tempo matching is also narrower than beat-perfect synchronization. Live pedomete
 
 The runner chooses one existing collection, presses Start, and begins moving. Samadhi plays real music, acquires real cadence, selects the musically equivalent beat rate for the current track, and gently adjusts playback speed within a conservative range. Once the rate settles, the interface confirms that the tempo is matched and withdraws.
 
-Playlist import comes before playlist generation. The first production source is chosen by a short device feasibility gate:
+Playlist import comes before playlist generation. Apple Music was selected after the device feasibility work resolved token, tempo-source, playback, Bluetooth routing, and live-rate risk:
 
-- Prefer Apple Music if library import, tempo analysis, rate control, background playback, and listening quality all pass.
-- Fall back to multi-file import from Files and an `AVAudioEngine` player if any load-bearing Apple Music capability fails.
-- Do not maintain two production playback systems in this milestone.
+- Use Apple Music as the one production playback system.
+- Keep long-form background, interruption, route-loss, and listening checks as Milestone 2 completion gates.
+- Do not build a local-file player, Spotify player, or second production system in this milestone.
 
 The existing run interface stays recognizable. Ready gains a focused music-selection path. The active run screen reuses its aperture, progress, controls, recovery, and finish behavior. Labels become honest about measured capability.
 
@@ -339,21 +339,18 @@ The milestone requires all of the following:
 
 ### Where we are now
 
-Milestones 0 and 1 are complete. Milestone 2 source-neutral models, adaptation policy, cadence filtering, Core Motion boundary, honest summary measurement, and device harness are built. The signed harness installs and launches on a physical iPhone 17 Pro. Exact-App-ID signing fixed automatic token generation. Authorization, library loading, strict catalog resolution, 10 of 10 local preview decodes, real playback, live rate writes, pause, and resume pass. Spotify is rejected for adaptive playback. Headphone listening, background, next track, controlled interruption, and route loss now decide whether Apple Music becomes the production source or the local-file fallback begins. See [MUSIC-SOURCE-RESOLUTION-SPEC.md](MUSIC-SOURCE-RESOLUTION-SPEC.md).
+Milestones 0 and 1 are complete. Apple Music is the selected Milestone 2 source. Source-neutral models, adaptation policy, cadence filtering, Core Motion boundary, honest measurement, production playback contract, deterministic player, Apple Music adapter, and focused device harness are built. The adapter receives identified progress and recovery events. The normal app still defaults to simulation until import is connected. Bluetooth listening notes, background, next track, controlled interruption, and route loss remain completion gates. See [MUSIC-SOURCE-RESOLUTION-SPEC.md](MUSIC-SOURCE-RESOLUTION-SPEC.md).
 
 ### Build order
 
-1. Run the Apple Music feasibility gate on a physical iPhone.
-2. Record the source decision before building surrounding UI.
-3. Add source-neutral domain models and deterministic adaptation-policy tests.
-4. Replace simulated cadence with a Core Motion provider behind the existing boundary.
-5. Prove one known-tempo track through the selected player.
-6. Build tempo analysis and its validation corpus.
-7. Connect collection import, persistence, and real track progress.
-8. Update honest lock and summary labels.
-9. Complete repeatable automated gates.
-10. Run cadence calibration, listening checks, and the outdoor completion gate.
-11. Save evidence, update active documentation, remove rejected spike code, and push main.
+1. Run one verified-tempo catalog track through the Apple Music adapter.
+2. Connect Core Motion cadence and the bounded adaptation policy.
+3. Build tempo analysis and its validation corpus.
+4. Connect playlist import, persistence, real progress, and track transitions.
+5. Connect honest lock and summary measurement to applied player state.
+6. Complete repeatable automated gates.
+7. Run cadence calibration, listening, background, recovery, and the outdoor completion gate.
+8. Save evidence, update active documentation, and push main.
 
 Do not redesign the app before the source decision and core audio loop pass. Do not build playlist generation before imported music works. Do not keep a failed player path “for later.”
 

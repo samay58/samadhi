@@ -68,6 +68,14 @@ public struct RunReducer: Sendable {
                 return (state, [])
             }
 
+        case let (
+            .preparing(preparation),
+            .playbackFailed(sessionID, operationID)
+        )
+        where preparation.session.id == sessionID
+            && preparation.session.playbackOperationID == operationID:
+            return (.ready, [.cancelAllTasks(sessionID: sessionID)])
+
         case let (.active(active), .cadenceLocked(sessionID, acquisitionID, spm)):
             // Both IDs must match because an old sensor callback can arrive after a restart.
             guard active.session.id == sessionID,
@@ -174,12 +182,14 @@ public struct RunReducer: Sendable {
             next.session.trackIndex = (next.session.trackIndex + 1) % trackCount
             next.session.songCount += 1
             next.session.trackElapsedSeconds = 0
+            next.session.trackDurationSeconds = nil
             return (.active(next), [.skipTrack(sessionID: active.session.id)])
 
         case let (.active(active), .previousTapped):
             var next = active
             next.session.trackIndex = (next.session.trackIndex - 1 + trackCount) % trackCount
             next.session.trackElapsedSeconds = 0
+            next.session.trackDurationSeconds = nil
             return (.active(next), [.previousTrack(sessionID: active.session.id)])
 
         case let (.active(active), .finishTapped):
@@ -282,6 +292,64 @@ public struct RunReducer: Sendable {
                 ),
                 effects
             )
+
+        case let (
+            .active(active),
+            .playbackProgress(
+                sessionID,
+                operationID,
+                trackIndex,
+                elapsedSeconds,
+                durationSeconds
+            )
+        ):
+            guard active.session.id == sessionID,
+                active.session.playbackOperationID == operationID,
+                (0..<trackCount).contains(trackIndex)
+            else { return (state, []) }
+            var next = active
+            if next.session.trackIndex != trackIndex {
+                next.session.trackIndex = trackIndex
+                next.session.songCount += 1
+            }
+            next.session.trackElapsedSeconds = max(elapsedSeconds, 0)
+            next.session.trackDurationSeconds = max(durationSeconds, 0)
+            return (.active(next), [])
+
+        case let (
+            .active(active),
+            .playbackRouteLost(sessionID, operationID)
+        ),
+            let (
+                .active(active),
+                .playbackInterrupted(sessionID, operationID)
+            ),
+            let (
+                .active(active),
+                .playbackFailed(sessionID, operationID)
+            ):
+            guard active.session.id == sessionID,
+                active.session.playbackOperationID == operationID
+            else { return (state, []) }
+            return routeRecovery(from: active.session, origin: active.activity)
+
+        case let (
+            .routeRecovery(recovery),
+            .playbackRouteRestored(sessionID, operationID)
+        ),
+            let (
+                .routeRecovery(recovery),
+                .playbackInterruptionEnded(sessionID, operationID)
+            ):
+            guard recovery.session.id == sessionID,
+                recovery.session.playbackOperationID == operationID
+            else { return (state, []) }
+            var next = recovery
+            next.availability = .restored
+            if case .paused = recovery.origin {
+                return (.active(ActiveRun(session: recovery.session, activity: recovery.origin)), [])
+            }
+            return (.routeRecovery(next), [])
 
         case let (.active(active), .activeSecond(tempoMatched)):
             // Only stable playback enters the summary. Paused and cadence-acquisition time is excluded.

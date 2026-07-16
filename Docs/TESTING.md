@@ -9,7 +9,7 @@
 
 Scripts/test.sh runs Swift package tests, app-model tests, and UI tests serially on iPhone 17 Pro Simulator.
 
-The current gate passed 29 Swift package tests, 2 app-model tests, and 4 UI tests. The result summary lives at `Evidence/Logs/final-test-summary.json`; the full log lives at `Evidence/Logs/milestone-2-safe-groundwork-test.log`.
+The 2026-07-16 full gate passed 32 Swift package tests, 2 app-model tests, and 4 UI tests. The added coverage proves identified playback progress, preparation failure, and the deterministic player contract.
 
 Formatter gate:
 
@@ -88,12 +88,15 @@ The `Samadhi MusicKit Gate` scheme verifies that the harness and framework calls
 - Strict catalog resolution: passed for 10 of 10 City Pocket tracks with 0.0-second duration deltas
 - Temporary preview download and PCM decode: passed for 10 of 10 City Pocket tracks
 - Built-in-speaker listening: passed provisionally; no major pitch change or unpleasant artifacts were reported at 0.94 and 1.06
+- Bluetooth A2DP route: passed on Beoplay Eleven
+- Bluetooth rate writes during playback: passed at 0.94, 1.00, and 1.06
+- Bluetooth listening note: not recorded
 - Spotify adaptive playback: rejected by documented platform capability and policy review; no code spike warranted
-- Bluetooth listening, screen-lock background, next track, controlled interruption, and route-loss checks: not proven
+- Screen-lock background, next track, controlled interruption, and route-loss checks: deferred to the reliability gate
 
 ## Next source gate
 
-Repeat the speaker result on a Bluetooth headphone route at 0.94, 1.00, and 1.06, listening for pitch change, clicks, gaps, warble, or instability. If acceptable, prove five screen-locked minutes, next track, controlled interruption, and route loss. Save the trace and listening notes under `Evidence/Device/`. Mechanical rate writes do not pass the listening gate.
+Run one verified-tempo catalog track through the production adapter, then connect Core Motion and the adaptation policy. Before Milestone 2 completion, record a concise Bluetooth listening note and prove five screen-locked minutes, next track, controlled interruption, and route loss.
 
 ## Known environment behavior
 

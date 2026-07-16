@@ -12,9 +12,9 @@
 | Audio timing | Simulated only | Deterministic beat-clock tests |
 | Playlist import | Specified, not started | Milestone 2 spec |
 | Adaptation policy | Built, not connected to a real player | Deterministic policy tests |
-| Apple Music feasibility | Token and tempo-source passed; speaker listening passed; headphones and recovery open | Exact-profile trace with 10 of 10 decoded previews |
+| Apple Music feasibility | Source selected; Bluetooth route and rate writes passed; long-form reliability deferred | Exact-profile traces and explicit product decision |
 | Spotify feasibility | Rejected for adaptive playback | Remote-control architecture, missing music rate control, and content policy conflict |
-| Production player | Undecided | Physical gate required |
+| Production player | Apple Music selected; adapter built behind a core-loop launch path | Source-neutral contract and generic iPhone build |
 | Physical run validation | MusicKit feasibility run in progress; outdoor run not started | Requires completed source decision and route matrix |
 
 ## Completed
@@ -74,18 +74,22 @@
 - Added strict title, artist, album, and duration catalog resolution that fails closed on ambiguity and persists the returned numeric catalog ID
 - Downloaded remote preview assets into temporary app storage and decoded 10 of 10 City Pocket previews to PCM
 - Recorded a clean built-in-speaker listening pass across the safe-rate endpoints; Bluetooth listening remains required
+- Reached Beoplay Eleven over Bluetooth A2DP and applied 0.94, 1.00, and 1.06 during real playback
+- Selected Apple Music as the one production source after Samay explicitly deferred further repetitive manual drills
+- Added a source-neutral production player contract, deterministic player, Apple Music adapter, and identified progress and recovery events
+- Added a dedicated `Samadhi Apple Music Core Loop` scheme around catalog track `1092027177`
 
 ## Proof
 
 The current serial gate passed:
 
-- 29 Swift package tests
+- 32 Swift package tests
 - 2 app-model tests
 - 4 UI tests
 - Swift formatter lint
 - Resource-inclusive Simulator build
 - Unsigned generic iPhone build
-- Signed physical iPhone build and install
+- Signed physical iPhone build with the exact development profile
 
 Durable logs and final visual frames live under Evidence/.
 
@@ -93,8 +97,8 @@ The MusicKit harness launches in Simulator and on the connected physical iPhone.
 
 ## Known limits
 
-No physical run has validated cadence quality. Built-in-speaker listening found no major pitch change or unpleasant artifacts at the safe-rate endpoints, but Bluetooth listening remains open. The normal app still uses silent bundled media, simulated cadence, and simulated beat timing. Apple authorization, library loading, automatic token generation, catalog resolution, 10 of 10 preview decodes, playback, live rate writes, pause, and resume pass. Spotify is not a viable substitute for adaptive playback. Track change, screen-lock playback, controlled interruption, and route loss remain unproven.
+No physical run has validated cadence quality. Built-in-speaker listening found no major pitch change or unpleasant artifacts at the safe-rate endpoints. Bluetooth routing and rate writes pass, but no separate Bluetooth listening note was recorded. The normal app still defaults to silent bundled media, simulated cadence, and simulated beat timing. The Apple Music adapter is available only through the focused core-loop scheme while import remains unfinished. Track change, five locked minutes, controlled interruption, and route loss remain reliability gates.
 
 ## WHERE WE LEFT OFF
 
-Milestone 2 safe groundwork is built. The exact Samadhi profile fixed automatic token generation. City Pocket passed strict catalog resolution and local PCM decoding at 10 of 10 tracks. Apple Music remains the active candidate. Complete headphone listening at 0.94, 1.00, and 1.06, then prove five locked minutes, next track, controlled interruption, and route loss. Any load-bearing failure still selects local files. The full decision is in [MUSIC-SOURCE-RESOLUTION-SPEC.md](MUSIC-SOURCE-RESOLUTION-SPEC.md).
+Apple Music is selected. The player contract, deterministic test player, Apple Music adapter, real progress events, and focused core-loop scheme are built. Next, run one catalog track through the adapter with a verified tempo, then connect real Core Motion cadence and adaptation. Five locked minutes, track change, controlled interruption, and route loss remain mandatory before Milestone 2 completion, but no longer block implementation. The full decision is in [MUSIC-SOURCE-RESOLUTION-SPEC.md](MUSIC-SOURCE-RESOLUTION-SPEC.md).

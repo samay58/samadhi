@@ -20,12 +20,12 @@ Milestone 2 turns the interaction prototype into a useful music product.
 
 Build in this order:
 
-1. Repeat the clean built-in-speaker listening result at 0.94, 1.00, and 1.06 on a Bluetooth headphone route.
-2. Prove five screen-locked minutes, next track, controlled interruption, and route loss. If any load-bearing check fails, choose local file import immediately.
-3. Prove real cadence and one known-tempo track through the selected player.
-4. Add tempo analysis and import at least three usable tracks.
-5. Connect real progress, honest lock, summary, background playback, and recovery.
-6. Pass automated, calibration, listening, and outdoor-run gates.
+1. Run one catalog track with a verified tempo through the Apple Music adapter.
+2. Connect Core Motion cadence and bounded rate adaptation through the existing reducer boundary.
+3. Add tempo analysis and import at least three usable playlist tracks.
+4. Connect persistent selection, real progress, track transitions, honest lock, and summary.
+5. Complete five locked minutes, next track, interruption, route loss, accessibility, and recovery checks.
+6. Pass cadence calibration, listening, and the outdoor-run gate.
 
 ## Current gate state
 
@@ -33,12 +33,13 @@ Build in this order:
 - Token remediation: complete; exact profile `Samadhi Development` fixed catalog access
 - Tempo-source feasibility: passed for City Pocket at 10 of 10 decoded previews; analyzer accuracy remains a later gate
 - Spotify feasibility: rejected for adaptive playback; it cannot supply the required app-owned, analyzable, rate-controlled audio path
-- Source decision: open; neither Apple Music nor local files has been selected
+- Source decision: Apple Music selected on 2026-07-16; remaining manual drills moved to the reliability gate
 - Source-neutral domain and adaptation rules: complete for the current slice
 - Cadence boundary, deterministic filter, and Core Motion adapter: built but not physically calibrated or connected to the normal run flow
-- Device harness: exact-profile catalog search, strict identity resolution, temporary preview download, local PCM decoding, playback, rate controls, route observation, and trace export are installed on a physical iPhone 17 Pro
+- Production playback: source-neutral contract, deterministic player, Apple Music adapter, identified events, real duration progress, and a core-loop scheme are built
+- Device harness: exact-profile catalog search, strict identity resolution, temporary preview download, local PCM decoding, playback, rate controls, route observation, and trace export remain available on the physical iPhone 17 Pro
 
-The exact execution and stop rules live in [MUSIC-SOURCE-RESOLUTION-SPEC.md](MUSIC-SOURCE-RESOLUTION-SPEC.md). No production player implementation begins until listening, background, and recovery produce real evidence. A load-bearing failure selects local files rather than opening a backend or second-provider project.
+The source decision and deferred reliability requirements live in [MUSIC-SOURCE-RESOLUTION-SPEC.md](MUSIC-SOURCE-RESOLUTION-SPEC.md). A later reliability failure must be fixed before Milestone 2 completion. It does not reopen Spotify or a second-provider project.
 
 ## Milestone boundary
 

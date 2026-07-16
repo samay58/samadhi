@@ -19,7 +19,7 @@ The exact `Samadhi Development` profile is installed. Automatic token generation
 
 Do not create a Media Services key, embed a developer token, or add a token backend for this gate.
 
-## Apple Music feasibility run after token pass
+## Deferred Apple Music reliability run
 
 1. Connect and trust an unlocked iPhone, then confirm Developer Mode is enabled.
 2. Confirm the phone appears in `xcrun devicectl list devices` as a physical device.
@@ -29,6 +29,6 @@ Do not create a Media Services key, embed a developer token, or add a token back
 6. Attach one Bluetooth A2DP headphone route and open one library playlist with at least ten tracks.
 7. Run authorization, playlist loading, decoded preview coverage, playback, the 0.94, 1.00, and 1.06 rate writes, pause, resume, next track, interruption, route loss, and five screen-locked minutes.
 8. Share the harness JSON trace and save listening notes under `Evidence/Device/` with device, OS, route, playlist, result, and date.
-9. Make the source decision. Keep MusicKit only if every load-bearing item passes; otherwise remove the spike and select local file import with AVAudioEngine.
+9. Save the result as the selected Apple Music adapter's reliability evidence. The source decision is already closed.
 
-Physical cadence and audio quality remain unproven. Simulator evidence must never be described as a real-run result.
+Physical cadence remains unproven. Bluetooth routing and rate writes pass, but a dedicated Bluetooth listening note and the long-form recovery checks remain open. Simulator evidence must never be described as a real-run result.

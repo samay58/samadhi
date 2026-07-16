@@ -35,8 +35,10 @@ public struct RunSession: Sendable, Equatable {
     public var songCount: Int
     public var trackIndex: Int
     public var trackElapsedSeconds: Int
+    public var trackDurationSeconds: Int?
+    public var playbackOperationID: Int
 
-    public init(id: Int, mode: RunMode = .adaptive) {
+    public init(id: Int, mode: RunMode = .adaptive, playbackOperationID: Int? = nil) {
         self.id = id
         self.mode = mode
         elapsedActiveSeconds = 0
@@ -47,6 +49,8 @@ public struct RunSession: Sendable, Equatable {
         songCount = 1
         trackIndex = 0
         trackElapsedSeconds = 0
+        trackDurationSeconds = nil
+        self.playbackOperationID = playbackOperationID ?? id
     }
 
     public mutating func recordSecond(cadence: Int?, tempoMatched: Bool?) {
@@ -157,6 +161,7 @@ public enum HapticEvent: Sendable, Equatable {
 public enum RunTaskKind: Sendable, Equatable, Hashable {
     case authorization
     case preparation
+    case playbackCommand
     case acquisition
     case controlsTimeout
     case finishHold
@@ -205,6 +210,18 @@ public enum RunEvent: Sendable, Equatable {
     case audioRouteLost
     case audioRouteRestored
     case routeResumeTapped(acquisitionID: Int, timeoutID: Int)
+    case playbackProgress(
+        sessionID: Int,
+        operationID: Int,
+        trackIndex: Int,
+        elapsedSeconds: Int,
+        durationSeconds: Int
+    )
+    case playbackRouteLost(sessionID: Int, operationID: Int)
+    case playbackRouteRestored(sessionID: Int, operationID: Int)
+    case playbackInterrupted(sessionID: Int, operationID: Int)
+    case playbackInterruptionEnded(sessionID: Int, operationID: Int)
+    case playbackFailed(sessionID: Int, operationID: Int)
     case activeSecond(tempoMatched: Bool?)
     case finishCompleted(sessionID: Int)
     case summaryDismissed

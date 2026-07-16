@@ -102,6 +102,16 @@
 - Passed the full serial test gate, rebuilt with the exact profile, and installed the final harness build on the physical iPhone
 - Left headphone listening, background, track change, controlled interruption, and route loss honestly open
 
+## 2026-07-16. Production player selected
+
+- Reached Beoplay Eleven through Bluetooth A2DP and applied 0.94, 1.00, and 1.06 during real playback
+- Stopped the repetitive manual trace loop after Samay explicitly deferred the remaining drills
+- Selected Apple Music as the one production source while keeping long-form reliability checks open
+- Added a source-neutral player contract, deterministic player, Apple Music adapter, and identified progress and recovery events
+- Added a focused Apple Music core-loop scheme around one real catalog track
+- Preserved the normal deterministic app flow until playlist import is ready
+- Passed formatting, 32 package tests, 2 app-model tests, and 4 UI tests on the implementation tree
+
 ## Current checkpoint
 
-Milestones 0 and 1 are complete. Milestone 2 safe groundwork is built. Apple authorization, library import, automatic token generation, strict catalog resolution, 10 of 10 local preview decodes, playback, mechanical rate writes, pause, and resume pass. Spotify is rejected for adaptive playback. Headphone listening, background, track change, controlled interruption, and route loss remain before the source decision.
+Milestones 0 and 1 are complete. Apple Music is the selected Milestone 2 source. The production player boundary and adapter are built, while the normal app remains deterministic until import is connected. Next comes one verified-tempo catalog track through the adapter, real Core Motion cadence, and bounded adaptation. Bluetooth listening notes and long-form background and recovery checks remain before Milestone 2 completion.
