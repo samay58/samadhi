@@ -18,9 +18,11 @@ Playlist import, real cadence, adaptive playback, honest measurement, source sel
 
 Milestone 2 turns the interaction prototype into a useful music product.
 
+The finish line is one real outdoor run, not a feature checklist. Samay should be able to import one Apple Music playlist, start running, hear music settle into his cadence, lock the phone, recover from normal interruptions, finish, and trust the summary. Stop expanding scope until that run works.
+
 Build in this order:
 
-1. Physically prove one imported playlist with at least three ready tracks and relaunch restore.
+1. Relaunch the physical app and prove the persisted 13-ready-track playlist restores.
 2. Verify real progress, track transitions, honest lock, and summary across those tracks.
 3. Complete five locked minutes, interruption, route loss, accessibility, and recovery checks.
 4. Pass cadence calibration, listening, and the outdoor-run gate.
@@ -38,9 +40,10 @@ Build in this order:
 - Production playback: validated catalog fixture `1558215042`, live cadence updates, bounded reducer effects, identified MusicKit read-back, and honest measurement are connected
 - Playlist import and persistence: implemented with strict resolution, local preview analysis, versioned cache keys, atomic replacement, honest per-track states, and ready-only production filtering
 - Normal run composition: restored imported tracks use Apple Music playback and Core Motion; deterministic fixtures remain available for tests and previews
-- Automated body-to-music gate: 48 package tests, 7 app-model tests, 8 UI tests, formatter, exact-profile build, installation, and launch pass
+- Automated body-to-music gate: 48 package tests, 9 app-model tests, 8 UI tests, formatter, exact-profile build, and installation pass; the prior normal build also launched successfully
 - Physical body-to-music observation: passed; the corrected 59-second run averaged 155 SPM and measured 98 percent tempo matched from MusicKit read-back
-- Physical imported-collection gate: test build installed; real playlist analysis, three-ready-track threshold, relaunch restore, and multi-track run remain open
+- Physical imported-collection gate: real playlist selection and local analysis passed at 13 of 25 ready tracks; relaunch restore and multi-track run remain open
+- Device evidence: debug builds persist one latest completed-run diagnostic file for direct container retrieval; refreshed physical build and installation pass, with launch blocked only by device lock
 - Device harness: exact-profile catalog search, strict identity resolution, temporary preview download, local PCM decoding, playback, rate controls, route observation, and trace export remain available on the physical iPhone 17 Pro
 
 The source decision and deferred reliability requirements live in [MUSIC-SOURCE-RESOLUTION-SPEC.md](MUSIC-SOURCE-RESOLUTION-SPEC.md). A later reliability failure must be fixed before Milestone 2 completion. It does not reopen Spotify or a second-provider project.

@@ -77,6 +77,8 @@ The debug-only MusicKit harness sits in the app target and is not a production p
 
 `TempoCorpusValidator` is an opt-in development executable. It validates fixed catalog identities whose published titles declare tempo, analyzes temporary provider-hosted previews, writes JSON evidence, and removes the audio. Normal automated tests remain offline.
 
+Debug builds overwrite one local latest-run diagnostic file after finish. `RunDiagnosticsRecorder` observes accepted reducer transitions from the app shell and records player progress, cadence, rate feedback, track changes, recovery events, and summary truth. `RunDiagnosticsStore` writes that snapshot atomically under Application Support. It does not change reducer state or create product run history.
+
 ## Invariants
 
 - UI reports capability honestly

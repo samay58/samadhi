@@ -9,7 +9,7 @@
 
 Scripts/test.sh runs Swift package tests, app-model tests, and UI tests serially on iPhone 17 Pro Simulator.
 
-The 2026-07-16 full serial gate passed 48 package tests, 7 app-model tests, and 8 UI tests.
+The 2026-07-20 full serial gate passed 48 package tests, 9 app-model tests, and 8 UI tests.
 
 Formatter gate:
 
@@ -79,7 +79,7 @@ UI tests cover:
 - Partial import with visible failures and an enabled ready-track start
 - Import failure and retry
 
-App-model tests cover ready mapping, start transition, atomic store round trips, corrupt persistence, restored selection, and cancellation of stale replacement work.
+App-model tests cover ready mapping, start transition, atomic store round trips, corrupt persistence, restored selection, cancellation of stale replacement work, latest-run diagnostic persistence, and a reducer-driven diagnostic timeline through finish.
 
 ## Visual proof
 
@@ -101,6 +101,8 @@ The `Samadhi MusicKit Gate` scheme verifies that the harness and framework calls
 - Background audio entry in built Info.plist: verified as an array containing `audio`
 - Physical device signing, build, installation, and launch: passed
 - Import-capable normal app exact-profile build, installation, and launch: passed
+- Latest-run diagnostics exact-profile build and installation: passed; existing selected playlist survived byte-for-byte
+- Latest-run diagnostics foreground launch: blocked because the physical iPhone is locked
 - Focused body-to-music exact-profile build, installation, and launch argument: passed
 - Physical cadence seam: passed for a 29-second walk with changing cadence and a 142 SPM average
 - Automatic cadence-driven rate response: passed; the corrected 59-second physical run averaged 155 SPM and measured 98 percent tempo matched from MusicKit read-back
@@ -120,11 +122,12 @@ The `Samadhi MusicKit Gate` scheme verifies that the harness and framework calls
 - Bluetooth listening note: not recorded
 - Spotify adaptive playback: rejected by documented platform capability and policy review; no code spike warranted
 - Screen-lock background, next track, controlled interruption, and route-loss checks: deferred to the reliability gate
-- Real playlist with at least three ready tracks and relaunch restore: not yet physically run
+- Real playlist selection and analysis: passed at 13 ready, 8 unreadable, and 4 unavailable tracks from a 25-track physical selection
+- Relaunch restoration and imported multi-track playback: not yet physically run
 
 ## Next implementation gate
 
-Select one moderate real playlist in the installed normal app. Confirm at least three tracks become ready, relaunch to prove restoration, and run through a real track transition. Before Milestone 2 completion, record one concise Bluetooth listening note and prove five screen-locked minutes, controlled interruption, and route loss.
+Relaunch the installed normal app while the phone is unlocked, confirm `Strut Frequency -- July 2026` restores with 13 ready tracks, and run through a real track transition. Pull `latest-run-diagnostics.json` after finish. Before Milestone 2 completion, record one concise Bluetooth listening note and prove five screen-locked minutes, controlled interruption, and route loss.
 
 ## Known environment behavior
 

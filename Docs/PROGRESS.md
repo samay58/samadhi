@@ -185,6 +185,18 @@
 - Built with the exact development profile, installed the normal test build, and launched it on Samay's iPhone
 - Left one real playlist, three ready tracks, relaunch restore, and multi-track playback open for physical proof
 
+## 2026-07-20. Physical import evidence and run diagnostics
+
+- Pulled the Xcode-installed app container directly from Samay's connected iPhone
+- Verified `Strut Frequency -- July 2026` persisted with 25 tracks: 13 ready, 8 unreadable, and 4 unavailable
+- Passed the physical three-ready-track import threshold without asking Samay to repeat analysis
+- Kept raw personal library metadata out of the repository and saved counts plus checksum as durable evidence
+- Found relaunch blocked only because the phone was locked
+- Added debug-only latest-run diagnostics for real progress, cadence, target and applied rates, track changes, recovery events, and summary
+- Passed formatter lint, a Simulator build, 48 package tests, 9 app-model tests, and 8 UI tests
+- Built and installed the diagnostics-capable app with the exact profile while preserving the selected playlist byte-for-byte
+- Reached the honest device blocker: iOS denied foreground launch because the phone was locked
+
 ## Current checkpoint
 
-Milestones 0 and 1 are complete. Apple Music is the selected Milestone 2 source. Live Core Motion cadence and automatic MusicKit rate response pass together on the physical iPhone. The narrow 12-preview corpus passes. Import, persistence, ready-track filtering, and the normal real-player composition are implemented and installed. Next comes one real playlist with three ready tracks, relaunch restore, and multi-track physical playback. Long-form background and recovery checks remain before Milestone 2 completion.
+Milestones 0 and 1 are complete. Apple Music is the selected Milestone 2 source. Live Core Motion cadence and automatic MusicKit rate response pass together on the physical iPhone. The narrow 12-preview corpus passes. One real playlist now passes selection and analysis with 13 ready tracks. Next comes unlocked relaunch restoration, multi-track physical playback, and direct retrieval of the new latest-run diagnostics. Long-form background and recovery checks remain before Milestone 2 completion.

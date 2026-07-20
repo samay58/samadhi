@@ -2,18 +2,29 @@
 
 ## Current capability
 
-Apple team `ZL5U59XBJ6` is saved in `project.yml`. Signed compilation, installation, and launch pass with an Apple Development certificate. Samay's iPhone 17 Pro runs iOS 27.0 with Developer Mode enabled. The explicit App ID exists and the MusicKit App Service is user-confirmed as enabled. The import-capable normal app was installed and launched on 2026-07-16.
+Apple team `ZL5U59XBJ6` is saved in `project.yml`. Signed compilation and installation pass with an Apple Development certificate. Samay's iPhone 17 Pro runs iOS 27.0 with Developer Mode enabled. The explicit App ID exists and the MusicKit App Service is user-confirmed as enabled. The diagnostics-capable normal app was installed on 2026-07-20 and preserved the selected playlist. iOS blocked foreground launch because the phone was locked.
 
 ## Denver test build
 
 1. Open Samadhi and tap `Choose music`.
-2. Select a moderate Apple Music playlist. Keep the app open during its first analysis.
+2. The current physical selection is `Strut Frequency -- July 2026`. Its first analysis produced 13 ready tracks from 25.
 3. Read the result honestly. Ready tracks can run; unreadable or unavailable tracks remain visible but do not enter playback.
-4. Confirm at least three tracks are ready, tap `Start`, and allow motion access if asked.
+4. Confirm the restored collection still reports ready tracks, tap `Start`, and allow motion access if asked.
 5. Close and reopen Samadhi. Confirm the same playlist returns without another choice.
 6. During a short run, check that playback starts, cadence changes, and skip advances to another ready track.
 
-The build is suitable for product testing, not public distribution. The installed offline profile expires on 2026-07-23 UTC. Import, persistence, and partial-failure states pass automated gates, but the steps above are the remaining physical imported-collection proof.
+The build is suitable for product testing, not public distribution. The installed offline profile expires on 2026-07-23 UTC. Physical selection and analysis pass. Relaunch restoration and multi-track playback remain open.
+
+After a debug run finishes, pull `Library/Application Support/Samadhi/latest-run-diagnostics.json` directly from the app container. The file overwrites the prior run and contains progress, cadence, target and applied rates, track changes, recovery events, and the honest summary.
+
+~~~sh
+xcrun devicectl device copy from \
+  --device 74BE85BB-5455-56FE-BFA3-0150F3A28C43 \
+  --domain-type appDataContainer \
+  --domain-identifier com.samaydhawan.Samadhi \
+  --source Library \
+  --destination /tmp/samadhi-device-library
+~~~
 
 ## Completed Apple token repair
 

@@ -18,14 +18,22 @@ final class RunPresentationModel {
     @ObservationIgnored private let cadenceProvider: any CadenceProviding
     @ObservationIgnored private let musicPlayer: any MusicPlaybackProviding
     @ObservationIgnored private let musicCollection: MusicCollection
+    @ObservationIgnored private let diagnosticsStore: RunDiagnosticsStore
     @ObservationIgnored private let taskStore = RunTaskStore()
+    @ObservationIgnored private var diagnosticsRecorder: RunDiagnosticsRecorder
     @ObservationIgnored private var nextToken = 1
     @ObservationIgnored private var currentHoldID: Int?
     @ObservationIgnored private var playbackEventTask: Task<Void, Never>?
 
-    init(musicCollection selectedCollection: MusicCollection? = nil) {
+    init(
+        musicCollection selectedCollection: MusicCollection? = nil,
+        diagnosticsStore: RunDiagnosticsStore = RunDiagnosticsStore(),
+        diagnosticsRecorder: RunDiagnosticsRecorder = RunDiagnosticsRecorder()
+    ) {
         let configuration = SimulationConfiguration.current
         self.configuration = configuration
+        self.diagnosticsStore = diagnosticsStore
+        self.diagnosticsRecorder = diagnosticsRecorder
         musicCollection =
             selectedCollection
             ?? (configuration.useAppleMusicCoreLoop
@@ -174,6 +182,19 @@ final class RunPresentationModel {
         if newState != oldState {
             state = newState
         }
+
+        #if DEBUG
+            if let snapshot = diagnosticsRecorder.record(
+                event: event,
+                oldState: oldState,
+                newState: newState,
+                collection: musicCollection
+            ) {
+                Task { [diagnosticsStore] in
+                    try? await diagnosticsStore.save(snapshot)
+                }
+            }
+        #endif
 
         if case .cadenceUpdated = event,
             case let .active(oldActive) = oldState,
