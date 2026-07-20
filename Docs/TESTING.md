@@ -134,7 +134,7 @@ The `Samadhi MusicKit Gate` scheme verifies that the harness and framework calls
 
 ## Next implementation gate
 
-Connect and unlock the physical iPhone, renew the exact profile first if it is past 2026-07-23 UTC, then install the BPM-control build. Confirm `Strut Frequency -- July 2026` restores with 13 ready tracks. During one short run, exercise three reachable BPM targets and one unreachable target, continue through a real track transition, and pull `latest-run-diagnostics.json` after finish. Before Milestone 2 completion, record one concise Bluetooth listening note and prove five screen-locked minutes, controlled interruption, and route loss.
+Use the installed BPM-control build while the physical iPhone is available. Confirm `Strut Frequency -- July 2026` restores with 13 ready tracks. During one short run, exercise three reachable BPM targets and one unreachable target, continue through a real track transition, and pull `latest-run-diagnostics.json` after finish. Renew the exact profile first if this happens after 2026-07-23 UTC. Before Milestone 2 completion, record one concise Bluetooth listening note and prove five screen-locked minutes, controlled interruption, and route loss.
 
 ## Known environment behavior
 
