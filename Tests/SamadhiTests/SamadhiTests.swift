@@ -16,6 +16,147 @@ import Testing
     #expect(model.viewState.phase == .preparing)
 }
 
+@Test func runDiagnosticsRoundTripPreservesPhysicalEvidence() async throws {
+    let directory = FileManager.default.temporaryDirectory
+        .appending(path: UUID().uuidString, directoryHint: .isDirectory)
+    defer { try? FileManager.default.removeItem(at: directory) }
+    let store = RunDiagnosticsStore(directoryURL: directory)
+    let capturedAt = Date(timeIntervalSince1970: 1_721_000_000)
+    let snapshot = RunDiagnosticSnapshot(
+        schemaVersion: 1,
+        capturedAt: capturedAt,
+        collectionID: "playlist",
+        collectionName: "Strut Frequency",
+        readyTrackCount: 3,
+        summary: RunDiagnosticSnapshot.Summary(
+            durationSeconds: 59,
+            averageCadence: 155,
+            tempoMatchedPercent: 98,
+            songCount: 2
+        ),
+        timeline: [
+            RunDiagnosticSnapshot.Entry(
+                offsetSeconds: 12,
+                kind: .rateApplied,
+                activeSeconds: 10,
+                cadenceSPM: 155,
+                targetRate: 1.035,
+                appliedRate: 1.03,
+                awaitingRateFeedback: false,
+                trackID: "101",
+                trackTitle: "First",
+                trackIndex: 0,
+                trackElapsedSeconds: 10,
+                trackDurationSeconds: 180,
+                tempoMatched: true
+            )
+        ]
+    )
+
+    try await store.save(snapshot)
+
+    #expect(try await store.latest() == snapshot)
+}
+
+@Test func runDiagnosticsCapturePlayerTruthThroughFinish() throws {
+    var time = Date(timeIntervalSince1970: 1_721_000_000)
+    var recorder = RunDiagnosticsRecorder(now: { time })
+    let collection = importedCollection(id: "playlist", name: "Strut Frequency", readyCount: 3)
+    let reducer = RunReducer(tracks: collection.tracks)
+    var state: RunState = .ready
+
+    func apply(_ event: RunEvent) -> RunDiagnosticSnapshot? {
+        let oldState = state
+        let newState = reducer.reduce(state: state, event: event).0
+        state = newState
+        time = time.addingTimeInterval(1)
+        return recorder.record(
+            event: event,
+            oldState: oldState,
+            newState: newState,
+            collection: collection
+        )
+    }
+
+    #expect(apply(.startTapped(sessionID: 1)) == nil)
+    #expect(apply(.authorizationResolved(sessionID: 1, .authorized)) == nil)
+    #expect(
+        apply(
+            .playbackPrepared(
+                sessionID: 1,
+                trackID: collection.tracks[0].id
+            )
+        ) == nil
+    )
+    #expect(
+        apply(
+            .cadenceUpdated(
+                sessionID: 1,
+                acquisitionID: 1,
+                stepsPerMinute: 162,
+                deltaSeconds: 1,
+                rateRequestID: 3
+            )
+        ) == nil
+    )
+    #expect(
+        apply(
+            .playbackRateApplied(
+                sessionID: 1,
+                operationID: 1,
+                requestID: 3,
+                trackID: collection.tracks[0].id,
+                rate: 0.98
+            )
+        ) == nil
+    )
+    #expect(
+        apply(
+            .playbackProgress(
+                sessionID: 1,
+                operationID: 1,
+                trackIndex: 0,
+                elapsedSeconds: 12,
+                durationSeconds: 180
+            )
+        ) == nil
+    )
+    #expect(apply(.activeSecond(tempoMatched: true)) == nil)
+    #expect(
+        apply(
+            .playbackTrackChanged(
+                sessionID: 1,
+                operationID: 1,
+                trackID: collection.tracks[1].id,
+                trackIndex: 1
+            )
+        ) == nil
+    )
+    #expect(apply(.surfaceTapped(timeoutID: 4)) == nil)
+    #expect(apply(.finishTapped) == nil)
+    #expect(apply(.finishHoldBegan(holdID: 5)) == nil)
+    #expect(apply(.finishHoldCompleted(holdID: 5)) == nil)
+    let snapshot = try #require(apply(.finishCompleted(sessionID: 1)))
+
+    #expect(snapshot.summary.averageCadence == 162)
+    #expect(snapshot.summary.tempoMatchedPercent == 100)
+    #expect(snapshot.summary.songCount == 2)
+    #expect(
+        snapshot.timeline.map(\.kind) == [
+            .started,
+            .cadenceUpdated,
+            .rateApplied,
+            .playerProgress,
+            .activeSecond,
+            .trackChanged,
+            .finishRequested,
+            .finished,
+        ]
+    )
+    #expect(snapshot.timeline[2].appliedRate == 0.98)
+    #expect(snapshot.timeline[3].trackElapsedSeconds == 12)
+}
+
 @Test func collectionStoreRoundTripsSelectionAndCache() async throws {
     let directory = FileManager.default.temporaryDirectory
         .appending(path: UUID().uuidString, directoryHint: .isDirectory)

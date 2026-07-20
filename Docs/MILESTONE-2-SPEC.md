@@ -17,7 +17,7 @@ A useful version needs both halves of the loop:
 
 Building playlist browsing without adaptive playback would create a conventional music player. Building adaptive playback around one bundled test file would prove engineering but still leave the product awkward to use. This milestone must connect an imported collection to real cadence and real playback.
 
-Apple Music is the selected production player. Its song metadata does not include tempo, so Samadhi resolves preview audio, analyzes it locally, and applies the result to Apple Music playback. A narrow 12-preview reference corpus now passes. The verified fixture, Core Motion, bounded adaptation, and applied-rate feedback are connected in a focused device configuration. Broad music accuracy, physical response, and long-form reliability remain open product risks.
+Apple Music is the selected production player. Its song metadata does not include tempo, so Samadhi resolves preview audio, analyzes it locally, and applies the result to Apple Music playback. A narrow 12-preview reference corpus now passes. The verified fixture, Core Motion, bounded adaptation, and applied-rate feedback pass in a focused device configuration. Broad music accuracy, imported multi-track playback, and long-form reliability remain open product risks.
 
 Tempo matching is also narrower than beat-perfect synchronization. Live pedometer cadence provides steps per minute, not a reliable timestamp for every foot strike. Milestone 2 matches the music's tempo to stable cadence. It does not claim that each footfall lands on a specific beat.
 
@@ -335,12 +335,12 @@ The milestone requires all of the following:
 
 ### Where we are now
 
-Milestones 0 and 1 are complete. Apple Music is the selected Milestone 2 source. A validated 149.75 BPM fixture, Core Motion cadence, bounded reducer adaptation, identified MusicKit read-back, and honest measurement pass together in the focused core-loop scheme. The corrected 59-second physical run averaged 155 SPM and measured 98 percent tempo matched. Analyzer version 2 uses Accelerate spectral flux and fractional-lag autocorrelation and passes the narrow 12-preview corpus. Playlist import, analysis persistence, ready-track filtering, and the normal production composition are implemented and installed.
+Milestones 0 and 1 are complete. Apple Music is the selected Milestone 2 source. A validated 149.75 BPM fixture, Core Motion cadence, bounded reducer adaptation, identified MusicKit read-back, and honest measurement pass together in the focused core-loop scheme. The corrected 59-second physical run averaged 155 SPM and measured 98 percent tempo matched. Analyzer version 2 uses Accelerate spectral flux and fractional-lag autocorrelation and passes the narrow 12-preview corpus. One physical 25-track playlist produced 13 ready tracks. Playlist persistence, ready-track filtering, and the normal production composition are implemented.
 
 ### Build order
 
-1. Prove one real imported playlist with at least three ready tracks and relaunch restoration.
-2. Run the multi-track production flow and verify real progress and transitions.
+1. Relaunch the physical app and prove the persisted 13-ready-track collection restores.
+2. Run the imported production flow and verify real progress, transitions, and saved diagnostics.
 3. Expand analyzer coverage only when new real tracks expose a specific failure.
 4. Run cadence calibration, listening, background, recovery, and the outdoor completion gate.
 5. Save evidence, update active documentation, and push main.

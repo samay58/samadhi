@@ -26,6 +26,7 @@
 		AADD64A3B49FF8F3E42C941C /* RunTaskStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 475C0E9AEDB57921D9893CA3 /* RunTaskStore.swift */; };
 		AE8168A594751E431F59C263 /* AppMusicCollection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22DE37CDF525C7843D5F365B /* AppMusicCollection.swift */; };
 		BFB93B5F0188CF63A19E30CB /* RunPresentationModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27E4457C2F93694193D8E85D /* RunPresentationModel.swift */; };
+		C73A3E457F7E49ECA0DE3B75 /* RunDiagnosticsStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B2CF4A238A54D2F9D443D91 /* RunDiagnosticsStore.swift */; };
 		D2DEE5D8F696BC6339CA819B /* SimulationConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95B076E4388E9E61360A6215 /* SimulationConfiguration.swift */; };
 		D80D703E28BBEBEDC8A9AE3A /* SamadhiDesign in Frameworks */ = {isa = PBXBuildFile; productRef = A48F446192EFBD7579C7BF67 /* SamadhiDesign */; };
 		EC41CEFCE78C60A45AD5680A /* SamadhiApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1CE55560A18BCBFBAF13E01 /* SamadhiApp.swift */; };
@@ -63,6 +64,7 @@
 		68062F4BB4E7FDBE2A2EEEC0 /* PlaylistPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaylistPickerView.swift; sourceTree = "<group>"; };
 		8200E148AF4ABACA3B47ADA2 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		84DEE35021BD9A5D2A7F5F45 /* SamadhiUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SamadhiUITests.swift; sourceTree = "<group>"; };
+		8B2CF4A238A54D2F9D443D91 /* RunDiagnosticsStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RunDiagnosticsStore.swift; sourceTree = "<group>"; };
 		95B076E4388E9E61360A6215 /* SimulationConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SimulationConfiguration.swift; sourceTree = "<group>"; };
 		A28146360481C17881F591C3 /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
 		AB90BB4B3A76F3AFC7FD65D2 /* SamadhiKit */ = {isa = PBXFileReference; lastKnownFileType = folder; name = SamadhiKit; path = Packages/SamadhiKit; sourceTree = SOURCE_ROOT; };
@@ -173,6 +175,7 @@
 				43016700FEA62148736FD0BB /* MusicSelectionModel.swift */,
 				68062F4BB4E7FDBE2A2EEEC0 /* PlaylistPickerView.swift */,
 				A28146360481C17881F591C3 /* RootView.swift */,
+				8B2CF4A238A54D2F9D443D91 /* RunDiagnosticsStore.swift */,
 				27E4457C2F93694193D8E85D /* RunPresentationModel.swift */,
 				475C0E9AEDB57921D9893CA3 /* RunTaskStore.swift */,
 				B1CE55560A18BCBFBAF13E01 /* SamadhiApp.swift */,
@@ -342,6 +345,7 @@
 				F23869DE2A691630025E7D19 /* MusicSelectionModel.swift in Sources */,
 				AA09908690CAEFD7301A8CE1 /* PlaylistPickerView.swift in Sources */,
 				59F6A7F42EF07136C8A749D2 /* RootView.swift in Sources */,
+				C73A3E457F7E49ECA0DE3B75 /* RunDiagnosticsStore.swift in Sources */,
 				BFB93B5F0188CF63A19E30CB /* RunPresentationModel.swift in Sources */,
 				AADD64A3B49FF8F3E42C941C /* RunTaskStore.swift in Sources */,
 				EC41CEFCE78C60A45AD5680A /* SamadhiApp.swift in Sources */,
