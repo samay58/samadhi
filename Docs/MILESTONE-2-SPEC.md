@@ -316,6 +316,38 @@ The milestone requires all of the following:
 - No thermal warning or audio-render failure.
 - Trace and listening notes agree with what the interface claimed.
 
+### In-run BPM control
+
+The next product slice is one rhythm control that helps both the runner and the physical test. It must expose musical intent without exposing raw playback engineering.
+
+Behavior:
+
+- Auto follows stable Core Motion cadence through the existing deadband, ramp, confidence, compatibility, and 0.94 through 1.06 rate limits.
+- Fine-tune applies a small signed BPM correction to Auto. Initial range is minus 8 through plus 8 BPM in one-BPM steps.
+- Manual lets the runner choose a target BPM directly. Initial range is 120 through 200 BPM in one-BPM steps.
+- Reset returns to Auto with zero correction.
+- Each run starts in Auto. Manual state does not silently carry into a later run.
+- The control shows the requested BPM and whether the current track can reach it. At the safe-rate boundary it says `At limit`; it never pretends the request was fully applied.
+- The reducer derives the target rate. The control never writes the player directly.
+- Rate changes still ramp, preserve pitch, carry request identity, and accept only matching MusicKit read-back.
+- Diagnostics record control mode, requested BPM, derived target rate, applied rate, and limit state.
+- The summary remains based on measured cadence and applied player truth, not the chosen setting.
+
+Interaction and taste:
+
+- The resting run screen stays quiet. Direct manipulation reveals the control in place and dismisses it without navigation.
+- Use the existing central rhythm object as the visual anchor. Do not add a white card, settings page, dashboard, or permanent row of controls.
+- Provide restrained haptics at one-BPM detents, a stronger Auto detent, large touch targets, VoiceOver adjustable actions, Dynamic Type, increased contrast, and Reduce Motion behavior.
+- Motion confirms grip and release, then settles quickly. It must remain interruptible and must not compete with the music.
+- Judge the design from real iPhone Simulator frames at rest, while dragging, at Auto, in Manual, and at a safety limit. Reject any treatment that obscures song, cadence, progress, pause, or finish.
+
+Acceptance:
+
+- Deterministic tests cover Auto, fine-tune, Manual, reset, bounds, ramping, confidence loss, incompatible tracks, stale callbacks, and honest measurement.
+- A physical check changes between at least three reachable requested BPM values and confirms matching target-rate movement plus MusicKit read-back.
+- One unreachable request produces clear limit feedback without hunting or audio instability.
+- Samay can use the control during a normal run without stopping or studying the interface.
+
 ## Out of Scope
 
 - Playlist generation, recommendations, catalog search, or AI curation
@@ -339,11 +371,14 @@ Milestones 0 and 1 are complete. Apple Music is the selected Milestone 2 source.
 
 ### Build order
 
-1. Relaunch the physical app and prove the persisted 13-ready-track collection restores.
-2. Run the imported production flow and verify real progress, transitions, and saved diagnostics.
-3. Expand analyzer coverage only when new real tracks expose a specific failure.
-4. Run cadence calibration, listening, background, recovery, and the outdoor completion gate.
-5. Save evidence, update active documentation, and push main.
+1. Implement the source-neutral BPM-control policy and deterministic reducer tests.
+2. Build and visually resolve the in-run control without adding navigation or settings.
+3. Install it and prove requested BPM, safe target rate, MusicKit read-back, and limit feedback on the physical phone.
+4. Relaunch the physical app and prove the persisted 13-ready-track collection restores.
+5. Run the imported production flow and verify real progress, transitions, and saved diagnostics.
+6. Expand analyzer coverage only when new real tracks expose a specific failure.
+7. Run cadence calibration, listening, background, recovery, and the outdoor completion gate.
+8. Save evidence, update active documentation, and push main.
 
 Do not redesign the app before the source decision and core audio loop pass. Do not build playlist generation before imported music works. Do not keep a failed player path “for later.”
 

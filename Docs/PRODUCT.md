@@ -19,6 +19,7 @@ Done means:
 - Start a run in one or two clear actions
 - Sense cadence from one declared phone placement
 - Adapt playback rate inside the proven safe range
+- Let the runner fine-tune the automatic match or choose a manual BPM without leaving the run
 - Keep audio stable, pitch-stable, and continuous through lock, pause, resume, and route recovery
 - Show honest progress and tempo-matched summary
 - Make failure states calm, legible, and recoverable
@@ -53,6 +54,10 @@ Cadence is input, not content. Song, atmosphere, and rhythm outrank telemetry.
 ### Confirm, then withdraw
 
 UI becomes visible during preparation, uncertainty, and direct manipulation. Stable playback should feel quiet.
+
+### Control without clutter
+
+Automatic matching is the default. When it feels wrong, the runner can reveal one precise rhythm control, correct it, and return attention to the music. Manual control must not become a settings screen or a permanent telemetry panel.
 
 ### Continuity over spectacle
 
