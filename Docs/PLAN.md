@@ -22,7 +22,7 @@ The finish line is one real outdoor run, not a feature checklist. Samay should b
 
 The BPM-control implementation and Simulator design gate are complete. Continue in this order:
 
-1. Install the BPM-control build, then compare requested BPM, derived target rate, and MusicKit read-back at three reachable targets and one unreachable target on the physical iPhone.
+1. Use the installed BPM-control build to compare requested BPM, derived target rate, and MusicKit read-back at three reachable targets and one unreachable target on the physical iPhone.
 2. Relaunch the physical app and prove the persisted 13-ready-track playlist restores.
 3. Verify real progress, one natural track transition, honest lock, and the saved summary across imported tracks.
 4. Complete five locked minutes, interruption, route loss, accessibility, and recovery checks.
@@ -41,7 +41,7 @@ The BPM-control implementation and Simulator design gate are complete. Continue 
 - Production playback: validated catalog fixture `1558215042`, live cadence updates, bounded reducer effects, identified MusicKit read-back, and honest measurement are connected
 - Playlist import and persistence: implemented with strict resolution, local preview analysis, versioned cache keys, atomic replacement, honest per-track states, and ready-only production filtering
 - Normal run composition: restored imported tracks use Apple Music playback and Core Motion; deterministic fixtures remain available for tests and previews
-- Automated body-to-music gate: 60 package tests, 9 app-model tests, 9 UI tests, formatter, normal Simulator build, and current exact-profile signed build pass; the prior normal installation also passed
+- Automated body-to-music gate: 60 package tests, 9 app-model tests, 9 UI tests, formatter, normal Simulator build, current exact-profile signed build, physical installation, and launch pass
 - Physical body-to-music observation: passed; the corrected 59-second run averaged 155 SPM and measured 98 percent tempo matched from MusicKit read-back
 - Physical imported-collection gate: real playlist selection and local analysis passed at 13 of 25 ready tracks; relaunch restore and multi-track run remain open
 - Device evidence: debug builds persist one latest completed-run diagnostic file for direct container retrieval; the BPM-control build, installation, and launch pass on the physical iPhone
