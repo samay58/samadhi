@@ -132,7 +132,7 @@ The current serial gate passed on 2026-07-20:
 
 Durable logs and final visual frames live under Evidence/.
 
-The diagnostics slice passes formatter lint, a Simulator build, the full serial gate, an exact-profile physical build, and physical installation. Foreground launch remains blocked by the locked phone.
+The diagnostics slice passes formatter lint, a Simulator build, the full serial gate, an exact-profile physical build, physical installation, and foreground launch.
 
 The MusicKit harness and normal app launch in Simulator and on the physical iPhone. Signing uses the Apple Development certificate for team `ZL5U59XBJ6`. The import-capable normal build is installed. Its build and installation record is under `Evidence/Device/`.
 
@@ -142,4 +142,4 @@ Live cadence and automatic cadence-driven rate response pass on the physical iPh
 
 ## WHERE WE LEFT OFF
 
-Apple Music is selected. A real 25-track playlist is persisted on Samay's iPhone with 13 ready tracks, so physical selection and analysis pass. The in-run BPM control is implemented, visually resolved, accessible, and covered by the full automated gate. The paired iPhone is currently unavailable to Xcode, so the next step is one short physical imported-playlist run that exercises three reachable targets and one unreachable target, then exports the saved diagnostics. Relaunch restoration, a natural track transition, locked playback, recovery, and the outdoor run remain mandatory before Milestone 2 completion.
+Apple Music is selected. A real 25-track playlist is persisted on Samay's iPhone with 13 ready tracks, so physical selection and analysis pass. The in-run BPM control is implemented, visually resolved, accessible, covered by the full automated gate, installed, and running on the physical iPhone. The next step is one short imported-playlist run that exercises three reachable targets and one unreachable target, then exports the saved diagnostics. Playlist restoration, a natural track transition, locked playback, recovery, and the outdoor run remain mandatory before Milestone 2 completion.

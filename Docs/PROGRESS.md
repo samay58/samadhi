@@ -207,8 +207,9 @@
 - Added VoiceOver adjustment, useful labels and values, Dynamic Type behavior, increased contrast, and Reduce Motion support
 - Reviewed final iPhone 17 Pro Simulator frames for Auto fine-tune, Manual safety limit, and accessibility-size text; the wider main-screen system did not need redesign
 - Passed formatter lint, 60 package tests, 9 app-model tests, 9 UI tests, the normal Simulator build, and an exact-profile signed iPhone build
-- Found the paired physical iPhone unavailable to Xcode, so no physical MusicKit or listening claim was made
+- Initially found the paired physical iPhone unavailable to Xcode, so no MusicKit or listening claim was made
+- Reconnected later, then built from clean commit `50de75b`, installed the exact-profile app, launched it, and confirmed the Samadhi process was running
 
 ## Current checkpoint
 
-Milestones 0 and 1 are complete. Apple Music is the selected Milestone 2 source. Live Core Motion cadence and automatic MusicKit rate response pass together on the physical iPhone. The narrow 12-preview corpus passes. One real playlist passes selection and analysis with 13 ready tracks. The bounded in-run BPM control is implemented, visually resolved, accessible, and covered by the full automated gate. Next comes physical BPM response, unlocked relaunch restoration, multi-track playback, and direct retrieval of the latest-run diagnostics. Long-form background and recovery checks remain before Milestone 2 completion.
+Milestones 0 and 1 are complete. Apple Music is the selected Milestone 2 source. Live Core Motion cadence and automatic MusicKit rate response pass together on the physical iPhone. The narrow 12-preview corpus passes. One real playlist passes selection and analysis with 13 ready tracks. The bounded in-run BPM control is implemented, visually resolved, accessible, covered by the full automated gate, installed, and running on the physical phone. Next comes physical BPM response, playlist restoration, multi-track playback, and direct retrieval of the latest-run diagnostics. Long-form background and recovery checks remain before Milestone 2 completion.

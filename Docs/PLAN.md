@@ -44,7 +44,7 @@ The BPM-control implementation and Simulator design gate are complete. Continue 
 - Automated body-to-music gate: 60 package tests, 9 app-model tests, 9 UI tests, formatter, normal Simulator build, and current exact-profile signed build pass; the prior normal installation also passed
 - Physical body-to-music observation: passed; the corrected 59-second run averaged 155 SPM and measured 98 percent tempo matched from MusicKit read-back
 - Physical imported-collection gate: real playlist selection and local analysis passed at 13 of 25 ready tracks; relaunch restore and multi-track run remain open
-- Device evidence: debug builds persist one latest completed-run diagnostic file for direct container retrieval; refreshed physical build and installation pass, with launch blocked only by device lock
+- Device evidence: debug builds persist one latest completed-run diagnostic file for direct container retrieval; the BPM-control build, installation, and launch pass on the physical iPhone
 - Rhythm control: implemented with Auto fine-tune, Manual target, reset, honest limit feedback, reducer-owned safety, diagnostics, restrained haptics, and accessibility; physical MusicKit and listening proof remains open
 - Device harness: exact-profile catalog search, strict identity resolution, temporary preview download, local PCM decoding, playback, rate controls, route observation, and trace export remain available on the physical iPhone 17 Pro
 

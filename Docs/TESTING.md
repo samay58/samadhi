@@ -99,7 +99,7 @@ The `Samadhi MusicKit Gate` scheme verifies that the harness and framework calls
 
 - Unsigned generic iPhone build: passed
 - Signed generic and physical iPhone builds: passed
-- Current BPM-control exact-profile signed build: passed; installation open because the physical phone is unavailable
+- Current BPM-control exact-profile signed build, installation, launch, and running process check: passed
 - Physical iPhone installation and gate launch: passed
 - Normal Simulator app: launched and visually checked
 - MusicKit harness Simulator app: launched and visually checked
@@ -130,7 +130,7 @@ The `Samadhi MusicKit Gate` scheme verifies that the harness and framework calls
 - Real playlist selection and analysis: passed at 13 ready, 8 unreadable, and 4 unavailable tracks from a 25-track physical selection
 - Relaunch restoration and imported multi-track playback: not yet physically run
 - BPM control: deterministic policy, UI interaction, and Simulator design pass; physical MusicKit response and listening proof not yet run
-- Paired iPhone state on 2026-07-20: unavailable to Xcode; exact `Samadhi Development` profile remains installed and expires on 2026-07-23 UTC
+- Paired iPhone state on 2026-07-20: available to Xcode; exact `Samadhi Development` profile remains installed and expires on 2026-07-23 UTC
 
 ## Next implementation gate
 
