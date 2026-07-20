@@ -22,10 +22,13 @@ The finish line is one real outdoor run, not a feature checklist. Samay should b
 
 Build in this order:
 
-1. Relaunch the physical app and prove the persisted 13-ready-track playlist restores.
-2. Verify real progress, track transitions, honest lock, and summary across those tracks.
-3. Complete five locked minutes, interruption, route loss, accessibility, and recovery checks.
-4. Pass cadence calibration, listening, and the outdoor-run gate.
+1. Build one in-run BPM control with Auto, fine-tune, Manual, and reset behavior. Keep all rate changes inside the existing safety policy.
+2. Resolve its interaction and visual design in real Simulator frames, including haptics, accessibility, reduced motion, and clear limit feedback.
+3. Install it, then use the control to compare requested BPM, derived target rate, and MusicKit read-back on the physical iPhone.
+4. Relaunch the physical app and prove the persisted 13-ready-track playlist restores.
+5. Verify real progress, track transitions, honest lock, and summary across those tracks.
+6. Complete five locked minutes, interruption, route loss, accessibility, and recovery checks.
+7. Pass cadence calibration, listening, and the outdoor-run gate.
 
 ## Current gate state
 
@@ -44,6 +47,7 @@ Build in this order:
 - Physical body-to-music observation: passed; the corrected 59-second run averaged 155 SPM and measured 98 percent tempo matched from MusicKit read-back
 - Physical imported-collection gate: real playlist selection and local analysis passed at 13 of 25 ready tracks; relaunch restore and multi-track run remain open
 - Device evidence: debug builds persist one latest completed-run diagnostic file for direct container retrieval; refreshed physical build and installation pass, with launch blocked only by device lock
+- Rhythm control: top-priority next slice; behavior and design are specified, but not implemented
 - Device harness: exact-profile catalog search, strict identity resolution, temporary preview download, local PCM decoding, playback, rate controls, route observation, and trace export remain available on the physical iPhone 17 Pro
 
 The source decision and deferred reliability requirements live in [MUSIC-SOURCE-RESOLUTION-SPEC.md](MUSIC-SOURCE-RESOLUTION-SPEC.md). A later reliability failure must be fixed before Milestone 2 completion. It does not reopen Spotify or a second-provider project.
@@ -57,6 +61,7 @@ Included:
 - Core Motion cadence from one declared phone placement
 - Local tempo analysis
 - Pitch-stable playback-rate adaptation from 0.94 through 1.06
+- One calm in-run BPM control for automatic matching, manual targeting, and small corrections
 - Background continuity with screen lock
 - Existing pause, resume, skip, route recovery, finish, and summary behavior
 - Physical calibration, listening evidence, and one 20-minute outdoor run
@@ -70,4 +75,4 @@ Excluded:
 
 ## Stop rule
 
-Do not redesign the app or build playlist generation before imported music and the physical body-to-music loop work. If cadence, tempo accuracy, or audio quality fails, fix the core loop before adding surrounding product.
+Do not redesign the app or build playlist generation before imported music and the physical body-to-music loop work. The BPM control is part of that loop, not a settings feature. If cadence, tempo accuracy, or audio quality fails, fix the core loop before adding surrounding product.
