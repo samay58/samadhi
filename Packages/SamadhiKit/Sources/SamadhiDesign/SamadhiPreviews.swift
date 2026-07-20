@@ -103,6 +103,82 @@ private let previewSend: @MainActor (RunAction) -> Void = { _ in }
     SamadhiScreen(state: RunViewState(phase: .running, cadenceSPM: 194), send: previewSend)
 }
 
+#Preview("Tempo control, Auto") {
+    SamadhiScreen(
+        state: RunViewState(
+            phase: .running,
+            cadenceSPM: 168,
+            trackElapsedSeconds: 91,
+            trackProgress: 0.43,
+            rhythmControl: RhythmControlPresentation(
+                mode: .automatic,
+                requestedBPM: 168,
+                appliedBPM: 167,
+                isVisible: true
+            )
+        ),
+        send: previewSend
+    )
+}
+
+#Preview("Tempo control, fine tune") {
+    SamadhiScreen(
+        state: RunViewState(
+            phase: .running,
+            cadenceSPM: 168,
+            trackElapsedSeconds: 91,
+            trackProgress: 0.43,
+            rhythmControl: RhythmControlPresentation(
+                mode: .automatic,
+                automaticCorrectionBPM: 3,
+                requestedBPM: 171,
+                appliedBPM: 169,
+                isVisible: true
+            )
+        ),
+        send: previewSend
+    )
+}
+
+#Preview("Tempo control, Manual") {
+    SamadhiScreen(
+        state: RunViewState(
+            phase: .running,
+            cadenceSPM: 168,
+            trackElapsedSeconds: 91,
+            trackProgress: 0.43,
+            rhythmControl: RhythmControlPresentation(
+                mode: .manual,
+                manualTargetBPM: 176,
+                requestedBPM: 176,
+                appliedBPM: 174,
+                isVisible: true
+            )
+        ),
+        send: previewSend
+    )
+}
+
+#Preview("Tempo control, safety limit") {
+    SamadhiScreen(
+        state: RunViewState(
+            phase: .running,
+            cadenceSPM: 168,
+            trackElapsedSeconds: 91,
+            trackProgress: 0.43,
+            rhythmControl: RhythmControlPresentation(
+                mode: .manual,
+                manualTargetBPM: 200,
+                requestedBPM: 200,
+                appliedBPM: 170,
+                isAtLimit: true,
+                isVisible: true
+            )
+        ),
+        send: previewSend
+    )
+}
+
 #Preview("Controls visible") {
     SamadhiScreen(
         state: RunViewState(
@@ -153,7 +229,17 @@ private let previewSend: @MainActor (RunAction) -> Void = { _ in }
 
 #Preview("Accessibility text") {
     SamadhiScreen(
-        state: RunViewState(phase: .running, controlsVisible: true, cadenceSPM: 168),
+        state: RunViewState(
+            phase: .running,
+            cadenceSPM: 168,
+            rhythmControl: RhythmControlPresentation(
+                mode: .manual,
+                manualTargetBPM: 176,
+                requestedBPM: 176,
+                appliedBPM: 174,
+                isVisible: true
+            )
+        ),
         send: previewSend
     )
     .environment(\.dynamicTypeSize, .accessibility5)

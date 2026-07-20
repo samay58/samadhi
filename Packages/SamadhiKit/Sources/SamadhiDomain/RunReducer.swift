@@ -141,16 +141,59 @@ public struct RunReducer: Sendable {
             )
 
         case let (.active(active), .surfaceTapped(timeoutID)):
-            guard case let .playing(rhythm, _) = active.activity else { return (state, []) }
+            guard case let .playing(rhythm, controls) = active.activity,
+                controls.surface != .rhythm
+            else { return (state, []) }
             var next = active
-            next.activity = .playing(rhythm: rhythm, controls: .timed(timeoutID: timeoutID))
+            next.activity = .playing(
+                rhythm: rhythm,
+                controls: .timed(surface: .transport, timeoutID: timeoutID)
+            )
             return (
                 .active(next),
                 [.scheduleControlsTimeout(sessionID: active.session.id, timeoutID: timeoutID)]
             )
 
+        case let (.active(active), .rhythmControlRevealed(timeoutID)):
+            guard active.session.mode == .adaptive,
+                case let .playing(rhythm, _) = active.activity
+            else { return (state, []) }
+            var next = active
+            next.activity = .playing(
+                rhythm: rhythm,
+                controls: .timed(surface: .rhythm, timeoutID: timeoutID)
+            )
+            return (
+                .active(next),
+                [.scheduleControlsTimeout(sessionID: active.session.id, timeoutID: timeoutID)]
+            )
+
+        case let (.active(active), .rhythmControlAdjusted(steps, rateRequestID, timeoutID)):
+            return reduceRhythmControlChange(
+                active: active,
+                change: .adjust(steps),
+                rateRequestID: rateRequestID,
+                timeoutID: timeoutID
+            )
+
+        case let (.active(active), .rhythmControlSetManual(rateRequestID, timeoutID)):
+            return reduceRhythmControlChange(
+                active: active,
+                change: .manual,
+                rateRequestID: rateRequestID,
+                timeoutID: timeoutID
+            )
+
+        case let (.active(active), .rhythmControlReset(rateRequestID, timeoutID)):
+            return reduceRhythmControlChange(
+                active: active,
+                change: .automatic,
+                rateRequestID: rateRequestID,
+                timeoutID: timeoutID
+            )
+
         case let (.active(active), .controlsTimedOut(timeoutID)):
-            guard case let .playing(rhythm, .timed(currentID)) = active.activity,
+            guard case let .playing(rhythm, .timed(_, currentID)) = active.activity,
                 currentID == timeoutID
             else { return (state, []) }
             var next = active
@@ -160,21 +203,32 @@ public struct RunReducer: Sendable {
         case let (.active(active), .controlsFocusEntered):
             // Visible controls stay pinned while VoiceOver owns focus.
             guard case let .playing(rhythm, controls) = active.activity, case .hidden = controls else {
-                if case let .playing(rhythm, .timed) = active.activity {
+                if case let .playing(rhythm, .timed(surface, _)) = active.activity {
                     var next = active
-                    next.activity = .playing(rhythm: rhythm, controls: .voiceOverPinned)
+                    next.activity = .playing(
+                        rhythm: rhythm,
+                        controls: .voiceOverPinned(surface: surface)
+                    )
                     return (.active(next), [.cancelTask(sessionID: active.session.id, .controlsTimeout)])
                 }
                 return (state, [])
             }
             var next = active
-            next.activity = .playing(rhythm: rhythm, controls: .voiceOverPinned)
+            next.activity = .playing(
+                rhythm: rhythm,
+                controls: .voiceOverPinned(surface: .transport)
+            )
             return (.active(next), [])
 
         case let (.active(active), .controlsFocusExited(timeoutID)):
-            guard case let .playing(rhythm, .voiceOverPinned) = active.activity else { return (state, []) }
+            guard case let .playing(rhythm, .voiceOverPinned(surface)) = active.activity else {
+                return (state, [])
+            }
             var next = active
-            next.activity = .playing(rhythm: rhythm, controls: .timed(timeoutID: timeoutID))
+            next.activity = .playing(
+                rhythm: rhythm,
+                controls: .timed(surface: surface, timeoutID: timeoutID)
+            )
             return (
                 .active(next),
                 [.scheduleControlsTimeout(sessionID: active.session.id, timeoutID: timeoutID)]
@@ -224,7 +278,10 @@ public struct RunReducer: Sendable {
             }
             var next = active
             next.session.cadenceAcquisitionID = resumedRhythm == .fixed ? nil : acquisitionID
-            next.activity = .playing(rhythm: resumedRhythm, controls: .timed(timeoutID: timeoutID))
+            next.activity = .playing(
+                rhythm: resumedRhythm,
+                controls: .timed(surface: .transport, timeoutID: timeoutID)
+            )
             return (
                 .active(next),
                 [.resumePlayback(sessionID: active.session.id), .emitHaptic(.resume)] + cadenceEffect + [
@@ -351,7 +408,7 @@ public struct RunReducer: Sendable {
                         session: resumedSession,
                         activity: .playing(
                             rhythm: nextRhythm,
-                            controls: .timed(timeoutID: timeoutID)
+                            controls: .timed(surface: .transport, timeoutID: timeoutID)
                         )
                     )
                 ),
@@ -407,7 +464,8 @@ public struct RunReducer: Sendable {
                 sessionID,
                 operationID,
                 trackID,
-                trackIndex
+                trackIndex,
+                rateRequestID
             )
         ):
             guard active.session.id == sessionID,
@@ -424,7 +482,10 @@ public struct RunReducer: Sendable {
             next.session.trackElapsedSeconds = 0
             next.session.trackDurationSeconds = nil
             next.session.pendingRateRequestID = nil
-            return (.active(next), [])
+            return adaptManualControlAfterTrackChange(
+                active: next,
+                rateRequestID: rateRequestID
+            )
 
         case let (
             .active(active),
@@ -471,7 +532,8 @@ public struct RunReducer: Sendable {
             case .fixed:
                 next.session.recordSecond(cadence: nil, tempoMatched: nil)
             case .acquiring:
-                return (state, [])
+                guard next.session.rhythmControl.mode == .manual else { return (state, []) }
+                next.session.recordSecond(cadence: nil, tempoMatched: nil)
             }
             return (.active(next), [])
 

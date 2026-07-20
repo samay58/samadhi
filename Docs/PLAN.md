@@ -20,15 +20,13 @@ Milestone 2 turns the interaction prototype into a useful music product.
 
 The finish line is one real outdoor run, not a feature checklist. Samay should be able to import one Apple Music playlist, start running, hear music settle into his cadence, lock the phone, recover from normal interruptions, finish, and trust the summary. Stop expanding scope until that run works.
 
-Build in this order:
+The BPM-control implementation and Simulator design gate are complete. Continue in this order:
 
-1. Build one in-run BPM control with Auto, fine-tune, Manual, and reset behavior. Keep all rate changes inside the existing safety policy.
-2. Resolve its interaction and visual design in real Simulator frames, including haptics, accessibility, reduced motion, and clear limit feedback.
-3. Install it, then use the control to compare requested BPM, derived target rate, and MusicKit read-back on the physical iPhone.
-4. Relaunch the physical app and prove the persisted 13-ready-track playlist restores.
-5. Verify real progress, track transitions, honest lock, and summary across those tracks.
-6. Complete five locked minutes, interruption, route loss, accessibility, and recovery checks.
-7. Pass cadence calibration, listening, and the outdoor-run gate.
+1. Install the BPM-control build, then compare requested BPM, derived target rate, and MusicKit read-back at three reachable targets and one unreachable target on the physical iPhone.
+2. Relaunch the physical app and prove the persisted 13-ready-track playlist restores.
+3. Verify real progress, one natural track transition, honest lock, and the saved summary across imported tracks.
+4. Complete five locked minutes, interruption, route loss, accessibility, and recovery checks.
+5. Pass cadence calibration, listening, and the outdoor-run gate.
 
 ## Current gate state
 
@@ -43,11 +41,11 @@ Build in this order:
 - Production playback: validated catalog fixture `1558215042`, live cadence updates, bounded reducer effects, identified MusicKit read-back, and honest measurement are connected
 - Playlist import and persistence: implemented with strict resolution, local preview analysis, versioned cache keys, atomic replacement, honest per-track states, and ready-only production filtering
 - Normal run composition: restored imported tracks use Apple Music playback and Core Motion; deterministic fixtures remain available for tests and previews
-- Automated body-to-music gate: 48 package tests, 9 app-model tests, 8 UI tests, formatter, exact-profile build, and installation pass; the prior normal build also launched successfully
+- Automated body-to-music gate: 60 package tests, 9 app-model tests, 9 UI tests, formatter, normal Simulator build, and current exact-profile signed build pass; the prior normal installation also passed
 - Physical body-to-music observation: passed; the corrected 59-second run averaged 155 SPM and measured 98 percent tempo matched from MusicKit read-back
 - Physical imported-collection gate: real playlist selection and local analysis passed at 13 of 25 ready tracks; relaunch restore and multi-track run remain open
 - Device evidence: debug builds persist one latest completed-run diagnostic file for direct container retrieval; refreshed physical build and installation pass, with launch blocked only by device lock
-- Rhythm control: top-priority next slice; behavior and design are specified, but not implemented
+- Rhythm control: implemented with Auto fine-tune, Manual target, reset, honest limit feedback, reducer-owned safety, diagnostics, restrained haptics, and accessibility; physical MusicKit and listening proof remains open
 - Device harness: exact-profile catalog search, strict identity resolution, temporary preview download, local PCM decoding, playback, rate controls, route observation, and trace export remain available on the physical iPhone 17 Pro
 
 The source decision and deferred reliability requirements live in [MUSIC-SOURCE-RESOLUTION-SPEC.md](MUSIC-SOURCE-RESOLUTION-SPEC.md). A later reliability failure must be fixed before Milestone 2 completion. It does not reopen Spotify or a second-provider project.

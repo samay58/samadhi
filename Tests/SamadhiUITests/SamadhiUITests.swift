@@ -16,7 +16,7 @@ final class SamadhiUITests: XCTestCase {
         XCTAssertTrue(app.staticTexts["Listening for your stride"].waitForExistence(timeout: 2))
         XCTAssertTrue(element("cadence-lock").waitForExistence(timeout: 3))
 
-        element("run-screen").tap()
+        element("track-identity").tap()
         let pause = app.buttons["pause-run"]
         XCTAssertTrue(pause.waitForExistence(timeout: 2))
         pause.tap()
@@ -29,6 +29,8 @@ final class SamadhiUITests: XCTestCase {
         app.buttons["skip-track"].tap()
         XCTAssertTrue(app.staticTexts["Afterimage"].waitForExistence(timeout: 2))
 
+        element("track-identity").tap()
+        XCTAssertTrue(app.buttons["finish-run"].waitForExistence(timeout: 2))
         app.buttons["finish-run"].tap()
         let hold = app.buttons["hold-to-finish"]
         XCTAssertTrue(hold.waitForExistence(timeout: 2))
@@ -103,6 +105,28 @@ final class SamadhiUITests: XCTestCase {
         XCTAssertTrue(element("music-import-failed").waitForExistence(timeout: 2))
         XCTAssertTrue(app.buttons["choose-music"].exists)
         XCTAssertFalse(app.buttons["start-run"].exists)
+    }
+
+    func testTempoControlRevealsAndSwitchesOwnership() {
+        prepareApp()
+        app.launch()
+        XCTAssertTrue(app.buttons["start-run"].waitForExistence(timeout: 2))
+        app.buttons["start-run"].tap()
+        XCTAssertTrue(element("cadence-lock").waitForExistence(timeout: 3))
+
+        element("tempo-control").tap()
+        XCTAssertTrue(element("rhythm-dial").waitForExistence(timeout: 2))
+        XCTAssertTrue(app.buttons["rhythm-auto"].exists)
+        XCTAssertTrue(app.buttons["rhythm-manual"].exists)
+
+        app.buttons["rhythm-faster"].tap()
+        XCTAssertTrue(element("rhythm-dial").exists)
+
+        app.buttons["rhythm-manual"].tap()
+        XCTAssertTrue(app.buttons["rhythm-manual"].isSelected)
+
+        app.buttons["rhythm-auto"].tap()
+        XCTAssertTrue(app.buttons["rhythm-auto"].isSelected)
     }
 
     private func element(_ identifier: String) -> XCUIElement {

@@ -16,15 +16,12 @@ struct ActiveRunScreen: View {
 
                 Spacer(minLength: Space.x3)
 
-                TempoAperture(
+                RhythmControl(
+                    state: state,
                     mode: apertureMode,
-                    cadenceSPM: state.cadenceSPM,
-                    progress: state.trackProgress,
-                    reduceMotionOverride: state.forceReduceMotion,
-                    increasedContrastOverride: state.forceIncreasedContrast
+                    size: apertureSize,
+                    send: send
                 )
-                .frame(width: apertureSize, height: apertureSize)
-                .accessibilityIdentifier(state.phase == .running ? "cadence-lock" : "tempo-aperture")
 
                 RunStatus(state: state)
                     .frame(minHeight: showsStatus ? 44 : 4)
@@ -51,7 +48,7 @@ struct ActiveRunScreen: View {
         .scrollIndicators(.hidden)
         .contentShape(Rectangle())
         // The full surface reveals low-attention controls; VoiceOver gets the same action without a tap target hunt.
-        .simultaneousGesture(TapGesture().onEnded(showControls))
+        .onTapGesture(perform: showControls)
         .accessibilityAction(named: "Show controls", showControls)
         .accessibilityIdentifier("run-screen")
     }
@@ -68,7 +65,7 @@ struct ActiveRunScreen: View {
                     "Song position, \(RunDurationText.spoken(state.trackElapsedSeconds))"
                 )
 
-            if controlsVisible {
+            if transportControlsVisible {
                 TransportControls(state: state, send: send)
                     .transition(.opacity.combined(with: .move(edge: .bottom)))
             }
@@ -80,8 +77,8 @@ struct ActiveRunScreen: View {
         .frame(maxWidth: 368)
         .background {
             Ellipse()
-                .fill(SamadhiColor.ink.opacity(controlsVisible ? 0.56 : 0.42))
-                .frame(width: 440, height: controlsVisible ? 300 : 190)
+                .fill(SamadhiColor.ink.opacity(transportControlsVisible ? 0.56 : 0.42))
+                .frame(width: 440, height: transportControlsVisible ? 300 : 190)
                 .blur(radius: 54)
         }
     }
@@ -91,7 +88,7 @@ struct ActiveRunScreen: View {
         if state.phase == .confirmingFinish {
             HoldToFinishControl(send: send, reduceMotionOverride: state.forceReduceMotion)
                 .transition(.opacity)
-        } else if controlsVisible {
+        } else if transportControlsVisible {
             Button(action: beginFinish) {
                 Text("Finish")
                     .font(.body.weight(.semibold))
@@ -105,7 +102,7 @@ struct ActiveRunScreen: View {
         }
     }
 
-    private var controlsVisible: Bool {
+    private var transportControlsVisible: Bool {
         state.controlsVisible || state.phase == .paused
     }
 
@@ -136,11 +133,15 @@ struct ActiveRunScreen: View {
     }
 
     private var apertureSize: CGFloat {
-        dynamicTypeSize.isAccessibilitySize ? 210 : (state.controlsVisible ? 244 : 286)
+        if dynamicTypeSize.isAccessibilitySize {
+            return state.rhythmControl.isVisible ? 228 : 250
+        }
+        return state.rhythmControl.isVisible || state.controlsVisible ? 244 : 286
     }
 
     private func showControls() {
         guard state.phase == .running || state.phase == .acquiring else { return }
+        guard !state.rhythmControl.isVisible else { return }
         send(.revealControls)
         if voiceOverEnabled { send(.controlsFocusChanged(true)) }
     }
@@ -161,14 +162,18 @@ private struct RunStatus: View {
         case .acquiring:
             statusText("Listening for your stride")
         case .running where state.showLockBrief:
-            HStack(alignment: .firstTextBaseline, spacing: Space.x2) {
-                Text("\(state.cadenceSPM ?? 168)")
-                    .font(.title2.monospacedDigit().weight(.bold))
-                Text("steps per minute")
-                    .font(.caption.weight(.semibold))
-                    .foregroundStyle(SamadhiColor.ivory.opacity(0.8))
+            VStack(spacing: Space.x1) {
+                Text("Tempo matched")
+                    .font(.callout.weight(.semibold))
+                HStack(alignment: .firstTextBaseline, spacing: Space.x2) {
+                    Text("\(state.cadenceSPM ?? 168)")
+                        .font(.title2.monospacedDigit().weight(.bold))
+                    Text("steps per minute")
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(SamadhiColor.ivory.opacity(0.8))
+                }
             }
-            .accessibilityLabel("In step at \(state.cadenceSPM ?? 168) steps per minute")
+            .accessibilityLabel("Tempo matched at \(state.cadenceSPM ?? 168) steps per minute")
             .accessibilityIdentifier("cadence-lock")
         case .paused:
             statusText("Paused", font: .headline)

@@ -112,6 +112,6 @@ Debug builds overwrite one local `latest-run-diagnostics.json` file when a run f
 
 ## Manual rhythm control belongs in the core loop
 
-Automatic cadence matching remains the default, but it is not the only control. The runner needs one in-run BPM control to correct the feel and to prove that requested musical changes reach the real player. The control will support a small Auto correction, a direct Manual target, and one-step reset to Auto. It will remain bounded by the existing rate, ramp, confidence, and track-compatibility rules.
+Automatic cadence matching remains the default, but it is not the only control. The runner has one in-run BPM control to correct the feel and to prove that requested musical changes reach the real player. It supports a small Auto correction, a direct Manual target, and one-step reset to Auto. It remains bounded by the existing rate, ramp, confidence, and track-compatibility rules.
 
-This is not a settings system and it does not bypass the reducer. SwiftUI sends intent. The reducer derives safe target rates, identified player effects carry the change, and MusicKit read-back remains the applied truth. The control is now the highest-priority slice because it improves the product and makes physical verification clearer.
+This is not a settings system and it does not bypass the reducer. SwiftUI sends intent. The reducer derives safe target rates, identified player effects carry the change, and MusicKit read-back remains the applied truth. The existing aperture becomes the direct manipulation surface, while requested and applied BPM remain visibly distinct. Physical proof must still confirm that this interaction changes real Apple Music playback cleanly.

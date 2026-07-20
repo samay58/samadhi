@@ -13,6 +13,7 @@
 | Playlist import | Real selection and 13 ready tracks passed; relaunch and run open | Pulled physical app-container record, import model tests, and Simulator states |
 | Tempo analysis | Version 2 passes a narrow 12-preview real-music corpus | Generated regression tests and opt-in Apple preview validation |
 | Adaptation policy | Physical automatic rate-response check passed | Identified reducer effects, deterministic feedback tests, and 59-second device result |
+| In-run BPM control | Implemented and Simulator-verified; physical listening proof open | Auto fine-tune, Manual target, limit truth, accessibility, and reducer tests |
 | Apple Music feasibility | Source selected; Bluetooth route and rate writes passed; long-form reliability deferred | Exact-profile traces and explicit product decision |
 | Spotify feasibility | Rejected for adaptive playback | Remote-control architecture, missing music rate control, and content policy conflict |
 | Production player | Apple Music selected; imported ready tracks enter the real player | Source-neutral contract, exact-profile build, and device install |
@@ -110,18 +111,24 @@
 - Pulled the physical app container and verified one real 25-track playlist produced 13 ready, 8 unreadable, and 4 unavailable tracks
 - Added debug-only latest-run diagnostics so progress, cadence, target and applied rates, track changes, recovery events, and summary survive finish for direct device retrieval
 - Built, signed, and installed the diagnostics-capable app while preserving the selected playlist byte-for-byte; foreground launch remains blocked by the locked phone
+- Added one in-run rhythm control with Auto fine-tune from minus 8 through plus 8 BPM, Manual targets from 120 through 200 BPM, and one-step return to neutral Auto
+- Kept safe rate bounds, ramping, deadband, confidence handling, track compatibility, identified player feedback, and honest summary measurement authoritative in the reducer
+- Added explicit `At limit` feedback when the current track cannot safely reach the requested BPM
+- Extended latest-run diagnostics with control mode, correction or Manual target, requested BPM, derived rate, MusicKit read-back, and limit state
+- Resolved the control as direct manipulation of the existing tempo aperture with large touch targets, restrained haptics, VoiceOver adjustment, Dynamic Type, increased contrast, and Reduce Motion support
+- Reviewed final Auto fine-tune, Manual safety-limit, and accessibility-size frames in the iPhone 17 Pro Simulator without changing the wider visual system
 
 ## Proof
 
 The current serial gate passed on 2026-07-20:
 
-- 48 Swift package tests
+- 60 Swift package tests
 - 9 app-model tests
-- 8 UI tests
+- 9 UI tests
 - Swift formatter lint
 - Resource-inclusive Simulator build
 - Unsigned generic iPhone build
-- Signed physical iPhone build with the exact development profile
+- Signed generic iPhone build with the exact development profile
 
 Durable logs and final visual frames live under Evidence/.
 
@@ -131,8 +138,8 @@ The MusicKit harness and normal app launch in Simulator and on the physical iPho
 
 ## Known limits
 
-Live cadence and automatic cadence-driven rate response pass on the physical iPhone. The planned BPM control is not implemented yet. Debug builds now persist the latest completed run's exact progress, cadence, target and applied rates, track changes, recovery events, and summary. Built-in-speaker listening found no major pitch change or unpleasant artifacts at the safe-rate endpoints. Bluetooth routing and rate writes pass, but no separate Bluetooth listening note was recorded. The tempo estimator passes its narrow 12-preview reference corpus, but broad music accuracy and public-distribution permission for preview analysis remain open. One real playlist passed import and local analysis with 13 ready tracks. Relaunch restoration and multi-track playback are still not physically proven. Five locked minutes, controlled interruption, route loss, accessibility on imported states, and the outdoor run remain open.
+Live cadence and automatic cadence-driven rate response pass on the physical iPhone. The BPM control is implemented and Simulator-verified, but its requested BPM, derived rate, MusicKit read-back, limit behavior, and listening quality have not been proven together on the physical phone. Debug builds persist the latest completed run's exact control, progress, cadence, target and applied rates, track changes, recovery events, and summary. Built-in-speaker listening found no major pitch change or unpleasant artifacts at the safe-rate endpoints. Bluetooth routing and rate writes pass, but no separate Bluetooth listening note was recorded. The tempo estimator passes its narrow 12-preview reference corpus, but broad music accuracy and public-distribution permission for preview analysis remain open. One real playlist passed import and local analysis with 13 ready tracks. Relaunch restoration and multi-track playback are still not physically proven. Five locked minutes, controlled interruption, route loss, accessibility on imported states, and the outdoor run remain open.
 
 ## WHERE WE LEFT OFF
 
-Apple Music is selected. A real 25-track playlist is persisted on Samay's iPhone with 13 ready tracks, so physical selection and analysis pass. The diagnostics-capable build is installed and the playlist survived the update. Next, build and resolve the in-run BPM control, then use it during the restored imported-playlist proof. Long-form reliability checks remain mandatory before Milestone 2 completion.
+Apple Music is selected. A real 25-track playlist is persisted on Samay's iPhone with 13 ready tracks, so physical selection and analysis pass. The in-run BPM control is implemented, visually resolved, accessible, and covered by the full automated gate. The paired iPhone is currently unavailable to Xcode, so the next step is one short physical imported-playlist run that exercises three reachable targets and one unreachable target, then exports the saved diagnostics. Relaunch restoration, a natural track transition, locked playback, recovery, and the outdoor run remain mandatory before Milestone 2 completion.

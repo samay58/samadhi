@@ -10,7 +10,7 @@ public enum ApertureMode: Sendable, Equatable {
 
 public struct TempoAperture: View {
     let mode: ApertureMode
-    let cadenceSPM: Int?
+    let tempoBPM: Int?
     let progress: Double
     let reduceMotionOverride: Bool
     let increasedContrastOverride: Bool
@@ -20,13 +20,13 @@ public struct TempoAperture: View {
 
     public init(
         mode: ApertureMode,
-        cadenceSPM: Int? = nil,
+        tempoBPM: Int? = nil,
         progress: Double = 0,
         reduceMotionOverride: Bool = false,
         increasedContrastOverride: Bool = false
     ) {
         self.mode = mode
-        self.cadenceSPM = cadenceSPM
+        self.tempoBPM = tempoBPM
         self.progress = min(max(progress, 0), 1)
         self.reduceMotionOverride = reduceMotionOverride
         self.increasedContrastOverride = increasedContrastOverride
@@ -57,7 +57,7 @@ public struct TempoAperture: View {
 
     private var visualPhase: Double {
         guard !effectiveReduceMotion, mode != .paused, mode != .interrupted else { return 0.18 }
-        let bpm = Double(cadenceSPM ?? 96)
+        let bpm = Double(tempoBPM ?? 96)
         let snapshot = BeatClockSnapshot(bpm: bpm, anchorUptime: 0)
         return snapshot.phase(atUptime: ProcessInfo.processInfo.systemUptime)
     }
@@ -79,7 +79,7 @@ public struct TempoAperture: View {
     private var accessibilityLabel: String {
         switch mode {
         case .acquiring: "Listening for your stride"
-        case .locked: "In step"
+        case .locked: "Tempo matched"
         case .paused: "Paused"
         case .interrupted: "Music paused"
         }
@@ -91,8 +91,8 @@ public struct TempoAperture: View {
 
     private var accessibilityValue: String {
         let songProgress = "\(Int(progress * 100)) percent through song"
-        guard let cadenceSPM, mode == .locked else { return songProgress }
-        return "\(cadenceSPM) steps per minute, \(songProgress)"
+        guard let tempoBPM, mode == .locked else { return songProgress }
+        return "Music at \(tempoBPM) beats per minute, \(songProgress)"
     }
 }
 
