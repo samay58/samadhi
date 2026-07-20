@@ -190,9 +190,8 @@ After source selection, the full serial Xcode gate must pass before a milestone 
 
 ### Immediate execution order
 
-1. Relaunch the physical app and prove the persisted 13-ready-track collection restores.
-2. Run through a real track transition and confirm progress, cadence, applied-rate behavior, and the saved diagnostic file.
-3. Complete Bluetooth listening, five locked minutes, controlled interruption, and route loss before Milestone 2 completion.
+1. Run the restored 13-ready-track collection through a real track transition and confirm cadence, applied-rate behavior, and the saved diagnostic file.
+2. Complete Bluetooth listening, five locked minutes, controlled interruption, and route loss before Milestone 2 completion.
 
 ### Verified platform sources
 

@@ -13,7 +13,7 @@ Apple team `ZL5U59XBJ6` is saved in `project.yml`. Signed compilation and instal
 5. Close and reopen Samadhi. Confirm the same playlist returns without another choice.
 6. During a short run, check that playback starts, cadence changes, and skip advances to another ready track.
 
-The build is suitable for product testing, not public distribution. The installed offline profile expires on 2026-07-23 UTC. Physical selection and analysis pass. Relaunch restoration and multi-track playback remain open.
+The build is suitable for product testing, not public distribution. The installed offline profile expires on 2026-07-23 UTC. Physical selection, analysis, reinstall and relaunch restoration, and basic player progress pass. A natural track transition remains open.
 
 After a debug run finishes, pull `Library/Application Support/Samadhi/latest-run-diagnostics.json` directly from the app container. The file overwrites the prior run and contains progress, cadence, target and applied rates, track changes, recovery events, and the honest summary.
 

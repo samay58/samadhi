@@ -210,6 +210,15 @@
 - Initially found the paired physical iPhone unavailable to Xcode, so no MusicKit or listening claim was made
 - Reconnected later, then built from clean commit `50de75b`, installed the exact-profile app, launched it, and confirmed the Samadhi process was running
 
+## 2026-07-20. Current main phone update
+
+- Built current `main` from a clean detached worktree with the exact development profile
+- Installed and launched the physical build on Samay's iPhone
+- Verified the selected playlist survived byte-for-byte and restored to the normal ready screen with 13 of 25 tracks ready
+- Pulled schema-version-2 diagnostics showing real production-player progress from 0 through 6 seconds
+- Re-ran the focused BPM interaction UI test on the booted iPhone 17 Pro Simulator
+- Left cadence-driven BPM response, a natural track transition, listening, background, and recovery honestly open
+
 ## Current checkpoint
 
-Milestones 0 and 1 are complete. Apple Music is the selected Milestone 2 source. Live Core Motion cadence and automatic MusicKit rate response pass together on the physical iPhone. The narrow 12-preview corpus passes. One real playlist passes selection and analysis with 13 ready tracks. The bounded in-run BPM control is implemented, visually resolved, accessible, covered by the full automated gate, installed, and running on the physical phone. Next comes physical BPM response, playlist restoration, multi-track playback, and direct retrieval of the latest-run diagnostics. Long-form background and recovery checks remain before Milestone 2 completion.
+Milestones 0 and 1 are complete. Apple Music is the selected Milestone 2 source. Live Core Motion cadence and automatic MusicKit rate response pass together on the physical iPhone. The narrow 12-preview corpus passes. One real playlist passes selection, analysis, reinstall and relaunch restoration, and basic production-player progress with 13 ready tracks. The bounded in-run BPM control is implemented, visually resolved, accessible, covered by the full automated gate, installed from current `main`, and running on the physical phone. Next comes one short cadence-driven BPM-control run through a natural track transition, followed by direct retrieval of the latest-run diagnostics. Long-form background and recovery checks remain before Milestone 2 completion.
