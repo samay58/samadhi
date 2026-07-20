@@ -96,7 +96,7 @@ Design benchmark research lives in [DESIGN-BENCHMARKS.md](DESIGN-BENCHMARKS.md).
 
 Current build answers one question: can complete run interaction feel calm, legible, and coherent before real sensing and audio exist?
 
-Answer: yes in Simulator, and the focused body-to-music loop now passes on the physical iPhone. A corrected 59-second run averaged 155 SPM and measured 98 percent tempo matched from MusicKit read-back. One real 25-track playlist produced 13 ready tracks on the physical phone. Relaunch restoration, multi-track playback, broad music accuracy, and the complete outdoor loop remain unproven.
+Answer: yes in Simulator, and the focused body-to-music loop now passes on the physical iPhone. A corrected 59-second run averaged 155 SPM and measured 98 percent tempo matched from MusicKit read-back. One real 25-track playlist restores after reinstall and relaunch with 13 ready tracks, and basic production-player progress passes. Cadence-driven BPM control across imported tracks, a natural transition, broad music accuracy, and the complete outdoor loop remain unproven.
 
 ## Current exclusions
 

@@ -128,13 +128,15 @@ The `Samadhi MusicKit Gate` scheme verifies that the harness and framework calls
 - Spotify adaptive playback: rejected by documented platform capability and policy review; no code spike warranted
 - Screen-lock background, next track, controlled interruption, and route-loss checks: deferred to the reliability gate
 - Real playlist selection and analysis: passed at 13 ready, 8 unreadable, and 4 unavailable tracks from a 25-track physical selection
-- Relaunch restoration and imported multi-track playback: not yet physically run
+- Reinstall and relaunch restoration: passed with the selected collection checksum unchanged and the physical ready screen showing 13 of 25 ready
+- Production-player progress: passed from a pulled schema-version-2 trace advancing from 0 through 6 seconds on one stable catalog identity
+- Imported natural track transition: not yet physically run
 - BPM control: deterministic policy, UI interaction, and Simulator design pass; physical MusicKit response and listening proof not yet run
 - Paired iPhone state on 2026-07-20: available to Xcode; exact `Samadhi Development` profile remains installed and expires on 2026-07-23 UTC
 
 ## Next implementation gate
 
-Use the installed BPM-control build while the physical iPhone is available. Confirm `Strut Frequency -- July 2026` restores with 13 ready tracks. During one short run, exercise three reachable BPM targets and one unreachable target, continue through a real track transition, and pull `latest-run-diagnostics.json` after finish. Renew the exact profile first if this happens after 2026-07-23 UTC. Before Milestone 2 completion, record one concise Bluetooth listening note and prove five screen-locked minutes, controlled interruption, and route loss.
+Use the installed current-`main` BPM-control build while the physical iPhone is available. During one short run, exercise three reachable BPM targets and one unreachable target, continue through a real track transition, and pull `latest-run-diagnostics.json` after finish. Renew the exact profile first if this happens after 2026-07-23 UTC. Before Milestone 2 completion, record one concise Bluetooth listening note and prove five screen-locked minutes, controlled interruption, and route loss.
 
 ## Known environment behavior
 

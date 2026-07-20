@@ -367,16 +367,15 @@ Acceptance:
 
 ### Where we are now
 
-Milestones 0 and 1 are complete. Apple Music is the selected Milestone 2 source. A validated 149.75 BPM fixture, Core Motion cadence, bounded reducer adaptation, identified MusicKit read-back, and honest measurement pass together in the focused core-loop scheme. The corrected 59-second physical run averaged 155 SPM and measured 98 percent tempo matched. Analyzer version 2 uses Accelerate spectral flux and fractional-lag autocorrelation and passes the narrow 12-preview corpus. One physical 25-track playlist produced 13 ready tracks. Playlist persistence, ready-track filtering, the normal production composition, and the source-neutral BPM control are implemented. The control's physical MusicKit response and listening behavior remain open.
+Milestones 0 and 1 are complete. Apple Music is the selected Milestone 2 source. A validated 149.75 BPM fixture, Core Motion cadence, bounded reducer adaptation, identified MusicKit read-back, and honest measurement pass together in the focused core-loop scheme. The corrected 59-second physical run averaged 155 SPM and measured 98 percent tempo matched. Analyzer version 2 uses Accelerate spectral flux and fractional-lag autocorrelation and passes the narrow 12-preview corpus. One physical 25-track playlist restores after reinstall and relaunch with 13 ready tracks, and basic production-player progress passes. Playlist persistence, ready-track filtering, the normal production composition, and the source-neutral BPM control are implemented. The control's physical MusicKit response, natural imported-track transition, and listening behavior remain open.
 
 ### Build order
 
-1. Install the BPM-control build and prove requested BPM, safe target rate, MusicKit read-back, and limit feedback on the physical phone.
-2. Relaunch the physical app and prove the persisted 13-ready-track collection restores.
-3. Run the imported production flow and verify real progress, transitions, and saved diagnostics.
-4. Expand analyzer coverage only when new real tracks expose a specific failure.
-5. Run cadence calibration, listening, background, recovery, and the outdoor completion gate.
-6. Save evidence and update active documentation as each physical gate closes.
+1. Prove requested BPM, safe target rate, MusicKit read-back, and limit feedback on the physical phone.
+2. Continue the restored imported production flow through a natural transition and verify the saved diagnostics.
+3. Expand analyzer coverage only when new real tracks expose a specific failure.
+4. Run cadence calibration, listening, background, recovery, and the outdoor completion gate.
+5. Save evidence and update active documentation as each physical gate closes.
 
 Do not redesign the app before the source decision and core audio loop pass. Do not build playlist generation before imported music works. Do not keep a failed player path “for later.”
 
