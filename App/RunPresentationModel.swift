@@ -72,6 +72,7 @@ final class RunPresentationModel {
         let trackDuration = session?.trackDurationSeconds ?? track.durationSeconds
         var phase: RunVisualPhase = .ready
         var controlsVisible = false
+        var rhythmControlVisible = false
         var cadence: Int?
 
         switch state {
@@ -84,7 +85,8 @@ final class RunPresentationModel {
         case let .active(active):
             switch active.activity {
             case let .playing(rhythm, controls):
-                controlsVisible = controls != .hidden
+                controlsVisible = controls.surface == .transport
+                rhythmControlVisible = controls.surface == .rhythm
                 switch rhythm {
                 case .acquiring:
                     phase = .acquiring
@@ -110,6 +112,16 @@ final class RunPresentationModel {
             phase = .summary(summary)
         }
 
+        let requestedBPM =
+            session?.rhythmControl.requestedBPM(
+                cadenceSPM: cadence.map(Double.init)
+            ) ?? session?.adaptationState.requestedBPM
+        let appliedBPM = appliedTempoBPM(
+            for: domainTrack,
+            rate: session?.appliedPlaybackRate,
+            referenceBPM: requestedBPM ?? cadence.map(Double.init)
+        )
+
         return RunViewState(
             phase: phase,
             controlsVisible: controlsVisible,
@@ -121,7 +133,17 @@ final class RunPresentationModel {
             ),
             track: track,
             hasArtwork: !configuration.missingArtwork,
-            showLockBrief: showLockBrief
+            showLockBrief: showLockBrief,
+            rhythmControl: RhythmControlPresentation(
+                mode: session?.rhythmControl.mode ?? .automatic,
+                automaticCorrectionBPM: session?.rhythmControl.automaticCorrectionBPM ?? 0,
+                manualTargetBPM: session?.rhythmControl.manualTargetBPM ?? 168,
+                requestedBPM: requestedBPM.map { Int($0.rounded()) },
+                appliedBPM: appliedBPM,
+                isAtLimit: session?.adaptationState.isAtLimit ?? false,
+                isVisible: rhythmControlVisible,
+                isAvailable: session?.mode == .adaptive
+            )
         )
     }
 
@@ -131,6 +153,20 @@ final class RunPresentationModel {
             dispatch(.startTapped(sessionID: token()))
         case .revealControls:
             dispatch(.surfaceTapped(timeoutID: token()))
+        case .revealRhythmControl:
+            dispatch(.rhythmControlRevealed(timeoutID: token()))
+        case let .adjustRhythmControl(steps):
+            dispatch(
+                .rhythmControlAdjusted(
+                    steps: steps,
+                    rateRequestID: token(),
+                    timeoutID: token()
+                )
+            )
+        case .useManualRhythm:
+            dispatch(.rhythmControlSetManual(rateRequestID: token(), timeoutID: token()))
+        case .resetRhythmControl:
+            dispatch(.rhythmControlReset(rateRequestID: token(), timeoutID: token()))
         case let .controlsFocusChanged(isFocused):
             dispatch(isFocused ? .controlsFocusEntered : .controlsFocusExited(timeoutID: token()))
         case .previous:
@@ -481,7 +517,8 @@ final class RunPresentationModel {
                     sessionID: session.id,
                     operationID: operationID,
                     trackID: trackID,
-                    trackIndex: trackIndex
+                    trackIndex: trackIndex,
+                    rateRequestID: token()
                 )
             )
 
@@ -519,6 +556,23 @@ final class RunPresentationModel {
         )
     }
 
+    private func appliedTempoBPM(
+        for track: MusicTrack,
+        rate: Double?,
+        referenceBPM: Double?
+    ) -> Int? {
+        guard let tempo = track.tempo, let rate else { return nil }
+        let candidates = [tempo.baseBPM / 2, tempo.baseBPM, tempo.baseBPM * 2]
+            .filter { (120...210).contains($0) }
+            .map { $0 * rate }
+        guard !candidates.isEmpty else { return nil }
+        let reference = referenceBPM ?? candidates.min(by: { abs($0 - 168) < abs($1 - 168) })
+        guard let reference,
+            let closest = candidates.min(by: { abs($0 - reference) < abs($1 - reference) })
+        else { return nil }
+        return Int(closest.rounded())
+    }
+
     private func emitHaptic(_ event: HapticEvent) {
         switch event {
         case .start, .resume:
@@ -529,6 +583,12 @@ final class RunPresentationModel {
             UIImpactFeedbackGenerator(style: .medium).impactOccurred()
         case .finish:
             UIImpactFeedbackGenerator(style: .heavy).impactOccurred()
+        case .rhythmStep:
+            UISelectionFeedbackGenerator().selectionChanged()
+        case .rhythmAuto:
+            UIImpactFeedbackGenerator(style: .medium).impactOccurred(intensity: 0.72)
+        case .rhythmLimit:
+            UINotificationFeedbackGenerator().notificationOccurred(.warning)
         }
     }
 }

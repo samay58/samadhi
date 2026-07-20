@@ -197,6 +197,18 @@
 - Built and installed the diagnostics-capable app with the exact profile while preserving the selected playlist byte-for-byte
 - Reached the honest device blocker: iOS denied foreground launch because the phone was locked
 
+## 2026-07-20. In-run BPM control
+
+- Added source-neutral Auto fine-tune and Manual BPM state with explicit reset and per-run defaults
+- Routed every adjustment through the reducer, bounded adaptation policy, identified player effect, and MusicKit read-back seam
+- Kept Manual useful before cadence lock without inventing cadence or a measured summary
+- Added honest safe-limit feedback and persisted control intent, derived rate, observed rate, and limit state in latest-run diagnostics
+- Turned the existing tempo aperture into a progressive, one-handed control with horizontal detents, large slower and faster targets, restrained haptics, and separate Auto and Manual ownership
+- Added VoiceOver adjustment, useful labels and values, Dynamic Type behavior, increased contrast, and Reduce Motion support
+- Reviewed final iPhone 17 Pro Simulator frames for Auto fine-tune, Manual safety limit, and accessibility-size text; the wider main-screen system did not need redesign
+- Passed formatter lint, 60 package tests, 9 app-model tests, 9 UI tests, the normal Simulator build, and an exact-profile signed iPhone build
+- Found the paired physical iPhone unavailable to Xcode, so no physical MusicKit or listening claim was made
+
 ## Current checkpoint
 
-Milestones 0 and 1 are complete. Apple Music is the selected Milestone 2 source. Live Core Motion cadence and automatic MusicKit rate response pass together on the physical iPhone. The narrow 12-preview corpus passes. One real playlist now passes selection and analysis with 13 ready tracks. The next product slice is a bounded in-run BPM control with Auto correction, Manual targeting, honest limit feedback, and polished direct manipulation. After that comes unlocked relaunch restoration, multi-track physical playback, and direct retrieval of the latest-run diagnostics. Long-form background and recovery checks remain before Milestone 2 completion.
+Milestones 0 and 1 are complete. Apple Music is the selected Milestone 2 source. Live Core Motion cadence and automatic MusicKit rate response pass together on the physical iPhone. The narrow 12-preview corpus passes. One real playlist passes selection and analysis with 13 ready tracks. The bounded in-run BPM control is implemented, visually resolved, accessible, and covered by the full automated gate. Next comes physical BPM response, unlocked relaunch restoration, multi-track playback, and direct retrieval of the latest-run diagnostics. Long-form background and recovery checks remain before Milestone 2 completion.

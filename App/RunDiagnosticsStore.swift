@@ -25,6 +25,8 @@ struct RunDiagnosticSnapshot: Codable, Equatable, Sendable {
             case interruptionEnded
             case playbackFailed
             case activeSecond
+            case rhythmAdjusted
+            case rhythmModeChanged
             case finishRequested
             case finished
         }
@@ -34,6 +36,12 @@ struct RunDiagnosticSnapshot: Codable, Equatable, Sendable {
         let activeSeconds: Int
         let cadenceSPM: Double?
         let targetRate: Double?
+        let controlMode: String?
+        let automaticCorrectionBPM: Int?
+        let manualTargetBPM: Int?
+        let requestedBPM: Double?
+        let derivedTargetRate: Double?
+        let atLimit: Bool?
         let appliedRate: Double
         let awaitingRateFeedback: Bool
         let trackID: String?
@@ -42,6 +50,48 @@ struct RunDiagnosticSnapshot: Codable, Equatable, Sendable {
         let trackElapsedSeconds: Int
         let trackDurationSeconds: Int?
         let tempoMatched: Bool?
+
+        init(
+            offsetSeconds: Double,
+            kind: Kind,
+            activeSeconds: Int,
+            cadenceSPM: Double?,
+            targetRate: Double?,
+            controlMode: String? = nil,
+            automaticCorrectionBPM: Int? = nil,
+            manualTargetBPM: Int? = nil,
+            requestedBPM: Double? = nil,
+            derivedTargetRate: Double? = nil,
+            atLimit: Bool = false,
+            appliedRate: Double,
+            awaitingRateFeedback: Bool,
+            trackID: String?,
+            trackTitle: String?,
+            trackIndex: Int,
+            trackElapsedSeconds: Int,
+            trackDurationSeconds: Int?,
+            tempoMatched: Bool?
+        ) {
+            self.offsetSeconds = offsetSeconds
+            self.kind = kind
+            self.activeSeconds = activeSeconds
+            self.cadenceSPM = cadenceSPM
+            self.targetRate = targetRate
+            self.controlMode = controlMode
+            self.automaticCorrectionBPM = automaticCorrectionBPM
+            self.manualTargetBPM = manualTargetBPM
+            self.requestedBPM = requestedBPM
+            self.derivedTargetRate = derivedTargetRate
+            self.atLimit = atLimit
+            self.appliedRate = appliedRate
+            self.awaitingRateFeedback = awaitingRateFeedback
+            self.trackID = trackID
+            self.trackTitle = trackTitle
+            self.trackIndex = trackIndex
+            self.trackElapsedSeconds = trackElapsedSeconds
+            self.trackDurationSeconds = trackDurationSeconds
+            self.tempoMatched = tempoMatched
+        }
     }
 
     let schemaVersion: Int
@@ -140,6 +190,12 @@ struct RunDiagnosticsRecorder {
                 activeSeconds: session?.elapsedActiveSeconds ?? 0,
                 cadenceSPM: cadence(in: stateForEntry),
                 targetRate: session?.adaptationState.targetRate,
+                controlMode: session?.rhythmControl.mode.rawValue,
+                automaticCorrectionBPM: session?.rhythmControl.automaticCorrectionBPM,
+                manualTargetBPM: session?.rhythmControl.manualTargetBPM,
+                requestedBPM: session?.adaptationState.requestedBPM,
+                derivedTargetRate: session?.adaptationState.derivedTargetRate,
+                atLimit: session?.adaptationState.isAtLimit ?? false,
                 appliedRate: session?.appliedPlaybackRate ?? 1,
                 awaitingRateFeedback: session?.pendingRateRequestID != nil,
                 trackID: session?.currentTrackID?.rawValue,
@@ -153,7 +209,7 @@ struct RunDiagnosticsRecorder {
 
         guard case let .summary(summary) = newState else { return nil }
         let snapshot = RunDiagnosticSnapshot(
-            schemaVersion: 1,
+            schemaVersion: 2,
             capturedAt: now(),
             collectionID: collection.id.rawValue,
             collectionName: collection.name,
@@ -201,6 +257,10 @@ struct RunDiagnosticsRecorder {
             .playbackFailed
         case .activeSecond:
             .activeSecond
+        case .rhythmControlAdjusted:
+            .rhythmAdjusted
+        case .rhythmControlSetManual, .rhythmControlReset:
+            .rhythmModeChanged
         case .finishHoldCompleted:
             .finishRequested
         case .finishCompleted:

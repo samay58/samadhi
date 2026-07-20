@@ -14,6 +14,9 @@ public struct AdaptationState: Sendable, Equatable {
     public var confidenceLossStartRate: Double?
     public var matchedSeconds: Double
     public var hasMatched: Bool
+    public var requestedBPM: Double?
+    public var derivedTargetRate: Double?
+    public var isAtLimit: Bool
 
     public init(
         targetRate: Double? = nil,
@@ -23,7 +26,10 @@ public struct AdaptationState: Sendable, Equatable {
         confidenceLostSeconds: Double? = nil,
         confidenceLossStartRate: Double? = nil,
         matchedSeconds: Double = 0,
-        hasMatched: Bool = false
+        hasMatched: Bool = false,
+        requestedBPM: Double? = nil,
+        derivedTargetRate: Double? = nil,
+        isAtLimit: Bool = false
     ) {
         self.targetRate = targetRate
         self.baseTempoBPM = baseTempoBPM
@@ -33,6 +39,9 @@ public struct AdaptationState: Sendable, Equatable {
         self.confidenceLossStartRate = confidenceLossStartRate
         self.matchedSeconds = max(matchedSeconds, 0)
         self.hasMatched = hasMatched
+        self.requestedBPM = requestedBPM
+        self.derivedTargetRate = derivedTargetRate
+        self.isAtLimit = isAtLimit
     }
 
     public static let initial = AdaptationState()
@@ -45,6 +54,8 @@ public struct AdaptationInput: Sendable, Equatable {
     public let analysisConfidence: Double
     public let appliedRate: Double
     public let deltaSeconds: Double
+    public let rhythmControl: RhythmControlState
+    public let forceTargetUpdate: Bool
 
     public init(
         cadenceSPM: Double?,
@@ -52,7 +63,9 @@ public struct AdaptationInput: Sendable, Equatable {
         baseTempoBPM: Double,
         analysisConfidence: Double,
         appliedRate: Double,
-        deltaSeconds: Double
+        deltaSeconds: Double,
+        rhythmControl: RhythmControlState = .initial,
+        forceTargetUpdate: Bool = false
     ) {
         self.cadenceSPM = cadenceSPM
         self.cadenceReliable = cadenceReliable
@@ -60,6 +73,8 @@ public struct AdaptationInput: Sendable, Equatable {
         self.analysisConfidence = analysisConfidence
         self.appliedRate = appliedRate
         self.deltaSeconds = max(deltaSeconds, 0)
+        self.rhythmControl = rhythmControl
+        self.forceTargetUpdate = forceTargetUpdate
     }
 }
 
@@ -69,6 +84,9 @@ public struct AdaptationDecision: Sendable, Equatable {
     public let isTrackCompatible: Bool
     public let status: AdaptationStatus
     public let nextState: AdaptationState
+    public let requestedBPM: Double?
+    public let derivedTargetRate: Double?
+    public let isAtLimit: Bool
 }
 
 public struct AdaptationPolicy: Sendable {
@@ -87,38 +105,67 @@ public struct AdaptationPolicy: Sendable {
             return musicSteady(state: state, input: input)
         }
 
-        guard input.cadenceReliable,
-            let cadence = input.cadenceSPM,
-            (120...210).contains(cadence)
-        else {
-            return confidenceLost(state: state, input: input)
+        let requestedBPM: Double
+        switch input.rhythmControl.mode {
+        case .automatic:
+            guard input.cadenceReliable,
+                let cadence = input.cadenceSPM,
+                (120...210).contains(cadence),
+                let requested = input.rhythmControl.requestedBPM(cadenceSPM: cadence)
+            else {
+                return confidenceLost(state: state, input: input)
+            }
+            requestedBPM = requested
+        case .manual:
+            guard let requested = input.rhythmControl.requestedBPM(cadenceSPM: input.cadenceSPM) else {
+                return musicSteady(state: state, input: input)
+            }
+            requestedBPM = requested
         }
 
         var next = state
-        next.confidenceLostSeconds = nil
-        next.confidenceLossStartRate = nil
+        if input.rhythmControl.mode == .manual, !input.cadenceReliable {
+            next.confidenceLostSeconds = (state.confidenceLostSeconds ?? 0) + input.deltaSeconds
+            next.confidenceLossStartRate = nil
+            if (next.confidenceLostSeconds ?? 0) >= 10 {
+                next.lastReliableCadenceSPM = nil
+            }
+        } else {
+            next.confidenceLostSeconds = nil
+            next.confidenceLossStartRate = nil
+        }
         next.secondsSinceTargetUpdate += input.deltaSeconds
+        next.requestedBPM = requestedBPM
 
-        let cadenceMovement = state.lastReliableCadenceSPM.map { abs(cadence - $0) }
-        let cadenceChanged = cadenceMovement.map { $0 > 2 } ?? true
+        let requestedMovement = state.requestedBPM.map { abs(requestedBPM - $0) }
+        let requestedChanged = requestedMovement.map { $0 > 2 } ?? true
         let trackChanged = state.baseTempoBPM != input.baseTempoBPM
         let canUpdateTarget =
-            state.targetRate == nil || trackChanged
-            || (cadenceChanged && next.secondsSinceTargetUpdate >= 2)
+            state.targetRate == nil || trackChanged || input.forceTargetUpdate
+            || (requestedChanged && next.secondsSinceTargetUpdate >= 2)
 
         if canUpdateTarget {
             if trackChanged {
                 next.hasMatched = false
                 next.matchedSeconds = 0
             }
-            guard let target = targetRate(cadence: cadence, baseTempo: input.baseTempoBPM),
-                (minimumRate...maximumRate).contains(target)
-            else {
+            guard let target = targetRate(requestedBPM: requestedBPM, baseTempo: input.baseTempoBPM) else {
                 return musicSteady(state: next, input: input)
+            }
+            next.derivedTargetRate = target
+            next.isAtLimit = !(minimumRate...maximumRate).contains(target)
+            guard !next.isAtLimit else {
+                return musicSteady(
+                    state: next,
+                    input: input,
+                    requestedBPM: requestedBPM,
+                    derivedTargetRate: target,
+                    isAtLimit: true
+                )
             }
             next.targetRate = target
             next.baseTempoBPM = input.baseTempoBPM
-            next.lastReliableCadenceSPM = cadence
+            if input.cadenceReliable { next.lastReliableCadenceSPM = input.cadenceSPM }
             next.secondsSinceTargetUpdate = 0
         }
 
@@ -152,16 +199,19 @@ public struct AdaptationPolicy: Sendable {
             targetRate: target,
             isTrackCompatible: true,
             status: status,
-            nextState: next
+            nextState: next,
+            requestedBPM: requestedBPM,
+            derivedTargetRate: next.derivedTargetRate,
+            isAtLimit: false
         )
     }
 
-    private func targetRate(cadence: Double, baseTempo: Double) -> Double? {
+    private func targetRate(requestedBPM: Double, baseTempo: Double) -> Double? {
         let candidates = [baseTempo / 2, baseTempo, baseTempo * 2]
             .filter { (120...210).contains($0) }
         return
             candidates
-            .map { cadence / $0 }
+            .map { requestedBPM / $0 }
             .min { abs($0 - 1) < abs($1 - 1) }
     }
 
@@ -191,11 +241,20 @@ public struct AdaptationPolicy: Sendable {
             targetRate: next.targetRate,
             isTrackCompatible: true,
             status: .acquiring,
-            nextState: next
+            nextState: next,
+            requestedBPM: next.requestedBPM,
+            derivedTargetRate: next.derivedTargetRate,
+            isAtLimit: next.isAtLimit
         )
     }
 
-    private func musicSteady(state: AdaptationState, input: AdaptationInput) -> AdaptationDecision {
+    private func musicSteady(
+        state: AdaptationState,
+        input: AdaptationInput,
+        requestedBPM: Double? = nil,
+        derivedTargetRate: Double? = nil,
+        isAtLimit: Bool = false
+    ) -> AdaptationDecision {
         var next = state
         next.targetRate = nil
         next.baseTempoBPM = input.baseTempoBPM
@@ -203,12 +262,18 @@ public struct AdaptationPolicy: Sendable {
         next.hasMatched = false
         next.confidenceLostSeconds = nil
         next.confidenceLossStartRate = nil
+        next.requestedBPM = requestedBPM
+        next.derivedTargetRate = derivedTargetRate
+        next.isAtLimit = isAtLimit
         return AdaptationDecision(
             commandedRate: move(input.appliedRate, toward: 1, maximumChange: 0.02 * input.deltaSeconds),
             targetRate: nil,
             isTrackCompatible: false,
             status: .musicSteady,
-            nextState: next
+            nextState: next,
+            requestedBPM: requestedBPM,
+            derivedTargetRate: derivedTargetRate,
+            isAtLimit: isAtLimit
         )
     }
 

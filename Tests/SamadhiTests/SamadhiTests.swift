@@ -23,7 +23,7 @@ import Testing
     let store = RunDiagnosticsStore(directoryURL: directory)
     let capturedAt = Date(timeIntervalSince1970: 1_721_000_000)
     let snapshot = RunDiagnosticSnapshot(
-        schemaVersion: 1,
+        schemaVersion: 2,
         capturedAt: capturedAt,
         collectionID: "playlist",
         collectionName: "Strut Frequency",
@@ -41,6 +41,12 @@ import Testing
                 activeSeconds: 10,
                 cadenceSPM: 155,
                 targetRate: 1.035,
+                controlMode: RhythmControlMode.automatic.rawValue,
+                automaticCorrectionBPM: 2,
+                manualTargetBPM: 168,
+                requestedBPM: 157,
+                derivedTargetRate: 1.035,
+                atLimit: false,
                 appliedRate: 1.03,
                 awaitingRateFeedback: false,
                 trackID: "101",
@@ -128,7 +134,8 @@ import Testing
                 sessionID: 1,
                 operationID: 1,
                 trackID: collection.tracks[1].id,
-                trackIndex: 1
+                trackIndex: 1,
+                rateRequestID: 4
             )
         ) == nil
     )
@@ -155,6 +162,11 @@ import Testing
     )
     #expect(snapshot.timeline[2].appliedRate == 0.98)
     #expect(snapshot.timeline[3].trackElapsedSeconds == 12)
+    #expect(snapshot.schemaVersion == 2)
+    #expect(snapshot.timeline[1].controlMode == RhythmControlMode.automatic.rawValue)
+    #expect(snapshot.timeline[1].automaticCorrectionBPM == 0)
+    #expect(snapshot.timeline[1].requestedBPM == 162)
+    #expect(snapshot.timeline[1].derivedTargetRate != nil)
 }
 
 @Test func collectionStoreRoundTripsSelectionAndCache() async throws {

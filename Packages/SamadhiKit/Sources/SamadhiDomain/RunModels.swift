@@ -40,6 +40,7 @@ public struct RunSession: Sendable, Equatable {
     public var currentTrackID: MusicTrackID?
     public var cadenceAcquisitionID: Int?
     public var adaptationState: AdaptationState
+    public var rhythmControl: RhythmControlState
     public var appliedPlaybackRate: Double
     public var pendingRateRequestID: Int?
 
@@ -59,6 +60,7 @@ public struct RunSession: Sendable, Equatable {
         currentTrackID = nil
         cadenceAcquisitionID = nil
         adaptationState = .initial
+        rhythmControl = .initial
         appliedPlaybackRate = 1
         pendingRateRequestID = nil
     }
@@ -80,9 +82,9 @@ public struct RunSession: Sendable, Equatable {
         RunSummary(
             durationSeconds: elapsedActiveSeconds,
             averageCadence: cadenceSamples == 0 ? nil : cadenceTotal / cadenceSamples,
-            tempoMatchedPercent: mode == .fixed
+            tempoMatchedPercent: mode == .fixed || eligibleTempoMatchSamples == 0
                 ? nil
-                : eligibleTempoMatchSamples == 0 ? 0 : (tempoMatchedSamples * 100) / eligibleTempoMatchSamples,
+                : (tempoMatchedSamples * 100) / eligibleTempoMatchSamples,
             songCount: songCount
         )
     }
@@ -104,10 +106,24 @@ public enum RhythmState: Sendable, Equatable {
     case fixed
 }
 
+public enum RunControlSurface: Sendable, Equatable {
+    case transport
+    case rhythm
+}
+
 public enum ControlsState: Sendable, Equatable {
     case hidden
-    case timed(timeoutID: Int)
-    case voiceOverPinned
+    case timed(surface: RunControlSurface, timeoutID: Int)
+    case voiceOverPinned(surface: RunControlSurface)
+
+    public var surface: RunControlSurface? {
+        switch self {
+        case .hidden:
+            nil
+        case let .timed(surface, _), let .voiceOverPinned(surface):
+            surface
+        }
+    }
 }
 
 public enum RunActivity: Sendable, Equatable {
@@ -166,6 +182,9 @@ public enum HapticEvent: Sendable, Equatable {
     case pause
     case resume
     case finish
+    case rhythmStep
+    case rhythmAuto
+    case rhythmLimit
 }
 
 public enum RunTaskKind: Sendable, Equatable, Hashable {
@@ -226,6 +245,10 @@ public enum RunEvent: Sendable, Equatable {
     )
     case cadenceAcquisitionFailed(sessionID: Int, acquisitionID: Int)
     case surfaceTapped(timeoutID: Int)
+    case rhythmControlRevealed(timeoutID: Int)
+    case rhythmControlAdjusted(steps: Int, rateRequestID: Int, timeoutID: Int)
+    case rhythmControlSetManual(rateRequestID: Int, timeoutID: Int)
+    case rhythmControlReset(rateRequestID: Int, timeoutID: Int)
     case controlsTimedOut(timeoutID: Int)
     case controlsFocusEntered
     case controlsFocusExited(timeoutID: Int)
@@ -262,7 +285,8 @@ public enum RunEvent: Sendable, Equatable {
         sessionID: Int,
         operationID: Int,
         trackID: MusicTrackID,
-        trackIndex: Int
+        trackIndex: Int,
+        rateRequestID: Int
     )
     case playbackFailed(sessionID: Int, operationID: Int)
     case activeSecond(tempoMatched: Bool?)

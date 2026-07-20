@@ -82,6 +82,37 @@ public enum MusicSelectionPresentation: Sendable, Equatable {
     case failed(String)
 }
 
+public struct RhythmControlPresentation: Sendable, Equatable {
+    public var mode: RhythmControlMode
+    public var automaticCorrectionBPM: Int
+    public var manualTargetBPM: Int
+    public var requestedBPM: Int?
+    public var appliedBPM: Int?
+    public var isAtLimit: Bool
+    public var isVisible: Bool
+    public var isAvailable: Bool
+
+    public init(
+        mode: RhythmControlMode = .automatic,
+        automaticCorrectionBPM: Int = 0,
+        manualTargetBPM: Int = 168,
+        requestedBPM: Int? = nil,
+        appliedBPM: Int? = nil,
+        isAtLimit: Bool = false,
+        isVisible: Bool = false,
+        isAvailable: Bool = true
+    ) {
+        self.mode = mode
+        self.automaticCorrectionBPM = automaticCorrectionBPM
+        self.manualTargetBPM = manualTargetBPM
+        self.requestedBPM = requestedBPM
+        self.appliedBPM = appliedBPM
+        self.isAtLimit = isAtLimit
+        self.isVisible = isVisible
+        self.isAvailable = isAvailable
+    }
+}
+
 public struct RunViewState: Sendable, Equatable {
     public var phase: RunVisualPhase
     public var controlsVisible: Bool
@@ -94,6 +125,7 @@ public struct RunViewState: Sendable, Equatable {
     public var forceReduceMotion: Bool
     public var forceIncreasedContrast: Bool
     public var musicSelection: MusicSelectionPresentation
+    public var rhythmControl: RhythmControlPresentation
 
     public init(
         phase: RunVisualPhase,
@@ -106,6 +138,7 @@ public struct RunViewState: Sendable, Equatable {
         showLockBrief: Bool = false,
         forceReduceMotion: Bool = false,
         forceIncreasedContrast: Bool = false,
+        rhythmControl: RhythmControlPresentation = RhythmControlPresentation(),
         musicSelection: MusicSelectionPresentation = .ready(
             ImportedCollectionPresentation(
                 name: "Night Motion",
@@ -126,6 +159,7 @@ public struct RunViewState: Sendable, Equatable {
         self.showLockBrief = showLockBrief
         self.forceReduceMotion = forceReduceMotion
         self.forceIncreasedContrast = forceIncreasedContrast
+        self.rhythmControl = rhythmControl
         self.musicSelection = musicSelection
     }
 }
@@ -133,6 +167,10 @@ public struct RunViewState: Sendable, Equatable {
 public enum RunAction: Sendable, Equatable {
     case start
     case revealControls
+    case revealRhythmControl
+    case adjustRhythmControl(Int)
+    case useManualRhythm
+    case resetRhythmControl
     case controlsFocusChanged(Bool)
     case previous
     case pause

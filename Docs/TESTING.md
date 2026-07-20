@@ -9,7 +9,7 @@
 
 Scripts/test.sh runs Swift package tests, app-model tests, and UI tests serially on iPhone 17 Pro Simulator.
 
-The 2026-07-20 full serial gate passed 48 package tests, 9 app-model tests, and 8 UI tests.
+The 2026-07-20 full serial gate passed 60 package tests, 9 app-model tests, and 9 UI tests.
 
 Formatter gate:
 
@@ -47,6 +47,9 @@ Domain tests cover:
 - Stale session feedback and cadence-provider failure
 - Imported collection order, ready-track filtering, and cache-key invalidation
 - Refusal to start a production collection without an adaptive-ready track
+- Auto correction, Manual targeting, reset, bounds, and honest limit reporting
+- Manual behavior before cadence lock, through confidence loss, pause, resume, and track change
+- Prevention of a general surface tap replacing an open rhythm control
 
 Motion tests cover:
 
@@ -78,12 +81,13 @@ UI tests cover:
 - Honest analysis progress
 - Partial import with visible failures and an enabled ready-track start
 - Import failure and retry
+- In-run BPM-control reveal, one-BPM adjustment, Manual ownership, and return to Auto
 
-App-model tests cover ready mapping, start transition, atomic store round trips, corrupt persistence, restored selection, cancellation of stale replacement work, latest-run diagnostic persistence, and a reducer-driven diagnostic timeline through finish.
+App-model tests cover ready mapping, start transition, atomic store round trips, corrupt persistence, restored selection, cancellation of stale replacement work, latest-run diagnostic persistence with BPM-control truth, and a reducer-driven diagnostic timeline through finish.
 
 ## Visual proof
 
-Final frames under Evidence/Simulator/ cover ready, imported empty and partial states, locked run, controls, summary, and Home Screen icon. Evidence/Previews/ covers accessibility text and state-specific visual checks.
+Final frames under Evidence/Simulator/ cover ready, imported empty and partial states, locked run, controls, summary, Home Screen icon, BPM Auto fine-tune, the Manual safety limit, and accessibility-size BPM controls. Evidence/Previews/ covers other accessibility and state-specific visual checks.
 
 ## Truth boundary
 
@@ -95,6 +99,7 @@ The `Samadhi MusicKit Gate` scheme verifies that the harness and framework calls
 
 - Unsigned generic iPhone build: passed
 - Signed generic and physical iPhone builds: passed
+- Current BPM-control exact-profile signed build: passed; installation open because the physical phone is unavailable
 - Physical iPhone installation and gate launch: passed
 - Normal Simulator app: launched and visually checked
 - MusicKit harness Simulator app: launched and visually checked
@@ -124,10 +129,12 @@ The `Samadhi MusicKit Gate` scheme verifies that the harness and framework calls
 - Screen-lock background, next track, controlled interruption, and route-loss checks: deferred to the reliability gate
 - Real playlist selection and analysis: passed at 13 ready, 8 unreadable, and 4 unavailable tracks from a 25-track physical selection
 - Relaunch restoration and imported multi-track playback: not yet physically run
+- BPM control: deterministic policy, UI interaction, and Simulator design pass; physical MusicKit response and listening proof not yet run
+- Paired iPhone state on 2026-07-20: unavailable to Xcode; exact `Samadhi Development` profile remains installed and expires on 2026-07-23 UTC
 
 ## Next implementation gate
 
-Relaunch the installed normal app while the phone is unlocked, confirm `Strut Frequency -- July 2026` restores with 13 ready tracks, and run through a real track transition. Pull `latest-run-diagnostics.json` after finish. Before Milestone 2 completion, record one concise Bluetooth listening note and prove five screen-locked minutes, controlled interruption, and route loss.
+Connect and unlock the physical iPhone, renew the exact profile first if it is past 2026-07-23 UTC, then install the BPM-control build. Confirm `Strut Frequency -- July 2026` restores with 13 ready tracks. During one short run, exercise three reachable BPM targets and one unreachable target, continue through a real track transition, and pull `latest-run-diagnostics.json` after finish. Before Milestone 2 completion, record one concise Bluetooth listening note and prove five screen-locked minutes, controlled interruption, and route loss.
 
 ## Known environment behavior
 

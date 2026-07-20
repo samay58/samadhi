@@ -29,6 +29,7 @@ private let policy = AdaptationPolicy()
     #expect(!decision.isTrackCompatible)
     #expect(decision.commandedRate == 1)
     #expect(decision.status == .musicSteady)
+    #expect(decision.isAtLimit)
 }
 
 @Test func initialAndOngoingRateChangesUseDifferentRampLimits() {
@@ -75,6 +76,7 @@ private let policy = AdaptationPolicy()
     state.targetRate = 1.02
     state.baseTempoBPM = 165
     state.lastReliableCadenceSPM = 170
+    state.requestedBPM = 170
     state.secondsSinceTargetUpdate = 0
 
     let insideDeadband = policy.update(
@@ -129,6 +131,77 @@ private let policy = AdaptationPolicy()
     #expect(!normal.nextState.hasMatched)
 }
 
+@Test func automaticCorrectionChangesTheMusicalRequestWithoutChangingCadenceTruth() {
+    let control = RhythmControlState(
+        mode: .automatic,
+        automaticCorrectionBPM: 2
+    )
+    let decision = policy.update(
+        state: .initial,
+        input: input(cadence: 168, tempo: 170, rhythmControl: control)
+    )
+
+    #expect(decision.requestedBPM == 170)
+    #expect(decision.targetRate == 1)
+    #expect(decision.nextState.lastReliableCadenceSPM == 168)
+}
+
+@Test func manualTargetCanDriveMusicWithoutInventingCadence() {
+    let control = RhythmControlState(mode: .manual, manualTargetBPM: 168)
+    let decision = policy.update(
+        state: .initial,
+        input: input(
+            cadence: nil,
+            tempo: 160,
+            reliable: false,
+            rhythmControl: control,
+            forceTargetUpdate: true
+        )
+    )
+
+    #expect(decision.requestedBPM == 168)
+    #expect(decision.targetRate == 1.05)
+    #expect(decision.commandedRate == 1.02)
+    #expect(decision.nextState.lastReliableCadenceSPM == nil)
+}
+
+@Test func unreachableManualTargetReportsTheDerivedRateAndLimit() {
+    let control = RhythmControlState(mode: .manual, manualTargetBPM: 200)
+    let decision = policy.update(
+        state: .initial,
+        input: input(
+            cadence: 168,
+            tempo: 170,
+            rhythmControl: control,
+            forceTargetUpdate: true
+        )
+    )
+
+    #expect(decision.targetRate == nil)
+    #expect(decision.derivedTargetRate == 200.0 / 170.0)
+    #expect(decision.isAtLimit)
+    #expect(decision.commandedRate == 1)
+}
+
+@Test func rhythmControlClampsBothModesAndResetReturnsToNeutralAuto() {
+    var control = RhythmControlState.initial
+
+    _ = control.adjust(by: 99)
+    #expect(control.automaticCorrectionBPM == 8)
+    _ = control.adjust(by: -99)
+    #expect(control.automaticCorrectionBPM == -8)
+
+    control.useManual(seedBPM: 250)
+    #expect(control.mode == .manual)
+    #expect(control.manualTargetBPM == 200)
+    _ = control.adjust(by: -99)
+    #expect(control.manualTargetBPM == 120)
+
+    control.resetToAutomatic()
+    #expect(control.mode == .automatic)
+    #expect(control.automaticCorrectionBPM == 0)
+}
+
 @Test func matchRequiresOneSecondInsideAppliedRateTolerance() {
     let first = policy.update(
         state: .initial,
@@ -168,7 +241,9 @@ private func input(
     tempo: Double,
     appliedRate: Double = 1,
     reliable: Bool = true,
-    deltaSeconds: Double = 1
+    deltaSeconds: Double = 1,
+    rhythmControl: RhythmControlState = .initial,
+    forceTargetUpdate: Bool = false
 ) -> AdaptationInput {
     AdaptationInput(
         cadenceSPM: cadence,
@@ -176,6 +251,8 @@ private func input(
         baseTempoBPM: tempo,
         analysisConfidence: 0.9,
         appliedRate: appliedRate,
-        deltaSeconds: deltaSeconds
+        deltaSeconds: deltaSeconds,
+        rhythmControl: rhythmControl,
+        forceTargetUpdate: forceTargetUpdate
     )
 }

@@ -1,4 +1,10 @@
 extension RunReducer {
+    enum RhythmControlChange: Sendable, Equatable {
+        case adjust(Int)
+        case manual
+        case automatic
+    }
+
     func reduceCadenceUpdate(
         active: ActiveRun,
         sessionID: Int,
@@ -100,12 +106,128 @@ extension RunReducer {
         )
     }
 
+    func reduceRhythmControlChange(
+        active: ActiveRun,
+        change: RhythmControlChange,
+        rateRequestID: Int,
+        timeoutID: Int
+    ) -> (RunState, [RunEffect]) {
+        guard active.session.mode == .adaptive,
+            case let .playing(rhythm, _) = active.activity
+        else { return (.active(active), []) }
+
+        let cadenceSPM: Double?
+        let cadenceReliable: Bool
+        switch rhythm {
+        case let .locked(spm):
+            cadenceSPM = Double(spm)
+            cadenceReliable = true
+        case let .acquiring(priorSPM, _):
+            cadenceSPM = priorSPM.map(Double.init)
+            cadenceReliable = false
+        case .fixed:
+            cadenceSPM = nil
+            cadenceReliable = false
+        }
+
+        var next = active
+        let priorControl = next.session.rhythmControl
+        switch change {
+        case let .adjust(steps):
+            _ = next.session.rhythmControl.adjust(by: steps)
+        case .manual:
+            let seed = next.session.adaptationState.requestedBPM ?? cadenceSPM ?? 168
+            next.session.rhythmControl.useManual(seedBPM: seed)
+        case .automatic:
+            next.session.rhythmControl.resetToAutomatic()
+        }
+
+        next.activity = .playing(
+            rhythm: rhythm,
+            controls: .timed(surface: .rhythm, timeoutID: timeoutID)
+        )
+
+        guard next.session.rhythmControl != priorControl else {
+            return (
+                .active(next),
+                [
+                    .emitHaptic(.rhythmLimit),
+                    .scheduleControlsTimeout(sessionID: active.session.id, timeoutID: timeoutID),
+                ]
+            )
+        }
+
+        let adaptation = adapt(
+            session: next.session,
+            cadenceSPM: cadenceSPM,
+            cadenceReliable: cadenceReliable,
+            deltaSeconds: 1,
+            rateRequestID: rateRequestID,
+            forceTargetUpdate: true
+        )
+        next.session = adaptation.session
+
+        let haptic: HapticEvent
+        if next.session.adaptationState.isAtLimit {
+            haptic = .rhythmLimit
+        } else if next.session.rhythmControl.mode == .automatic,
+            next.session.rhythmControl.automaticCorrectionBPM == 0
+        {
+            haptic = .rhythmAuto
+        } else {
+            haptic = .rhythmStep
+        }
+
+        return (
+            .active(next),
+            [.emitHaptic(haptic)] + adaptation.effects + [
+                .scheduleControlsTimeout(sessionID: active.session.id, timeoutID: timeoutID)
+            ]
+        )
+    }
+
+    func adaptManualControlAfterTrackChange(
+        active: ActiveRun,
+        rateRequestID: Int
+    ) -> (RunState, [RunEffect]) {
+        guard active.session.rhythmControl.mode == .manual else {
+            return (.active(active), [])
+        }
+
+        let cadenceSPM: Double?
+        let cadenceReliable: Bool
+        switch active.activity.rhythm {
+        case let .locked(spm):
+            cadenceSPM = Double(spm)
+            cadenceReliable = true
+        case let .acquiring(priorSPM, _):
+            cadenceSPM = priorSPM.map(Double.init)
+            cadenceReliable = false
+        case .fixed:
+            cadenceSPM = nil
+            cadenceReliable = false
+        }
+
+        var next = active
+        let adaptation = adapt(
+            session: next.session,
+            cadenceSPM: cadenceSPM,
+            cadenceReliable: cadenceReliable,
+            deltaSeconds: 1,
+            rateRequestID: rateRequestID,
+            forceTargetUpdate: true
+        )
+        next.session = adaptation.session
+        return (.active(next), adaptation.effects)
+    }
+
     private func adapt(
         session: RunSession,
         cadenceSPM: Double?,
         cadenceReliable: Bool,
         deltaSeconds: Double,
-        rateRequestID: Int
+        rateRequestID: Int,
+        forceTargetUpdate: Bool = false
     ) -> (session: RunSession, effects: [RunEffect]) {
         guard session.mode == .adaptive,
             let trackID = session.currentTrackID,
@@ -122,7 +244,9 @@ extension RunReducer {
                 baseTempoBPM: tempo.baseBPM,
                 analysisConfidence: tempo.confidence,
                 appliedRate: session.appliedPlaybackRate,
-                deltaSeconds: deltaSeconds
+                deltaSeconds: deltaSeconds,
+                rhythmControl: session.rhythmControl,
+                forceTargetUpdate: forceTargetUpdate
             )
         )
         next.adaptationState = decision.nextState

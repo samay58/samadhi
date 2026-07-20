@@ -43,7 +43,7 @@ SamadhiScreen keeps continuous atmospheric surface and routes state to focused s
 - RunRecoveryScreen
 - RunSummaryScreen
 
-Run controls, summary metrics, duration formatting, aperture, and fluid field live in dedicated types. Views contain thin UI actions only. Business transitions remain in reducer.
+Run controls, rhythm control, summary metrics, duration formatting, aperture, and fluid field live in dedicated types. Views contain thin UI actions only. Business transitions remain in reducer.
 
 ## Cancellation
 
@@ -71,13 +71,15 @@ Apple Music is the selected production player. `AppleMusicPlaybackController` is
 
 Stable cadence enters the reducer with session and acquisition identity. The reducer owns `AdaptationState`, evaluates the current track's tempo, and emits a bounded rate effect carrying session, playback operation, rate request, and track identity. Player feedback must match all four identities before the reducer records the applied rate. Cadence sensing continues after lock so confidence loss can hold, ease toward normal speed, and return to acquisition without direct platform mutation.
 
+`RhythmControlState` is source-neutral run state. Auto applies a bounded correction to reliable cadence. Manual supplies a musical target without inventing cadence. Both enter the same `AdaptationPolicy`, so rate limits, ramping, deadband, confidence handling, compatibility, and identified MusicKit feedback stay authoritative. The SwiftUI control freezes its displayed target during a drag, sends intent through `RunPresentationModel`, and never writes the player directly.
+
 The debug-only MusicKit harness sits in the app target and is not a production player. It resolves opaque library tracks through strict title, artist, album, and duration agreement, downloads each preview into temporary storage, passes the local file through `TempoAnalyzing`, records the estimate, and deletes the file. `LocalTempoAnalyzer` owns off-main PCM decoding. `TempoEstimator` owns versioned Accelerate spectral-flux and fractional-lag autocorrelation behavior behind the same small interface.
 
 `AppleMusicImportService` reuses the strict resolver, analyzes tracks sequentially, and reports honest progress. `MusicCollectionStore` atomically persists the selected collection and versioned analysis cache. `MusicSelectionModel` owns replacement identity and ignores stale import callbacks. SwiftUI only sends choose, change, and start intent.
 
 `TempoCorpusValidator` is an opt-in development executable. It validates fixed catalog identities whose published titles declare tempo, analyzes temporary provider-hosted previews, writes JSON evidence, and removes the audio. Normal automated tests remain offline.
 
-Debug builds overwrite one local latest-run diagnostic file after finish. `RunDiagnosticsRecorder` observes accepted reducer transitions from the app shell and records player progress, cadence, rate feedback, track changes, recovery events, and summary truth. `RunDiagnosticsStore` writes that snapshot atomically under Application Support. It does not change reducer state or create product run history.
+Debug builds overwrite one local latest-run diagnostic file after finish. `RunDiagnosticsRecorder` observes accepted reducer transitions from the app shell and records control mode, requested BPM, derived and applied rates, limit state, player progress, cadence, track changes, recovery events, and summary truth. `RunDiagnosticsStore` writes that snapshot atomically under Application Support. It does not change reducer state or create product run history.
 
 ## Invariants
 

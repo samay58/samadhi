@@ -15,6 +15,17 @@ private let coreLoopTrack = MusicTrack(
     )
 )
 private let coreLoopReducer = RunReducer(tracks: [coreLoopTrack])
+private let transitionTrack = MusicTrack(
+    id: MusicTrackID("transition-track"),
+    title: "Transition",
+    durationSeconds: 210,
+    tempo: TempoAnalysis(
+        baseBPM: 160,
+        confidence: 1,
+        analyzedDurationSeconds: 30,
+        version: 2
+    )
+)
 
 @Test func adaptiveStartLocksAndRecordsOnlyEligibleTime() {
     var state: RunState = .ready
@@ -72,6 +83,18 @@ private let coreLoopReducer = RunReducer(tracks: [coreLoopTrack])
     #expect(state != visible)
 }
 
+@Test func surfaceTapCannotReplaceAnOpenRhythmControl() {
+    var state = reducer.reduce(
+        state: lockedRun(),
+        event: .rhythmControlRevealed(timeoutID: 4)
+    ).0
+    let rhythmVisible = state
+
+    state = reducer.reduce(state: state, event: .surfaceTapped(timeoutID: 5)).0
+
+    #expect(state == rhythmVisible)
+}
+
 @Test func pauseExcludesTimeAndResumeReacquiresWithPrior() {
     var state = lockedRun()
     state = reducer.reduce(state: state, event: .surfaceTapped(timeoutID: 2)).0
@@ -81,13 +104,17 @@ private let coreLoopReducer = RunReducer(tracks: [coreLoopTrack])
 
     state = reducer.reduce(state: state, event: .resumeTapped(acquisitionID: 8, timeoutID: 9)).0
     guard case let .active(active) = state,
-        case let .playing(.acquiring(prior, acquisitionID), .timed(timeoutID)) = active.activity
+        case let .playing(
+            .acquiring(prior, acquisitionID),
+            .timed(surface, timeoutID)
+        ) = active.activity
     else {
         Issue.record("Expected reacquiring run")
         return
     }
     #expect(prior == 168)
     #expect(acquisitionID == 8)
+    #expect(surface == .transport)
     #expect(timeoutID == 9)
 }
 
@@ -127,14 +154,200 @@ private let coreLoopReducer = RunReducer(tracks: [coreLoopTrack])
 
     state = reducer.reduce(state: state, event: .routeResumeTapped(acquisitionID: 12, timeoutID: 13)).0
     guard case let .active(active) = state,
-        case let .playing(.acquiring(prior, acquisitionID), .timed(timeoutID)) = active.activity
+        case let .playing(
+            .acquiring(prior, acquisitionID),
+            .timed(surface, timeoutID)
+        ) = active.activity
     else {
         Issue.record("Expected explicit reacquisition")
         return
     }
     #expect(prior == 168)
     #expect(acquisitionID == 12)
+    #expect(surface == .transport)
     #expect(timeoutID == 13)
+}
+
+@Test func rhythmControlStartsInAutomaticAndResetsForEveryRun() {
+    var prior = RunSession(id: 1)
+    prior.rhythmControl = RhythmControlState(mode: .manual, manualTargetBPM: 176)
+
+    let next = RunSession(id: 2)
+
+    #expect(prior.rhythmControl.mode == .manual)
+    #expect(next.rhythmControl == .initial)
+}
+
+@Test func manualControlAdjustsMusicBeforeCadenceLocks() {
+    let state = acquiringCoreLoopRun(sessionID: 61)
+    let result = coreLoopReducer.reduce(
+        state: state,
+        event: .rhythmControlSetManual(rateRequestID: 62, timeoutID: 63)
+    )
+
+    guard case let .active(active) = result.0,
+        case let .playing(.acquiring, .timed(surface, timeoutID)) = active.activity
+    else {
+        Issue.record("Expected visible manual rhythm control")
+        return
+    }
+    #expect(active.session.rhythmControl.mode == .manual)
+    #expect(active.session.rhythmControl.manualTargetBPM == 168)
+    #expect(active.session.adaptationState.requestedBPM == 168)
+    #expect(active.session.adaptationState.lastReliableCadenceSPM == nil)
+    #expect(surface == .rhythm)
+    #expect(timeoutID == 63)
+    #expect(
+        result.1 == [
+            .emitHaptic(.rhythmStep),
+            .setPlaybackRate(
+                sessionID: 61,
+                operationID: 61,
+                requestID: 62,
+                trackID: coreLoopTrack.id,
+                rate: 168.0 / 170.25
+            ),
+            .scheduleControlsTimeout(sessionID: 61, timeoutID: 63),
+        ]
+    )
+}
+
+@Test func manualTimeWithoutCadenceRemainsNotMeasured() {
+    var state = acquiringCoreLoopRun(sessionID: 64)
+    state =
+        coreLoopReducer.reduce(
+            state: state,
+            event: .rhythmControlSetManual(rateRequestID: 65, timeoutID: 66)
+        ).0
+    state = coreLoopReducer.reduce(state: state, event: .activeSecond(tempoMatched: nil)).0
+
+    #expect(state.session?.elapsedActiveSeconds == 1)
+    #expect(state.session?.summary.averageCadence == nil)
+    #expect(state.session?.summary.tempoMatchedPercent == nil)
+}
+
+@Test func manualTargetSurvivesConfidenceLossWithoutLeavingStaleCadenceLocked() {
+    var state = coreLoopReducer.reduce(
+        state: acquiringCoreLoopRun(sessionID: 68),
+        event: .cadenceUpdated(
+            sessionID: 68,
+            acquisitionID: 1,
+            stepsPerMinute: 168,
+            deltaSeconds: 1,
+            rateRequestID: 69
+        )
+    ).0
+    state =
+        coreLoopReducer.reduce(
+            state: state,
+            event: .rhythmControlSetManual(rateRequestID: 70, timeoutID: 71)
+        ).0
+
+    let result = coreLoopReducer.reduce(
+        state: state,
+        event: .cadenceConfidenceLost(
+            sessionID: 68,
+            acquisitionID: 1,
+            deltaSeconds: 10,
+            rateRequestID: 72
+        )
+    )
+
+    guard case let .active(active) = result.0,
+        case .playing(.acquiring, _) = active.activity
+    else {
+        Issue.record("Expected cadence acquisition while manual music target remains active")
+        return
+    }
+    #expect(active.session.rhythmControl.mode == .manual)
+    #expect(active.session.adaptationState.requestedBPM == 168)
+    #expect(active.session.adaptationState.lastReliableCadenceSPM == nil)
+}
+
+@Test func automaticFineTuneClampsAtEightBPM() {
+    var state = acquiringCoreLoopRun(sessionID: 67)
+    for step in 0..<9 {
+        state =
+            coreLoopReducer.reduce(
+                state: state,
+                event: .rhythmControlAdjusted(
+                    steps: 1,
+                    rateRequestID: 70 + step,
+                    timeoutID: 90 + step
+                )
+            ).0
+    }
+
+    #expect(state.session?.rhythmControl.automaticCorrectionBPM == 8)
+}
+
+@Test func resetReturnsFineTuneToNeutralAutomaticMode() {
+    var state = acquiringCoreLoopRun(sessionID: 74)
+    state =
+        coreLoopReducer.reduce(
+            state: state,
+            event: .rhythmControlAdjusted(steps: 3, rateRequestID: 75, timeoutID: 76)
+        ).0
+
+    let result = coreLoopReducer.reduce(
+        state: state,
+        event: .rhythmControlReset(rateRequestID: 77, timeoutID: 78)
+    )
+
+    #expect(result.0.session?.rhythmControl == .initial)
+    #expect(result.1.contains(.emitHaptic(.rhythmAuto)))
+}
+
+@Test func manualOwnershipSurvivesPauseResumeAndRecomputesForTheNextTrack() {
+    let transitionReducer = RunReducer(tracks: [coreLoopTrack, transitionTrack])
+    var state: RunState = .ready
+    state = transitionReducer.reduce(state: state, event: .startTapped(sessionID: 79)).0
+    state =
+        transitionReducer.reduce(
+            state: state,
+            event: .authorizationResolved(sessionID: 79, .authorized)
+        ).0
+    state =
+        transitionReducer.reduce(
+            state: state,
+            event: .playbackPrepared(sessionID: 79, trackID: coreLoopTrack.id)
+        ).0
+    state =
+        transitionReducer.reduce(
+            state: state,
+            event: .rhythmControlSetManual(rateRequestID: 80, timeoutID: 81)
+        ).0
+    state = transitionReducer.reduce(state: state, event: .pauseTapped).0
+    state =
+        transitionReducer.reduce(
+            state: state,
+            event: .resumeTapped(acquisitionID: 82, timeoutID: 83)
+        ).0
+
+    let result = transitionReducer.reduce(
+        state: state,
+        event: .playbackTrackChanged(
+            sessionID: 79,
+            operationID: 79,
+            trackID: transitionTrack.id,
+            trackIndex: 1,
+            rateRequestID: 84
+        )
+    )
+
+    #expect(result.0.session?.rhythmControl.mode == .manual)
+    #expect(result.0.session?.adaptationState.derivedTargetRate == 1.05)
+    #expect(
+        result.1 == [
+            .setPlaybackRate(
+                sessionID: 79,
+                operationID: 79,
+                requestID: 84,
+                trackID: transitionTrack.id,
+                rate: 1.02
+            )
+        ]
+    )
 }
 
 @Test func finishRequiresVisibleControlsAndMatchingHold() {
