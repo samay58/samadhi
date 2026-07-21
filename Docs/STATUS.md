@@ -13,6 +13,7 @@
 | Playlist import | Real selection, 13 ready tracks, restoration, and basic progress passed | Physical ready screen, pulled app-container records, import model tests, and Simulator states |
 | Tempo analysis | Version 2 passes a narrow 12-preview real-music corpus | Generated regression tests and opt-in Apple preview validation |
 | Adaptation policy | Physical automatic rate-response check passed | Identified reducer effects, deterministic feedback tests, and 59-second device result |
+| Track fit | Source-neutral planner implemented; production connection open | Deterministic pulse-family, envelope, order, and retention tests |
 | In-run BPM control | Implemented and Simulator-verified; physical listening proof open | Auto fine-tune, Manual target, limit truth, accessibility, and reducer tests |
 | Apple Music feasibility | Source selected; Bluetooth route and rate writes passed; long-form reliability deferred | Exact-profile traces and explicit product decision |
 | Spotify feasibility | Rejected for adaptive playback | Remote-control architecture, missing music rate control, and content policy conflict |
@@ -117,12 +118,13 @@
 - Extended latest-run diagnostics with control mode, correction or Manual target, requested BPM, derived rate, MusicKit read-back, and limit state
 - Resolved the control as direct manipulation of the existing tempo aperture with large touch targets, restrained haptics, VoiceOver adjustment, Dynamic Type, increased contrast, and Reduce Motion support
 - Reviewed final Auto fine-tune, Manual safety-limit, and accessibility-size frames in the iPhone 17 Pro Simulator without changing the wider visual system
+- Added a debug-only blinded 0.92 versus 1.08 comparison that captures rate read-back and direction recognition with optional 0.90 and 1.10 endpoint controls
 
 ## Proof
 
-The current serial gate passed on 2026-07-20:
+The current serial gate passed on 2026-07-21:
 
-- 60 Swift package tests
+- 67 Swift package tests
 - 9 app-model tests
 - 9 UI tests
 - Swift formatter lint
@@ -138,8 +140,8 @@ The MusicKit harness and normal app launch in Simulator and on the physical iPho
 
 ## Known limits
 
-Live cadence and automatic cadence-driven rate response pass on the physical iPhone. The BPM control is implemented and Simulator-verified, but its requested BPM, derived rate, MusicKit read-back, limit behavior, and listening quality have not been proven together on the physical phone. Debug builds persist the latest completed run's exact control, progress, cadence, target and applied rates, track changes, recovery events, and summary. Built-in-speaker listening found no major pitch change or unpleasant artifacts at the safe-rate endpoints. Bluetooth routing and rate writes pass, but no separate Bluetooth listening note was recorded. The tempo estimator passes its narrow 12-preview reference corpus, but broad music accuracy and public-distribution permission for preview analysis remain open. One real playlist passed import, local analysis, reinstall and relaunch restoration, and basic production-player progress with 13 ready tracks. A natural transition is still not physically proven. Five locked minutes, controlled interruption, route loss, accessibility on imported states, and the outdoor run remain open.
+Live cadence and automatic cadence-driven rate response pass mechanically on the physical iPhone. The BPM control is implemented and Simulator-verified, but an obvious clean change has not been proven. An earlier rate near 1.02 was imperceptible, and the current out-of-range behavior correctly returns incompatible music toward 1.00. The source-neutral track-fit planner can now choose a reachable pulse, but production selection still uses source order. Debug builds persist the latest completed run's exact control, progress, cadence, target and applied rates, track changes, recovery events, and summary. Built-in-speaker listening found no major pitch change or unpleasant artifacts at 0.94 and 1.06. Bluetooth routing and rate writes pass, but no separate Bluetooth listening note was recorded. The tempo estimator passes its narrow 12-preview reference corpus, but broad music accuracy and public-distribution permission for preview analysis remain open. One real playlist passed import, local analysis, reinstall and relaunch restoration, and basic production-player progress with 13 ready tracks. A natural transition is still not physically proven. Five locked minutes, controlled interruption, route loss, accessibility on imported states, and the outdoor run remain open.
 
 ## WHERE WE LEFT OFF
 
-Apple Music is selected. A real 25-track playlist restores after reinstall and relaunch on Samay's iPhone with 13 ready tracks, and production-player progress advances. The in-run BPM control is implemented, visually resolved, accessible, covered by the full automated gate, installed from current `main`, and running on the physical iPhone. The next step is one short imported-playlist run that exercises three reachable targets and one unreachable target, then pulls the saved diagnostics. A natural track transition, locked playback, recovery, and the outdoor run remain mandatory before Milestone 2 completion.
+Apple Music remains selected, conditional on felt perceptibility. A real 25-track playlist restores with 13 ready tracks, production-player progress advances, and the in-run BPM control is implemented and installed. The debug harness now runs a blinded 0.92 versus 1.08 comparison and records direction recognition. The paired iPhone is currently unavailable to Xcode, so no listening result is claimed. `TrackMatchPlanner` is tested as the coarse matching layer but is not yet connected to the production queue. A compatible transition, beat-phase investigation, locked playback, recovery, and the outdoor run remain mandatory before Milestone 2 completion.

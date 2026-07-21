@@ -219,6 +219,17 @@
 - Re-ran the focused BPM interaction UI test on the booted iPhone 17 Pro Simulator
 - Left cadence-driven BPM response, a natural track transition, listening, background, and recovery honestly open
 
+## 2026-07-21. Felt-synchronization research
+
+- Researched Weav's adaptive-arrangement system, published running entrainment work, public MusicKit limits, and djay Pro's separation of BPM, beat sync, key lock, track compatibility, and transitions
+- Confirmed that arbitrary Apple Music masters cannot reproduce Weav's broad range through playback rate alone
+- Defined a pass-or-pivot MusicKit perceptibility gate and an app-owned audio fallback
+- Made coarse compatible-track selection plus fine rate correction the production mechanic
+- Added a source-neutral track-fit planner with deterministic half-time, full-time, double-time, quality-envelope, source-order, and retention tests
+- Added a debug-only blinded 0.92 versus 1.08 comparison with recorded answers, rate read-back, and optional wider endpoints
+- Saved the sourced mechanics and evidence thresholds in `ADAPTIVE-AUDIO-PLAYBOOK.md`
+- Passed formatter lint, 67 package tests, 9 app-model tests, and 9 UI tests on the resulting tree
+
 ## Current checkpoint
 
-Milestones 0 and 1 are complete. Apple Music is the selected Milestone 2 source. Live Core Motion cadence and automatic MusicKit rate response pass together on the physical iPhone. The narrow 12-preview corpus passes. One real playlist passes selection, analysis, reinstall and relaunch restoration, and basic production-player progress with 13 ready tracks. The bounded in-run BPM control is implemented, visually resolved, accessible, covered by the full automated gate, installed from current `main`, and running on the physical phone. Next comes one short cadence-driven BPM-control run through a natural track transition, followed by direct retrieval of the latest-run diagnostics. Long-form background and recovery checks remain before Milestone 2 completion.
+Milestones 0 and 1 are complete. Apple Music remains the selected Milestone 2 source, but its suitability for the core feeling is now conditional. Live Core Motion cadence and automatic MusicKit rate response pass mechanically on the physical iPhone. The missing proof is perceptibility: Samay must hear a clean, unmistakable response rather than trust changing numbers. The source-neutral track-fit planner is tested but not yet connected to production selection. Next comes the short MusicKit A/B gate, then either track-aware Apple Music integration or an immediate pivot to app-owned audio. Long-form background and recovery checks remain before Milestone 2 completion.

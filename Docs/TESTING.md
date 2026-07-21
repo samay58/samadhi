@@ -9,7 +9,7 @@
 
 Scripts/test.sh runs Swift package tests, app-model tests, and UI tests serially on iPhone 17 Pro Simulator.
 
-The 2026-07-20 full serial gate passed 60 package tests, 9 app-model tests, and 9 UI tests.
+The 2026-07-21 full serial gate passed 67 package tests, 9 app-model tests, and 9 UI tests.
 
 Formatter gate:
 
@@ -50,6 +50,8 @@ Domain tests cover:
 - Auto correction, Manual targeting, reset, bounds, and honest limit reporting
 - Manual behavior before cadence lock, through confidence loss, pause, resume, and track change
 - Prevention of a general surface tap replacing an open rhythm control
+- Compatible-track ranking across half-time, full-time, and double-time pulse families
+- Quality-envelope exclusion, source-order ties, and current-track retention
 
 Motion tests cover:
 
@@ -132,11 +134,14 @@ The `Samadhi MusicKit Gate` scheme verifies that the harness and framework calls
 - Production-player progress: passed from a pulled schema-version-2 trace advancing from 0 through 6 seconds on one stable catalog identity
 - Imported natural track transition: not yet physically run
 - BPM control: deterministic policy, UI interaction, and Simulator design pass; physical MusicKit response and listening proof not yet run
-- Paired iPhone state on 2026-07-20: available to Xcode; exact `Samadhi Development` profile remains installed and expires on 2026-07-23 UTC
+- Blinded perceptibility harness: 0.92 versus 1.08 sequence, direction answer, MusicKit read-back trace, and optional 0.90 and 1.10 controls compile in the debug gate scheme
+- Paired iPhone state on 2026-07-21: unavailable to Xcode; exact `Samadhi Development` profile was previously verified through 2026-07-23 UTC
 
-## Next implementation gate
+## Felt-synchronization gate
 
-Use the installed current-`main` BPM-control build while the physical iPhone is available. During one short run, exercise three reachable BPM targets and one unreachable target, continue through a real track transition, and pull `latest-run-diagnostics.json` after finish. Renew the exact profile first if this happens after 2026-07-23 UTC. Before Milestone 2 completion, record one concise Bluetooth listening note and prove five screen-locked minutes, controlled interruption, and route loss.
+Use five analyzed songs with prominent, stable beats. Compare 0.92, 1.00, and 1.08 on the supported Bluetooth route, then test 0.90 and 1.10 only if the first endpoints remain clean. Log requested rate, MusicKit read-back, route, audible artifacts, and blinded faster-or-slower recognition. Pass only if Samay identifies direction in at least four of five comparisons and calls the largest clean pair obvious rather than subtle.
+
+After that gate, connect `TrackMatchPlanner` to production selection and prove one compatible-track transition. Pull `latest-run-diagnostics.json` and confirm requested BPM, selected pulse, required rate, MusicKit read-back, progress, and summary agree. Renew the exact profile first if testing occurs after 2026-07-23 UTC. Before Milestone 2 completion, record one concise Bluetooth listening note and prove five screen-locked minutes, controlled interruption, and route loss.
 
 ## Known environment behavior
 
