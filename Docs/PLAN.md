@@ -20,7 +20,7 @@ Milestone 2 turns the interaction prototype into a useful music product.
 
 The finish line is one real outdoor run, not a feature checklist. Samay should be able to import one Apple Music playlist, start running, hear music settle into his cadence, lock the phone, recover from normal interruptions, finish, and trust the summary. Stop expanding scope until that run works.
 
-The BPM-control implementation and Simulator design gate are complete. Research into Weav, running entrainment, public MusicKit, and djay Pro exposed a more important gate: tempo read-back is not the same as felt synchronization. Continue in this order:
+The BPM-control implementation and Simulator design gate are complete. Research into Weav, running entrainment, public MusicKit, and djay Pro exposed a more important gate: tempo read-back is not the same as felt synchronization. The detailed decision ladder lives in [FELT-SYNCHRONIZATION-EXECUTION-SPEC.md](FELT-SYNCHRONIZATION-EXECUTION-SPEC.md). Continue in this order:
 
 1. Run the MusicKit perceptibility gate from [ADAPTIVE-AUDIO-PLAYBOOK.md](ADAPTIVE-AUDIO-PLAYBOOK.md) at 0.92, 1.00, and 1.08 on five strong-beat tracks. Test 0.90 and 1.10 only if the first endpoints sound clean. Record MusicKit read-back and blinded faster-or-slower recognition.
 2. Keep Apple Music only if the largest clean pair feels obvious. If it does not, reopen the source decision and move to app-owned DRM-free audio. Do not polish an imperceptible middle path.

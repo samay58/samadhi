@@ -41,6 +41,7 @@ DEVELOPER_DIR=/Applications/Xcode-beta.app/Contents/Developer \
 | What happens next? | [Docs/PLAN.md](Docs/PLAN.md) |
 | What exactly are we building next? | [Docs/MILESTONE-2-SPEC.md](Docs/MILESTONE-2-SPEC.md) |
 | What makes the music feel synchronized? | [Docs/ADAPTIVE-AUDIO-PLAYBOOK.md](Docs/ADAPTIVE-AUDIO-PLAYBOOK.md) |
+| What is the prioritized execution sequence? | [Docs/FELT-SYNCHRONIZATION-EXECUTION-SPEC.md](Docs/FELT-SYNCHRONIZATION-EXECUTION-SPEC.md) |
 | What do product terms mean? | [Docs/CONTEXT.md](Docs/CONTEXT.md) |
 | How will the production music source be decided? | [Docs/MUSIC-SOURCE-RESOLUTION-SPEC.md](Docs/MUSIC-SOURCE-RESOLUTION-SPEC.md) |
 | How is code shaped? | [Docs/ARCHITECTURE.md](Docs/ARCHITECTURE.md) |

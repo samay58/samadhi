@@ -229,6 +229,7 @@
 - Added a debug-only blinded 0.92 versus 1.08 comparison with recorded answers, rate read-back, and optional wider endpoints
 - Saved the sourced mechanics and evidence thresholds in `ADAPTIVE-AUDIO-PLAYBOOK.md`
 - Passed formatter lint, 67 package tests, 9 app-model tests, and 9 UI tests on the resulting tree
+- Consolidated the findings into one prioritized execution spec with explicit pass, pivot, evidence, craft, and milestone-completion gates
 
 ## Current checkpoint
 
