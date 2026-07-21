@@ -28,13 +28,21 @@ final class MusicSelectionModel {
         configuration: SimulationConfiguration = .current
     ) {
         self.store = store
-        self.importer = importer ?? AppleMusicImportService(store: store)
+        if let importer {
+            self.importer = importer
+        } else if configuration.useSimulatorDemoMusic {
+            self.importer = SimulatorMusicImportService()
+        } else {
+            self.importer = AppleMusicImportService(store: store)
+        }
         self.configuration = configuration
 
         if configuration.fastMode {
             applyFixture(configuration.musicSelectionFixture)
         } else if configuration.useAppleMusicCoreLoop {
             apply(AppMusicCollection.appleMusicCoreLoop)
+        } else if configuration.useSimulatorDemoMusic {
+            apply(AppMusicCollection.simulatorDemo)
         }
     }
 
@@ -43,7 +51,10 @@ final class MusicSelectionModel {
     }
 
     func restore() async {
-        guard !configuration.fastMode, !configuration.useAppleMusicCoreLoop else { return }
+        guard !configuration.fastMode,
+            !configuration.useAppleMusicCoreLoop,
+            !configuration.useSimulatorDemoMusic
+        else { return }
         do {
             guard let collection = try await store.selectedCollection() else {
                 presentation = .none

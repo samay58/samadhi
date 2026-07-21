@@ -9,11 +9,10 @@ struct RhythmControl: View {
 
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Environment(\.accessibilityVoiceOverEnabled) private var voiceOverEnabled
+    @State private var dragAutomaticBaseBPM: Int?
     @State private var dragOriginBPM: Int?
-    @State private var lastDragDetent = 0
     @State private var frozenDisplayBPM: Int?
-    @State private var lastTouchAngle: Double?
-    @State private var accumulatedRotation = 0.0
+    @State private var rotaryTracker = RotaryDetentTracker()
     @State private var wheelIndicatorAngle: Double?
 
     var body: some View {
@@ -166,41 +165,36 @@ struct RhythmControl: View {
                 let center = CGPoint(x: size / 2, y: size / 2)
                 let x = value.location.x - center.x
                 let y = value.location.y - center.y
-                let radius = hypot(x, y)
                 let angle = atan2(y, x)
+                let startX = value.startLocation.x - center.x
+                let startY = value.startLocation.y - center.y
+                let startRadius = hypot(startX, startY)
+                let startAngle = atan2(startY, startX)
 
-                guard lastTouchAngle != nil || radius >= size * 0.28 else { return }
-                guard let priorAngle = lastTouchAngle else {
+                guard rotaryTracker.isTracking || startRadius >= size * 0.28 else { return }
+                guard rotaryTracker.isTracking else {
                     dragOriginBPM = displayBPM
-                    lastDragDetent = 0
+                    if state.rhythmControl.mode == .automatic, let displayBPM {
+                        dragAutomaticBaseBPM =
+                            displayBPM - state.rhythmControl.automaticCorrectionBPM
+                    }
                     frozenDisplayBPM = displayBPM
-                    accumulatedRotation = 0
-                    lastTouchAngle = angle
+                    rotaryTracker.begin(at: startAngle)
                     wheelIndicatorAngle = angle
+                    _ = rotaryTracker.update(to: angle)
+                    applyTrackedDetent()
                     return
                 }
 
-                var delta = angle - priorAngle
-                if delta > .pi { delta -= 2 * .pi }
-                if delta < -.pi { delta += 2 * .pi }
-                accumulatedRotation += delta
-                lastTouchAngle = angle
+                _ = rotaryTracker.update(to: angle)
                 wheelIndicatorAngle = angle
-
-                let radiansPerBPM = Double.pi / 22.5
-                let detent = Int((accumulatedRotation / radiansPerBPM).rounded(.towardZero))
-                let change = detent - lastDragDetent
-                guard change != 0 else { return }
-                lastDragDetent = detent
-                frozenDisplayBPM = boundedDisplayBPM((dragOriginBPM ?? 168) + detent)
-                send(.adjustRhythmControl(change))
+                applyTrackedDetent()
             }
             .onEnded { _ in
+                dragAutomaticBaseBPM = nil
                 dragOriginBPM = nil
-                lastDragDetent = 0
                 frozenDisplayBPM = nil
-                lastTouchAngle = nil
-                accumulatedRotation = 0
+                rotaryTracker.reset()
                 withAnimation(effectiveReduceMotion ? nil : .easeOut(duration: MotionToken.control)) {
                     wheelIndicatorAngle = nil
                 }
@@ -257,13 +251,65 @@ struct RhythmControl: View {
     private func boundedDisplayBPM(_ bpm: Int) -> Int {
         switch state.rhythmControl.mode {
         case .automatic:
-            guard let origin = dragOriginBPM else { return bpm }
-            let correction = state.rhythmControl.automaticCorrectionBPM
-            let lowerBound = origin + RhythmControlState.automaticCorrectionRange.lowerBound - correction
-            let upperBound = origin + RhythmControlState.automaticCorrectionRange.upperBound - correction
+            guard let base = dragAutomaticBaseBPM else { return bpm }
+            let lowerBound = base + RhythmControlState.automaticCorrectionRange.lowerBound
+            let upperBound = base + RhythmControlState.automaticCorrectionRange.upperBound
             return min(max(bpm, lowerBound), upperBound)
         case .manual:
             return min(max(bpm, 120), 200)
         }
+    }
+
+    private func applyTrackedDetent() {
+        let origin = dragOriginBPM ?? 168
+        let nextDisplayBPM = boundedDisplayBPM(origin + rotaryTracker.currentDetent)
+        let change = nextDisplayBPM - (frozenDisplayBPM ?? origin)
+        guard change != 0 else { return }
+        frozenDisplayBPM = nextDisplayBPM
+
+        // Each crossed detent gets one state change and one haptic click.
+        let step = change > 0 ? 1 : -1
+        for _ in 0..<abs(change) {
+            send(.adjustRhythmControl(step))
+        }
+    }
+}
+
+final class RotaryDetentTracker {
+    static let radiansPerDetent = Double.pi / 22.5
+
+    private(set) var currentDetent = 0
+    private var lastAngle: Double?
+    private var accumulatedRotation = 0.0
+
+    var isTracking: Bool { lastAngle != nil }
+
+    func begin(at angle: Double) {
+        currentDetent = 0
+        accumulatedRotation = 0
+        lastAngle = angle
+    }
+
+    func update(to angle: Double) -> Int {
+        guard let priorAngle = lastAngle else {
+            begin(at: angle)
+            return currentDetent
+        }
+
+        var delta = angle - priorAngle
+        if delta > .pi { delta -= 2 * .pi }
+        if delta < -.pi { delta += 2 * .pi }
+        accumulatedRotation += delta
+        lastAngle = angle
+        currentDetent = Int(
+            (accumulatedRotation / Self.radiansPerDetent).rounded(.towardZero)
+        )
+        return currentDetent
+    }
+
+    func reset() {
+        currentDetent = 0
+        accumulatedRotation = 0
+        lastAngle = nil
     }
 }

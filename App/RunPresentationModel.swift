@@ -19,6 +19,7 @@ final class RunPresentationModel {
     @ObservationIgnored private let musicPlayer: any MusicPlaybackProviding
     @ObservationIgnored private let musicCollection: MusicCollection
     @ObservationIgnored private let diagnosticsStore: RunDiagnosticsStore
+    @ObservationIgnored private let hapticFeedback = RunHapticFeedback()
     @ObservationIgnored private let taskStore = RunTaskStore()
     @ObservationIgnored private var diagnosticsRecorder: RunDiagnosticsRecorder
     @ObservationIgnored private var nextToken = 1
@@ -41,7 +42,9 @@ final class RunPresentationModel {
                 : AppMusicCollection.simulated)
         let usesProductionServices =
             configuration.useAppleMusicCoreLoop
-            || (selectedCollection != nil && !configuration.fastMode)
+            || (selectedCollection != nil
+                && !configuration.fastMode
+                && !configuration.useSimulatorDemoMusic)
         musicPlayer =
             usesProductionServices
             ? AppleMusicPlaybackController()
@@ -156,6 +159,7 @@ final class RunPresentationModel {
         case .revealControls:
             dispatch(.surfaceTapped(timeoutID: token()))
         case .revealRhythmControl:
+            hapticFeedback.prepareRhythmStep()
             dispatch(.rhythmControlRevealed(timeoutID: token()))
         case let .adjustRhythmControl(steps):
             dispatch(
@@ -616,21 +620,39 @@ final class RunPresentationModel {
     }
 
     private func emitHaptic(_ event: HapticEvent) {
+        hapticFeedback.emit(event)
+    }
+}
+
+@MainActor
+private final class RunHapticFeedback {
+    private let lightImpact = UIImpactFeedbackGenerator(style: .light)
+    private let mediumImpact = UIImpactFeedbackGenerator(style: .medium)
+    private let heavyImpact = UIImpactFeedbackGenerator(style: .heavy)
+    private let notification = UINotificationFeedbackGenerator()
+    private let rhythmStep = UISelectionFeedbackGenerator()
+
+    func prepareRhythmStep() {
+        rhythmStep.prepare()
+    }
+
+    func emit(_ event: HapticEvent) {
         switch event {
         case .start, .resume:
-            UIImpactFeedbackGenerator(style: .light).impactOccurred()
+            lightImpact.impactOccurred()
         case .lock:
-            UINotificationFeedbackGenerator().notificationOccurred(.success)
+            notification.notificationOccurred(.success)
         case .pause:
-            UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+            mediumImpact.impactOccurred()
         case .finish:
-            UIImpactFeedbackGenerator(style: .heavy).impactOccurred()
+            heavyImpact.impactOccurred()
         case .rhythmStep:
-            UISelectionFeedbackGenerator().selectionChanged()
+            rhythmStep.selectionChanged()
+            rhythmStep.prepare()
         case .rhythmAuto:
-            UIImpactFeedbackGenerator(style: .medium).impactOccurred(intensity: 0.72)
+            mediumImpact.impactOccurred(intensity: 0.72)
         case .rhythmLimit:
-            UINotificationFeedbackGenerator().notificationOccurred(.warning)
+            notification.notificationOccurred(.warning)
         }
     }
 }

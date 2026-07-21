@@ -16,6 +16,31 @@ import Testing
     #expect(model.viewState.phase == .preparing)
 }
 
+@Test @MainActor func simulatorDemoStartsReadyWithoutAppleMusic() {
+    let model = MusicSelectionModel(configuration: .simulatorFixture)
+
+    #expect(model.selectedCollection == AppMusicCollection.simulatorDemo)
+    guard case let .ready(presentation) = model.presentation else {
+        Issue.record("Expected local demo music to be ready")
+        return
+    }
+    #expect(presentation.readyTrackCount == 3)
+}
+
+@Test @MainActor func simulatorDemoCanChooseAnotherPlaceholderPlaylist() async {
+    let model = MusicSelectionModel(configuration: .simulatorFixture)
+
+    model.beginChoosing()
+    await waitUntil { model.playlistSheet != nil }
+    let choice = try? #require(model.playlistSheet?.playlists.last)
+    guard let choice else { return }
+    model.selectPlaylist(choice)
+    await waitUntil { model.selectedCollection?.id.rawValue == choice.id }
+
+    #expect(model.selectedCollection?.name == choice.name)
+    #expect(model.selectedCollection?.readyTrackCount == 4)
+}
+
 @Test func runDiagnosticsRoundTripPreservesPhysicalEvidence() async throws {
     let directory = FileManager.default.temporaryDirectory
         .appending(path: UUID().uuidString, directoryHint: .isDirectory)
@@ -354,7 +379,7 @@ private func waitUntil(
 ) async {
     for _ in 0..<100 {
         if condition() { return }
-        await Task.yield()
+        try? await Task.sleep(for: .milliseconds(10))
     }
     Issue.record("Timed out waiting for state")
 }
@@ -393,6 +418,18 @@ private extension SimulationConfiguration {
         missingArtwork: false,
         extendedAcquisitionWindow: false,
         useAppleMusicCoreLoop: false,
+        useSimulatorDemoMusic: false,
+        musicSelectionFixture: .standard
+    )
+
+    static let simulatorFixture = SimulationConfiguration(
+        fastMode: false,
+        permissionDenied: false,
+        simulateRouteLoss: false,
+        missingArtwork: false,
+        extendedAcquisitionWindow: false,
+        useAppleMusicCoreLoop: false,
+        useSimulatorDemoMusic: true,
         musicSelectionFixture: .standard
     )
 }

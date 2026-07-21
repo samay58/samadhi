@@ -23,7 +23,7 @@ The finish line is one real outdoor run, not a feature checklist. Samay should b
 The BPM-control interaction, production track-fit connection, and Simulator design gate are complete. Research into Weav, running entrainment, public MusicKit, and djay Pro exposed a more important gate: tempo read-back is not the same as felt synchronization. The detailed decision ladder lives in [FELT-SYNCHRONIZATION-EXECUTION-SPEC.md](FELT-SYNCHRONIZATION-EXECUTION-SPEC.md). Continue in this order:
 
 1. Prove one normal imported run starts on the planned compatible song and crosses one natural prepared transition without a gap, stale feedback, or a false summary.
-2. Verify the aperture click wheel feels controllable on the physical phone and that requested BPM, selected pulse, requested rate, MusicKit read-back, and summary agree.
+2. Verify the aperture click wheel feels crisp on the physical phone and that requested BPM, selected pulse, requested rate, MusicKit read-back, and summary agree. Simulator already proves clockwise and counterclockwise direction, protected center behavior, fixed bounds, ownership changes, and one event per detent.
 3. Complete the broader MusicKit listening envelope while exercising real tracks. The one-track 0.90 versus 1.10 change was obvious, but full-song endpoint quality remains open and the production envelope stays conservative.
 4. Investigate beat phase and end-to-end latency. Keep the product language at “Tempo matched” unless phase is actually measured.
 5. Complete five locked minutes, interruption, route loss, accessibility, cadence calibration, listening, and the outdoor-run gate.
@@ -40,8 +40,8 @@ The BPM-control interaction, production track-fit connection, and Simulator desi
 - Cadence boundary, deterministic filter, and Core Motion adapter: connected in the focused core loop and normal imported run; a 29-second walk produced live cadence and a 142 SPM average, but calibration remains open
 - Production playback: validated catalog fixture `1558215042`, live cadence updates, bounded reducer effects, identified MusicKit read-back, and honest measurement are connected
 - Playlist import and persistence: implemented with strict resolution, local preview analysis, versioned cache keys, atomic replacement, honest per-track states, and ready-only production filtering
-- Normal run composition: restored imported tracks use Apple Music playback and Core Motion; deterministic fixtures remain available for tests and previews
-- Automated body-to-music gate: 60 package tests, 9 app-model tests, 9 UI tests, formatter, normal Simulator build, current exact-profile signed build, physical installation, and launch pass
+- Normal run composition: restored imported tracks use Apple Music playback and Core Motion; Debug Simulator uses isolated local placeholder playlists with simulated cadence and silent playback
+- Automated body-to-music gate: 80 package tests, 11 app-model tests, 10 UI tests, formatter, normal Simulator build, current exact-profile signed build, physical installation, and launch pass
 - Physical body-to-music observation: passed; the corrected 59-second run averaged 155 SPM and measured 98 percent tempo matched from MusicKit read-back
 - Physical imported-collection gate: real playlist selection, local analysis, reinstall and relaunch restoration, and basic progress passed at 13 of 25 ready tracks; a natural transition remains open
 - Device evidence: debug builds persist one latest completed-run diagnostic file for direct container retrieval; the BPM-control build, installation, and launch pass on the physical iPhone

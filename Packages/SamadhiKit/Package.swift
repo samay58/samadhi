@@ -24,5 +24,6 @@ let package = Package(
         .testTarget(name: "SamadhiDomainTests", dependencies: ["SamadhiDomain"]),
         .testTarget(name: "SamadhiAudioTests", dependencies: ["SamadhiAudio", "SamadhiDomain"]),
         .testTarget(name: "SamadhiMotionTests", dependencies: ["SamadhiMotion"]),
+        .testTarget(name: "SamadhiDesignTests", dependencies: ["SamadhiDesign"]),
     ]
 )
