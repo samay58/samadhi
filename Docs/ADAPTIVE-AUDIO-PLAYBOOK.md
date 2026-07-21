@@ -40,6 +40,27 @@ Use two different motion profiles:
 
 D-Jogger's sudden 3 percent phase corrections synchronized well but sounded mechanical and sometimes overcorrected. Its later continuously coupled approach felt smoother and synchronized more strongly. Source: [D-Jogger implementation](https://backoffice.biblio.ugent.be/download/8551818/8551819).
 
+## Cadence range and control envelope
+
+Cadence is individual. Published running work places recreational running cadence broadly around 130 to 200 steps per minute, while large wearable datasets show that the relationship between speed and step frequency differs meaningfully between runners. Sources: [running cadence and music study](https://pmc.ncbi.nlm.nih.gov/articles/PMC4526248/), [wearable stride-frequency study](https://pubmed.ncbi.nlm.nih.gov/31079578/).
+
+Cadence-retraining studies commonly test changes of 5 to 10 percent from the runner's own preferred cadence. That evidence does not justify prescribing one universal target. Source: [randomized cadence-retraining trial](https://pubmed.ncbi.nlm.nih.gov/31264286/).
+
+Samadhi therefore separates availability from prescription:
+
+- Auto defaults to zero correction and follows the runner's measured cadence.
+- The runner can explore minus 20 through plus 20 BPM around that cadence. The 40-BPM window is clipped to the app's accepted 120 through 210 running range.
+- Manual supports the full 120 through 210 range for run-walk transitions, unusual stride patterns, and direct testing.
+- The broader dial does not broaden one song's time-stretch envelope. Compatible-track selection creates coarse range; the physically proven playback-rate range creates fine correction.
+
+The 40-BPM span is a product control envelope, not a claim that changing a runner's natural cadence by 20 BPM is universally beneficial.
+
+## Tactile grammar
+
+Apple recommends selection haptics while a control's value changes and warns against feedback that lacks a direct causal relationship or becomes tiring through repetition. Low-sharpness Core Haptics events feel round and organic, while high-sharpness events feel crisp. Sources: [Apple haptics guidance](https://developer.apple.com/design/human-interface-guidelines/playing-haptics), [Core Haptics sharpness](https://developer.apple.com/documentation/corehaptics/chhapticevent/parameterid/hapticsharpness).
+
+Samadhi uses one low-sharpness transient per BPM, a slightly fuller low-sharpness notch every five BPM, and a soft landing when Auto returns to neutral. One revolution maps to 40 BPM, matching the visible 40-detent ring. The engine starts only when the control opens, queues rapid detents 28 milliseconds apart so crossed values do not collapse into one buzz, and falls back to the system selection haptic when custom haptics are unavailable. Simulator proves event order and visual agreement; only a physical iPhone can judge warmth, fatigue, and grip.
+
 ## djay Pro as the manipulation benchmark
 
 djay demonstrates what polished control looks like, but it does not prove that an ordinary MusicKit app receives the same audio access.
@@ -66,13 +87,13 @@ Any wider MusicKit rate remains an empirical device capability. Test it. Do not 
 
 ## Current Samadhi gap
 
-The code already explains why the current experience can feel inert.
+The source-neutral planner now selects the best ready fit at run start and prepares a better fit after five seconds of stable incompatibility. The 40-BPM wheel can therefore express a broad target without widening one song's rate envelope. Three physical truths remain open:
 
-- When a requested BPM falls outside 0.94 through 1.06, `AdaptationPolicy` records `At limit` but calls `musicSteady`, which eases the command toward 1.00. The user can request a dramatic change and hear the original speed. Source: [AdaptationPolicy.swift](../Packages/SamadhiKit/Sources/SamadhiDomain/AdaptationPolicy.swift).
-- The production queue retains imported order. It does not choose the ready track whose normalized tempo is closest to current cadence. Sources: [RunReducer.swift](../Packages/SamadhiKit/Sources/SamadhiDomain/RunReducer.swift), [AppleMusicPlaybackController.swift](../App/AppleMusicPlaybackController.swift).
+- One imported run must cross a natural prepared transition without a gap, stale feedback, or a false summary.
+- The wider dial must agree with the requested BPM, selected pulse, MusicKit rate read-back, and audible result on the physical phone.
 - The current metric compares effective tempo with cadence. It does not observe footfall phase. Source: [AdaptationPolicy.swift](../Packages/SamadhiKit/Sources/SamadhiDomain/AdaptationPolicy.swift).
 
-This is a mechanics problem before it is a visual-design problem. Do not polish the current matched state until the audio behavior passes the felt test.
+Do not mistake the completed control surface for a completed body-to-music loop.
 
 ## Recommended Apple Music mechanic
 
@@ -162,6 +183,8 @@ Reject the middle path: do not polish a ±6 percent tempo-only system and market
 - https://pmc.ncbi.nlm.nih.gov/articles/PMC8048782/
 - https://pmc.ncbi.nlm.nih.gov/articles/PMC6283599/
 - https://pubmed.ncbi.nlm.nih.gov/25489742/
+- https://pubmed.ncbi.nlm.nih.gov/31079578/
+- https://pubmed.ncbi.nlm.nih.gov/31264286/
 - https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0070758
 - https://backoffice.biblio.ugent.be/download/8551818/8551819
 - https://web-archive.southampton.ac.uk/cogprints.org/644/1/tempo.htm
@@ -178,6 +201,8 @@ Reject the middle path: do not polish a ±6 percent tempo-only system and market
 - https://techcrunch.com/2015/05/20/spotify-for-runners/
 - https://docs.superpowered.com/reference/latest/time-stretching/
 - https://github.com/breakfastquay/rubberband
+- https://developer.apple.com/design/human-interface-guidelines/playing-haptics
+- https://developer.apple.com/documentation/corehaptics/chhapticevent/parameterid/hapticsharpness
 
 ---
 

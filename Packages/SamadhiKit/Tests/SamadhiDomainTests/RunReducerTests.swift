@@ -375,7 +375,7 @@ private let slowTrack = MusicTrack(
     #expect(timeoutID == 63)
     #expect(
         result.1 == [
-            .emitHaptic(.rhythmStep),
+            .emitHaptic(.rhythmStep(isMajor: false)),
             .setPlaybackRate(
                 sessionID: 61,
                 operationID: 61,
@@ -440,11 +440,11 @@ private let slowTrack = MusicTrack(
     #expect(active.session.adaptationState.lastReliableCadenceSPM == nil)
 }
 
-@Test func automaticFineTuneClampsAtEightBPM() {
+@Test func automaticFineTuneSpansFortyBPMAroundCadence() {
     var state = acquiringCoreLoopRun(sessionID: 67)
     var stepHapticCount = 0
     var finalEffects: [RunEffect] = []
-    for step in 0..<9 {
+    for step in 0..<21 {
         let result = coreLoopReducer.reduce(
             state: state,
             event: .rhythmControlAdjusted(
@@ -455,14 +455,41 @@ private let slowTrack = MusicTrack(
         )
         state = result.0
         finalEffects = result.1
-        if result.1.contains(.emitHaptic(.rhythmStep)) {
+        if result.1.contains(where: {
+            if case .emitHaptic(.rhythmStep) = $0 { return true }
+            return false
+        }) {
             stepHapticCount += 1
         }
     }
 
-    #expect(state.session?.rhythmControl.automaticCorrectionBPM == 8)
-    #expect(stepHapticCount == 8)
+    #expect(state.session?.rhythmControl.automaticCorrectionBPM == 20)
+    #expect(stepHapticCount == 20)
     #expect(finalEffects.contains(.emitHaptic(.rhythmLimit)))
+}
+
+@Test func rhythmDetentsAccentEveryFiveBPM() {
+    var state = acquiringCoreLoopRun(sessionID: 69)
+    let minor = coreLoopReducer.reduce(
+        state: state,
+        event: .rhythmControlAdjusted(steps: 1, rateRequestID: 70, timeoutID: 71)
+    )
+    state = minor.0
+    var major = minor
+    for offset in 2...5 {
+        major = coreLoopReducer.reduce(
+            state: state,
+            event: .rhythmControlAdjusted(
+                steps: 1,
+                rateRequestID: 70 + offset,
+                timeoutID: 80 + offset
+            )
+        )
+        state = major.0
+    }
+
+    #expect(minor.1.contains(.emitHaptic(.rhythmStep(isMajor: false))))
+    #expect(major.1.contains(.emitHaptic(.rhythmStep(isMajor: true))))
 }
 
 @Test func resetReturnsFineTuneToNeutralAutomaticMode() {

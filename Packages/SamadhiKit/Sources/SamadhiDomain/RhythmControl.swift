@@ -4,8 +4,9 @@ public enum RhythmControlMode: String, Sendable, Equatable, Codable {
 }
 
 public struct RhythmControlState: Sendable, Equatable, Codable {
-    public static let automaticCorrectionRange = -8...8
-    public static let manualTargetRange = 120...200
+    public static let runningTargetRange = 120...210
+    public static let automaticCorrectionRange = -20...20
+    public static let manualTargetRange = runningTargetRange
 
     public var mode: RhythmControlMode
     public var automaticCorrectionBPM: Int
@@ -26,7 +27,13 @@ public struct RhythmControlState: Sendable, Equatable, Codable {
     public func requestedBPM(cadenceSPM: Double?) -> Double? {
         switch mode {
         case .automatic:
-            cadenceSPM.map { $0 + Double(automaticCorrectionBPM) }
+            cadenceSPM.map {
+                let requested = $0 + Double(automaticCorrectionBPM)
+                return min(
+                    max(requested, Double(Self.runningTargetRange.lowerBound)),
+                    Double(Self.runningTargetRange.upperBound)
+                )
+            }
         case .manual:
             Double(manualTargetBPM)
         }

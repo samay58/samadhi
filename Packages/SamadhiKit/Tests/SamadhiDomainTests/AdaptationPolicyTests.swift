@@ -187,19 +187,27 @@ private let policy = AdaptationPolicy()
     var control = RhythmControlState.initial
 
     _ = control.adjust(by: 99)
-    #expect(control.automaticCorrectionBPM == 8)
+    #expect(control.automaticCorrectionBPM == 20)
     _ = control.adjust(by: -99)
-    #expect(control.automaticCorrectionBPM == -8)
+    #expect(control.automaticCorrectionBPM == -20)
 
     control.useManual(seedBPM: 250)
     #expect(control.mode == .manual)
-    #expect(control.manualTargetBPM == 200)
+    #expect(control.manualTargetBPM == 210)
     _ = control.adjust(by: -99)
     #expect(control.manualTargetBPM == 120)
 
     control.resetToAutomatic()
     #expect(control.mode == .automatic)
     #expect(control.automaticCorrectionBPM == 0)
+}
+
+@Test func automaticTargetKeepsItsFortyBPMWindowInsideRunningBounds() {
+    let faster = RhythmControlState(automaticCorrectionBPM: 20)
+    let slower = RhythmControlState(automaticCorrectionBPM: -20)
+
+    #expect(faster.requestedBPM(cadenceSPM: 205) == 210)
+    #expect(slower.requestedBPM(cadenceSPM: 125) == 120)
 }
 
 @Test func matchRequiresOneSecondInsideAppliedRateTolerance() {

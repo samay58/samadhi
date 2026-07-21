@@ -181,14 +181,16 @@ extension RunReducer {
         next.session = transition.session
 
         let haptic: HapticEvent
-        if next.session.adaptationState.isAtLimit {
-            haptic = .rhythmLimit
-        } else if next.session.rhythmControl.mode == .automatic,
+        if next.session.rhythmControl.mode == .automatic,
             next.session.rhythmControl.automaticCorrectionBPM == 0
         {
             haptic = .rhythmAuto
         } else {
-            haptic = .rhythmStep
+            let detentValue =
+                next.session.rhythmControl.mode == .automatic
+                ? next.session.rhythmControl.automaticCorrectionBPM
+                : next.session.rhythmControl.manualTargetBPM
+            haptic = .rhythmStep(isMajor: detentValue.isMultiple(of: 5))
         }
 
         return (

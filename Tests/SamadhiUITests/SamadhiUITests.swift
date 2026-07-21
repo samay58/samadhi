@@ -128,7 +128,7 @@ final class SamadhiUITests: XCTestCase {
             withVelocity: .slow,
             thenHoldForDuration: 0.2
         )
-        XCTAssertTrue(app.staticTexts["176"].waitForExistence(timeout: 2))
+        XCTAssertTrue(app.staticTexts["178"].waitForExistence(timeout: 2))
 
         right.press(
             forDuration: 0.12,
@@ -136,10 +136,10 @@ final class SamadhiUITests: XCTestCase {
             withVelocity: .slow,
             thenHoldForDuration: 0.2
         )
-        XCTAssertTrue(app.staticTexts["165"].waitForExistence(timeout: 2))
+        XCTAssertTrue(app.staticTexts["168"].waitForExistence(timeout: 2))
 
         dial.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5)).tap()
-        XCTAssertTrue(app.staticTexts["165"].exists)
+        XCTAssertTrue(app.staticTexts["168"].exists)
 
         app.buttons["rhythm-manual"].tap()
         XCTAssertTrue(app.buttons["rhythm-manual"].isSelected)

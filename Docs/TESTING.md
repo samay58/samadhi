@@ -9,7 +9,7 @@
 
 Scripts/test.sh runs Swift package tests, app-model tests, and UI tests serially on iPhone 17 Pro Simulator.
 
-The 2026-07-21 full serial gate passed 80 package tests, 11 app-model tests, and 10 UI tests.
+The 2026-07-21 full serial gate passed 83 package tests, 11 app-model tests, and 10 UI tests.
 
 Formatter gate:
 
@@ -55,9 +55,9 @@ Domain tests cover:
 - Compatible adaptive starting-song selection from the initial cadence prior
 - Five-second mismatch hold, prepared-next identity, recovery clearing, and stale preparation rejection
 - Player-confirmed Previous and Skip truth instead of predicted song state
-- One selection haptic for each accepted Auto detent and one distinct limit warning at the ninth step
+- One haptic for each accepted Auto detent, a fuller event every five BPM, and one distinct warning beyond the 40-BPM window
 
-Design tests cover clockwise and counterclockwise one-BPM detents, partial-turn accumulation, direction reversal, angle wraparound, and reset between gestures.
+Design tests cover clockwise and counterclockwise one-BPM detents, partial-turn accumulation, direction reversal, angle wraparound, reset between gestures, and exactly 40 BPM per revolution.
 
 Motion tests cover:
 
@@ -96,7 +96,7 @@ App-model tests cover ready mapping, start transition, atomic store round trips,
 
 ## Visual proof
 
-Final frames under Evidence/Simulator/ cover ready, imported empty and partial states, locked run, controls, summary, Home Screen icon, BPM Auto fine-tune, the Manual safety limit, accessibility-size BPM controls, the refined rotary BPM click wheel, and normal local-demo readiness. The short rotary recording shows clockwise, counterclockwise, protected-center, Manual, and Auto behavior. Evidence/Previews/ covers other accessibility and state-specific visual checks.
+Final frames under Evidence/Simulator/ cover ready, imported empty and partial states, locked run, controls, summary, Home Screen icon, BPM Auto fine-tune, the Manual safety limit, accessibility-size BPM controls, the 40-detent rotary BPM click wheel, and normal local-demo readiness. The short rotary recording shows clockwise, counterclockwise, protected-center, Manual, and Auto behavior. Evidence/Previews/ covers other accessibility and state-specific visual checks.
 
 ## Truth boundary
 
