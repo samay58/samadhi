@@ -2,7 +2,9 @@
 
 ## Current capability
 
-Apple team `ZL5U59XBJ6` is saved in `project.yml`. Signed compilation and installation pass with an Apple Development certificate. Samay's iPhone 17 Pro runs iOS 27.0 with Developer Mode enabled. The explicit App ID exists and the MusicKit App Service is user-confirmed as enabled. The diagnostics-capable normal app was installed on 2026-07-20 and preserved the selected playlist. iOS blocked foreground launch because the phone was locked.
+Apple team `ZL5U59XBJ6` is saved in `project.yml`. Signed compilation and installation pass with an Apple Development certificate. Samay's iPhone 17 Pro runs iOS 27.0 with Developer Mode enabled. The explicit App ID exists and the MusicKit App Service is user-confirmed as enabled. On 2026-07-21 the exact-profile harness ran over Beoplay Eleven and made 0.90 versus 1.10 clearly audible on one track. The normal app now contains compatible-song start selection, prepared next-song fit, and the aperture click wheel.
+
+Automatic signing selected the wildcard profile during the first build even though the exact profile was installed. For MusicKit work, inspect the embedded profile before installation and require `Samadhi Development` with application identifier `ZL5U59XBJ6.com.samaydhawan.Samadhi`.
 
 ## Denver test build
 
@@ -11,9 +13,9 @@ Apple team `ZL5U59XBJ6` is saved in `project.yml`. Signed compilation and instal
 3. Read the result honestly. Ready tracks can run; unreadable or unavailable tracks remain visible but do not enter playback.
 4. Confirm the restored collection still reports ready tracks, tap `Start`, and allow motion access if asked.
 5. Close and reopen Samadhi. Confirm the same playlist returns without another choice.
-6. During a short run, check that playback starts, cadence changes, and skip advances to another ready track.
+6. During a short run, turn the aperture perimeter to adjust BPM. Check that playback starts on a suitable ready song, cadence changes, and one song crosses naturally into a prepared better fit.
 
-The build is suitable for product testing, not public distribution. The installed offline profile expires on 2026-07-23 UTC. Physical selection, analysis, reinstall and relaunch restoration, and basic player progress pass. A natural track transition remains open.
+The build is suitable for product testing, not public distribution. The installed offline profile expires on 2026-07-23 UTC. Physical selection, analysis, reinstall and relaunch restoration, basic player progress, Bluetooth routing, and one-track perceptibility pass. The production track-fit and click-wheel slice has an exact-profile signed build, but the paired phone was unavailable when installation was attempted. Physical click-wheel feel and a natural prepared transition remain open.
 
 After a debug run finishes, pull `Library/Application Support/Samadhi/latest-run-diagnostics.json` directly from the app container. The file overwrites the prior run and contains progress, cadence, target and applied rates, track changes, recovery events, and the honest summary.
 

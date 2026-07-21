@@ -21,7 +21,7 @@ The research basis and source links live in [ADAPTIVE-AUDIO-PLAYBOOK.md](ADAPTIV
 - `TrackMatchPlanner` is source-neutral and passes deterministic tests for half-time, full-time, double-time, quality-envelope, source-order, and current-track retention behavior.
 - The debug MusicKit harness can run a blinded 0.92 versus 1.08 comparison and record requested rate, read-back, and direction recognition. Optional 0.90 and 1.10 controls are available only for a clean follow-up.
 - Public MusicKit exposes playback rate but no documented beat grid, full-track PCM callback, phase-control primitive, or processing-quality guarantee.
-- The paired iPhone is currently unavailable to Xcode. The previously installed exact development profile expires on 2026-07-23 UTC.
+- The paired iPhone reconnected on 2026-07-21. On `LITE SPOTS` through Beoplay Eleven, Samay clearly heard 0.90 versus 1.10 and reported approximately 95 percent confidence that the mechanic worked. The broader blinded and full-song quality checks remain open, and the installed exact development profile expires on 2026-07-23 UTC.
 
 ## Priority map
 
@@ -227,4 +227,4 @@ Do not add playlist generation, Spotify, GPS, maps, pace, distance, coaching, so
 
 ## WHERE WE LEFT OFF
 
-The research and source-neutral planner are complete. The blinded MusicKit harness compiles and the full automated gate passes. The next action is the physical 0.92 versus 1.08 pass-or-pivot test. The iPhone must reconnect first, and the exact development profile must be renewed if it has expired.
+The research, source-neutral planner, production track-fit connection, and aperture click wheel are complete. Adaptive runs start from the best ready fit using 168 BPM only as a prior. A stable five-second mismatch prepares a better-fitting next song while keeping the current song playing, and identified callbacks prevent stale preparation from winning. The exact-profile harness and trace proved an obvious 0.90 versus 1.10 change on one Bluetooth track. Apple Music remains authoritative, but the normal-run envelope stays at 0.94 through 1.06 until full-song quality is proven. The next action is one physical imported-playlist run through a natural prepared transition. Renew the exact development profile before another install after its 2026-07-23 UTC expiration.

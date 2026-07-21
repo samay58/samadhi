@@ -35,19 +35,38 @@ public struct RunReducer: Sendable {
         where preparation.session.id == sessionID && preparation.stage == .authorization:
             switch authorization {
             case .authorized:
+                guard let startingTrackID = adaptiveStartingTrackID else {
+                    return (.ready, [.cancelAllTasks(sessionID: sessionID)])
+                }
                 var next = preparation
                 next.stage = .playback(.adaptive)
-                return (.preparing(next), [.preparePlayback(sessionID: sessionID, mode: .adaptive)])
+                return (
+                    .preparing(next),
+                    [
+                        .preparePlayback(
+                            sessionID: sessionID,
+                            mode: .adaptive,
+                            startingTrackID: startingTrackID
+                        )
+                    ]
+                )
             case .denied, .unavailable:
                 return (.permissionRecovery(preparation.session), [])
             }
 
         case let (.permissionRecovery(session), .useFixedRhythmTapped):
+            let startingTrackID = tracks.first?.id ?? MusicTrackID("demo-0")
             var fixedSession = session
             fixedSession.mode = .fixed
             return (
                 .preparing(Preparation(session: fixedSession, stage: .playback(.fixed))),
-                [.preparePlayback(sessionID: session.id, mode: .fixed)]
+                [
+                    .preparePlayback(
+                        sessionID: session.id,
+                        mode: .fixed,
+                        startingTrackID: startingTrackID
+                    )
+                ]
             )
 
         case let (.preparing(preparation), .playbackPrepared(sessionID, trackID))
@@ -57,6 +76,9 @@ public struct RunReducer: Sendable {
             }
             var session = preparation.session
             session.currentTrackID = trackID
+            if let index = tracks.firstIndex(where: { $0.id == trackID }) {
+                session.trackIndex = index
+            }
             switch preparation.stage {
             case .playback(.adaptive):
                 let acquisitionID = 1
@@ -290,27 +312,10 @@ public struct RunReducer: Sendable {
             )
 
         case let (.active(active), .skipTapped):
-            var next = active
-            next.session.trackIndex = (next.session.trackIndex + 1) % trackCount
-            if tracks.indices.contains(next.session.trackIndex) {
-                next.session.currentTrackID = tracks[next.session.trackIndex].id
-            }
-            next.session.pendingRateRequestID = nil
-            next.session.songCount += 1
-            next.session.trackElapsedSeconds = 0
-            next.session.trackDurationSeconds = nil
-            return (.active(next), [.skipTrack(sessionID: active.session.id)])
+            return (state, [.skipTrack(sessionID: active.session.id)])
 
         case let (.active(active), .previousTapped):
-            var next = active
-            next.session.trackIndex = (next.session.trackIndex - 1 + trackCount) % trackCount
-            if tracks.indices.contains(next.session.trackIndex) {
-                next.session.currentTrackID = tracks[next.session.trackIndex].id
-            }
-            next.session.pendingRateRequestID = nil
-            next.session.trackElapsedSeconds = 0
-            next.session.trackDurationSeconds = nil
-            return (.active(next), [.previousTrack(sessionID: active.session.id)])
+            return (state, [.previousTrack(sessionID: active.session.id)])
 
         case let (.active(active), .finishTapped):
             switch active.activity {
@@ -440,6 +445,35 @@ public struct RunReducer: Sendable {
 
         case let (
             .active(active),
+            .nextTrackPrepared(sessionID, operationID, selectionID, trackID)
+        ):
+            guard active.session.id == sessionID,
+                active.session.playbackOperationID == operationID,
+                active.session.pendingTrackSelectionID == selectionID,
+                active.session.pendingNextTrackID == trackID
+            else { return (state, []) }
+            var next = active
+            next.session.pendingTrackSelectionID = nil
+            next.session.pendingNextTrackID = nil
+            next.session.preparedNextTrackID = trackID
+            return (.active(next), [])
+
+        case let (
+            .active(active),
+            .nextTrackPreparationFailed(sessionID, operationID, selectionID, trackID)
+        ):
+            guard active.session.id == sessionID,
+                active.session.playbackOperationID == operationID,
+                active.session.pendingTrackSelectionID == selectionID,
+                active.session.pendingNextTrackID == trackID
+            else { return (state, []) }
+            var next = active
+            next.session.pendingTrackSelectionID = nil
+            next.session.pendingNextTrackID = nil
+            return (.active(next), [])
+
+        case let (
+            .active(active),
             .playbackRateApplied(
                 sessionID,
                 operationID,
@@ -482,6 +516,10 @@ public struct RunReducer: Sendable {
             next.session.trackElapsedSeconds = 0
             next.session.trackDurationSeconds = nil
             next.session.pendingRateRequestID = nil
+            next.session.incompatibleTrackSeconds = 0
+            next.session.pendingTrackSelectionID = nil
+            next.session.pendingNextTrackID = nil
+            next.session.preparedNextTrackID = nil
             return adaptManualControlAfterTrackChange(
                 active: next,
                 rateRequestID: rateRequestID
@@ -557,6 +595,12 @@ public struct RunReducer: Sendable {
                 .pausePlayback(sessionID: session.id),
             ]
         )
+    }
+
+    private var adaptiveStartingTrackID: MusicTrackID? {
+        if tracks.isEmpty { return MusicTrackID("demo-0") }
+        return TrackMatchPlanner().select(requestedBPM: 168, from: tracks)?.trackID
+            ?? tracks.first(where: \.isAdaptiveReady)?.id
     }
 
 }

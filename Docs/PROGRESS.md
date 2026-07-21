@@ -231,6 +231,31 @@
 - Passed formatter lint, 67 package tests, 9 app-model tests, and 9 UI tests on the resulting tree
 - Consolidated the findings into one prioritized execution spec with explicit pass, pivot, evidence, craft, and milestone-completion gates
 
+## 2026-07-21. Perceptibility gate setup
+
+- Reconnected to the paired iPhone 17 Pro over the local network and verified iOS 27.0 with Developer Mode enabled
+- Confirmed the exact `Samadhi Development` profile remains installed and expires on 2026-07-23 UTC
+- Caught automatic signing selecting the wildcard profile and rejected that build before installation
+- Rebuilt the MusicKit harness with the exact profile, verified its embedded application identifier, installed it, and launched it
+- Captured the live harness on the Beoplay Eleven Bluetooth A2DP route
+- Reached the honest human blocker: the blinded faster-or-slower and artifact judgments still need Samay's ears
+- Pulled the device trace directly and matched it against the user export at the shared observation point
+- Recorded that 0.90 versus 1.10 was clearly audible on `LITE SPOTS` through Beoplay Eleven, with approximately 95 percent user confidence
+- Kept the normal-run quality envelope at 0.94 through 1.06 because the wider endpoints have not passed full-song artifact listening
+
+## 2026-07-21. Production track fit and click wheel
+
+- Connected `TrackMatchPlanner` to adaptive run start using 168 BPM only as an initial prior
+- Made real player callbacks authoritative for song identity, index, and count
+- Added a five-second stable-mismatch hold and identified preparation of one better-fitting next song
+- Kept the current song playing until explicit Skip or its natural boundary
+- Turned the tempo aperture into a rotary BPM click wheel with angular one-BPM detents, soft takeover, restrained haptics, VoiceOver adjustment, and a temporary perimeter marker
+- Removed separate plus and minus controls after visual review
+- Saved the refined iPhone 17 Pro Simulator frame as `Evidence/Simulator/2026-07-21-rotary-bpm-click-wheel.png`
+- Expanded the package suite to 74 tests and kept 9 app-model and 9 UI tests
+- Passed formatter lint, the full serial gate, and an exact-profile signed iPhone build
+- Left installation honest and open because the paired iPhone was unavailable over the network
+
 ## Current checkpoint
 
-Milestones 0 and 1 are complete. Apple Music remains the selected Milestone 2 source, but its suitability for the core feeling is now conditional. Live Core Motion cadence and automatic MusicKit rate response pass mechanically on the physical iPhone. The missing proof is perceptibility: Samay must hear a clean, unmistakable response rather than trust changing numbers. The source-neutral track-fit planner is tested but not yet connected to production selection. Next comes the short MusicKit A/B gate, then either track-aware Apple Music integration or an immediate pivot to app-owned audio. Long-form background and recovery checks remain before Milestone 2 completion.
+Milestones 0 and 1 are complete. Apple Music remains the selected Milestone 2 source. Live Core Motion cadence and automatic MusicKit rate response pass mechanically on the physical iPhone, and one Bluetooth track made 0.90 versus 1.10 clearly audible. The production run now starts on the best ready fit, waits through a five-second mismatch before preparing another fit, and rejects stale preparation. The pulsing aperture is the rotary BPM click wheel, with one-BPM detents and no separate control furniture. Next comes one normal imported-playlist run through a natural prepared transition, followed by broader listening, phase investigation, long-form background, recovery, and the outdoor run.

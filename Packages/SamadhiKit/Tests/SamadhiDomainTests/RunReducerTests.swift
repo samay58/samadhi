@@ -27,6 +27,182 @@ private let transitionTrack = MusicTrack(
     )
 )
 
+private let slowTrack = MusicTrack(
+    id: MusicTrackID("slow-track"),
+    title: "Slow",
+    durationSeconds: 210,
+    tempo: TempoAnalysis(
+        baseBPM: 148,
+        confidence: 1,
+        analyzedDurationSeconds: 30,
+        version: 2
+    )
+)
+
+@Test func adaptivePreparationChoosesTheClosestTrackToTheInitialPrior() {
+    let planningReducer = RunReducer(tracks: [slowTrack, coreLoopTrack])
+    let state = planningReducer.reduce(
+        state: .ready,
+        event: .startTapped(sessionID: 200)
+    ).0
+
+    let result = planningReducer.reduce(
+        state: state,
+        event: .authorizationResolved(sessionID: 200, .authorized)
+    )
+
+    #expect(
+        result.1 == [
+            .preparePlayback(
+                sessionID: 200,
+                mode: .adaptive,
+                startingTrackID: coreLoopTrack.id
+            )
+        ]
+    )
+}
+
+@Test func preparedTrackSetsItsRealCollectionIndex() {
+    let planningReducer = RunReducer(tracks: [slowTrack, coreLoopTrack])
+    var state = planningReducer.reduce(
+        state: .ready,
+        event: .startTapped(sessionID: 201)
+    ).0
+    state =
+        planningReducer.reduce(
+            state: state,
+            event: .authorizationResolved(sessionID: 201, .authorized)
+        ).0
+
+    let result = planningReducer.reduce(
+        state: state,
+        event: .playbackPrepared(sessionID: 201, trackID: coreLoopTrack.id)
+    )
+
+    #expect(result.0.session?.currentTrackID == coreLoopTrack.id)
+    #expect(result.0.session?.trackIndex == 1)
+}
+
+@Test func incompatibleTrackMustStayOutsideTheEnvelopeForFiveSeconds() {
+    let planningReducer = RunReducer(tracks: [slowTrack, coreLoopTrack])
+    var state = incompatibleRun()
+
+    var result = planningReducer.reduce(
+        state: state,
+        event: .cadenceUpdated(
+            sessionID: 202,
+            acquisitionID: 1,
+            stepsPerMinute: 168,
+            deltaSeconds: 4,
+            rateRequestID: 300
+        )
+    )
+    state = result.0
+    #expect(result.1.isEmpty)
+
+    result = planningReducer.reduce(
+        state: state,
+        event: .cadenceUpdated(
+            sessionID: 202,
+            acquisitionID: 1,
+            stepsPerMinute: 168,
+            deltaSeconds: 1,
+            rateRequestID: 301
+        )
+    )
+
+    #expect(
+        result.1 == [
+            .prepareNextTrack(
+                sessionID: 202,
+                operationID: 202,
+                selectionID: 301,
+                trackID: coreLoopTrack.id
+            )
+        ]
+    )
+    #expect(result.0.session?.pendingTrackSelectionID == 301)
+}
+
+@Test func stalePreparedSelectionCannotReplaceANewerPlan() {
+    let planningReducer = RunReducer(tracks: [slowTrack, coreLoopTrack])
+    var state = incompatibleRun()
+    state =
+        planningReducer.reduce(
+            state: state,
+            event: .cadenceUpdated(
+                sessionID: 202,
+                acquisitionID: 1,
+                stepsPerMinute: 168,
+                deltaSeconds: 5,
+                rateRequestID: 301
+            )
+        ).0
+
+    let stale = planningReducer.reduce(
+        state: state,
+        event: .nextTrackPrepared(
+            sessionID: 202,
+            operationID: 202,
+            selectionID: 300,
+            trackID: coreLoopTrack.id
+        )
+    )
+    #expect(stale.0 == state)
+
+    let current = planningReducer.reduce(
+        state: state,
+        event: .nextTrackPrepared(
+            sessionID: 202,
+            operationID: 202,
+            selectionID: 301,
+            trackID: coreLoopTrack.id
+        )
+    )
+    #expect(current.0.session?.pendingTrackSelectionID == nil)
+    #expect(current.0.session?.preparedNextTrackID == coreLoopTrack.id)
+}
+
+@Test func compatibilityRecoveryInvalidatesAnOutstandingSelection() {
+    let planningReducer = RunReducer(tracks: [slowTrack, coreLoopTrack])
+    var state = incompatibleRun()
+    state =
+        planningReducer.reduce(
+            state: state,
+            event: .cadenceUpdated(
+                sessionID: 202,
+                acquisitionID: 1,
+                stepsPerMinute: 168,
+                deltaSeconds: 5,
+                rateRequestID: 301
+            )
+        ).0
+
+    let result = planningReducer.reduce(
+        state: state,
+        event: .cadenceUpdated(
+            sessionID: 202,
+            acquisitionID: 1,
+            stepsPerMinute: 148,
+            deltaSeconds: 1,
+            rateRequestID: 302
+        )
+    )
+    state = result.0
+
+    #expect(state.session?.pendingTrackSelectionID == nil)
+    #expect(state.session?.incompatibleTrackSeconds == 0)
+    #expect(
+        result.1 == [
+            .clearPreparedNextTrack(
+                sessionID: 202,
+                operationID: 202,
+                selectionID: 302
+            )
+        ]
+    )
+}
+
 @Test func adaptiveStartLocksAndRecordsOnlyEligibleTime() {
     var state: RunState = .ready
     state = reducer.reduce(state: state, event: .startTapped(sessionID: 7)).0
@@ -422,27 +598,25 @@ private let transitionTrack = MusicTrack(
     #expect(session.summary.tempoMatchedPercent == nil)
 }
 
-@Test func changingTracksResetsSongProgress() {
+@Test func skipWaitsForPlayerTruthBeforeChangingTheSong() {
     var state = lockedRun()
     state = reducer.reduce(state: state, event: .activeSecond(tempoMatched: true)).0
     state = reducer.reduce(state: state, event: .activeSecond(tempoMatched: true)).0
     #expect(state.session?.trackElapsedSeconds == 2)
 
     let result = reducer.reduce(state: state, event: .skipTapped)
-    #expect(result.0.session?.trackElapsedSeconds == 0)
-    #expect(result.0.session?.trackIndex == 1)
-    #expect(result.0.session?.songCount == 2)
+    #expect(result.0.session?.trackElapsedSeconds == 2)
+    #expect(result.0.session?.trackIndex == 0)
+    #expect(result.0.session?.songCount == 1)
     #expect(result.1 == [.skipTrack(sessionID: 1)])
 }
 
-@Test func trackNavigationUsesConfiguredCollectionSize() {
-    let twoTrackReducer = RunReducer(trackCount: 2)
+@Test func previousWaitsForPlayerTruthBeforeChangingTheSong() {
+    let state = lockedRun()
+    let result = reducer.reduce(state: state, event: .previousTapped)
 
-    var state = twoTrackReducer.reduce(state: lockedRun(), event: .previousTapped).0
-    #expect(state.session?.trackIndex == 1)
-
-    state = twoTrackReducer.reduce(state: state, event: .skipTapped).0
-    #expect(state.session?.trackIndex == 0)
+    #expect(result.0 == state)
+    #expect(result.1 == [.previousTrack(sessionID: 1)])
 }
 
 @Test func playbackProgressRequiresCurrentSessionAndOperation() {
@@ -739,4 +913,16 @@ private func acquiringCoreLoopRun(sessionID: Int) -> RunState {
             state: state,
             event: .playbackPrepared(sessionID: sessionID, trackID: coreLoopTrack.id)
         ).0
+}
+
+private func incompatibleRun() -> RunState {
+    var session = RunSession(id: 202)
+    session.currentTrackID = slowTrack.id
+    session.cadenceAcquisitionID = 1
+    return .active(
+        ActiveRun(
+            session: session,
+            activity: .playing(rhythm: .locked(spm: 168), controls: .hidden)
+        )
+    )
 }

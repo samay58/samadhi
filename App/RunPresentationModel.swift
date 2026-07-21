@@ -141,6 +141,8 @@ final class RunPresentationModel {
                 requestedBPM: requestedBPM.map { Int($0.rounded()) },
                 appliedBPM: appliedBPM,
                 isAtLimit: session?.adaptationState.isAtLimit ?? false,
+                isFindingBetterFit: session?.pendingTrackSelectionID != nil
+                    || session?.preparedNextTrackID != nil,
                 isVisible: rhythmControlVisible,
                 isAvailable: session?.mode == .adaptive
             )
@@ -268,17 +270,20 @@ final class RunPresentationModel {
                     ))
             }
 
-        case let .preparePlayback(sessionID, _):
+        case let .preparePlayback(sessionID, _, startingTrackID):
             let delay: Duration = configuration.fastMode ? .milliseconds(70) : .milliseconds(280)
             taskStore.replace(.preparation) { [weak self, musicPlayer, musicCollection] in
                 try? await Task.sleep(for: delay)
                 guard !Task.isCancelled else { return }
                 guard let self else { return }
                 do {
-                    try await musicPlayer.prepare(musicCollection, operationID: sessionID)
+                    try await musicPlayer.prepare(
+                        musicCollection,
+                        startingAt: startingTrackID,
+                        operationID: sessionID
+                    )
                     guard !Task.isCancelled else { return }
-                    guard let firstTrackID = musicCollection.tracks.first?.id else { return }
-                    dispatch(.playbackPrepared(sessionID: sessionID, trackID: firstTrackID))
+                    dispatch(.playbackPrepared(sessionID: sessionID, trackID: startingTrackID))
                 } catch {
                     dispatch(.playbackFailed(sessionID: sessionID, operationID: sessionID))
                 }
@@ -403,6 +408,43 @@ final class RunPresentationModel {
                     self?.dispatch(.playbackFailed(sessionID: sessionID, operationID: sessionID))
                 }
             }
+
+        case let .prepareNextTrack(sessionID, operationID, selectionID, trackID):
+            taskStore.replace(.trackSelection) { [weak self, musicPlayer] in
+                do {
+                    try await musicPlayer.prepareNext(
+                        trackID: trackID,
+                        operationID: operationID,
+                        selectionID: selectionID
+                    )
+                    guard !Task.isCancelled else { return }
+                    self?.dispatch(
+                        .nextTrackPrepared(
+                            sessionID: sessionID,
+                            operationID: operationID,
+                            selectionID: selectionID,
+                            trackID: trackID
+                        )
+                    )
+                } catch {
+                    self?.dispatch(
+                        .nextTrackPreparationFailed(
+                            sessionID: sessionID,
+                            operationID: operationID,
+                            selectionID: selectionID,
+                            trackID: trackID
+                        )
+                    )
+                }
+            }
+
+        case let .clearPreparedNextTrack(sessionID, operationID, selectionID):
+            guard state.session?.id == sessionID else { return }
+            taskStore.cancel(.trackSelection)
+            musicPlayer.clearPreparedNext(
+                operationID: operationID,
+                selectionID: selectionID
+            )
 
         case let .setPlaybackRate(
             sessionID,

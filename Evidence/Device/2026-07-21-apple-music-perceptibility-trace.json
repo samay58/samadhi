@@ -1,0 +1,623 @@
+[
+  {
+    "date" : "2026-07-21T16:22:01Z",
+    "detail" : "MusicKit feasibility harness opened with playback reset",
+    "device" : "iPhone",
+    "event" : "harness_started",
+    "id" : "1828FB59-3410-4BE5-A8F9-0C6828688F8E",
+    "os" : "iOS 27.0",
+    "route" : "BluetoothA2DPOutput:Beoplay Eleven"
+  },
+  {
+    "date" : "2026-07-21T16:22:01Z",
+    "detail" : "stopped @ 1.0; none; id none; time 0.0",
+    "device" : "iPhone",
+    "event" : "player_state",
+    "id" : "1598A552-EEDE-4FA6-8DB7-FA4DE0E9A6B0",
+    "os" : "iOS 27.0",
+    "route" : "BluetoothA2DPOutput:Beoplay Eleven"
+  },
+  {
+    "date" : "2026-07-21T16:22:01Z",
+    "detail" : "stopped @ 1.0; none; id none; time 0.0",
+    "device" : "iPhone",
+    "event" : "app_became_active",
+    "id" : "98F641D7-ECE4-4ABF-87A8-F16839C819A0",
+    "os" : "iOS 27.0",
+    "route" : "BluetoothA2DPOutput:Beoplay Eleven"
+  },
+  {
+    "date" : "2026-07-21T16:23:41Z",
+    "detail" : ".authorized",
+    "device" : "iPhone",
+    "event" : "authorization",
+    "id" : "5B06E9E0-E740-44A5-91B1-A33B4E7CCBF2",
+    "os" : "iOS 27.0",
+    "route" : "BluetoothA2DPOutput:Beoplay Eleven"
+  },
+  {
+    "date" : "2026-07-21T16:23:41Z",
+    "detail" : "42 playlists",
+    "device" : "iPhone",
+    "event" : "playlists_loaded",
+    "id" : "EC9E0BE9-9807-45C4-B592-8914C8714E27",
+    "os" : "iOS 27.0",
+    "route" : "BluetoothA2DPOutput:Beoplay Eleven"
+  },
+  {
+    "date" : "2026-07-21T16:23:43Z",
+    "detail" : "Catalog returned 1 song",
+    "device" : "iPhone",
+    "event" : "catalog_token_passed",
+    "id" : "D55DE65C-C4EF-42DA-BF14-FBC90BC46D98",
+    "os" : "iOS 27.0",
+    "route" : "BluetoothA2DPOutput:Beoplay Eleven"
+  },
+  {
+    "date" : "2026-07-21T16:23:47Z",
+    "detail" : "LITE SPOTS; catalog id 1092027177",
+    "device" : "iPhone",
+    "event" : "catalog_preview_resolved",
+    "id" : "D9F9BEE2-9F9C-42EF-A5AB-336A0DFB5458",
+    "os" : "iOS 27.0",
+    "route" : "BluetoothA2DPOutput:Beoplay Eleven"
+  },
+  {
+    "date" : "2026-07-21T16:23:48Z",
+    "detail" : "LITE SPOTS; 60.5 BPM; confidence 0.92; version 2",
+    "device" : "iPhone",
+    "event" : "preview_tempo_estimated",
+    "id" : "CFC87C6F-A12A-4A2D-BF2D-F34BCC8B035A",
+    "os" : "iOS 27.0",
+    "route" : "BluetoothA2DPOutput:Beoplay Eleven"
+  },
+  {
+    "date" : "2026-07-21T16:23:49Z",
+    "detail" : "Tondo; catalog id 1499115595",
+    "device" : "iPhone",
+    "event" : "catalog_preview_resolved",
+    "id" : "092F79C9-16E8-4123-AF8A-F043345B178C",
+    "os" : "iOS 27.0",
+    "route" : "BluetoothA2DPOutput:Beoplay Eleven"
+  },
+  {
+    "date" : "2026-07-21T16:23:49Z",
+    "detail" : "Tondo; 66.0 BPM; confidence 1.00; version 2",
+    "device" : "iPhone",
+    "event" : "preview_tempo_estimated",
+    "id" : "7E807E12-643B-4169-B0DE-6EDC98FF8090",
+    "os" : "iOS 27.0",
+    "route" : "BluetoothA2DPOutput:Beoplay Eleven"
+  },
+  {
+    "date" : "2026-07-21T16:23:50Z",
+    "detail" : "Udd Gaye; catalog id 1550578437",
+    "device" : "iPhone",
+    "event" : "catalog_preview_resolved",
+    "id" : "36C17A9D-F252-4D9C-ABCB-559143DB3DF5",
+    "os" : "iOS 27.0",
+    "route" : "BluetoothA2DPOutput:Beoplay Eleven"
+  },
+  {
+    "date" : "2026-07-21T16:23:50Z",
+    "detail" : "Udd Gaye; 72.5 BPM; confidence 1.00; version 2",
+    "device" : "iPhone",
+    "event" : "preview_tempo_estimated",
+    "id" : "5E5A4C00-5E38-4133-90C0-D8807AE04C9B",
+    "os" : "iOS 27.0",
+    "route" : "BluetoothA2DPOutput:Beoplay Eleven"
+  },
+  {
+    "date" : "2026-07-21T16:23:51Z",
+    "detail" : "Gorilla; catalog id 1658414162",
+    "device" : "iPhone",
+    "event" : "catalog_preview_resolved",
+    "id" : "77D4A611-3A24-4192-AED8-7BA31C21CBEB",
+    "os" : "iOS 27.0",
+    "route" : "BluetoothA2DPOutput:Beoplay Eleven"
+  },
+  {
+    "date" : "2026-07-21T16:23:51Z",
+    "detail" : "Gorilla; 179.5 BPM; confidence 0.80; version 2",
+    "device" : "iPhone",
+    "event" : "preview_tempo_estimated",
+    "id" : "A1A0EE73-1863-4771-9028-F37C71D8A642",
+    "os" : "iOS 27.0",
+    "route" : "BluetoothA2DPOutput:Beoplay Eleven"
+  },
+  {
+    "date" : "2026-07-21T16:23:51Z",
+    "detail" : "Nanchaku; catalog id 1804733883",
+    "device" : "iPhone",
+    "event" : "catalog_preview_resolved",
+    "id" : "FFEEAA69-D3C7-42C3-B9AB-FEC88A92018A",
+    "os" : "iOS 27.0",
+    "route" : "BluetoothA2DPOutput:Beoplay Eleven"
+  },
+  {
+    "date" : "2026-07-21T16:23:52Z",
+    "detail" : "Nanchaku; 140.8 BPM; confidence 0.91; version 2",
+    "device" : "iPhone",
+    "event" : "preview_tempo_estimated",
+    "id" : "245C634F-E300-4224-96CD-BB0B0B58577D",
+    "os" : "iOS 27.0",
+    "route" : "BluetoothA2DPOutput:Beoplay Eleven"
+  },
+  {
+    "date" : "2026-07-21T16:23:52Z",
+    "detail" : "Afterhours (feat. Diplo & Nina Sky); catalog id 1040011716",
+    "device" : "iPhone",
+    "event" : "catalog_preview_resolved",
+    "id" : "19B2F4C7-B780-4544-B2C2-928D3D1BD39F",
+    "os" : "iOS 27.0",
+    "route" : "BluetoothA2DPOutput:Beoplay Eleven"
+  },
+  {
+    "date" : "2026-07-21T16:23:53Z",
+    "detail" : "Afterhours (feat. Diplo & Nina Sky); 181.5 BPM; confidence 0.79; version 2",
+    "device" : "iPhone",
+    "event" : "preview_tempo_estimated",
+    "id" : "3E75DCAE-AB02-42BF-AE87-6A4CD2F19E8C",
+    "os" : "iOS 27.0",
+    "route" : "BluetoothA2DPOutput:Beoplay Eleven"
+  },
+  {
+    "date" : "2026-07-21T16:23:54Z",
+    "detail" : "GLOWED UP (feat. Anderson .Paak); catalog id 1092027084",
+    "device" : "iPhone",
+    "event" : "catalog_preview_resolved",
+    "id" : "B5DDF856-6AD3-4201-9E70-B02D4D66853B",
+    "os" : "iOS 27.0",
+    "route" : "BluetoothA2DPOutput:Beoplay Eleven"
+  },
+  {
+    "date" : "2026-07-21T16:23:54Z",
+    "detail" : "GLOWED UP (feat. Anderson .Paak)",
+    "device" : "iPhone",
+    "event" : "preview_tempo_rejected",
+    "id" : "B0BE30E3-5850-4A85-9CC6-4006BC103D42",
+    "os" : "iOS 27.0",
+    "route" : "BluetoothA2DPOutput:Beoplay Eleven"
+  },
+  {
+    "date" : "2026-07-21T16:23:55Z",
+    "detail" : "Come Down; catalog id 1065681770",
+    "device" : "iPhone",
+    "event" : "catalog_preview_resolved",
+    "id" : "D6D5A43C-409E-43EC-8E6D-AEBAEE752439",
+    "os" : "iOS 27.0",
+    "route" : "BluetoothA2DPOutput:Beoplay Eleven"
+  },
+  {
+    "date" : "2026-07-21T16:23:55Z",
+    "detail" : "Come Down; 131.2 BPM; confidence 1.00; version 2",
+    "device" : "iPhone",
+    "event" : "preview_tempo_estimated",
+    "id" : "85E59809-4CFF-4078-9316-FE3D13D6FED5",
+    "os" : "iOS 27.0",
+    "route" : "BluetoothA2DPOutput:Beoplay Eleven"
+  },
+  {
+    "date" : "2026-07-21T16:23:56Z",
+    "detail" : "Tadow (Extended Version); catalog id 1794863839",
+    "device" : "iPhone",
+    "event" : "catalog_preview_resolved",
+    "id" : "87F01E0B-8B7E-4580-9B11-3A9A456AA316",
+    "os" : "iOS 27.0",
+    "route" : "BluetoothA2DPOutput:Beoplay Eleven"
+  },
+  {
+    "date" : "2026-07-21T16:23:56Z",
+    "detail" : "Tadow (Extended Version)",
+    "device" : "iPhone",
+    "event" : "preview_tempo_rejected",
+    "id" : "26ED62A2-80C4-4627-B602-D30581881F8E",
+    "os" : "iOS 27.0",
+    "route" : "BluetoothA2DPOutput:Beoplay Eleven"
+  },
+  {
+    "date" : "2026-07-21T16:23:57Z",
+    "detail" : "The Difference (Willaris. K Remix) [feat. Toro y Moi]; catalog id 1683373029",
+    "device" : "iPhone",
+    "event" : "catalog_preview_resolved",
+    "id" : "2CE5ADE2-F120-4F3E-8B3C-29C043AC00E2",
+    "os" : "iOS 27.0",
+    "route" : "BluetoothA2DPOutput:Beoplay Eleven"
+  },
+  {
+    "date" : "2026-07-21T16:23:57Z",
+    "detail" : "The Difference (Willaris. K Remix) [feat. Toro y Moi]; 139.5 BPM; confidence 1.00; version 2",
+    "device" : "iPhone",
+    "event" : "preview_tempo_estimated",
+    "id" : "1A2DD839-0675-4EDC-B9D1-0ABEAFA27C1B",
+    "os" : "iOS 27.0",
+    "route" : "BluetoothA2DPOutput:Beoplay Eleven"
+  },
+  {
+    "date" : "2026-07-21T16:23:57Z",
+    "detail" : "Rhythm, Heat & Pocket; 18 tracks; decoded preview coverage 8 of 10",
+    "device" : "iPhone",
+    "event" : "playlist_selected",
+    "id" : "4331B6BD-B29B-4E6E-9331-888B7C89715D",
+    "os" : "iOS 27.0",
+    "route" : "BluetoothA2DPOutput:Beoplay Eleven"
+  },
+  {
+    "date" : "2026-07-21T16:24:00Z",
+    "detail" : "requested 0.9; reported 0.9",
+    "device" : "iPhone",
+    "event" : "rate_written",
+    "id" : "913B1A1C-2870-4F76-8F12-2BF7F46F0B47",
+    "os" : "iOS 27.0",
+    "route" : "BluetoothA2DPOutput:Beoplay Eleven"
+  },
+  {
+    "date" : "2026-07-21T16:24:01Z",
+    "detail" : "stopped @ 0.9; none; id none; time 0.0",
+    "device" : "iPhone",
+    "event" : "player_state",
+    "id" : "55DEB7FE-F6B0-4E78-95F3-799E55B7C339",
+    "os" : "iOS 27.0",
+    "route" : "BluetoothA2DPOutput:Beoplay Eleven"
+  },
+  {
+    "date" : "2026-07-21T16:24:03Z",
+    "detail" : "Playback was not active",
+    "device" : "iPhone",
+    "event" : "perceptibility_blocked",
+    "id" : "07484BF6-19D8-42EF-9A03-77300BBDA18C",
+    "os" : "iOS 27.0",
+    "route" : "BluetoothA2DPOutput:Beoplay Eleven"
+  },
+  {
+    "date" : "2026-07-21T16:24:07Z",
+    "detail" : "Queue contains 18 tracks; paused @ 0.0; LITE SPOTS; id So2pr0EbI::NsPfsr0IX; time 0.0",
+    "device" : "iPhone",
+    "event" : "playback_started",
+    "id" : "8C24EE98-029C-410F-9CB5-D407C9761FE2",
+    "os" : "iOS 27.0",
+    "route" : "BluetoothA2DPOutput:Beoplay Eleven"
+  },
+  {
+    "date" : "2026-07-21T16:24:07Z",
+    "detail" : "playing @ 1.0; LITE SPOTS; id So2pr0EbI::NsPfsr0IX; time 0.1",
+    "device" : "iPhone",
+    "event" : "player_state",
+    "id" : "DEB18300-3893-4AD6-AE56-6D047035FD2D",
+    "os" : "iOS 27.0",
+    "route" : "BluetoothA2DPOutput:Beoplay Eleven"
+  },
+  {
+    "date" : "2026-07-21T16:24:07Z",
+    "detail" : "playing @ 1.0; LITE SPOTS; id So2pr0EbI::NsPfsr0IX; time 0.1",
+    "device" : "iPhone",
+    "event" : "playback_heartbeat",
+    "id" : "939748B5-3755-4632-B399-12ECEBC69912",
+    "os" : "iOS 27.0",
+    "route" : "BluetoothA2DPOutput:Beoplay Eleven"
+  },
+  {
+    "date" : "2026-07-21T16:24:09Z",
+    "detail" : "requested 0.9; reported 0.9",
+    "device" : "iPhone",
+    "event" : "rate_written",
+    "id" : "E9BABBFD-339E-4AC3-9AB7-8E5C3A731718",
+    "os" : "iOS 27.0",
+    "route" : "BluetoothA2DPOutput:Beoplay Eleven"
+  },
+  {
+    "date" : "2026-07-21T16:24:10Z",
+    "detail" : "playing @ 0.9; LITE SPOTS; id So2pr0EbI::NsPfsr0IX; time 2.1",
+    "device" : "iPhone",
+    "event" : "player_state",
+    "id" : "B7CDDB40-DA2F-4D1C-9BAA-67D7D9F0B9C8",
+    "os" : "iOS 27.0",
+    "route" : "BluetoothA2DPOutput:Beoplay Eleven"
+  },
+  {
+    "date" : "2026-07-21T16:24:12Z",
+    "detail" : "requested 1.1; reported 1.1",
+    "device" : "iPhone",
+    "event" : "rate_written",
+    "id" : "A3FD0571-EAE4-464F-934A-BB9C1B2FC772",
+    "os" : "iOS 27.0",
+    "route" : "BluetoothA2DPOutput:Beoplay Eleven"
+  },
+  {
+    "date" : "2026-07-21T16:24:12Z",
+    "detail" : "playing @ 1.1; LITE SPOTS; id So2pr0EbI::NsPfsr0IX; time 4.0",
+    "device" : "iPhone",
+    "event" : "player_state",
+    "id" : "F00BFEC7-F334-457A-BE68-98C29362A7B9",
+    "os" : "iOS 27.0",
+    "route" : "BluetoothA2DPOutput:Beoplay Eleven"
+  },
+  {
+    "date" : "2026-07-21T16:24:15Z",
+    "detail" : "requested 0.9; reported 0.9",
+    "device" : "iPhone",
+    "event" : "rate_written",
+    "id" : "F22986B0-10EA-4600-8907-D945A230FA58",
+    "os" : "iOS 27.0",
+    "route" : "BluetoothA2DPOutput:Beoplay Eleven"
+  },
+  {
+    "date" : "2026-07-21T16:24:15Z",
+    "detail" : "playing @ 0.9; LITE SPOTS; id So2pr0EbI::NsPfsr0IX; time 7.4",
+    "device" : "iPhone",
+    "event" : "player_state",
+    "id" : "5AE80C0C-A733-48DC-B8C7-86D0ED0A8D2C",
+    "os" : "iOS 27.0",
+    "route" : "BluetoothA2DPOutput:Beoplay Eleven"
+  },
+  {
+    "date" : "2026-07-21T16:24:23Z",
+    "detail" : "playing @ 0.9; LITE SPOTS; id So2pr0EbI::NsPfsr0IX; time 13.9",
+    "device" : "iPhone",
+    "event" : "playback_heartbeat",
+    "id" : "A54DD2D8-957B-4F8A-884B-5A742CC2729F",
+    "os" : "iOS 27.0",
+    "route" : "BluetoothA2DPOutput:Beoplay Eleven"
+  },
+  {
+    "date" : "2026-07-21T16:24:27Z",
+    "detail" : "requested 1.0; reported 1.0",
+    "device" : "iPhone",
+    "event" : "rate_written",
+    "id" : "0C164608-DB01-4E73-B598-11C8013FF0DE",
+    "os" : "iOS 27.0",
+    "route" : "BluetoothA2DPOutput:Beoplay Eleven"
+  },
+  {
+    "date" : "2026-07-21T16:24:27Z",
+    "detail" : "playing @ 1.0; LITE SPOTS; id So2pr0EbI::NsPfsr0IX; time 17.6",
+    "device" : "iPhone",
+    "event" : "player_state",
+    "id" : "607CE684-BA06-4EA9-9507-2A61FE908DD6",
+    "os" : "iOS 27.0",
+    "route" : "BluetoothA2DPOutput:Beoplay Eleven"
+  },
+  {
+    "date" : "2026-07-21T16:24:30Z",
+    "detail" : "requested 0.9; reported 0.9",
+    "device" : "iPhone",
+    "event" : "rate_written",
+    "id" : "2A48B2F8-2A0C-4CD4-A380-1B94BB98FD8E",
+    "os" : "iOS 27.0",
+    "route" : "BluetoothA2DPOutput:Beoplay Eleven"
+  },
+  {
+    "date" : "2026-07-21T16:24:31Z",
+    "detail" : "playing @ 0.9; LITE SPOTS; id So2pr0EbI::NsPfsr0IX; time 21.6",
+    "device" : "iPhone",
+    "event" : "player_state",
+    "id" : "F8AA1D17-D86E-4B23-83F2-41D621D144FF",
+    "os" : "iOS 27.0",
+    "route" : "BluetoothA2DPOutput:Beoplay Eleven"
+  },
+  {
+    "date" : "2026-07-21T16:24:33Z",
+    "detail" : "requested 1.0; reported 1.0",
+    "device" : "iPhone",
+    "event" : "rate_written",
+    "id" : "6840981E-C743-4FEB-A60B-0F6E2BEA01FE",
+    "os" : "iOS 27.0",
+    "route" : "BluetoothA2DPOutput:Beoplay Eleven"
+  },
+  {
+    "date" : "2026-07-21T16:24:33Z",
+    "detail" : "playing @ 1.0; LITE SPOTS; id So2pr0EbI::NsPfsr0IX; time 23.4",
+    "device" : "iPhone",
+    "event" : "player_state",
+    "id" : "EBD4C382-665A-467C-A1B3-952175634AA5",
+    "os" : "iOS 27.0",
+    "route" : "BluetoothA2DPOutput:Beoplay Eleven"
+  },
+  {
+    "date" : "2026-07-21T16:24:35Z",
+    "detail" : "requested 1.08; reported 1.08",
+    "device" : "iPhone",
+    "event" : "rate_written",
+    "id" : "C0614EA2-5F16-43E8-8202-3FDA81AD5594",
+    "os" : "iOS 27.0",
+    "route" : "BluetoothA2DPOutput:Beoplay Eleven"
+  },
+  {
+    "date" : "2026-07-21T16:24:35Z",
+    "detail" : "playing @ 1.08; LITE SPOTS; id So2pr0EbI::NsPfsr0IX; time 25.3",
+    "device" : "iPhone",
+    "event" : "player_state",
+    "id" : "C7FBF562-35DB-47A8-87DA-ECABB71D1232",
+    "os" : "iOS 27.0",
+    "route" : "BluetoothA2DPOutput:Beoplay Eleven"
+  },
+  {
+    "date" : "2026-07-21T16:24:36Z",
+    "detail" : "requested 0.92; reported 0.92",
+    "device" : "iPhone",
+    "event" : "rate_written",
+    "id" : "A19F8FD1-C754-4810-A274-17A2DC29C5F5",
+    "os" : "iOS 27.0",
+    "route" : "BluetoothA2DPOutput:Beoplay Eleven"
+  },
+  {
+    "date" : "2026-07-21T16:24:36Z",
+    "detail" : "playing @ 0.92; LITE SPOTS; id So2pr0EbI::NsPfsr0IX; time 26.5",
+    "device" : "iPhone",
+    "event" : "player_state",
+    "id" : "EB9F8613-6CC9-4397-8ED0-0335B269506F",
+    "os" : "iOS 27.0",
+    "route" : "BluetoothA2DPOutput:Beoplay Eleven"
+  },
+  {
+    "date" : "2026-07-21T16:24:37Z",
+    "detail" : "requested 0.9; reported 0.9",
+    "device" : "iPhone",
+    "event" : "rate_written",
+    "id" : "00BE3A87-FFC6-4939-82A6-AD37CE69F28A",
+    "os" : "iOS 27.0",
+    "route" : "BluetoothA2DPOutput:Beoplay Eleven"
+  },
+  {
+    "date" : "2026-07-21T16:24:37Z",
+    "detail" : "playing @ 0.9; LITE SPOTS; id So2pr0EbI::NsPfsr0IX; time 27.4",
+    "device" : "iPhone",
+    "event" : "player_state",
+    "id" : "3E502EAC-6478-4CAE-8E6F-FB48061B118D",
+    "os" : "iOS 27.0",
+    "route" : "BluetoothA2DPOutput:Beoplay Eleven"
+  },
+  {
+    "date" : "2026-07-21T16:24:38Z",
+    "detail" : "playing @ 0.9; LITE SPOTS; id So2pr0EbI::NsPfsr0IX; time 28.3",
+    "device" : "iPhone",
+    "event" : "playback_heartbeat",
+    "id" : "13E8154B-FA96-4F48-A86C-7A613BC82869",
+    "os" : "iOS 27.0",
+    "route" : "BluetoothA2DPOutput:Beoplay Eleven"
+  },
+  {
+    "date" : "2026-07-21T16:24:45Z",
+    "detail" : "requested 1.1; reported 1.1",
+    "device" : "iPhone",
+    "event" : "rate_written",
+    "id" : "BF164277-3366-4480-801C-0221959407DC",
+    "os" : "iOS 27.0",
+    "route" : "BluetoothA2DPOutput:Beoplay Eleven"
+  },
+  {
+    "date" : "2026-07-21T16:24:45Z",
+    "detail" : "playing @ 1.1; LITE SPOTS; id So2pr0EbI::NsPfsr0IX; time 34.8",
+    "device" : "iPhone",
+    "event" : "player_state",
+    "id" : "CFCB846C-95B0-474D-9C0C-A353D86185A6",
+    "os" : "iOS 27.0",
+    "route" : "BluetoothA2DPOutput:Beoplay Eleven"
+  },
+  {
+    "date" : "2026-07-21T16:24:50Z",
+    "detail" : "requested 0.9; reported 0.9",
+    "device" : "iPhone",
+    "event" : "rate_written",
+    "id" : "FA4B89A7-7F2A-42F7-8C44-DBE64BD4E9F6",
+    "os" : "iOS 27.0",
+    "route" : "BluetoothA2DPOutput:Beoplay Eleven"
+  },
+  {
+    "date" : "2026-07-21T16:24:50Z",
+    "detail" : "playing @ 0.9; LITE SPOTS; id So2pr0EbI::NsPfsr0IX; time 40.3",
+    "device" : "iPhone",
+    "event" : "player_state",
+    "id" : "F0DE7B03-9A06-414A-ABC2-A4AD426171DC",
+    "os" : "iOS 27.0",
+    "route" : "BluetoothA2DPOutput:Beoplay Eleven"
+  },
+  {
+    "date" : "2026-07-21T16:24:52Z",
+    "detail" : "requested 1.0; reported 1.0",
+    "device" : "iPhone",
+    "event" : "rate_written",
+    "id" : "2ED98FE5-D61A-432D-99B1-EC115480A848",
+    "os" : "iOS 27.0",
+    "route" : "BluetoothA2DPOutput:Beoplay Eleven"
+  },
+  {
+    "date" : "2026-07-21T16:24:53Z",
+    "detail" : "playing @ 1.0; LITE SPOTS; id So2pr0EbI::NsPfsr0IX; time 43.1",
+    "device" : "iPhone",
+    "event" : "player_state",
+    "id" : "6A211CA1-F653-4C88-98AF-48A752EB95C9",
+    "os" : "iOS 27.0",
+    "route" : "BluetoothA2DPOutput:Beoplay Eleven"
+  },
+  {
+    "date" : "2026-07-21T16:24:53Z",
+    "detail" : "playing @ 1.0; LITE SPOTS; id So2pr0EbI::NsPfsr0IX; time 43.2",
+    "device" : "iPhone",
+    "event" : "playback_heartbeat",
+    "id" : "3F48F2A6-2A73-432E-B498-3122D5B79C35",
+    "os" : "iOS 27.0",
+    "route" : "BluetoothA2DPOutput:Beoplay Eleven"
+  },
+  {
+    "date" : "2026-07-21T16:24:58Z",
+    "detail" : "requested 1.1; reported 1.1",
+    "device" : "iPhone",
+    "event" : "rate_written",
+    "id" : "5FA0E80D-EF1A-48AB-8C8A-E76E7301AFCC",
+    "os" : "iOS 27.0",
+    "route" : "BluetoothA2DPOutput:Beoplay Eleven"
+  },
+  {
+    "date" : "2026-07-21T16:24:59Z",
+    "detail" : "playing @ 1.1; LITE SPOTS; id So2pr0EbI::NsPfsr0IX; time 48.2",
+    "device" : "iPhone",
+    "event" : "player_state",
+    "id" : "378CD636-CCBF-4157-8AAB-F7060E7F58A6",
+    "os" : "iOS 27.0",
+    "route" : "BluetoothA2DPOutput:Beoplay Eleven"
+  },
+  {
+    "date" : "2026-07-21T16:25:00Z",
+    "detail" : "requested 0.9; reported 0.9",
+    "device" : "iPhone",
+    "event" : "rate_written",
+    "id" : "4F7815D1-376B-4993-AB78-27560C103A29",
+    "os" : "iOS 27.0",
+    "route" : "BluetoothA2DPOutput:Beoplay Eleven"
+  },
+  {
+    "date" : "2026-07-21T16:25:01Z",
+    "detail" : "playing @ 0.9; LITE SPOTS; id So2pr0EbI::NsPfsr0IX; time 50.4",
+    "device" : "iPhone",
+    "event" : "player_state",
+    "id" : "1BC53CCC-4569-42C3-99E5-12BC7479692A",
+    "os" : "iOS 27.0",
+    "route" : "BluetoothA2DPOutput:Beoplay Eleven"
+  },
+  {
+    "date" : "2026-07-21T16:25:09Z",
+    "detail" : "playing @ 0.9; LITE SPOTS; id So2pr0EbI::NsPfsr0IX; time 57.9",
+    "device" : "iPhone",
+    "event" : "playback_heartbeat",
+    "id" : "AD7D1065-608E-41AA-AC8E-E1ACF1076A1C",
+    "os" : "iOS 27.0",
+    "route" : "BluetoothA2DPOutput:Beoplay Eleven"
+  },
+  {
+    "date" : "2026-07-21T16:25:25Z",
+    "detail" : "playing @ 0.9; LITE SPOTS; id So2pr0EbI::NsPfsr0IX; time 71.9",
+    "device" : "iPhone",
+    "event" : "playback_heartbeat",
+    "id" : "FE2D4CAE-AFB1-4619-B0F6-885C2A9705A7",
+    "os" : "iOS 27.0",
+    "route" : "BluetoothA2DPOutput:Beoplay Eleven"
+  },
+  {
+    "date" : "2026-07-21T16:25:40Z",
+    "detail" : "playing @ 0.9; LITE SPOTS; id So2pr0EbI::NsPfsr0IX; time 85.7",
+    "device" : "iPhone",
+    "event" : "playback_heartbeat",
+    "id" : "6E041515-3E20-4CCB-B3F3-4C7E5B0B1F8B",
+    "os" : "iOS 27.0",
+    "route" : "BluetoothA2DPOutput:Beoplay Eleven"
+  },
+  {
+    "date" : "2026-07-21T16:25:42Z",
+    "detail" : "playing @ 0.9; LITE SPOTS; id So2pr0EbI::NsPfsr0IX; time 87.2",
+    "device" : "iPhone",
+    "event" : "app_backgrounded",
+    "id" : "81955D3E-C50B-49B8-9F3A-4ED107DD7043",
+    "os" : "iOS 27.0",
+    "route" : "BluetoothA2DPOutput:Beoplay Eleven"
+  },
+  {
+    "date" : "2026-07-21T16:25:48Z",
+    "detail" : "playing @ 0.9; LITE SPOTS; id So2pr0EbI::NsPfsr0IX; time 93.2",
+    "device" : "iPhone",
+    "event" : "app_became_active",
+    "id" : "AEFEF0CE-614F-4586-B701-4D4F7070DA42",
+    "os" : "iOS 27.0",
+    "route" : "BluetoothA2DPOutput:Beoplay Eleven"
+  }
+]
