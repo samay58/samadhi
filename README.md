@@ -8,7 +8,7 @@ Samadhi is a native iPhone music experience that lets a runner's cadence and mus
 
 ## Current state
 
-Milestones 0 and 1 are complete. Milestone 2 is in progress. Apple Music is the selected production source, subject to a new felt-perceptibility gate. Exact-App-ID signing fixed catalog access, analyzer version 2 passes a narrow 12-preview corpus, and a 59-second physical run averaged 155 SPM with 98 percent tempo matched from player read-back. A real 25-track playlist restores with 13 ready tracks. A source-neutral planner now chooses the compatible pulse requiring the least stretch. Production connection, obvious-change listening proof, natural transition, long-form background playback, and recovery remain open.
+Milestones 0 and 1 are complete. Milestone 2 is in progress. Apple Music is the selected production source. Exact-App-ID signing fixed catalog access, analyzer version 2 passes a narrow 12-preview corpus, and a 59-second physical run averaged 155 SPM with 98 percent tempo matched from player read-back. A real 25-track playlist restores with 13 ready tracks. The production run now starts with the compatible pulse requiring the least stretch, plans a better-fitting next song after a stable mismatch, and uses the pulsing aperture itself as a rotary BPM control. One Bluetooth track made the wider 0.90 versus 1.10 rate difference obvious. A natural imported-song transition, broader listening quality, long-form background playback, recovery, and the outdoor run remain open.
 
 Start with [product ethos](Docs/PRODUCT.md), then read [current status](Docs/STATUS.md), [next plan](Docs/PLAN.md), the [Milestone 2 specification](Docs/MILESTONE-2-SPEC.md), and the active [music-source resolution specification](Docs/MUSIC-SOURCE-RESOLUTION-SPEC.md).
 

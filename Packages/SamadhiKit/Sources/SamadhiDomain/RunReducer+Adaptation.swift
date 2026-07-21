@@ -43,6 +43,13 @@ extension RunReducer {
         next.session = adaptation.session
         var effects = firstLock ? [RunEffect.emitHaptic(.lock)] : []
         effects.append(contentsOf: adaptation.effects)
+        let transition = planTrackTransition(
+            session: next.session,
+            deltaSeconds: deltaSeconds,
+            selectionID: rateRequestID
+        )
+        next.session = transition.session
+        effects.append(contentsOf: transition.effects)
         return (.active(next), effects)
     }
 
@@ -166,6 +173,12 @@ extension RunReducer {
             forceTargetUpdate: true
         )
         next.session = adaptation.session
+        let transition = planTrackTransition(
+            session: next.session,
+            deltaSeconds: 0,
+            selectionID: rateRequestID
+        )
+        next.session = transition.session
 
         let haptic: HapticEvent
         if next.session.adaptationState.isAtLimit {
@@ -180,7 +193,7 @@ extension RunReducer {
 
         return (
             .active(next),
-            [.emitHaptic(haptic)] + adaptation.effects + [
+            [.emitHaptic(haptic)] + adaptation.effects + transition.effects + [
                 .scheduleControlsTimeout(sessionID: active.session.id, timeoutID: timeoutID)
             ]
         )
@@ -265,6 +278,64 @@ extension RunReducer {
                     requestID: rateRequestID,
                     trackID: trackID,
                     rate: decision.commandedRate
+                )
+            ]
+        )
+    }
+
+    private func planTrackTransition(
+        session: RunSession,
+        deltaSeconds: Double,
+        selectionID: Int
+    ) -> (session: RunSession, effects: [RunEffect]) {
+        var next = session
+        guard session.adaptationState.isAtLimit,
+            let requestedBPM = session.adaptationState.requestedBPM,
+            let match = TrackMatchPlanner().select(
+                requestedBPM: requestedBPM,
+                from: tracks,
+                currentTrackID: session.currentTrackID
+            ),
+            match.trackID != session.currentTrackID
+        else {
+            let shouldClearPlan =
+                next.pendingTrackSelectionID != nil
+                || next.preparedNextTrackID != nil
+            next.incompatibleTrackSeconds = 0
+            next.pendingTrackSelectionID = nil
+            next.pendingNextTrackID = nil
+            next.preparedNextTrackID = nil
+            return (
+                next,
+                shouldClearPlan
+                    ? [
+                        .clearPreparedNextTrack(
+                            sessionID: session.id,
+                            operationID: session.playbackOperationID,
+                            selectionID: selectionID
+                        )
+                    ]
+                    : []
+            )
+        }
+
+        next.incompatibleTrackSeconds += max(deltaSeconds, 0)
+        guard next.incompatibleTrackSeconds >= 5 else { return (next, []) }
+        guard next.pendingNextTrackID != match.trackID,
+            next.preparedNextTrackID != match.trackID
+        else { return (next, []) }
+
+        next.pendingTrackSelectionID = selectionID
+        next.pendingNextTrackID = match.trackID
+        next.preparedNextTrackID = nil
+        return (
+            next,
+            [
+                .prepareNextTrack(
+                    sessionID: session.id,
+                    operationID: session.playbackOperationID,
+                    selectionID: selectionID,
+                    trackID: match.trackID
                 )
             ]
         )

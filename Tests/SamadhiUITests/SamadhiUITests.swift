@@ -119,8 +119,11 @@ final class SamadhiUITests: XCTestCase {
         XCTAssertTrue(app.buttons["rhythm-auto"].exists)
         XCTAssertTrue(app.buttons["rhythm-manual"].exists)
 
-        app.buttons["rhythm-faster"].tap()
-        XCTAssertTrue(element("rhythm-dial").exists)
+        let dial = element("rhythm-dial")
+        let top = dial.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.08))
+        let right = dial.coordinate(withNormalizedOffset: CGVector(dx: 0.92, dy: 0.5))
+        top.press(forDuration: 0.08, thenDragTo: right)
+        XCTAssertTrue(app.staticTexts["176"].waitForExistence(timeout: 2))
 
         app.buttons["rhythm-manual"].tap()
         XCTAssertTrue(app.buttons["rhythm-manual"].isSelected)

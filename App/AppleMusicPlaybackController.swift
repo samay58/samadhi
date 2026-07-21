@@ -11,6 +11,7 @@
         private var continuation: AsyncStream<MusicPlaybackEvent>.Continuation?
         private var collection: MusicCollection?
         private var durations: [MusicTrackID: Double] = [:]
+        private var songs: [MusicTrackID: Song] = [:]
         private var operationID: Int?
         private var stateTask: Task<Void, Never>?
         private var interruptionTask: Task<Void, Never>?
@@ -19,6 +20,8 @@
         private var lastRate: Double?
         private var lastTrackID: MusicTrackID?
         private var pendingRateRequest: (id: Int, trackID: MusicTrackID)?
+        private var preparedNextTrackID: MusicTrackID?
+        private var latestSelectionID = 0
 
         func events() -> AsyncStream<MusicPlaybackEvent> {
             AsyncStream(bufferingPolicy: .bufferingNewest(128)) { continuation in
@@ -32,12 +35,18 @@
             }
         }
 
-        func prepare(_ collection: MusicCollection, operationID: Int) async throws {
-            guard let firstTrack = collection.tracks.first else {
+        func prepare(
+            _ collection: MusicCollection,
+            startingAt trackID: MusicTrackID,
+            operationID: Int
+        ) async throws {
+            guard collection.tracks.contains(where: { $0.id == trackID }) else {
                 throw MusicPlaybackError.emptyCollection
             }
 
             var songs: [Song] = []
+            var songsByID: [MusicTrackID: Song] = [:]
+            var selectedSong: Song?
             var durations: [MusicTrackID: Double] = [:]
             for track in collection.tracks {
                 var request = MusicCatalogResourceRequest<Song>(
@@ -49,20 +58,26 @@
                     throw AppleMusicPlaybackError.trackUnavailable(track.id)
                 }
                 songs.append(song)
+                songsByID[track.id] = song
+                if track.id == trackID { selectedSong = song }
                 durations[track.id] = song.duration ?? track.durationSeconds
             }
+            guard let selectedSong else { throw AppleMusicPlaybackError.trackUnavailable(trackID) }
 
             player.stop()
             player.state.playbackRate = 1
-            player.queue = ApplicationMusicPlayer.Queue(for: songs)
+            player.queue = ApplicationMusicPlayer.Queue(for: songs, startingAt: selectedSong)
             self.collection = collection
             self.durations = durations
+            self.songs = songsByID
             self.operationID = operationID
             lastState = nil
             lastRate = nil
-            lastTrackID = firstTrack.id
+            lastTrackID = trackID
             pendingRateRequest = nil
-            continuation?.yield(.prepared(operationID: operationID, trackID: firstTrack.id))
+            preparedNextTrackID = nil
+            latestSelectionID = 0
+            continuation?.yield(.prepared(operationID: operationID, trackID: trackID))
         }
 
         func play(operationID: Int) async throws {
@@ -86,7 +101,27 @@
 
         func skipToNext(operationID: Int) async throws {
             guard isCurrent(operationID) else { return }
+            try applyPreparedNextIfNeeded()
             try await player.skipToNextEntry()
+        }
+
+        func prepareNext(
+            trackID: MusicTrackID,
+            operationID: Int,
+            selectionID: Int
+        ) async throws {
+            guard isCurrent(operationID), songs[trackID] != nil else {
+                throw MusicPlaybackError.notPrepared
+            }
+            guard selectionID >= latestSelectionID else { return }
+            latestSelectionID = selectionID
+            preparedNextTrackID = trackID
+        }
+
+        func clearPreparedNext(operationID: Int, selectionID: Int) {
+            guard isCurrent(operationID), selectionID >= latestSelectionID else { return }
+            latestSelectionID = selectionID
+            preparedNextTrackID = nil
         }
 
         func setPlaybackRate(
@@ -109,11 +144,14 @@
             player.stop()
             collection = nil
             durations = [:]
+            songs = [:]
             self.operationID = nil
             lastState = nil
             lastRate = nil
             lastTrackID = nil
             pendingRateRequest = nil
+            preparedNextTrackID = nil
+            latestSelectionID = 0
         }
 
         private func startMonitoring() {
@@ -175,6 +213,13 @@
         private func publishPlayerState() {
             guard let operationID, let collection else { return }
 
+            if let currentTrackID,
+                let duration = durations[currentTrackID],
+                duration - player.playbackTime <= 8
+            {
+                try? applyPreparedNextIfNeeded()
+            }
+
             let state = playbackState
             if state != lastState {
                 lastState = state
@@ -210,6 +255,7 @@
             if trackID != lastTrackID {
                 lastTrackID = trackID
                 pendingRateRequest = nil
+                preparedNextTrackID = nil
                 continuation?.yield(.trackChanged(operationID: operationID, trackID: trackID))
             }
             guard let track = collection.tracks.first(where: { $0.id == trackID }) else { return }
@@ -238,6 +284,25 @@
 
         private func isCurrent(_ operationID: Int) -> Bool {
             self.operationID == operationID && collection != nil
+        }
+
+        private func applyPreparedNextIfNeeded() throws {
+            guard let trackID = preparedNextTrackID,
+                let selectedSong = songs[trackID],
+                let currentEntry = player.queue.currentEntry
+            else { return }
+
+            var entries = player.queue.entries
+            guard let selectedIndex = entries.firstIndex(where: { $0.item?.id == selectedSong.id })
+            else { throw AppleMusicPlaybackError.trackUnavailable(trackID) }
+            let selectedEntry = entries.remove(at: selectedIndex)
+            guard let currentIndex = entries.firstIndex(of: currentEntry) else {
+                throw MusicPlaybackError.notPrepared
+            }
+            entries.insert(selectedEntry, at: min(currentIndex + 1, entries.endIndex))
+            player.queue.entries = entries
+            player.queue.currentEntry = currentEntry
+            preparedNextTrackID = nil
         }
 
         private var currentTrackID: MusicTrackID? {

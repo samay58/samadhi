@@ -32,12 +32,22 @@ public enum MusicPlaybackError: Error, Sendable, Equatable {
 @MainActor
 public protocol MusicPlaybackProviding: AnyObject {
     func events() -> AsyncStream<MusicPlaybackEvent>
-    func prepare(_ collection: MusicCollection, operationID: Int) async throws
+    func prepare(
+        _ collection: MusicCollection,
+        startingAt trackID: MusicTrackID,
+        operationID: Int
+    ) async throws
     func play(operationID: Int) async throws
     func pause(operationID: Int)
     func resume(operationID: Int) async throws
     func skipToPrevious(operationID: Int) async throws
     func skipToNext(operationID: Int) async throws
+    func prepareNext(
+        trackID: MusicTrackID,
+        operationID: Int,
+        selectionID: Int
+    ) async throws
+    func clearPreparedNext(operationID: Int, selectionID: Int)
     func setPlaybackRate(
         _ rate: Double,
         operationID: Int,
@@ -53,6 +63,8 @@ public final class SimulatedMusicPlayer: MusicPlaybackProviding {
     private var collection: MusicCollection?
     private var operationID: Int?
     private var trackIndex = 0
+    private var preparedNextTrackIndex: Int?
+    private var latestSelectionID = 0
 
     public init() {}
 
@@ -62,14 +74,20 @@ public final class SimulatedMusicPlayer: MusicPlaybackProviding {
         }
     }
 
-    public func prepare(_ collection: MusicCollection, operationID: Int) async throws {
-        guard let firstTrack = collection.tracks.first else {
+    public func prepare(
+        _ collection: MusicCollection,
+        startingAt trackID: MusicTrackID,
+        operationID: Int
+    ) async throws {
+        guard let selectedIndex = collection.tracks.firstIndex(where: { $0.id == trackID }) else {
             throw MusicPlaybackError.emptyCollection
         }
         self.collection = collection
         self.operationID = operationID
-        trackIndex = 0
-        continuation?.yield(.prepared(operationID: operationID, trackID: firstTrack.id))
+        trackIndex = selectedIndex
+        preparedNextTrackIndex = nil
+        latestSelectionID = 0
+        continuation?.yield(.prepared(operationID: operationID, trackID: trackID))
     }
 
     public func play(operationID: Int) async throws {
@@ -96,10 +114,30 @@ public final class SimulatedMusicPlayer: MusicPlaybackProviding {
 
     public func skipToNext(operationID: Int) async throws {
         guard isCurrent(operationID), let collection else { return }
-        trackIndex = (trackIndex + 1) % collection.tracks.count
+        trackIndex = preparedNextTrackIndex ?? (trackIndex + 1) % collection.tracks.count
+        preparedNextTrackIndex = nil
         continuation?.yield(
             .trackChanged(operationID: operationID, trackID: collection.tracks[trackIndex].id)
         )
+    }
+
+    public func prepareNext(
+        trackID: MusicTrackID,
+        operationID: Int,
+        selectionID: Int
+    ) async throws {
+        guard isCurrent(operationID), let collection,
+            let index = collection.tracks.firstIndex(where: { $0.id == trackID })
+        else { throw MusicPlaybackError.notPrepared }
+        guard selectionID >= latestSelectionID else { return }
+        latestSelectionID = selectionID
+        preparedNextTrackIndex = index
+    }
+
+    public func clearPreparedNext(operationID: Int, selectionID: Int) {
+        guard isCurrent(operationID), selectionID >= latestSelectionID else { return }
+        latestSelectionID = selectionID
+        preparedNextTrackIndex = nil
     }
 
     public func setPlaybackRate(
@@ -125,6 +163,8 @@ public final class SimulatedMusicPlayer: MusicPlaybackProviding {
         guard isCurrent(operationID) else { return }
         continuation?.yield(.stateChanged(operationID: operationID, state: .stopped))
         collection = nil
+        preparedNextTrackIndex = nil
+        latestSelectionID = 0
         self.operationID = nil
     }
 

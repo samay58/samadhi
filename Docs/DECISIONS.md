@@ -82,6 +82,8 @@ The complete source decision and pass thresholds live in [MUSIC-SOURCE-RESOLUTIO
 
 MusicKit uses an App Service enabled for the bundle identifier in the Apple developer portal. Do not add a fabricated `com.apple.developer.musickit` entitlement. The app does require `NSAppleMusicUsageDescription` and background audio mode.
 
+Automatic signing may still choose the wildcard team profile even when the exact profile is installed. Every MusicKit gate build must verify the embedded profile and application identifier before installation. A successful compile is not signing proof.
+
 ## Policy before adapters
 
 Tempo normalization, compatibility, rate bounds, ramping, deadband, confidence loss, and honest measurement live in SamadhiDomain. Core Motion emits source-neutral cadence events. Production callbacks still enter the reducer through the app shell.
@@ -125,3 +127,9 @@ Weav achieved broad adaptation through licensed multi-arrangement material, not 
 The production mechanic is coarse track fit followed by fine rate correction. `TrackMatchPlanner` ranks adaptive-ready tracks by the smallest pitch-stable correction across half-time, full-time, and double-time pulse interpretations. It keeps the current song when another candidate is only marginally better and preserves source order as the tie-breaker.
 
 The 0.94 through 1.06 envelope remains authoritative until a physical MusicKit comparison proves a wider clean range. If 0.92 versus 1.08 is not both clean and unmistakable, Apple Music returns to a source decision instead of becoming a permanent compromised path. The evidence and pivot order live in [ADAPTIVE-AUDIO-PLAYBOOK.md](ADAPTIVE-AUDIO-PLAYBOOK.md).
+
+On 2026-07-21, one Beoplay Eleven check made the 0.90 versus 1.10 difference unmistakable on `LITE SPOTS`, with matching MusicKit read-back. Samay reported approximately 95 percent confidence that the mechanism worked and asked implementation to continue. Apple Music remains authoritative. This does not expand the production quality envelope because the wider endpoints have not passed full-song artifact listening.
+
+The tempo aperture is the BPM control. Turning its perimeter clockwise raises BPM and turning counterclockwise lowers it in one-BPM detents. The center remains protected for reading, a small perimeter marker appears only during manipulation, and VoiceOver exposes the same adjustment. Separate plus and minus furniture was removed because it made the control feel like a generic settings panel rather than one musical instrument.
+
+Adaptive run start uses `TrackMatchPlanner` with 168 BPM only as an initial prior. During a run, five seconds of stable incompatibility may prepare a better-fitting next song. The current song continues unless the runner skips or reaches its natural boundary. Song identity, index, and count change only after the player confirms the transition. Every prepared choice carries selection identity so a stale callback cannot replace newer intent.

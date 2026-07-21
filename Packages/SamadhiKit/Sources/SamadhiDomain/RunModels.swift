@@ -43,6 +43,10 @@ public struct RunSession: Sendable, Equatable {
     public var rhythmControl: RhythmControlState
     public var appliedPlaybackRate: Double
     public var pendingRateRequestID: Int?
+    public var incompatibleTrackSeconds: Double
+    public var pendingTrackSelectionID: Int?
+    public var pendingNextTrackID: MusicTrackID?
+    public var preparedNextTrackID: MusicTrackID?
 
     public init(id: Int, mode: RunMode = .adaptive, playbackOperationID: Int? = nil) {
         self.id = id
@@ -63,6 +67,10 @@ public struct RunSession: Sendable, Equatable {
         rhythmControl = .initial
         appliedPlaybackRate = 1
         pendingRateRequestID = nil
+        incompatibleTrackSeconds = 0
+        pendingTrackSelectionID = nil
+        pendingNextTrackID = nil
+        preparedNextTrackID = nil
     }
 
     public mutating func recordSecond(cadence: Int?, tempoMatched: Bool?) {
@@ -191,6 +199,7 @@ public enum RunTaskKind: Sendable, Equatable, Hashable {
     case authorization
     case preparation
     case playbackCommand
+    case trackSelection
     case acquisition
     case controlsTimeout
     case finishHold
@@ -203,13 +212,28 @@ public enum RunTaskKind: Sendable, Equatable, Hashable {
 public enum RunEffect: Sendable, Equatable {
     // Effects name outside work without performing it. IDs make late callbacks safe to ignore.
     case requestMotionAuthorization(sessionID: Int)
-    case preparePlayback(sessionID: Int, mode: RunMode)
+    case preparePlayback(
+        sessionID: Int,
+        mode: RunMode,
+        startingTrackID: MusicTrackID
+    )
     case beginPlayback(sessionID: Int)
     case beginCadenceAcquisition(sessionID: Int, acquisitionID: Int, priorSPM: Int?)
     case pausePlayback(sessionID: Int)
     case resumePlayback(sessionID: Int)
     case previousTrack(sessionID: Int)
     case skipTrack(sessionID: Int)
+    case prepareNextTrack(
+        sessionID: Int,
+        operationID: Int,
+        selectionID: Int,
+        trackID: MusicTrackID
+    )
+    case clearPreparedNextTrack(
+        sessionID: Int,
+        operationID: Int,
+        selectionID: Int
+    )
     case setPlaybackRate(
         sessionID: Int,
         operationID: Int,
@@ -230,6 +254,18 @@ public enum RunEvent: Sendable, Equatable {
     case authorizationResolved(sessionID: Int, MotionAuthorization)
     case useFixedRhythmTapped
     case playbackPrepared(sessionID: Int, trackID: MusicTrackID)
+    case nextTrackPrepared(
+        sessionID: Int,
+        operationID: Int,
+        selectionID: Int,
+        trackID: MusicTrackID
+    )
+    case nextTrackPreparationFailed(
+        sessionID: Int,
+        operationID: Int,
+        selectionID: Int,
+        trackID: MusicTrackID
+    )
     case cadenceUpdated(
         sessionID: Int,
         acquisitionID: Int,

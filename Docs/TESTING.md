@@ -9,7 +9,7 @@
 
 Scripts/test.sh runs Swift package tests, app-model tests, and UI tests serially on iPhone 17 Pro Simulator.
 
-The 2026-07-21 full serial gate passed 67 package tests, 9 app-model tests, and 9 UI tests.
+The 2026-07-21 full serial gate passed 74 package tests, 9 app-model tests, and 9 UI tests.
 
 Formatter gate:
 
@@ -52,6 +52,9 @@ Domain tests cover:
 - Prevention of a general surface tap replacing an open rhythm control
 - Compatible-track ranking across half-time, full-time, and double-time pulse families
 - Quality-envelope exclusion, source-order ties, and current-track retention
+- Compatible adaptive starting-song selection from the initial cadence prior
+- Five-second mismatch hold, prepared-next identity, recovery clearing, and stale preparation rejection
+- Player-confirmed Previous and Skip truth instead of predicted song state
 
 Motion tests cover:
 
@@ -83,13 +86,13 @@ UI tests cover:
 - Honest analysis progress
 - Partial import with visible failures and an enabled ready-track start
 - Import failure and retry
-- In-run BPM-control reveal, one-BPM adjustment, Manual ownership, and return to Auto
+- In-run aperture click-wheel reveal, angular one-BPM adjustment, Manual ownership, and return to Auto
 
 App-model tests cover ready mapping, start transition, atomic store round trips, corrupt persistence, restored selection, cancellation of stale replacement work, latest-run diagnostic persistence with BPM-control truth, and a reducer-driven diagnostic timeline through finish.
 
 ## Visual proof
 
-Final frames under Evidence/Simulator/ cover ready, imported empty and partial states, locked run, controls, summary, Home Screen icon, BPM Auto fine-tune, the Manual safety limit, and accessibility-size BPM controls. Evidence/Previews/ covers other accessibility and state-specific visual checks.
+Final frames under Evidence/Simulator/ cover ready, imported empty and partial states, locked run, controls, summary, Home Screen icon, BPM Auto fine-tune, the Manual safety limit, accessibility-size BPM controls, and the refined rotary BPM click wheel. Evidence/Previews/ covers other accessibility and state-specific visual checks.
 
 ## Truth boundary
 
@@ -133,9 +136,13 @@ The `Samadhi MusicKit Gate` scheme verifies that the harness and framework calls
 - Reinstall and relaunch restoration: passed with the selected collection checksum unchanged and the physical ready screen showing 13 of 25 ready
 - Production-player progress: passed from a pulled schema-version-2 trace advancing from 0 through 6 seconds on one stable catalog identity
 - Imported natural track transition: not yet physically run
-- BPM control: deterministic policy, UI interaction, and Simulator design pass; physical MusicKit response and listening proof not yet run
+- BPM control: deterministic policy, rotary UI interaction, and Simulator design pass; one-track wider-rate MusicKit response is audible, while physical click-wheel feel remains open
 - Blinded perceptibility harness: 0.92 versus 1.08 sequence, direction answer, MusicKit read-back trace, and optional 0.90 and 1.10 controls compile in the debug gate scheme
-- Paired iPhone state on 2026-07-21: unavailable to Xcode; exact `Samadhi Development` profile was previously verified through 2026-07-23 UTC
+- Paired iPhone state on 2026-07-21: connected over the local network; the exact-profile MusicKit harness built, installed, launched, and showed Beoplay Eleven as its Bluetooth A2DP route
+- Exact profile state on 2026-07-21: embedded `Samadhi Development` profile verified with application identifier `ZL5U59XBJ6.com.samaydhawan.Samadhi`; it expires on 2026-07-23 UTC
+- One-track perceptibility result: 0.90 versus 1.10 was clearly audible on `LITE SPOTS` through Beoplay Eleven, with repeated requested and reported rate agreement
+- Full perceptibility protocol: open; four-of-five blinded recognition and full-song endpoint quality were not completed, so the production envelope remains 0.94 through 1.06
+- Production track-fit and rotary-control build: exact-profile signing and embedded application identifier passed; installation was not attempted because the paired iPhone was unavailable over the network
 
 ## Felt-synchronization gate
 
@@ -143,7 +150,7 @@ Use five analyzed songs with prominent, stable beats. Compare 0.92, 1.00, and 1.
 
 The complete sequence, pivot rules, phase questions, and final evidence packet live in [FELT-SYNCHRONIZATION-EXECUTION-SPEC.md](FELT-SYNCHRONIZATION-EXECUTION-SPEC.md).
 
-After that gate, connect `TrackMatchPlanner` to production selection and prove one compatible-track transition. Pull `latest-run-diagnostics.json` and confirm requested BPM, selected pulse, required rate, MusicKit read-back, progress, and summary agree. Renew the exact profile first if testing occurs after 2026-07-23 UTC. Before Milestone 2 completion, record one concise Bluetooth listening note and prove five screen-locked minutes, controlled interruption, and route loss.
+Next, prove one compatible prepared transition in the normal imported run. Pull `latest-run-diagnostics.json` and confirm requested BPM, selected pulse, required rate, MusicKit read-back, progress, and summary agree. Renew the exact profile first if testing occurs after 2026-07-23 UTC. Before Milestone 2 completion, complete the broader listening note and prove five screen-locked minutes, controlled interruption, and route loss.
 
 ## Known environment behavior
 

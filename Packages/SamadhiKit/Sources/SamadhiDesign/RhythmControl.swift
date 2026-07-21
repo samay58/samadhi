@@ -12,6 +12,9 @@ struct RhythmControl: View {
     @State private var dragOriginBPM: Int?
     @State private var lastDragDetent = 0
     @State private var frozenDisplayBPM: Int?
+    @State private var lastTouchAngle: Double?
+    @State private var accumulatedRotation = 0.0
+    @State private var wheelIndicatorAngle: Double?
 
     var body: some View {
         VStack(spacing: Space.x3) {
@@ -38,10 +41,27 @@ struct RhythmControl: View {
 
                 readout
                     .transition(.opacity)
+
+                wheelIndicator
             }
             .frame(width: size, height: size)
             .contentShape(Circle())
             .gesture(adjustmentGesture)
+            .accessibilityElement(children: .ignore)
+            .accessibilityLabel(accessibilityLabel)
+            .accessibilityValue(accessibilityValue)
+            .accessibilityHint("Swipe up or down to adjust by one beat per minute")
+            .accessibilityAdjustableAction { direction in
+                switch direction {
+                case .increment:
+                    send(.adjustRhythmControl(1))
+                case .decrement:
+                    send(.adjustRhythmControl(-1))
+                @unknown default:
+                    break
+                }
+            }
+            .accessibilityIdentifier("rhythm-dial")
         } else {
             Button(action: reveal) {
                 aperture
@@ -88,27 +108,24 @@ struct RhythmControl: View {
                 )
                 .lineLimit(1)
         }
-        .accessibilityElement(children: .ignore)
-        .accessibilityLabel(accessibilityLabel)
-        .accessibilityValue(accessibilityValue)
-        .accessibilityHint("Swipe up or down to adjust by one beat per minute")
-        .accessibilityAdjustableAction { direction in
-            switch direction {
-            case .increment:
-                send(.adjustRhythmControl(1))
-            case .decrement:
-                send(.adjustRhythmControl(-1))
-            @unknown default:
-                break
-            }
+    }
+
+    @ViewBuilder
+    private var wheelIndicator: some View {
+        if let wheelIndicatorAngle {
+            Capsule()
+                .fill(SamadhiColor.ivory.opacity(0.94))
+                .frame(width: 3, height: 18)
+                .shadow(color: SamadhiColor.ivory.opacity(0.5), radius: 6)
+                .offset(y: -(size * 0.41))
+                .rotationEffect(.radians(wheelIndicatorAngle + .pi / 2))
+                .transition(.opacity)
+                .accessibilityHidden(true)
         }
-        .accessibilityIdentifier("rhythm-dial")
     }
 
     private var adjustmentRow: some View {
-        HStack(spacing: Space.x3) {
-            adjustmentButton(title: "Slower", systemImage: "minus", steps: -1)
-
+        VStack(spacing: Space.x1) {
             HStack(spacing: Space.x3) {
                 Button("Auto") { send(.resetRhythmControl) }
                     .font(.callout.weight(state.rhythmControl.mode == .automatic ? .bold : .medium))
@@ -132,48 +149,46 @@ struct RhythmControl: View {
             .buttonStyle(.plain)
             .frame(minHeight: 48)
 
-            adjustmentButton(title: "Faster", systemImage: "plus", steps: 1)
+            Text("Turn the ring to tune")
+                .font(.caption.weight(.medium))
+                .foregroundStyle(SamadhiColor.ivory.opacity(0.68))
+                .accessibilityHidden(true)
         }
         .foregroundStyle(SamadhiColor.ivory)
         .accessibilityElement(children: .contain)
         .accessibilityIdentifier("rhythm-controls")
     }
 
-    private func adjustmentButton(
-        title: String,
-        systemImage: String,
-        steps: Int
-    ) -> some View {
-        Button {
-            send(.adjustRhythmControl(steps))
-        } label: {
-            Image(systemName: systemImage)
-                .font(.body.weight(.bold))
-                .frame(width: 52, height: 52)
-                .background {
-                    Circle()
-                        .fill(SamadhiColor.ink.opacity(0.2))
-                        .stroke(SamadhiColor.ivory.opacity(0.48), lineWidth: 1)
-                }
-        }
-        .buttonStyle(.plain)
-        .accessibilityLabel(title)
-        .accessibilityIdentifier(steps < 0 ? "rhythm-slower" : "rhythm-faster")
-    }
-
     private var adjustmentGesture: some Gesture {
-        DragGesture(minimumDistance: 8)
+        DragGesture(minimumDistance: 2, coordinateSpace: .local)
             .onChanged { value in
-                guard state.rhythmControl.isVisible,
-                    abs(value.translation.width) > abs(value.translation.height)
-                else { return }
+                guard state.rhythmControl.isVisible else { return }
+                let center = CGPoint(x: size / 2, y: size / 2)
+                let x = value.location.x - center.x
+                let y = value.location.y - center.y
+                let radius = hypot(x, y)
+                let angle = atan2(y, x)
 
-                if dragOriginBPM == nil {
+                guard lastTouchAngle != nil || radius >= size * 0.28 else { return }
+                guard let priorAngle = lastTouchAngle else {
                     dragOriginBPM = displayBPM
                     lastDragDetent = 0
                     frozenDisplayBPM = displayBPM
+                    accumulatedRotation = 0
+                    lastTouchAngle = angle
+                    wheelIndicatorAngle = angle
+                    return
                 }
-                let detent = Int((value.translation.width / 12).rounded(.towardZero))
+
+                var delta = angle - priorAngle
+                if delta > .pi { delta -= 2 * .pi }
+                if delta < -.pi { delta += 2 * .pi }
+                accumulatedRotation += delta
+                lastTouchAngle = angle
+                wheelIndicatorAngle = angle
+
+                let radiansPerBPM = Double.pi / 22.5
+                let detent = Int((accumulatedRotation / radiansPerBPM).rounded(.towardZero))
                 let change = detent - lastDragDetent
                 guard change != 0 else { return }
                 lastDragDetent = detent
@@ -184,6 +199,11 @@ struct RhythmControl: View {
                 dragOriginBPM = nil
                 lastDragDetent = 0
                 frozenDisplayBPM = nil
+                lastTouchAngle = nil
+                accumulatedRotation = 0
+                withAnimation(effectiveReduceMotion ? nil : .easeOut(duration: MotionToken.control)) {
+                    wheelIndicatorAngle = nil
+                }
             }
     }
 
@@ -209,15 +229,19 @@ struct RhythmControl: View {
     private var accessibilityValue: String {
         let target = displayBPM.map { "\($0) beats per minute" } ?? "Waiting for cadence"
         let applied = state.rhythmControl.appliedBPM.map { ", music at \($0) beats per minute" } ?? ""
-        let limit = state.rhythmControl.isAtLimit ? ", at safe playback limit" : ""
-        return target + applied + limit
+        let fit =
+            state.rhythmControl.isFindingBetterFit
+            ? ", finding a better fitting song"
+            : (state.rhythmControl.isAtLimit ? ", music holding steady" : "")
+        return target + applied + fit
     }
 
     private var feedbackLabel: String {
+        if state.rhythmControl.isFindingBetterFit { return "Finding a better fit" }
         if let applied = state.rhythmControl.appliedBPM {
-            return state.rhythmControl.isAtLimit ? "Music \(applied) · At limit" : "Music \(applied)"
+            return state.rhythmControl.isAtLimit ? "Music \(applied) · Steady" : "Music \(applied)"
         }
-        return state.rhythmControl.isAtLimit ? "At limit" : "Settling"
+        return state.rhythmControl.isAtLimit ? "Music steady" : "Settling"
     }
 
     private var effectiveReduceMotion: Bool {

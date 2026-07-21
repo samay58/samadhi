@@ -89,6 +89,7 @@ public struct RhythmControlPresentation: Sendable, Equatable {
     public var requestedBPM: Int?
     public var appliedBPM: Int?
     public var isAtLimit: Bool
+    public var isFindingBetterFit: Bool
     public var isVisible: Bool
     public var isAvailable: Bool
 
@@ -99,6 +100,7 @@ public struct RhythmControlPresentation: Sendable, Equatable {
         requestedBPM: Int? = nil,
         appliedBPM: Int? = nil,
         isAtLimit: Bool = false,
+        isFindingBetterFit: Bool = false,
         isVisible: Bool = false,
         isAvailable: Bool = true
     ) {
@@ -108,6 +110,7 @@ public struct RhythmControlPresentation: Sendable, Equatable {
         self.requestedBPM = requestedBPM
         self.appliedBPM = appliedBPM
         self.isAtLimit = isAtLimit
+        self.isFindingBetterFit = isFindingBetterFit
         self.isVisible = isVisible
         self.isAvailable = isAvailable
     }
