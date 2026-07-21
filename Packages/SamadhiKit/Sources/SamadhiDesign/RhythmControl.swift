@@ -38,6 +38,8 @@ struct RhythmControl: View {
                 aperture
                     .accessibilityHidden(true)
 
+                wheelDetents
+
                 readout
                     .transition(.opacity)
 
@@ -121,6 +123,22 @@ struct RhythmControl: View {
                 .transition(.opacity)
                 .accessibilityHidden(true)
         }
+    }
+
+    private var wheelDetents: some View {
+        ZStack {
+            ForEach(0..<40, id: \.self) { index in
+                let isMajor = index.isMultiple(of: 5)
+                Capsule()
+                    .fill(
+                        SamadhiColor.ivory.opacity(isMajor ? 0.46 : 0.2)
+                    )
+                    .frame(width: isMajor ? 2 : 1, height: isMajor ? 9 : 5)
+                    .offset(y: -(size * 0.445))
+                    .rotationEffect(.degrees(Double(index) * 9))
+            }
+        }
+        .accessibilityHidden(true)
     }
 
     private var adjustmentRow: some View {
@@ -254,9 +272,11 @@ struct RhythmControl: View {
             guard let base = dragAutomaticBaseBPM else { return bpm }
             let lowerBound = base + RhythmControlState.automaticCorrectionRange.lowerBound
             let upperBound = base + RhythmControlState.automaticCorrectionRange.upperBound
-            return min(max(bpm, lowerBound), upperBound)
+            return RhythmControlState.runningTargetRange.clamped(
+                min(max(bpm, lowerBound), upperBound)
+            )
         case .manual:
-            return min(max(bpm, 120), 200)
+            return RhythmControlState.manualTargetRange.clamped(bpm)
         }
     }
 
@@ -276,7 +296,7 @@ struct RhythmControl: View {
 }
 
 final class RotaryDetentTracker {
-    static let radiansPerDetent = Double.pi / 22.5
+    static let radiansPerDetent = 2 * Double.pi / 40
 
     private(set) var currentDetent = 0
     private var lastAngle: Double?
@@ -311,5 +331,11 @@ final class RotaryDetentTracker {
         currentDetent = 0
         accumulatedRotation = 0
         lastAngle = nil
+    }
+}
+
+private extension ClosedRange where Bound == Int {
+    func clamped(_ value: Int) -> Int {
+        Swift.min(Swift.max(value, lowerBound), upperBound)
     }
 }

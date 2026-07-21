@@ -268,6 +268,19 @@
 - Saved a compact interaction recording and a normal-launch frame under `Evidence/Simulator/`
 - Expanded the automated gate to 80 package tests, 11 app-model tests, and 10 UI tests
 
+## 2026-07-21. Forty-BPM wheel and tactile grammar
+
+- Replaced the inherited minus-eight through plus-eight Auto correction with a 40-BPM window around measured cadence
+- Kept targets inside the app's accepted 120 through 210 running range and left the per-song 0.94 through 1.06 quality envelope unchanged
+- Mapped one complete wheel revolution to 40 one-BPM detents
+- Added a restrained visible detent ring with one landmark every five BPM
+- Replaced generic selection feedback on supported iPhones with low-sharpness Core Haptics transients, fuller five-BPM landmarks, and a soft Auto landing
+- Queued rapid detents 28 milliseconds apart so a quick turn still feels stepped instead of collapsing into one buzz
+- Kept system selection feedback as the fallback and delayed haptic-engine startup until the control opens
+- Added deterministic range, running-bound, tactile-event, and full-revolution tests
+- Saved the inspected iPhone 17 Pro frame as `Evidence/Simulator/2026-07-21-forty-bpm-click-wheel.png`
+- Expanded the package suite to 83 tests while retaining 11 app-model and 10 UI tests
+
 ## Current checkpoint
 
-Milestones 0 and 1 are complete. Apple Music remains the selected Milestone 2 source. Live Core Motion cadence and automatic MusicKit rate response pass mechanically on the physical iPhone, and one Bluetooth track made 0.90 versus 1.10 clearly audible. The production run now starts on the best ready fit, waits through a five-second mismatch before preparing another fit, and rejects stale preparation. The pulsing aperture is the rotary BPM click wheel, with one-BPM detents and no separate control furniture. Next comes one normal imported-playlist run through a natural prepared transition, followed by broader listening, phase investigation, long-form background, recovery, and the outdoor run.
+Milestones 0 and 1 are complete. Apple Music remains the selected Milestone 2 source. Live Core Motion cadence and automatic MusicKit rate response pass mechanically on the physical iPhone, and one Bluetooth track made 0.90 versus 1.10 clearly audible. The production run now starts on the best ready fit, waits through a five-second mismatch before preparing another fit, and rejects stale preparation. The pulsing aperture is the rotary BPM click wheel with a 40-BPM Auto window, one-BPM detents, and no separate control furniture. Next comes one normal imported-playlist run through a natural prepared transition and a brief tactile judgment, followed by broader listening, phase investigation, long-form background, recovery, and the outdoor run.

@@ -1,3 +1,4 @@
+import CoreHaptics
 import Foundation
 import Observation
 import SamadhiAudio
@@ -629,11 +630,18 @@ private final class RunHapticFeedback {
     private let lightImpact = UIImpactFeedbackGenerator(style: .light)
     private let mediumImpact = UIImpactFeedbackGenerator(style: .medium)
     private let heavyImpact = UIImpactFeedbackGenerator(style: .heavy)
+    private let softImpact = UIImpactFeedbackGenerator(style: .soft)
     private let notification = UINotificationFeedbackGenerator()
     private let rhythmStep = UISelectionFeedbackGenerator()
+    private var rhythmEngine: CHHapticEngine?
+    private var nextRhythmTime = 0.0
 
     func prepareRhythmStep() {
+        prepareRhythmEngine()
+        try? rhythmEngine?.start()
+        nextRhythmTime = rhythmEngine?.currentTime ?? 0
         rhythmStep.prepare()
+        softImpact.prepare()
     }
 
     func emit(_ event: HapticEvent) {
@@ -646,13 +654,76 @@ private final class RunHapticFeedback {
             mediumImpact.impactOccurred()
         case .finish:
             heavyImpact.impactOccurred()
-        case .rhythmStep:
-            rhythmStep.selectionChanged()
+        case let .rhythmStep(isMajor):
+            if !playRhythmDetent(isMajor: isMajor) {
+                rhythmStep.selectionChanged()
+            }
             rhythmStep.prepare()
         case .rhythmAuto:
-            mediumImpact.impactOccurred(intensity: 0.72)
+            softImpact.impactOccurred(intensity: 0.82)
+            softImpact.prepare()
         case .rhythmLimit:
             notification.notificationOccurred(.warning)
+        }
+    }
+
+    private func prepareRhythmEngine() {
+        guard rhythmEngine == nil,
+            CHHapticEngine.capabilitiesForHardware().supportsHaptics
+        else { return }
+        do {
+            let engine = try CHHapticEngine()
+            engine.playsHapticsOnly = true
+            engine.isAutoShutdownEnabled = false
+            try engine.start()
+            rhythmEngine = engine
+            engine.resetHandler = { [weak self] in
+                try? self?.rhythmEngine?.start()
+            }
+        } catch {
+            rhythmEngine = nil
+        }
+    }
+
+    private func playRhythmDetent(isMajor: Bool) -> Bool {
+        guard let engine = rhythmEngine else { return false }
+        do {
+            let transient = CHHapticEvent(
+                eventType: .hapticTransient,
+                parameters: [
+                    CHHapticEventParameter(
+                        parameterID: .hapticIntensity,
+                        value: isMajor ? 0.52 : 0.28
+                    ),
+                    CHHapticEventParameter(
+                        parameterID: .hapticSharpness,
+                        value: isMajor ? 0.16 : 0.12
+                    ),
+                ],
+                relativeTime: 0
+            )
+            var events = [transient]
+            if isMajor {
+                events.append(
+                    CHHapticEvent(
+                        eventType: .hapticContinuous,
+                        parameters: [
+                            CHHapticEventParameter(parameterID: .hapticIntensity, value: 0.14),
+                            CHHapticEventParameter(parameterID: .hapticSharpness, value: 0.04),
+                        ],
+                        relativeTime: 0.012,
+                        duration: 0.04
+                    )
+                )
+            }
+
+            let player = try engine.makePlayer(with: CHHapticPattern(events: events, parameters: []))
+            let scheduledTime = max(engine.currentTime, nextRhythmTime)
+            try player.start(atTime: scheduledTime)
+            nextRhythmTime = scheduledTime + 0.028
+            return true
+        } catch {
+            return false
         }
     }
 }

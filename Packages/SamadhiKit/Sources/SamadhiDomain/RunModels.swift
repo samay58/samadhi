@@ -190,7 +190,7 @@ public enum HapticEvent: Sendable, Equatable {
     case pause
     case resume
     case finish
-    case rhythmStep
+    case rhythmStep(isMajor: Bool)
     case rhythmAuto
     case rhythmLimit
 }

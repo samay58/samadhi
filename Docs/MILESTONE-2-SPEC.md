@@ -325,8 +325,8 @@ The implemented rhythm control helps both the runner and the physical test. It e
 Behavior:
 
 - Auto follows stable Core Motion cadence through the existing deadband, ramp, confidence, compatibility, and 0.94 through 1.06 rate limits.
-- Fine-tune applies a small signed BPM correction to Auto. Initial range is minus 8 through plus 8 BPM in one-BPM steps.
-- Manual lets the runner choose a target BPM directly. Initial range is 120 through 200 BPM in one-BPM steps.
+- Fine-tune applies a signed BPM correction to Auto. The range is minus 20 through plus 20 BPM in one-BPM steps, clipped to the accepted 120 through 210 running range.
+- Manual lets the runner choose a target BPM directly from 120 through 210 BPM in one-BPM steps.
 - Reset returns to Auto with zero correction.
 - Each run starts in Auto. Manual state does not silently carry into a later run.
 - The control shows the requested BPM and whether the current track can reach it. At the safe-rate boundary it says `At limit`; it never pretends the request was fully applied.
@@ -339,7 +339,7 @@ Interaction and taste:
 
 - The resting run screen stays quiet. Direct manipulation reveals the control in place and dismisses it without navigation.
 - Use the existing central rhythm object as the visual anchor. Do not add a white card, settings page, dashboard, or permanent row of controls.
-- Provide restrained haptics at one-BPM detents, a stronger Auto detent, large touch targets, VoiceOver adjustable actions, Dynamic Type, increased contrast, and Reduce Motion behavior.
+- Map one revolution to 40 BPM. Provide a rounded low-sharpness haptic at each one-BPM detent, a fuller notch every five BPM, a soft Auto landing, large touch targets, VoiceOver adjustable actions, Dynamic Type, increased contrast, and Reduce Motion behavior.
 - Motion confirms grip and release, then settles quickly. It must remain interruptible and must not compete with the music.
 - Judge the design from real iPhone Simulator frames at rest, while dragging, at Auto, in Manual, and at a safety limit. Reject any treatment that obscures song, cadence, progress, pause, or finish.
 

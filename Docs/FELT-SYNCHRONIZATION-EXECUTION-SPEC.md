@@ -17,8 +17,8 @@ The research basis and source links live in [ADAPTIVE-AUDIO-PLAYBOOK.md](ADAPTIV
 - Apple Music authorization, playlist import, catalog resolution, preview analysis, playback, bounded rate writes, pause, resume, live cadence, and mechanical automatic adaptation pass.
 - A 59-second physical run averaged 155 SPM and reported 98 percent tempo matched from MusicKit read-back.
 - The earlier rate near 1.02 was not perceptible. Mechanical correctness has not yet produced the required feeling.
-- The current production queue follows playlist order. It does not yet use `TrackMatchPlanner` to choose compatible music.
-- `TrackMatchPlanner` is source-neutral and passes deterministic tests for half-time, full-time, double-time, quality-envelope, source-order, and current-track retention behavior.
+- The production run starts from the `TrackMatchPlanner` result and may prepare a better-fitting next track after five seconds of stable incompatibility. One natural imported transition remains physically unproven.
+- `TrackMatchPlanner` is source-neutral and passes deterministic tests for half-time, full-time, double-time, quality-envelope, source-order, current-track retention, mismatch hold, and stale-preparation behavior.
 - The debug MusicKit harness can run a blinded 0.92 versus 1.08 comparison and record requested rate, read-back, and direction recognition. Optional 0.90 and 1.10 controls are available only for a clean follow-up.
 - Public MusicKit exposes playback rate but no documented beat grid, full-track PCM callback, phase-control primitive, or processing-quality guarantee.
 - The paired iPhone reconnected on 2026-07-21. On `LITE SPOTS` through Beoplay Eleven, Samay clearly heard 0.90 versus 1.10 and reported approximately 95 percent confidence that the mechanic worked. The broader blinded and full-song quality checks remain open, and the installed exact development profile expires on 2026-07-23 UTC.

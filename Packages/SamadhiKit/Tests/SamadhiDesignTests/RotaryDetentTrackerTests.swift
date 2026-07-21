@@ -1,4 +1,5 @@
 import Testing
+
 @testable import SamadhiDesign
 
 @Test func clockwiseRotationRaisesOneDetent() {
@@ -61,4 +62,14 @@ import Testing
     #expect(!tracker.isTracking)
     #expect(tracker.currentDetent == 0)
     #expect(tracker.update(to: .pi) == 0)
+}
+
+@Test func oneRevolutionSpansFortyBPM() {
+    let tracker = RotaryDetentTracker()
+    tracker.begin(at: -.pi / 2)
+
+    #expect(tracker.update(to: 0) == 10)
+    #expect(tracker.update(to: .pi / 2) == 20)
+    #expect(tracker.update(to: .pi) == 30)
+    #expect(tracker.update(to: -.pi / 2) == 40)
 }
