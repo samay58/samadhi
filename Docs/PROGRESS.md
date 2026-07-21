@@ -280,7 +280,11 @@
 - Added deterministic range, running-bound, tactile-event, and full-revolution tests
 - Saved the inspected iPhone 17 Pro frame as `Evidence/Simulator/2026-07-21-forty-bpm-click-wheel.png`
 - Expanded the package suite to 83 tests while retaining 11 app-model and 10 UI tests
+- Replaced the visible tuning sentence with three resting grip notches in the wheel rim
+- Added one clockwise-and-back teaching movement that retires after first use while keeping Reduce Motion static
+- Added the single word `Turn` inside the aperture after the purely visual cue proved too ambiguous
+- Saved the inspected resting frame as `Evidence/Simulator/2026-07-21-tempo-affordance.png`
 
 ## Current checkpoint
 
-Milestones 0 and 1 are complete. Apple Music remains the selected Milestone 2 source. Live Core Motion cadence and automatic MusicKit rate response pass mechanically on the physical iPhone, and one Bluetooth track made 0.90 versus 1.10 clearly audible. The production run now starts on the best ready fit, waits through a five-second mismatch before preparing another fit, and rejects stale preparation. The pulsing aperture is the rotary BPM click wheel with a 40-BPM Auto window, one-BPM detents, and no separate control furniture. Next comes one normal imported-playlist run through a natural prepared transition and a brief tactile judgment, followed by broader listening, phase investigation, long-form background, recovery, and the outdoor run.
+Milestones 0 and 1 are complete. Apple Music remains the selected Milestone 2 source. Live Core Motion cadence and automatic MusicKit rate response pass mechanically on the physical iPhone, and one Bluetooth track made 0.90 versus 1.10 clearly audible. The production run now starts on the best ready fit, waits through a five-second mismatch before preparing another fit, and rejects stale preparation. The pulsing aperture is the rotary BPM click wheel with a 40-BPM Auto window, one-BPM detents, and no separate control furniture. Its resting rim now teaches the interaction with three grip notches and one restrained movement instead of instructional copy. Next comes one normal imported-playlist run through a natural prepared transition and a brief tactile judgment, followed by broader listening, phase investigation, long-form background, recovery, and the outdoor run.

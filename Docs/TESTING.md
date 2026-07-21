@@ -96,7 +96,7 @@ App-model tests cover ready mapping, start transition, atomic store round trips,
 
 ## Visual proof
 
-Final frames under Evidence/Simulator/ cover ready, imported empty and partial states, locked run, controls, summary, Home Screen icon, BPM Auto fine-tune, the Manual safety limit, accessibility-size BPM controls, the 40-detent rotary BPM click wheel, and normal local-demo readiness. The short rotary recording shows clockwise, counterclockwise, protected-center, Manual, and Auto behavior. Evidence/Previews/ covers other accessibility and state-specific visual checks.
+Final frames under Evidence/Simulator/ cover ready, imported empty and partial states, locked run, controls, summary, Home Screen icon, BPM Auto fine-tune, the Manual safety limit, accessibility-size BPM controls, the resting `Turn` affordance, the 40-detent rotary BPM click wheel, and normal local-demo readiness. The short rotary recording shows clockwise, counterclockwise, protected-center, Manual, and Auto behavior. The focused UI test confirms the control opens through its existing accessible button and the former instruction sentence is absent. Evidence/Previews/ covers other accessibility and state-specific visual checks.
 
 ## Truth boundary
 
