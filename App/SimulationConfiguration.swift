@@ -18,10 +18,20 @@ struct SimulationConfiguration {
     let missingArtwork: Bool
     let extendedAcquisitionWindow: Bool
     let useAppleMusicCoreLoop: Bool
+    let useSimulatorDemoMusic: Bool
     let musicSelectionFixture: MusicSelectionFixture
 
     static var current: SimulationConfiguration {
         let arguments = ProcessInfo.processInfo.arguments
+        #if DEBUG && targetEnvironment(simulator)
+            let useSimulatorDemoMusic =
+                !arguments.contains("--real-apple-music")
+                && !arguments.contains("--music-feasibility")
+                && !arguments.contains("--apple-music-core-loop")
+        #else
+            let useSimulatorDemoMusic = false
+        #endif
+
         return SimulationConfiguration(
             fastMode: arguments.contains("-SAMADHI_FAST_MODE"),
             permissionDenied: arguments.contains("-SAMADHI_PERMISSION_DENIED"),
@@ -29,6 +39,7 @@ struct SimulationConfiguration {
             missingArtwork: arguments.contains("-SAMADHI_MISSING_ARTWORK"),
             extendedAcquisitionWindow: arguments.contains("-SAMADHI_TEST_ACQUISITION_WINDOW"),
             useAppleMusicCoreLoop: arguments.contains("--apple-music-core-loop"),
+            useSimulatorDemoMusic: useSimulatorDemoMusic,
             musicSelectionFixture: {
                 if arguments.contains("-SAMADHI_MUSIC_NONE") { return .none }
                 if arguments.contains("-SAMADHI_MUSIC_LOADING") { return .loading }

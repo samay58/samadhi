@@ -12,6 +12,8 @@ Use XcodeGen. Generated project stays versioned and reviewable. XcodeGen remains
 
 Milestone 1 uses deterministic cadence and beat timing. It does not link Core Motion or production audio frameworks. Simulator proves interaction, not physical quality.
 
+Normal Debug Simulator launches use isolated local placeholder playlists, simulated cadence, and silent simulated playback. This provides the complete product flow when MusicKit is unavailable without changing physical iPhone or Release behavior. The stable regression fixture remains separate from the richer demo collection so visual exploration cannot silently reorder golden tests. Remove the temporary demo entry point before public distribution if it no longer serves development.
+
 ## State architecture
 
 Use pure reducer plus one main-actor presentation model. Avoid screen view models and boolean phase clusters.

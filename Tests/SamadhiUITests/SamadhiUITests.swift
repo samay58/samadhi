@@ -122,14 +122,42 @@ final class SamadhiUITests: XCTestCase {
         let dial = element("rhythm-dial")
         let top = dial.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.08))
         let right = dial.coordinate(withNormalizedOffset: CGVector(dx: 0.92, dy: 0.5))
-        top.press(forDuration: 0.08, thenDragTo: right)
+        top.press(
+            forDuration: 0.12,
+            thenDragTo: right,
+            withVelocity: .slow,
+            thenHoldForDuration: 0.2
+        )
         XCTAssertTrue(app.staticTexts["176"].waitForExistence(timeout: 2))
+
+        right.press(
+            forDuration: 0.12,
+            thenDragTo: top,
+            withVelocity: .slow,
+            thenHoldForDuration: 0.2
+        )
+        XCTAssertTrue(app.staticTexts["165"].waitForExistence(timeout: 2))
+
+        dial.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5)).tap()
+        XCTAssertTrue(app.staticTexts["165"].exists)
 
         app.buttons["rhythm-manual"].tap()
         XCTAssertTrue(app.buttons["rhythm-manual"].isSelected)
 
         app.buttons["rhythm-auto"].tap()
         XCTAssertTrue(app.buttons["rhythm-auto"].isSelected)
+        XCTAssertTrue(app.staticTexts["168"].exists)
+    }
+
+    func testNormalSimulatorLaunchUsesLocalDemoMusic() {
+        continueAfterFailure = false
+        app = XCUIApplication()
+        app.launch()
+
+        XCTAssertTrue(element("music-ready").waitForExistence(timeout: 3))
+        XCTAssertTrue(app.staticTexts["Samadhi demo"].exists)
+        app.buttons["start-run"].tap()
+        XCTAssertTrue(element("cadence-lock").waitForExistence(timeout: 6))
     }
 
     private func element(_ identifier: String) -> XCUIElement {

@@ -442,19 +442,27 @@ private let slowTrack = MusicTrack(
 
 @Test func automaticFineTuneClampsAtEightBPM() {
     var state = acquiringCoreLoopRun(sessionID: 67)
+    var stepHapticCount = 0
+    var finalEffects: [RunEffect] = []
     for step in 0..<9 {
-        state =
-            coreLoopReducer.reduce(
-                state: state,
-                event: .rhythmControlAdjusted(
-                    steps: 1,
-                    rateRequestID: 70 + step,
-                    timeoutID: 90 + step
-                )
-            ).0
+        let result = coreLoopReducer.reduce(
+            state: state,
+            event: .rhythmControlAdjusted(
+                steps: 1,
+                rateRequestID: 70 + step,
+                timeoutID: 90 + step
+            )
+        )
+        state = result.0
+        finalEffects = result.1
+        if result.1.contains(.emitHaptic(.rhythmStep)) {
+            stepHapticCount += 1
+        }
     }
 
     #expect(state.session?.rhythmControl.automaticCorrectionBPM == 8)
+    #expect(stepHapticCount == 8)
+    #expect(finalEffects.contains(.emitHaptic(.rhythmLimit)))
 }
 
 @Test func resetReturnsFineTuneToNeutralAutomaticMode() {

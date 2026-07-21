@@ -256,6 +256,18 @@
 - Passed formatter lint, the full serial gate, and an exact-profile signed iPhone build
 - Left installation honest and open because the paired iPhone was unavailable over the network
 
+## 2026-07-21. Simulator demo and rotary coherence
+
+- Added two local placeholder playlists for normal Debug Simulator launches while leaving physical iPhone and Release composition unchanged
+- Kept stable regression music separate from the varied demo collection after the full gate exposed a golden-flow ordering regression
+- Added model and UI proof that the normal app starts, reaches cadence lock, and can replace the local collection without Apple Music
+- Anchored wheel geometry to finger-down, preserved angle continuity across wraparound, and kept center-origin gestures inert
+- Fixed an automatic-range defect that moved the limit inward after each detent and made a requested plus-eight turn stop at plus four
+- Emitted one reducer action and selection haptic per crossed BPM detent, used a distinct boundary warning, and reused prepared haptic generators
+- Verified clockwise 168 to 176, counterclockwise 176 to 165, center protection, Manual ownership, and Auto reset to 168 in the real Simulator UI
+- Saved a compact interaction recording and a normal-launch frame under `Evidence/Simulator/`
+- Expanded the automated gate to 80 package tests, 11 app-model tests, and 10 UI tests
+
 ## Current checkpoint
 
 Milestones 0 and 1 are complete. Apple Music remains the selected Milestone 2 source. Live Core Motion cadence and automatic MusicKit rate response pass mechanically on the physical iPhone, and one Bluetooth track made 0.90 versus 1.10 clearly audible. The production run now starts on the best ready fit, waits through a five-second mismatch before preparing another fit, and rejects stale preparation. The pulsing aperture is the rotary BPM click wheel, with one-BPM detents and no separate control furniture. Next comes one normal imported-playlist run through a natural prepared transition, followed by broader listening, phase investigation, long-form background, recovery, and the outdoor run.

@@ -15,6 +15,7 @@
 | Adaptation policy | Physical automatic rate-response check passed | Identified reducer effects, deterministic feedback tests, and 59-second device result |
 | Track fit | Connected to run start and next-song planning | Deterministic pulse-family, envelope, hold, identity, order, and retention tests |
 | In-run BPM control | Aperture click wheel implemented and Simulator-verified | Angular detents, Auto and Manual ownership, honest fit feedback, accessibility, and UI tests |
+| Simulator development loop | Local placeholder playlists and silent simulated playback available in Debug | Normal no-argument launch, model tests, UI flow, screenshot, and interaction recording |
 | Apple Music feasibility | Source selected; 0.90 versus 1.10 was clearly audible on one Bluetooth track; broader quality and long-form reliability remain | Exact-profile traces and explicit product decision |
 | Spotify feasibility | Rejected for adaptive playback | Remote-control architecture, missing music rate control, and content policy conflict |
 | Production player | Apple Music selected; imported ready tracks enter the real player | Source-neutral contract, exact-profile build, and device install |
@@ -125,14 +126,17 @@
 - Protected next-song preparation with selection identity so late preparation cannot replace a newer choice
 - Turned the pulsing aperture into the single rotary BPM click wheel with one-BPM angular detents, soft takeover, restrained haptics, a temporary perimeter marker, and VoiceOver adjustment
 - Removed separate plus and minus controls after visual review because they weakened the single-instrument interaction
+- Added a Debug Simulator-only local music path with two placeholder playlists so the normal app flow no longer depends on unavailable Simulator MusicKit state
+- Anchored rotary movement to finger-down, kept the automatic range fixed through a gesture, protected the center, and emitted one state change plus one selection haptic per crossed BPM detent
+- Reused prepared haptic generators so the first click is not weakened by generator startup
 
 ## Proof
 
 The current serial gate passed on 2026-07-21:
 
-- 74 Swift package tests
-- 9 app-model tests
-- 9 UI tests
+- 80 Swift package tests
+- 11 app-model tests
+- 10 UI tests
 - Swift formatter lint
 - Resource-inclusive Simulator build
 - Unsigned generic iPhone build
@@ -142,14 +146,14 @@ Durable logs and final visual frames live under Evidence/.
 
 The diagnostics slice passes formatter lint, a Simulator build, the full serial gate, an exact-profile physical build, physical installation, and foreground launch.
 
-The production track-fit and rotary-control slice passes formatter lint, 74 package tests, 9 app-model tests, 9 UI tests, and an exact-profile signed iPhone build. The paired phone was unavailable over the network at the installation step, so this exact build is not claimed as installed.
+The production track-fit and rotary-control slice passes formatter lint, 80 package tests, 11 app-model tests, 10 UI tests, and an exact-profile signed iPhone build. The paired phone was unavailable over the network at the installation step, so this exact build is not claimed as installed.
 
 The MusicKit harness and normal app launch in Simulator and on the physical iPhone. Signing uses the Apple Development certificate for team `ZL5U59XBJ6`. The import-capable normal build is installed. Its build and installation record is under `Evidence/Device/`.
 
 ## Known limits
 
-Live cadence and automatic cadence-driven rate response pass mechanically on the physical iPhone. One Bluetooth track made 0.90 versus 1.10 unmistakable, but broader and full-song listening quality remains open, so production stays at 0.94 through 1.06. Production selection now starts on the best ready fit and prepares a better next fit only after five seconds of stable mismatch. The aperture click wheel changes requested BPM without weakening the reducer's safety rules. Player callbacks remain authoritative for song identity. Debug builds persist the latest completed run's exact control, progress, cadence, target and applied rates, track changes, recovery events, and summary. The tempo estimator passes its narrow 12-preview reference corpus, but broad music accuracy and public-distribution permission for preview analysis remain open. One real playlist passed import, local analysis, reinstall and relaunch restoration, and basic production-player progress with 13 ready tracks. The public MusicKit queue preparation seam compiles and is deterministic in the simulated player, but one natural imported-song transition is still not physically proven. Five locked minutes, controlled interruption, route loss, accessibility on imported states, and the outdoor run remain open.
+Live cadence and automatic cadence-driven rate response pass mechanically on the physical iPhone. One Bluetooth track made 0.90 versus 1.10 unmistakable, but broader and full-song listening quality remains open, so production stays at 0.94 through 1.06. Production selection now starts on the best ready fit and prepares a better next fit only after five seconds of stable mismatch. The aperture click wheel changes requested BPM without weakening the reducer's safety rules. Its geometry, direction, limits, protected center, state ownership, and event-to-haptic contract pass in Simulator and deterministic tests. Simulator cannot prove the physical strength, sharpness, or timing of the iPhone haptic motor, so one short tactile check remains. Player callbacks remain authoritative for song identity. Debug builds persist the latest completed run's exact control, progress, cadence, target and applied rates, track changes, recovery events, and summary. The tempo estimator passes its narrow 12-preview reference corpus, but broad music accuracy and public-distribution permission for preview analysis remain open. One real playlist passed import, local analysis, reinstall and relaunch restoration, and basic production-player progress with 13 ready tracks. The public MusicKit queue preparation seam compiles and is deterministic in the simulated player, but one natural imported-song transition is still not physically proven. Five locked minutes, controlled interruption, route loss, accessibility on imported states, and the outdoor run remain open.
 
 ## WHERE WE LEFT OFF
 
-Apple Music remains the authoritative Milestone 2 player. A real 25-track playlist restores with 13 ready tracks, production-player progress advances, and Samay clearly heard 0.90 versus 1.10 on `LITE SPOTS` through Beoplay Eleven. The normal-run envelope remains 0.94 through 1.06 until broader quality is proven. Coarse track fit is now connected to adaptive run start and identified next-song preparation. The tempo aperture is now the rotary click wheel for Auto correction and Manual BPM. The next physical proof is one normal imported run that starts on the selected fit and crosses a natural prepared transition without a gap, stale feedback, or false summary. After that come phase investigation, locked playback, recovery, and the outdoor run.
+Apple Music remains the authoritative Milestone 2 player. A real 25-track playlist restores with 13 ready tracks, production-player progress advances, and Samay clearly heard 0.90 versus 1.10 on `LITE SPOTS` through Beoplay Eleven. The normal-run envelope remains 0.94 through 1.06 until broader quality is proven. Coarse track fit is now connected to adaptive run start and identified next-song preparation. The tempo aperture is the rotary click wheel for Auto correction and Manual BPM. Debug Simulator launches now use isolated local placeholder playlists so the complete interaction can be exercised without Apple Music. The next physical proof is one normal imported run that starts on the selected fit and crosses a natural prepared transition without a gap, stale feedback, or false summary. That same short check should judge whether the click-wheel haptics feel crisp. After that come phase investigation, locked playback, recovery, and the outdoor run.

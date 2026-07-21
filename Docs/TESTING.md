@@ -9,7 +9,7 @@
 
 Scripts/test.sh runs Swift package tests, app-model tests, and UI tests serially on iPhone 17 Pro Simulator.
 
-The 2026-07-21 full serial gate passed 74 package tests, 9 app-model tests, and 9 UI tests.
+The 2026-07-21 full serial gate passed 80 package tests, 11 app-model tests, and 10 UI tests.
 
 Formatter gate:
 
@@ -55,6 +55,9 @@ Domain tests cover:
 - Compatible adaptive starting-song selection from the initial cadence prior
 - Five-second mismatch hold, prepared-next identity, recovery clearing, and stale preparation rejection
 - Player-confirmed Previous and Skip truth instead of predicted song state
+- One selection haptic for each accepted Auto detent and one distinct limit warning at the ninth step
+
+Design tests cover clockwise and counterclockwise one-BPM detents, partial-turn accumulation, direction reversal, angle wraparound, and reset between gestures.
 
 Motion tests cover:
 
@@ -86,17 +89,18 @@ UI tests cover:
 - Honest analysis progress
 - Partial import with visible failures and an enabled ready-track start
 - Import failure and retry
-- In-run aperture click-wheel reveal, angular one-BPM adjustment, Manual ownership, and return to Auto
+- In-run aperture click-wheel reveal, clockwise and counterclockwise angular adjustment, fixed Auto bounds, protected center, Manual ownership, and return to Auto
+- Normal no-argument Simulator launch through local demo music and cadence lock
 
-App-model tests cover ready mapping, start transition, atomic store round trips, corrupt persistence, restored selection, cancellation of stale replacement work, latest-run diagnostic persistence with BPM-control truth, and a reducer-driven diagnostic timeline through finish.
+App-model tests cover ready mapping, start transition, atomic store round trips, corrupt persistence, restored selection, cancellation of stale replacement work, latest-run diagnostic persistence with BPM-control truth, a reducer-driven diagnostic timeline through finish, immediate Simulator demo readiness, and replacement with a second local playlist.
 
 ## Visual proof
 
-Final frames under Evidence/Simulator/ cover ready, imported empty and partial states, locked run, controls, summary, Home Screen icon, BPM Auto fine-tune, the Manual safety limit, accessibility-size BPM controls, and the refined rotary BPM click wheel. Evidence/Previews/ covers other accessibility and state-specific visual checks.
+Final frames under Evidence/Simulator/ cover ready, imported empty and partial states, locked run, controls, summary, Home Screen icon, BPM Auto fine-tune, the Manual safety limit, accessibility-size BPM controls, the refined rotary BPM click wheel, and normal local-demo readiness. The short rotary recording shows clockwise, counterclockwise, protected-center, Manual, and Auto behavior. Evidence/Previews/ covers other accessibility and state-specific visual checks.
 
 ## Truth boundary
 
-Simulator verifies interaction, accessibility structure, reducer behavior, resource packaging, and deterministic motion. It cannot validate physical cadence quality, real headphone route behavior, tempo adaptation, or listening artifacts.
+Simulator verifies interaction, accessibility structure, reducer behavior, resource packaging, and deterministic motion. Normal Debug Simulator launches use two local placeholder playlists, simulated cadence, and silent simulated playback. This path is disabled on physical devices and in Release builds. Simulator cannot validate physical cadence quality, real headphone route behavior, audible tempo adaptation, listening artifacts, or the tactile character of haptics.
 
 The `Samadhi MusicKit Gate` scheme verifies that the harness and framework calls compile. Physical traces separately prove authorization, library loading, automatic token generation, strict catalog resolution, preview decoding, playback, mechanical rate writes, pause, and resume. Bluetooth listening, background, controlled interruption, and route checks remain separate physical gates.
 
@@ -107,6 +111,7 @@ The `Samadhi MusicKit Gate` scheme verifies that the harness and framework calls
 - Current BPM-control exact-profile signed build, installation, launch, and running process check: passed
 - Physical iPhone installation and gate launch: passed
 - Normal Simulator app: launched and visually checked
+- Normal Debug Simulator local-demo flow: two playlists, start, cadence lock, rotary BPM, transport, transition, finish, and summary passed without Apple Music
 - MusicKit harness Simulator app: launched and visually checked
 - Background audio entry in built Info.plist: verified as an array containing `audio`
 - Physical device signing, build, installation, and launch: passed

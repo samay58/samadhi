@@ -21,6 +21,32 @@ enum AppMusicCollection {
         }
     )
 
+    static let simulatorDemo = MusicCollection(
+        id: MusicCollectionID("simulator-demo"),
+        name: "Samadhi demo",
+        tracks: zip(TrackMetadata.demoTracks, [156.0, 168.0, 180.0]).map { track, bpm in
+            demoTrack(
+                id: "demo-\(track.title.lowercased().replacingOccurrences(of: " ", with: "-"))",
+                title: track.title,
+                artist: track.artist,
+                bpm: bpm
+            )
+        }
+    )
+
+    static let simulatorCruise = MusicCollection(
+        id: MusicCollectionID("simulator-cruise"),
+        name: "Soft Miles",
+        tracks: [
+            demoTrack(id: "cruise-148", title: "Open Shade", artist: "Field Note", bpm: 148),
+            demoTrack(id: "cruise-160", title: "Long Light", artist: "Low Season", bpm: 160),
+            demoTrack(id: "cruise-172", title: "Warm Signal", artist: "Paper Coast", bpm: 172),
+            demoTrack(id: "cruise-184", title: "Second Wind", artist: "North Window", bpm: 184),
+        ]
+    )
+
+    static let simulatorCollections = [simulatorDemo, simulatorCruise]
+
     // This catalog track is a temporary core-loop fixture, not a user-facing default.
     static let appleMusicCoreLoop = MusicCollection(
         id: MusicCollectionID("apple-music-core-loop"),
@@ -78,4 +104,64 @@ enum AppMusicCollection {
             ),
         ]
     )
+
+    private static func demoTrack(
+        id: String,
+        title: String,
+        artist: String,
+        bpm: Double
+    ) -> MusicTrack {
+        MusicTrack(
+            id: MusicTrackID(id),
+            title: title,
+            artist: artist,
+            durationSeconds: 210,
+            sourceFingerprint: "simulator-\(id)",
+            analysisState: .ready(
+                TempoAnalysis(
+                    baseBPM: bpm,
+                    confidence: 1,
+                    analyzedDurationSeconds: 30,
+                    version: 2
+                )
+            )
+        )
+    }
+}
+
+@MainActor
+final class SimulatorMusicImportService: MusicLibraryImporting {
+    func loadPlaylists() async throws -> [LibraryPlaylistChoice] {
+        AppMusicCollection.simulatorCollections.map {
+            LibraryPlaylistChoice(id: $0.id.rawValue, name: $0.name)
+        }
+    }
+
+    func importPlaylist(
+        id: String,
+        progress: @escaping @MainActor (MusicImportProgress) -> Void
+    ) async throws -> MusicCollection {
+        guard
+            let collection = AppMusicCollection.simulatorCollections.first(where: {
+                $0.id.rawValue == id
+            })
+        else {
+            throw AppleMusicImportError.playlistUnavailable
+        }
+
+        var imported: [MusicTrack] = []
+        progress(MusicImportProgress(completedCount: 0, totalCount: collection.tracks.count, tracks: []))
+        for track in collection.tracks {
+            try await Task.sleep(for: .milliseconds(120))
+            imported.append(track)
+            progress(
+                MusicImportProgress(
+                    completedCount: imported.count,
+                    totalCount: collection.tracks.count,
+                    tracks: imported
+                )
+            )
+        }
+        return collection
+    }
 }

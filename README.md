@@ -32,6 +32,8 @@ DEVELOPER_DIR=/Applications/Xcode-beta.app/Contents/Developer \
   App Packages/SamadhiKit/Sources Packages/SamadhiKit/Tests Tests
 ~~~
 
+A normal Debug launch on iPhone Simulator uses two local placeholder playlists, simulated cadence, and silent simulated playback. This keeps the complete import, run, rotary BPM, transport, transition, and summary flow available without Apple Music. Physical iPhone and Release builds never enable this path. Pass `--real-apple-music` only when intentionally debugging MusicKit in Simulator.
+
 ## Project guide
 
 | Question | Source |
