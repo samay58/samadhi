@@ -9,11 +9,14 @@ struct RhythmControl: View {
 
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Environment(\.accessibilityVoiceOverEnabled) private var voiceOverEnabled
+    @AppStorage("samadhi.tempoControlDiscovered") private var tempoControlDiscovered = false
     @State private var dragAutomaticBaseBPM: Int?
     @State private var dragOriginBPM: Int?
     @State private var frozenDisplayBPM: Int?
     @State private var rotaryTracker = RotaryDetentTracker()
     @State private var wheelIndicatorAngle: Double?
+    @State private var affordanceCueRotation = 0.0
+    @State private var didPresentAffordanceCue = false
 
     var body: some View {
         VStack(spacing: Space.x3) {
@@ -65,15 +68,22 @@ struct RhythmControl: View {
             .accessibilityIdentifier("rhythm-dial")
         } else {
             Button(action: reveal) {
-                aperture
-                    .frame(width: size, height: size)
-                    .contentShape(Circle())
+                ZStack {
+                    aperture
+                    restingAffordance
+                    restingLabel
+                }
+                .frame(width: size, height: size)
+                .contentShape(Circle())
             }
             .buttonStyle(.plain)
             .accessibilityElement(children: .ignore)
             .accessibilityLabel("Tempo control")
             .accessibilityHint("Opens automatic and manual tempo adjustment")
             .accessibilityIdentifier("tempo-control")
+            .task(id: shouldPresentAffordanceCue) {
+                await presentAffordanceCue()
+            }
         }
     }
 
@@ -141,36 +151,60 @@ struct RhythmControl: View {
         .accessibilityHidden(true)
     }
 
-    private var adjustmentRow: some View {
-        VStack(spacing: Space.x1) {
-            HStack(spacing: Space.x3) {
-                Button("Auto") { send(.resetRhythmControl) }
-                    .font(.callout.weight(state.rhythmControl.mode == .automatic ? .bold : .medium))
-                    .accessibilityIdentifier("rhythm-auto")
-                    .accessibilityAddTraits(
-                        state.rhythmControl.mode == .automatic ? .isSelected : []
+    private var restingAffordance: some View {
+        ZStack {
+            ForEach(-1...1, id: \.self) { index in
+                Capsule()
+                    .fill(
+                        SamadhiColor.ivory.opacity(index == 0 ? 0.56 : 0.3)
                     )
-
-                Rectangle()
-                    .fill(SamadhiColor.ivory.opacity(0.34))
-                    .frame(width: 1, height: 18)
-                    .accessibilityHidden(true)
-
-                Button("Manual") { send(.useManualRhythm) }
-                    .font(.callout.weight(state.rhythmControl.mode == .manual ? .bold : .medium))
-                    .accessibilityIdentifier("rhythm-manual")
-                    .accessibilityAddTraits(
-                        state.rhythmControl.mode == .manual ? .isSelected : []
-                    )
+                    .frame(width: index == 0 ? 2 : 1, height: index == 0 ? 8 : 5)
+                    .offset(y: -(size * 0.445))
+                    .rotationEffect(.degrees(118 + Double(index) * 8))
             }
-            .buttonStyle(.plain)
-            .frame(minHeight: 48)
+        }
+        .rotationEffect(.degrees(affordanceCueRotation))
+        .opacity(state.rhythmControl.isAvailable && mode == .locked ? 1 : 0)
+        .animation(effectiveReduceMotion ? nil : .easeOut(duration: 0.3), value: mode)
+        .accessibilityHidden(true)
+    }
 
-            Text("Turn the ring to tune")
-                .font(.caption.weight(.medium))
-                .foregroundStyle(SamadhiColor.ivory.opacity(0.68))
+    @ViewBuilder
+    private var restingLabel: some View {
+        if state.rhythmControl.isAvailable, mode == .locked {
+            Text("Turn")
+                .font(.caption.weight(.semibold))
+                .tracking(0.6)
+                .foregroundStyle(SamadhiColor.ivory.opacity(0.78))
+                .shadow(color: SamadhiColor.ink.opacity(0.3), radius: 5, y: 2)
+                .offset(y: size * 0.365)
                 .accessibilityHidden(true)
         }
+    }
+
+    private var adjustmentRow: some View {
+        HStack(spacing: Space.x3) {
+            Button("Auto") { send(.resetRhythmControl) }
+                .font(.callout.weight(state.rhythmControl.mode == .automatic ? .bold : .medium))
+                .accessibilityIdentifier("rhythm-auto")
+                .accessibilityAddTraits(
+                    state.rhythmControl.mode == .automatic ? .isSelected : []
+                )
+
+            Rectangle()
+                .fill(SamadhiColor.ivory.opacity(0.34))
+                .frame(width: 1, height: 18)
+                .accessibilityHidden(true)
+
+            Button("Manual") { send(.useManualRhythm) }
+                .font(.callout.weight(state.rhythmControl.mode == .manual ? .bold : .medium))
+                .accessibilityIdentifier("rhythm-manual")
+                .accessibilityAddTraits(
+                    state.rhythmControl.mode == .manual ? .isSelected : []
+                )
+        }
+        .buttonStyle(.plain)
+        .frame(minHeight: 48)
         .foregroundStyle(SamadhiColor.ivory)
         .accessibilityElement(children: .contain)
         .accessibilityIdentifier("rhythm-controls")
@@ -260,8 +294,37 @@ struct RhythmControl: View {
         reduceMotion || state.forceReduceMotion
     }
 
+    private var shouldPresentAffordanceCue: Bool {
+        mode == .locked && state.rhythmControl.isAvailable && !tempoControlDiscovered
+            && !effectiveReduceMotion
+    }
+
+    @MainActor
+    private func presentAffordanceCue() async {
+        guard shouldPresentAffordanceCue, !didPresentAffordanceCue else { return }
+        didPresentAffordanceCue = true
+
+        do {
+            try await Task.sleep(for: .milliseconds(450))
+            withAnimation(.easeInOut(duration: 0.42)) {
+                affordanceCueRotation = 7
+            }
+            try await Task.sleep(for: .milliseconds(420))
+            withAnimation(.easeInOut(duration: 0.42)) {
+                affordanceCueRotation = -5
+            }
+            try await Task.sleep(for: .milliseconds(420))
+            withAnimation(.easeOut(duration: 0.3)) {
+                affordanceCueRotation = 0
+            }
+        } catch {
+            affordanceCueRotation = 0
+        }
+    }
+
     private func reveal() {
         guard state.rhythmControl.isAvailable else { return }
+        tempoControlDiscovered = true
         if !state.rhythmControl.isVisible { send(.revealRhythmControl) }
         if voiceOverEnabled { send(.controlsFocusChanged(true)) }
     }

@@ -113,6 +113,7 @@ final class SamadhiUITests: XCTestCase {
         XCTAssertTrue(app.buttons["start-run"].waitForExistence(timeout: 2))
         app.buttons["start-run"].tap()
         XCTAssertTrue(element("cadence-lock").waitForExistence(timeout: 3))
+        XCTAssertFalse(app.staticTexts["Turn the ring to tune"].exists)
 
         element("tempo-control").tap()
         XCTAssertTrue(element("rhythm-dial").waitForExistence(timeout: 2))
