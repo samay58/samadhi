@@ -141,6 +141,8 @@ The `Samadhi MusicKit Gate` scheme verifies that the harness and framework calls
 
 Use five analyzed songs with prominent, stable beats. Compare 0.92, 1.00, and 1.08 on the supported Bluetooth route, then test 0.90 and 1.10 only if the first endpoints remain clean. Log requested rate, MusicKit read-back, route, audible artifacts, and blinded faster-or-slower recognition. Pass only if Samay identifies direction in at least four of five comparisons and calls the largest clean pair obvious rather than subtle.
 
+The complete sequence, pivot rules, phase questions, and final evidence packet live in [FELT-SYNCHRONIZATION-EXECUTION-SPEC.md](FELT-SYNCHRONIZATION-EXECUTION-SPEC.md).
+
 After that gate, connect `TrackMatchPlanner` to production selection and prove one compatible-track transition. Pull `latest-run-diagnostics.json` and confirm requested BPM, selected pulse, required rate, MusicKit read-back, progress, and summary agree. Renew the exact profile first if testing occurs after 2026-07-23 UTC. Before Milestone 2 completion, record one concise Bluetooth listening note and prove five screen-locked minutes, controlled interruption, and route loss.
 
 ## Known environment behavior
