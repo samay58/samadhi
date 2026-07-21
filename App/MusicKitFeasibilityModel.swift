@@ -29,6 +29,8 @@
         private(set) var currentTrack = "None"
         private(set) var outputRoute = "none"
         private(set) var requiresExplicitResume = false
+        private(set) var perceptibilityStatus = "Not run"
+        private(set) var awaitingPerceptibilityAnswer = false
 
         private let player = ApplicationMusicPlayer.shared
         private let tempoAnalyzer = LocalTempoAnalyzer()
@@ -37,6 +39,8 @@
         private var lastPlayerState = ""
         private var lastHeartbeat = Date.distantPast
         private var lastObservedRoute = "none"
+        private var perceptibilityComparisonCount = 0
+        private var secondComparisonRate: Float?
 
         var traceURL: URL? {
             FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first?
@@ -184,6 +188,64 @@
         func setRate(_ rate: Float) {
             player.state.playbackRate = rate
             record("rate_written", "requested \(rate); reported \(player.state.playbackRate)")
+        }
+
+        func runPerceptibilityComparison() {
+            run {
+                guard self.player.state.playbackStatus == .playing else {
+                    self.perceptibilityStatus = "Start playback first"
+                    self.record("perceptibility_blocked", "Playback was not active")
+                    return
+                }
+
+                self.awaitingPerceptibilityAnswer = false
+                self.perceptibilityStatus = "Listening to first sample"
+                let slowerFirst = self.perceptibilityComparisonCount.isMultiple(of: 2)
+                let firstRate: Float = slowerFirst ? 0.92 : 1.08
+                let secondRate: Float = slowerFirst ? 1.08 : 0.92
+                self.secondComparisonRate = secondRate
+                self.perceptibilityComparisonCount += 1
+
+                self.record("perceptibility_started", "comparison \(self.perceptibilityComparisonCount)")
+                self.player.state.playbackRate = firstRate
+                self.record(
+                    "perceptibility_sample_one",
+                    "requested \(firstRate); reported \(self.player.state.playbackRate)"
+                )
+                try await Task.sleep(for: .seconds(8))
+
+                self.perceptibilityStatus = "Brief neutral pause"
+                self.player.state.playbackRate = 1
+                try await Task.sleep(for: .seconds(2))
+
+                self.perceptibilityStatus = "Listening to second sample"
+                self.player.state.playbackRate = secondRate
+                self.record(
+                    "perceptibility_sample_two",
+                    "requested \(secondRate); reported \(self.player.state.playbackRate)"
+                )
+                try await Task.sleep(for: .seconds(8))
+
+                self.player.state.playbackRate = 1
+                self.perceptibilityStatus = "Which sample was faster?"
+                self.awaitingPerceptibilityAnswer = true
+                self.record(
+                    "perceptibility_awaiting_answer",
+                    "Playback returned to 1.00"
+                )
+            }
+        }
+
+        func recordPerceptibilityAnswer(secondWasFaster: Bool) {
+            guard awaitingPerceptibilityAnswer, let secondComparisonRate else { return }
+            let correct = secondWasFaster == (secondComparisonRate > 1)
+            perceptibilityStatus = correct ? "Direction identified" : "Direction missed"
+            awaitingPerceptibilityAnswer = false
+            self.secondComparisonRate = nil
+            record(
+                "perceptibility_answer",
+                "selected \(secondWasFaster ? "second" : "first"); \(correct ? "correct" : "incorrect")"
+            )
         }
 
         func pause() {

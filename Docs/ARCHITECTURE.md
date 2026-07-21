@@ -20,7 +20,7 @@ Reducer owns product state transitions. App shell owns time, UIKit, haptics, tas
 
 | Module | Responsibility |
 | --- | --- |
-| SamadhiDomain | Run models, source-neutral music and cadence values, adaptation policy, state, events, effects, reducer, summary |
+| SamadhiDomain | Run models, source-neutral music and cadence values, track-fit planning, adaptation policy, state, events, effects, reducer, summary |
 | SamadhiMotion | Cadence provider boundary, deterministic filtering and simulation, Core Motion adapter |
 | SamadhiAudio | Local tempo analysis, source-neutral playback contract, deterministic player, beat timing, and playback events |
 | SamadhiDesign | Screens, controls, fluid field, aperture, previews, tokens |
@@ -54,6 +54,8 @@ Stale events carry session, acquisition, timeout, or hold identifiers. Reducer i
 ## Collection navigation
 
 Reducer receives the selected tracks. Production composition passes only adaptive-ready imported tracks while deterministic fixtures retain their configured collection. Domain no longer assumes collection size.
+
+`TrackMatchPlanner` is the source-neutral coarse-matching seam. Given a requested musical BPM and a quality envelope, it ranks ready tracks across half-time, full-time, and double-time pulses by required stretch. It preserves source order for ties and retains the current song when switching would provide only a marginal improvement. Production connection remains a reducer and player-queue task, not a SwiftUI responsibility.
 
 ## Production seams
 

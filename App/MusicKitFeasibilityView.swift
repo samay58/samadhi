@@ -61,6 +61,39 @@
                         }
                     }
 
+                    Section("Felt change") {
+                        Text(
+                            "Start playback, place the phone face down, then run one comparison. Each sample lasts eight seconds."
+                        )
+                        Button("Run blinded 0.92 / 1.08 comparison") {
+                            model.runPerceptibilityComparison()
+                        }
+                        .disabled(model.tracks.isEmpty || model.isWorking)
+                        LabeledContent("Result", value: model.perceptibilityStatus)
+                        if model.awaitingPerceptibilityAnswer {
+                            HStack {
+                                Button("First was faster") {
+                                    model.recordPerceptibilityAnswer(secondWasFaster: false)
+                                }
+                                Button("Second was faster") {
+                                    model.recordPerceptibilityAnswer(secondWasFaster: true)
+                                }
+                            }
+                        }
+                        HStack {
+                            rateButton(0.92)
+                            rateButton(1)
+                            rateButton(1.08)
+                        }
+                        Text("Try 0.90 and 1.10 only if these endpoints remain clean.")
+                            .foregroundStyle(.secondary)
+                        HStack {
+                            rateButton(0.90)
+                            rateButton(1)
+                            rateButton(1.10)
+                        }
+                    }
+
                     Section("Evidence") {
                         Text(
                             "Listen at all three rates. Lock the screen for five minutes while music plays. Return and use Next. Trigger one interruption. Disconnect and reconnect the headphones while stationary, then use explicit Resume."

@@ -20,13 +20,14 @@ Milestone 2 turns the interaction prototype into a useful music product.
 
 The finish line is one real outdoor run, not a feature checklist. Samay should be able to import one Apple Music playlist, start running, hear music settle into his cadence, lock the phone, recover from normal interruptions, finish, and trust the summary. Stop expanding scope until that run works.
 
-The BPM-control implementation and Simulator design gate are complete. Continue in this order:
+The BPM-control implementation and Simulator design gate are complete. Research into Weav, running entrainment, public MusicKit, and djay Pro exposed a more important gate: tempo read-back is not the same as felt synchronization. Continue in this order:
 
-1. Use the installed BPM-control build to compare requested BPM, derived target rate, and MusicKit read-back at three reachable targets and one unreachable target on the physical iPhone.
-2. Continue the restored imported playlist through one natural track transition and verify adaptation recomputes without stale feedback.
-3. Verify honest lock and the saved summary across imported tracks.
-4. Complete five locked minutes, interruption, route loss, accessibility, and recovery checks.
-5. Pass cadence calibration, listening, and the outdoor-run gate.
+1. Run the MusicKit perceptibility gate from [ADAPTIVE-AUDIO-PLAYBOOK.md](ADAPTIVE-AUDIO-PLAYBOOK.md) at 0.92, 1.00, and 1.08 on five strong-beat tracks. Test 0.90 and 1.10 only if the first endpoints sound clean. Record MusicKit read-back and blinded faster-or-slower recognition.
+2. Keep Apple Music only if the largest clean pair feels obvious. If it does not, reopen the source decision and move to app-owned DRM-free audio. Do not polish an imperceptible middle path.
+3. Connect the source-neutral track-fit planner so Auto and Manual choose the ready track and native pulse requiring the least stretch. Preserve the current song when another candidate is only marginally better.
+4. Continue through one natural transition, then verify requested BPM, selected pulse, requested rate, MusicKit read-back, and summary agree without stale feedback.
+5. Investigate beat phase and end-to-end latency. Keep the product language at “Tempo matched” unless phase is actually measured.
+6. Complete five locked minutes, interruption, route loss, accessibility, cadence calibration, listening, and the outdoor-run gate.
 
 ## Current gate state
 
@@ -36,7 +37,7 @@ The BPM-control implementation and Simulator design gate are complete. Continue 
 - Tempo-analysis implementation: version 2 uses Accelerate spectral flux and fractional-lag autocorrelation; 12 of 12 tempo-declared Apple previews pass the narrow corpus gate
 - Spotify feasibility: rejected for adaptive playback; it cannot supply the required app-owned, analyzable, rate-controlled audio path
 - Source decision: Apple Music selected on 2026-07-16; remaining manual drills moved to the reliability gate
-- Source-neutral domain and adaptation rules: complete for the current slice
+- Source-neutral domain and adaptation rules: bounded rate behavior is complete; the tested track-fit planner now supplies coarse matching but is not connected to production selection
 - Cadence boundary, deterministic filter, and Core Motion adapter: connected in the focused core loop and normal imported run; a 29-second walk produced live cadence and a 142 SPM average, but calibration remains open
 - Production playback: validated catalog fixture `1558215042`, live cadence updates, bounded reducer effects, identified MusicKit read-back, and honest measurement are connected
 - Playlist import and persistence: implemented with strict resolution, local preview analysis, versioned cache keys, atomic replacement, honest per-track states, and ready-only production filtering
@@ -45,7 +46,8 @@ The BPM-control implementation and Simulator design gate are complete. Continue 
 - Physical body-to-music observation: passed; the corrected 59-second run averaged 155 SPM and measured 98 percent tempo matched from MusicKit read-back
 - Physical imported-collection gate: real playlist selection, local analysis, reinstall and relaunch restoration, and basic progress passed at 13 of 25 ready tracks; a natural transition remains open
 - Device evidence: debug builds persist one latest completed-run diagnostic file for direct container retrieval; the BPM-control build, installation, and launch pass on the physical iPhone
-- Rhythm control: implemented with Auto fine-tune, Manual target, reset, honest limit feedback, reducer-owned safety, diagnostics, restrained haptics, and accessibility; physical MusicKit and listening proof remains open
+- Rhythm control: implemented with Auto fine-tune, Manual target, reset, honest limit feedback, reducer-owned safety, diagnostics, restrained haptics, and accessibility; physical perceptibility remains open
+- Felt-synchronization research: complete enough to set direction; Weav used adaptive arrangements, djay separates BPM from beat sync, and published running work supports compatible-track selection plus phase-aware control
 - Device harness: exact-profile catalog search, strict identity resolution, temporary preview download, local PCM decoding, playback, rate controls, route observation, and trace export remain available on the physical iPhone 17 Pro
 
 The source decision and deferred reliability requirements live in [MUSIC-SOURCE-RESOLUTION-SPEC.md](MUSIC-SOURCE-RESOLUTION-SPEC.md). A later reliability failure must be fixed before Milestone 2 completion. It does not reopen Spotify or a second-provider project.
@@ -58,7 +60,7 @@ Included:
 - One selected production playback system
 - Core Motion cadence from one declared phone placement
 - Local tempo analysis
-- Pitch-stable playback-rate adaptation from 0.94 through 1.06
+- Compatible-track selection plus pitch-stable fine correction inside a physically proven quality envelope
 - One calm in-run BPM control for automatic matching, manual targeting, and small corrections
 - Background continuity with screen lock
 - Existing pause, resume, skip, route recovery, finish, and summary behavior
@@ -68,9 +70,9 @@ Excluded:
 
 - Playlist generation and recommendations
 - Spotify or a second production music provider
-- Beat-perfect footfall phase alignment
+- A beat-lock claim before phase and latency are measured
 - Run history, GPS, coaching, social features, backend, subscriptions, and broad hardware support
 
 ## Stop rule
 
-Do not redesign the app or build playlist generation before imported music and the physical body-to-music loop work. The BPM control is part of that loop, not a settings feature. If cadence, tempo accuracy, or audio quality fails, fix the core loop before adding surrounding product.
+Do not redesign the app or build playlist generation before imported music and the physical body-to-music loop work. The BPM control is part of that loop, not a settings feature. If public MusicKit cannot make a clean change that Samay can reliably feel, reopen the source decision. The complete mechanics and evidence thresholds live in [ADAPTIVE-AUDIO-PLAYBOOK.md](ADAPTIVE-AUDIO-PLAYBOOK.md).

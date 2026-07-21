@@ -60,6 +60,8 @@ Version 1 passed 11 of 12 tempo-declared Apple workout previews but confidently 
 
 Milestone 2 matches music tempo to stable cadence. It does not claim beat-perfect footfall phase. Rename the measured summary to tempo matched and defer a true in-step percentage until individual foot-strike timing exists.
 
+Tempo match is necessary but not sufficient for felt synchronization. The product must also prove that a deliberate change is audible and that a runner can settle onto a prominent beat. Beat lock is a separate future claim that requires measured phase and latency.
+
 ## Apple Music gate history
 
 The first physical harness used an Xcode-managed wildcard profile. It could authorize Music, load 40 playlists, play music, accept rate writes, pause, and resume, but catalog requests failed with `.developerTokenRequestFailed` before Apple returned a response.
@@ -115,3 +117,11 @@ Debug builds overwrite one local `latest-run-diagnostics.json` file when a run f
 Automatic cadence matching remains the default, but it is not the only control. The runner has one in-run BPM control to correct the feel and to prove that requested musical changes reach the real player. It supports a small Auto correction, a direct Manual target, and one-step reset to Auto. It remains bounded by the existing rate, ramp, confidence, and track-compatibility rules.
 
 This is not a settings system and it does not bypass the reducer. SwiftUI sends intent. The reducer derives safe target rates, identified player effects carry the change, and MusicKit read-back remains the applied truth. The existing aperture becomes the direct manipulation surface, while requested and applied BPM remain visibly distinct. Physical proof must still confirm that this interaction changes real Apple Music playback cleanly.
+
+## Compatible music before aggressive stretching
+
+Weav achieved broad adaptation through licensed multi-arrangement material, not one extreme rate control applied to ordinary masters. djay treats song compatibility, BPM correction, beat alignment, key lock, and transitions as separate responsibilities. Samadhi will use the same separation without importing a DJ interface.
+
+The production mechanic is coarse track fit followed by fine rate correction. `TrackMatchPlanner` ranks adaptive-ready tracks by the smallest pitch-stable correction across half-time, full-time, and double-time pulse interpretations. It keeps the current song when another candidate is only marginally better and preserves source order as the tie-breaker.
+
+The 0.94 through 1.06 envelope remains authoritative until a physical MusicKit comparison proves a wider clean range. If 0.92 versus 1.08 is not both clean and unmistakable, Apple Music returns to a source decision instead of becoming a permanent compromised path. The evidence and pivot order live in [ADAPTIVE-AUDIO-PLAYBOOK.md](ADAPTIVE-AUDIO-PLAYBOOK.md).

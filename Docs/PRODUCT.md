@@ -10,7 +10,7 @@ Runner opens app, presses Start, begins moving. Music finds their rhythm. Interf
 
 ## North star
 
-Samadhi is done for the first real product milestone when Samay can go for a normal outdoor run with one imported Apple Music playlist and feel the music settle into his stride without thinking about the app.
+Samadhi is done for the first real product milestone when Samay can go for a normal outdoor run with one imported Apple Music playlist, hear an unmistakable response when rhythm changes, and feel his stride settle onto the music without thinking about the app.
 
 Done means:
 
@@ -18,14 +18,16 @@ Done means:
 - Analyze enough tracks locally to build a usable queue
 - Start a run in one or two clear actions
 - Sense cadence from one declared phone placement
-- Adapt playback rate inside the proven safe range
+- Choose a track whose native pulse fits the requested rhythm
+- Apply fine playback-rate correction inside a physically proven quality envelope
 - Let the runner fine-tune the automatic match or choose a manual BPM without leaving the run
+- Make a deliberate rhythm change audible enough to verify without watching a number
 - Keep audio stable, pitch-stable, and continuous through lock, pause, resume, and route recovery
 - Show honest progress and tempo-matched summary
 - Make failure states calm, legible, and recoverable
 - Pass one 20-minute outdoor run with listening notes and saved evidence
 
-Done does not mean perfect recommendation, beat-perfect footfall sync, exhaustive music support, dashboard history, GPS fitness tracking, social features, or a polished App Store business. Those can wait. First milestone earns the right to exist by making one real run feel meaningfully better.
+Done does not mean perfect recommendation, a claim of beat lock without phase evidence, exhaustive music support, dashboard history, GPS fitness tracking, social features, or a polished App Store business. Those can wait. First milestone earns the right to exist by making one real run feel meaningfully better.
 
 If a proposed feature does not improve that run, reduce risk in that run, or make the app easier to trust during that run, defer it.
 
@@ -96,7 +98,7 @@ Design benchmark research lives in [DESIGN-BENCHMARKS.md](DESIGN-BENCHMARKS.md).
 
 Current build answers one question: can complete run interaction feel calm, legible, and coherent before real sensing and audio exist?
 
-Answer: yes in Simulator, and the focused body-to-music loop now passes on the physical iPhone. A corrected 59-second run averaged 155 SPM and measured 98 percent tempo matched from MusicKit read-back. One real 25-track playlist restores after reinstall and relaunch with 13 ready tracks, and basic production-player progress passes. Cadence-driven BPM control across imported tracks, a natural transition, broad music accuracy, and the complete outdoor loop remain unproven.
+Answer: the interaction is calm and the mechanical loop works, but the core feeling is not yet proven. A corrected 59-second run averaged 155 SPM and measured 98 percent tempo matched from MusicKit read-back. The runner did not hear enough change in an earlier narrow-rate check. One real 25-track playlist restores with 13 ready tracks. Samadhi must now prove an obvious clean tempo change, select tracks by fit instead of source order alone, and establish whether public MusicKit can support measured beat-phase work.
 
 ## Current exclusions
 

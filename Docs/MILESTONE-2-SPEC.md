@@ -162,15 +162,15 @@ Cadence rules:
 - A permission denial retains the existing fixed-rhythm recovery path.
 - A sensor error or sustained nil cadence returns the product to acquiring without inventing a number.
 
-### Adaptation policy
+### Felt synchronization and adaptation policy
 
-Adaptation is a pure domain policy. It receives stable cadence, base track tempo, analysis confidence, prior rate, and elapsed time. It returns a decision that the reducer turns into an audio effect.
+Adaptation is a source-neutral domain system with two layers. A track-fit planner chooses the ready track and native pulse requiring the least stretch. The adaptation policy then receives stable cadence, chosen pulse, analysis confidence, prior rate, and elapsed time and returns a fine-rate decision that the reducer turns into an audio effect.
 
 For a base tempo `B` and cadence `C`, consider `B / 2`, `B`, and `B * 2`. Keep candidates inside the running range, then choose the candidate that requires the smallest speed change. The target playback rate is `C / candidate`.
 
 Safety and stability rules:
 
-- Clamp target rate to 0.94 through 1.06 for Milestone 2.
+- Keep 0.94 through 1.06 as the current verified range. Expand only after the physical perceptibility and quality gate establishes a wider envelope.
 - A track is cadence-compatible only when its unclamped target falls inside that range.
 - Apply an initial lock ramp no faster than 2 percentage points of rate per second.
 - After lock, change rate no faster than 0.5 percentage points per second.
@@ -181,9 +181,11 @@ Safety and stability rules:
 - Never claim matched until the applied player rate is within 0.5 percent of target for at least 1 second.
 - Do not jump to a new track merely because cadence drifts. Finish the current track safely and choose a compatible next track.
 
-At run start, choose the first ready track compatible with the last reliable cadence. If no prior cadence exists, use 168 SPM only for initial track selection, never as measured cadence. Start that track at normal speed. Once real cadence locks, adapt it if compatible. If it is incompatible, keep normal playback and choose a compatible track at the next natural transition.
+At run start, choose the ready track whose half-time, full-time, or double-time pulse needs the least correction for the last reliable cadence. If no prior cadence exists, use 168 SPM only for initial track selection, never as measured cadence. Prefer the current or next source-order track when its fit is within the retention tolerance so small improvements do not interrupt the music. Once real cadence locks, adapt the chosen track inside the proven envelope. If it becomes incompatible for a sustained interval, keep playback stable and prepare a compatible track for the next natural transition.
 
 Skip chooses the next adaptive-ready track in original collection order. If no compatible track exists, playback may continue at 1.00, but the interface must say “Music steady” rather than “Tempo matched.”
+
+Before broad reliability work, pass the perceptibility gate in [ADAPTIVE-AUDIO-PLAYBOOK.md](ADAPTIVE-AUDIO-PLAYBOOK.md). A successful property write or tempo-matched percentage does not prove that the runner can feel the mechanic. Beat lock remains a separate claim requiring measured step-to-beat phase and route latency.
 
 ### Honest measurement
 
