@@ -293,6 +293,16 @@
 - Confirmed the live process and captured the normal `Choose music` setup screen directly from the device
 - Recorded that the restore cleared the prior local playlist selection without claiming click-wheel feel or run behavior
 
+## 2026-07-22. First normal field-run failure
+
+- Pulled the completed run and imported-collection records directly from the restored iPhone
+- Reproduced the core complaint from persisted evidence: 497 wheel adjustments and a 59-BPM requested span yielded only a 0.056 applied-rate span and finished at 1.00
+- Found that incompatible manual targets silently return playback toward 1.00 while the interface continues showing the requested BPM
+- Found that the 99 percent summary used 140 of 141 eligible automatic seconds while 99 manual seconds were unmeasured
+- Confirmed the selected 18-track playlist contained 11 ready tracks, 5 tempo-analysis failures, and 2 unavailable tracks
+- Located the hard five-row UI truncation, sequential import pipeline, collapsed failure reasons, deliberately weak detents, and directionless haptic event
+- Reordered the plan around deterministic replay, command truth, felt response, import comprehension and speed, and directional tactile proof
+
 ## Current checkpoint
 
-Milestones 0 and 1 are complete. Apple Music remains the selected Milestone 2 source. Live Core Motion cadence and automatic MusicKit rate response pass mechanically on the physical iPhone, and one Bluetooth track made 0.90 versus 1.10 clearly audible. The restored iPhone now has the latest exact-profile build, but its local playlist selection was cleared by the restore. The production run starts on the best ready fit, waits through a five-second mismatch before preparing another fit, and rejects stale preparation. The pulsing aperture is the rotary BPM click wheel with a 40-BPM Auto window, one-BPM detents, and no separate control furniture. Its resting rim teaches the interaction with three grip notches and one restrained movement instead of instructional copy. Next comes selecting one playlist again, one normal imported run through a natural prepared transition, and a brief tactile judgment, followed by broader listening, phase investigation, long-form background, recovery, and the outdoor run.
+Milestones 0 and 1 are complete. Milestone 2 is not useful yet. The first normal field run showed that the interface can request a broad BPM range while actual MusicKit playback remains near 1.00, and the summary can still look successful. Playlist analysis is slow and opaque, the ready screen hides every track after the first five, and the click wheel feels weak and directionless. The next slice starts with a replay test from the captured failure, then repairs command truth and proves an obvious physical audio change. Import comprehension, bounded concurrency, and directional haptics follow. No transition, reliability, or visual expansion work outranks that core mechanic.
