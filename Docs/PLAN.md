@@ -20,13 +20,14 @@ Milestone 2 turns the interaction prototype into a useful music product.
 
 The finish line is one real outdoor run, not a feature checklist. Samay should be able to import one Apple Music playlist, start running, hear music settle into his cadence, lock the phone, recover from normal interruptions, finish, and trust the summary. Stop expanding scope until that run works.
 
-The BPM-control interaction, production track-fit connection, and Simulator design gate are complete. Research into Weav, running entrainment, public MusicKit, and djay Pro exposed a more important gate: tempo read-back is not the same as felt synchronization. The detailed decision ladder lives in [FELT-SYNCHRONIZATION-EXECUTION-SPEC.md](FELT-SYNCHRONIZATION-EXECUTION-SPEC.md). Continue in this order:
+The BPM-control interaction and production track-fit connection compile and pass Simulator tests, but the first normal field run disproved the product mechanic. The detailed evidence lives in `Evidence/Device/2026-07-22-field-run-failure-analysis.md`. The app must not return to reliability or visual polish work until requested BPM, commanded rate, MusicKit read-back, audible change, and summary agree. Continue in this order:
 
-1. Prove one normal imported run starts on the planned compatible song and crosses one natural prepared transition without a gap, stale feedback, or a false summary.
-2. Verify the aperture click wheel's low-sharpness minor detents, five-BPM landmarks, and soft Auto landing feel warm rather than tiring on the physical phone. Confirm that the 40-BPM Auto window, requested BPM, selected pulse, requested rate, MusicKit read-back, and summary agree. Simulator already proves direction, protected center behavior, fixed running bounds, one revolution per 40 BPM, ownership changes, and one event per detent.
-3. Complete the broader MusicKit listening envelope while exercising real tracks. The one-track 0.90 versus 1.10 change was obvious, but full-song endpoint quality remains open and the production envelope stays conservative.
-4. Investigate beat phase and end-to-end latency. Keep the product language at “Tempo matched” unless phase is actually measured.
-5. Complete five locked minutes, interruption, route loss, accessibility, cadence calibration, listening, and the outdoor-run gate.
+1. Turn the captured field trace into a deterministic failing replay test. A 59-BPM requested span with 497 wheel adjustments produced only a 0.056 applied-rate span and finished at 1.00. No fix passes unless the real player follows each achievable command promptly or the app explicitly rejects it.
+2. Repair command truth. Never display an unachievable BPM as applied. Define one authoritative outcome for applied, track change required, and unreachable commands. Make the summary use verified read-back and mark unmeasured time honestly.
+3. Make a felt change on real Apple Music. Test the physically demonstrated 0.90 and 1.10 endpoints across several tracks, then either adopt the largest clean envelope or move incompatible targets to a compatible track. If public MusicKit still cannot make a prompt, obvious, clean change, follow the documented source pivot instead of preserving a non-product.
+4. Repair playlist import comprehension and speed. Remove the hard five-row truncation, expose all track outcomes through restrained progressive disclosure, preserve distinct failure reasons, measure each stage, and use bounded concurrency without weakening cancellation or ordering.
+5. Strengthen the wheel's tactile grammar. Preserve clockwise versus counterclockwise direction through the domain event, make ordinary detents stronger, keep five-BPM landmarks distinct, and prove direction recognition plus comfort on the phone.
+6. Only after these gates pass, prove a normal imported run, a natural compatible transition, five locked minutes, interruption, route loss, accessibility, cadence calibration, and the outdoor-run finish line.
 
 ## Current gate state
 
@@ -45,7 +46,7 @@ The BPM-control interaction, production track-fit connection, and Simulator desi
 - Physical body-to-music observation: passed; the corrected 59-second run averaged 155 SPM and measured 98 percent tempo matched from MusicKit read-back
 - Physical imported-collection gate: real playlist selection, local analysis, reinstall and relaunch restoration, and basic progress passed at 13 of 25 ready tracks; a natural transition remains open
 - Device evidence: debug builds persist one latest completed-run diagnostic file for direct container retrieval; the BPM-control build, installation, and launch pass on the physical iPhone
-- Rhythm control: the aperture is the one rotary click wheel with Auto fine-tune, Manual target, soft takeover, one-BPM detents, honest fit feedback, reducer-owned safety, diagnostics, restrained haptics, and accessibility; physical wheel feel remains open
+- Rhythm control: the aperture is the one rotary click wheel with Auto fine-tune, Manual target, soft takeover, one-BPM detents, diagnostics, and accessibility; the first field run showed that its displayed target can diverge sharply from MusicKit read-back, and its directionless haptics are too weak
 - Felt-synchronization research: complete enough to set direction; Weav used adaptive arrangements, djay separates BPM from beat sync, and published running work supports compatible-track selection plus phase-aware control
 - Device harness: exact-profile catalog search, strict identity resolution, temporary preview download, local PCM decoding, playback, rate controls, route observation, and trace export remain available on the physical iPhone 17 Pro
 - Perceptibility result: 0.90 versus 1.10 was clearly audible on `LITE SPOTS` through Beoplay Eleven; Apple Music stays authoritative while broader blinded and full-song quality evidence remains open

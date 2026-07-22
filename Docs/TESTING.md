@@ -148,6 +148,7 @@ The `Samadhi MusicKit Gate` scheme verifies that the harness and framework calls
 - One-track perceptibility result: 0.90 versus 1.10 was clearly audible on `LITE SPOTS` through Beoplay Eleven, with repeated requested and reported rate agreement
 - Full perceptibility protocol: open; four-of-five blinded recognition and full-song endpoint quality were not completed, so the production envelope remains 0.94 through 1.06
 - Production track-fit and rotary-control build: exact-profile signing, embedded application identifier, wireless installation, foreground launch, and normal setup rendering passed on the restored iPhone on 2026-07-22
+- First normal field run: failed command-truth and felt-response gates; 497 wheel adjustments and a 59-BPM requested span produced only a 0.056 MusicKit read-back span, while the summary reported 99 percent from automatic-only eligible samples
 
 ## Felt-synchronization gate
 
