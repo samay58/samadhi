@@ -8,14 +8,14 @@ Automatic signing selected the wildcard profile during the first build even thou
 
 ## Denver test build
 
-1. Open Samadhi and tap `Choose music`.
-2. The current physical selection is `Strut Frequency -- July 2026`. Its first analysis produced 13 ready tracks from 25.
+1. Open Samadhi and tap `Choose music`. The 2026-07-22 device restore cleared the prior local selection.
+2. Select one Apple Music playlist. The earlier `Strut Frequency -- July 2026` proof produced 13 ready tracks from 25 before the restore.
 3. Read the result honestly. Ready tracks can run; unreadable or unavailable tracks remain visible but do not enter playback.
 4. Confirm the restored collection still reports ready tracks, tap `Start`, and allow motion access if asked.
 5. Close and reopen Samadhi. Confirm the same playlist returns without another choice.
 6. During a short run, turn the aperture perimeter to adjust BPM. Check that playback starts on a suitable ready song, cadence changes, and one song crosses naturally into a prepared better fit.
 
-The build is suitable for product testing, not public distribution. The installed offline profile expires on 2026-07-23 UTC. Physical selection, analysis, reinstall and relaunch restoration, basic player progress, Bluetooth routing, and one-track perceptibility pass. The production track-fit and click-wheel slice has an exact-profile signed build, but the paired phone was unavailable when installation was attempted. Physical click-wheel feel and a natural prepared transition remain open.
+The build is suitable for product testing, not public distribution. The installed offline profile expires on 2026-07-23 UTC. Physical selection, analysis, reinstall and relaunch restoration, basic player progress, Bluetooth routing, and one-track perceptibility passed before the device restore. Commit `c8e195e` was installed and launched wirelessly on the restored iPhone on 2026-07-22. The normal setup screen rendered cleanly, but playlist reimport, physical click-wheel feel, and a natural prepared transition remain open.
 
 After a debug run finishes, pull `Library/Application Support/Samadhi/latest-run-diagnostics.json` directly from the app container. The file overwrites the prior run and contains progress, cadence, target and applied rates, track changes, recovery events, and the honest summary.
 

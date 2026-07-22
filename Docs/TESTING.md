@@ -147,7 +147,7 @@ The `Samadhi MusicKit Gate` scheme verifies that the harness and framework calls
 - Exact profile state on 2026-07-21: embedded `Samadhi Development` profile verified with application identifier `ZL5U59XBJ6.com.samaydhawan.Samadhi`; it expires on 2026-07-23 UTC
 - One-track perceptibility result: 0.90 versus 1.10 was clearly audible on `LITE SPOTS` through Beoplay Eleven, with repeated requested and reported rate agreement
 - Full perceptibility protocol: open; four-of-five blinded recognition and full-song endpoint quality were not completed, so the production envelope remains 0.94 through 1.06
-- Production track-fit and rotary-control build: exact-profile signing and embedded application identifier passed; installation was not attempted because the paired iPhone was unavailable over the network
+- Production track-fit and rotary-control build: exact-profile signing, embedded application identifier, wireless installation, foreground launch, and normal setup rendering passed on the restored iPhone on 2026-07-22
 
 ## Felt-synchronization gate
 
