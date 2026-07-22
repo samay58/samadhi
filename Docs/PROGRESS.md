@@ -285,6 +285,14 @@
 - Added the single word `Turn` inside the aperture after the purely visual cue proved too ambiguous
 - Saved the inspected resting frame as `Evidence/Simulator/2026-07-21-tempo-affordance.png`
 
+## 2026-07-22. Restored iPhone install
+
+- Repaired wireless pairing after the iPhone restore and confirmed Developer Mode remained enabled
+- Built commit `c8e195e` from a clean detached worktree with the exact `Samadhi Development` profile
+- Verified the embedded application identifier, installed the build over the local network, and launched Samadhi
+- Confirmed the live process and captured the normal `Choose music` setup screen directly from the device
+- Recorded that the restore cleared the prior local playlist selection without claiming click-wheel feel or run behavior
+
 ## Current checkpoint
 
-Milestones 0 and 1 are complete. Apple Music remains the selected Milestone 2 source. Live Core Motion cadence and automatic MusicKit rate response pass mechanically on the physical iPhone, and one Bluetooth track made 0.90 versus 1.10 clearly audible. The production run now starts on the best ready fit, waits through a five-second mismatch before preparing another fit, and rejects stale preparation. The pulsing aperture is the rotary BPM click wheel with a 40-BPM Auto window, one-BPM detents, and no separate control furniture. Its resting rim now teaches the interaction with three grip notches and one restrained movement instead of instructional copy. Next comes one normal imported-playlist run through a natural prepared transition and a brief tactile judgment, followed by broader listening, phase investigation, long-form background, recovery, and the outdoor run.
+Milestones 0 and 1 are complete. Apple Music remains the selected Milestone 2 source. Live Core Motion cadence and automatic MusicKit rate response pass mechanically on the physical iPhone, and one Bluetooth track made 0.90 versus 1.10 clearly audible. The restored iPhone now has the latest exact-profile build, but its local playlist selection was cleared by the restore. The production run starts on the best ready fit, waits through a five-second mismatch before preparing another fit, and rejects stale preparation. The pulsing aperture is the rotary BPM click wheel with a 40-BPM Auto window, one-BPM detents, and no separate control furniture. Its resting rim teaches the interaction with three grip notches and one restrained movement instead of instructional copy. Next comes selecting one playlist again, one normal imported run through a natural prepared transition, and a brief tactile judgment, followed by broader listening, phase investigation, long-form background, recovery, and the outdoor run.
