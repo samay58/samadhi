@@ -9,7 +9,7 @@
 
 Scripts/test.sh runs Swift package tests, app-model tests, and UI tests serially on iPhone 17 Pro Simulator.
 
-The 2026-07-21 full serial gate passed 83 package tests, 11 app-model tests, and 10 UI tests.
+The 2026-07-22 full serial gate passed 92 package tests, 14 app-model tests, and 10 UI tests.
 
 Formatter gate:
 
@@ -56,6 +56,14 @@ Domain tests cover:
 - Five-second mismatch hold, prepared-next identity, recovery clearing, and stale preparation rejection
 - Player-confirmed Previous and Skip truth instead of predicted song state
 - One haptic for each accepted Auto detent, a fuller event every five BPM, and one distinct warning beyond the 40-BPM window
+- Privacy-safe replay of the first field failure across broad Manual wheel input
+- Applied, changing-song, unreachable, and rejected command outcomes
+- Immediate compatible-track commitment for direct wheel intent
+- Target reapplication after a player-confirmed track change
+- Rapid detents coalescing toward the latest requested target before read-back
+- Mismatched read-back rejecting the command and preserving latency evidence
+- Tempo-matched coverage preventing unmeasured Manual time from producing a misleading percentage
+- Clockwise and counterclockwise haptic direction through the reducer event
 
 Design tests cover clockwise and counterclockwise one-BPM detents, partial-turn accumulation, direction reversal, angle wraparound, reset between gestures, and exactly 40 BPM per revolution.
 
@@ -87,16 +95,16 @@ UI tests cover:
 - Missing artwork
 - No selected collection
 - Honest analysis progress
-- Partial import with visible failures and an enabled ready-track start
+- Partial import with visible failures, an enabled ready-track start, and complete disclosure beyond the first three rows
 - Import failure and retry
 - In-run aperture click-wheel reveal, clockwise and counterclockwise angular adjustment, fixed Auto bounds, protected center, Manual ownership, and return to Auto
 - Normal no-argument Simulator launch through local demo music and cadence lock
 
-App-model tests cover ready mapping, start transition, atomic store round trips, corrupt persistence, restored selection, cancellation of stale replacement work, latest-run diagnostic persistence with BPM-control truth, a reducer-driven diagnostic timeline through finish, immediate Simulator demo readiness, and replacement with a second local playlist.
+App-model tests cover ready mapping, start transition, atomic store round trips, corrupt persistence, restored selection, cancellation of stale replacement work, complete typed import presentation, ordered three-track import batches, retry of the same playlist, retry after relaunch, schema-version-3 run diagnostics, a reducer-driven diagnostic timeline through finish, immediate Simulator demo readiness, and replacement with a second local playlist.
 
 ## Visual proof
 
-Final frames under Evidence/Simulator/ cover ready, imported empty and partial states, locked run, controls, summary, Home Screen icon, BPM Auto fine-tune, the Manual safety limit, accessibility-size BPM controls, the resting `Turn` affordance, the 40-detent rotary BPM click wheel, and normal local-demo readiness. The short rotary recording shows clockwise, counterclockwise, protected-center, Manual, and Auto behavior. The focused UI test confirms the control opens through its existing accessible button and the former instruction sentence is absent. Evidence/Previews/ covers other accessibility and state-specific visual checks.
+Final frames under Evidence/Simulator/ cover ready, imported empty and partial states, complete import disclosure, locked run, controls, summary, Home Screen icon, BPM Auto fine-tune, the Manual safety limit, accessibility-size BPM controls, the resting `Turn` affordance, the 40-detent rotary BPM click wheel, and normal local-demo readiness. The short rotary recording shows clockwise, counterclockwise, protected-center, Manual, and Auto behavior. The focused UI test confirms the control opens through its existing accessible button and the former instruction sentence is absent. Evidence/Previews/ covers other accessibility and state-specific visual checks.
 
 ## Truth boundary
 
@@ -141,14 +149,18 @@ The `Samadhi MusicKit Gate` scheme verifies that the harness and framework calls
 - Reinstall and relaunch restoration: passed with the selected collection checksum unchanged and the physical ready screen showing 13 of 25 ready
 - Production-player progress: passed from a pulled schema-version-2 trace advancing from 0 through 6 seconds on one stable catalog identity
 - Imported natural track transition: not yet physically run
-- BPM control: deterministic policy, rotary UI interaction, and Simulator design pass; one-track wider-rate MusicKit response is audible, while physical click-wheel feel remains open
+- BPM control: deterministic command truth, rapid-detent coalescing, compatible-track response, rotary UI interaction, and Simulator design pass; physical audible response and directional click-wheel feel remain open
 - Blinded perceptibility harness: 0.92 versus 1.08 sequence, direction answer, MusicKit read-back trace, and optional 0.90 and 1.10 controls compile in the debug gate scheme
 - Paired iPhone state on 2026-07-21: connected over the local network; the exact-profile MusicKit harness built, installed, launched, and showed Beoplay Eleven as its Bluetooth A2DP route
 - Exact profile state on 2026-07-21: embedded `Samadhi Development` profile verified with application identifier `ZL5U59XBJ6.com.samaydhawan.Samadhi`; it expires on 2026-07-23 UTC
 - One-track perceptibility result: 0.90 versus 1.10 was clearly audible on `LITE SPOTS` through Beoplay Eleven, with repeated requested and reported rate agreement
 - Full perceptibility protocol: open; four-of-five blinded recognition and full-song endpoint quality were not completed, so the production envelope remains 0.94 through 1.06
 - Production track-fit and rotary-control build: exact-profile signing, embedded application identifier, wireless installation, foreground launch, and normal setup rendering passed on the restored iPhone on 2026-07-22
-- First normal field run: failed command-truth and felt-response gates; 497 wheel adjustments and a 59-BPM requested span produced only a 0.056 MusicKit read-back span, while the summary reported 99 percent from automatic-only eligible samples
+- First normal field run: historical red evidence; 497 wheel adjustments and a 59-BPM requested span produced only a 0.056 MusicKit read-back span, while the summary reported 99 percent from automatic-only eligible samples
+- Field-run remediation: privacy-safe replay, truthful command states, prompt read-back, immediate compatible-track commitment, target reapplication, and honest coverage pass deterministically
+- Import remediation: full six-track disclosure fixture, typed failure sections, retry after relaunch, ordered three-track batching, and timing persistence pass in Simulator and model tests
+- Current remediation build: exact `Samadhi Development` profile, application identifier, signed physical build, and installation passed on 2026-07-22; foreground launch waited on the locked phone and was not claimed
+- Physical remediation check: open for audible direction, command latency, compatible track change, clockwise versus counterclockwise haptics, and real import wall time
 
 ## Felt-synchronization gate
 
@@ -156,7 +168,7 @@ Use five analyzed songs with prominent, stable beats. Compare 0.92, 1.00, and 1.
 
 The complete sequence, pivot rules, phase questions, and final evidence packet live in [FELT-SYNCHRONIZATION-EXECUTION-SPEC.md](FELT-SYNCHRONIZATION-EXECUTION-SPEC.md).
 
-Next, prove one compatible prepared transition in the normal imported run. Pull `latest-run-diagnostics.json` and confirm requested BPM, selected pulse, required rate, MusicKit read-back, progress, and summary agree. Renew the exact profile first if testing occurs after 2026-07-23 UTC. Before Milestone 2 completion, complete the broader listening note and prove five screen-locked minutes, controlled interruption, and route loss.
+Next, use the installed remediation build for one short normal imported run. Turn far enough to require a compatible track, then pull `latest-run-diagnostics.json` and `latest-import-diagnostics.json`. Confirm requested and achievable BPM, commanded rate, MusicKit read-back, latency, track change, import wall time, progress, and summary agree. Renew the exact profile first if testing occurs after 2026-07-23 UTC. Before Milestone 2 completion, complete the broader listening note and prove five screen-locked minutes, controlled interruption, and route loss.
 
 ## Known environment behavior
 

@@ -303,6 +303,22 @@
 - Located the hard five-row UI truncation, sequential import pipeline, collapsed failure reasons, deliberately weak detents, and directionless haptic event
 - Reordered the plan around deterministic replay, command truth, felt response, import comprehension and speed, and directional tactile proof
 
+## 2026-07-22. Field-run remediation
+
+- Added a privacy-safe deterministic replay of the broad Manual turn and misleading summary from the first field run
+- Made requested BPM, achievable BPM, commanded rate, MusicKit read-back, latency, and command status separate truths
+- Changed rapid detents to ramp from the latest pending command and kept applied state blocked on player read-back
+- Rejected unreachable detents at the last truthful target and committed an immediately compatible track for direct wheel intent
+- Reapplied the current Auto or Manual target after the player confirmed a track change
+- Required 80 percent verified measurement coverage before showing tempo matched and recorded Automatic versus Manual seconds
+- Preserved every imported track from the first progress frame, added typed failure reasons, and exposed complete results behind one native `All tracks` sheet
+- Added retry after relaunch, ordered three-track import batches, and private stage timing diagnostics
+- Strengthened ordinary detents and preserved clockwise versus counterclockwise direction through Core Haptics and system fallbacks
+- Saved and checked the complete import disclosure frame on iPhone 17 Pro Simulator
+- Passed formatter lint, 92 package tests, 14 app-model tests, and 10 UI tests
+- Built with the exact `Samadhi Development` profile, verified the embedded application identifier, and installed the remediation build on Samay's connected iPhone
+- Left audible response, haptic feel, and real import timing open because they require a short physical perception check
+
 ## Current checkpoint
 
-Milestones 0 and 1 are complete. Milestone 2 is not useful yet. The first normal field run showed that the interface can request a broad BPM range while actual MusicKit playback remains near 1.00, and the summary can still look successful. Playlist analysis is slow and opaque, the ready screen hides every track after the first five, and the click wheel feels weak and directionless. The next slice starts with a replay test from the captured failure, then repairs command truth and proves an obvious physical audio change. Import comprehension, bounded concurrency, and directional haptics follow. No transition, reliability, or visual expansion work outranks that core mechanic.
+Milestones 0 and 1 are complete. Milestone 2 is still open. The software defects from the first normal field run now have deterministic repairs, complete import disclosure, bounded analysis, and an installed physical build. The next checkpoint is deliberately small: use one real playlist, turn far enough to trigger a compatible song, judge the audible response and both haptic directions, then pull the run and import diagnostics. A failure returns directly to the recorded command chain. A pass unlocks background, transition, interruption, route-loss, accessibility, cadence-calibration, and final outdoor-run proof. No visual expansion or new feature outranks that checkpoint.

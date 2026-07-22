@@ -41,6 +41,14 @@ import Testing
     #expect(model.selectedCollection?.readyTrackCount == 4)
 }
 
+@Test func importBatchesPreserveOrderAndBoundConcurrency() {
+    let batches = musicImportBatches(count: 18, width: 3)
+
+    #expect(batches.flatMap { $0 } == Array(0..<18))
+    #expect(batches.allSatisfy { $0.count <= 3 })
+    #expect(musicImportBatches(count: 0, width: 3).isEmpty)
+}
+
 @Test func runDiagnosticsRoundTripPreservesPhysicalEvidence() async throws {
     let directory = FileManager.default.temporaryDirectory
         .appending(path: UUID().uuidString, directoryHint: .isDirectory)
@@ -48,7 +56,7 @@ import Testing
     let store = RunDiagnosticsStore(directoryURL: directory)
     let capturedAt = Date(timeIntervalSince1970: 1_721_000_000)
     let snapshot = RunDiagnosticSnapshot(
-        schemaVersion: 2,
+        schemaVersion: 3,
         capturedAt: capturedAt,
         collectionID: "playlist",
         collectionName: "Strut Frequency",
@@ -57,6 +65,9 @@ import Testing
             durationSeconds: 59,
             averageCadence: 155,
             tempoMatchedPercent: 98,
+            tempoMatchedCoveragePercent: 95,
+            automaticSeconds: 40,
+            manualSeconds: 19,
             songCount: 2
         ),
         timeline: [
@@ -72,6 +83,10 @@ import Testing
                 requestedBPM: 157,
                 derivedTargetRate: 1.035,
                 atLimit: false,
+                commandStatus: TempoCommandStatus.applied.rawValue,
+                achievableBPM: 157,
+                commandedRate: 1.03,
+                commandLatencySeconds: 0.08,
                 appliedRate: 1.03,
                 awaitingRateFeedback: false,
                 trackID: "101",
@@ -137,7 +152,8 @@ import Testing
                 operationID: 1,
                 requestID: 3,
                 trackID: collection.tracks[0].id,
-                rate: 0.98
+                rate: 0.98,
+                latencySeconds: 0
             )
         ) == nil
     )
@@ -172,6 +188,9 @@ import Testing
 
     #expect(snapshot.summary.averageCadence == 162)
     #expect(snapshot.summary.tempoMatchedPercent == 100)
+    #expect(snapshot.summary.tempoMatchedCoveragePercent == 100)
+    #expect(snapshot.summary.automaticSeconds == 1)
+    #expect(snapshot.summary.manualSeconds == 0)
     #expect(snapshot.summary.songCount == 2)
     #expect(
         snapshot.timeline.map(\.kind) == [
@@ -187,7 +206,7 @@ import Testing
     )
     #expect(snapshot.timeline[2].appliedRate == 0.98)
     #expect(snapshot.timeline[3].trackElapsedSeconds == 12)
-    #expect(snapshot.schemaVersion == 2)
+    #expect(snapshot.schemaVersion == 3)
     #expect(snapshot.timeline[1].controlMode == RhythmControlMode.automatic.rawValue)
     #expect(snapshot.timeline[1].automaticCorrectionBPM == 0)
     #expect(snapshot.timeline[1].requestedBPM == 162)
@@ -254,9 +273,10 @@ import Testing
     let store = MusicCollectionStore(directoryURL: directory)
     let collection = importedCollection(id: "saved", name: "Saved", readyCount: 2)
     try await store.replaceSelection(collection)
+    let importer = FixtureMusicImporter(collections: [collection.id.rawValue: collection])
     let model = MusicSelectionModel(
         store: store,
-        importer: FixtureMusicImporter(collections: [:]),
+        importer: importer,
         configuration: .productionFixture
     )
 
@@ -268,6 +288,9 @@ import Testing
         return
     }
     #expect(presentation.readyTrackCount == 2)
+
+    model.retryLastImport()
+    await waitUntil { importer.importedIDs == [collection.id.rawValue] }
 }
 
 @Test @MainActor func lowConfidenceAnalysisIsNotPresentedAsReady() async throws {
@@ -309,7 +332,85 @@ import Testing
         return
     }
     #expect(presentation.readyTrackCount == 0)
-    #expect(presentation.tracks.first?.status == .couldNotReadTempo)
+    #expect(presentation.tracks.first?.status == .rhythmUnclear)
+}
+
+@Test @MainActor func importPresentationKeepsEveryTrackAndItsFailureReason() async throws {
+    let directory = FileManager.default.temporaryDirectory
+        .appending(path: UUID().uuidString, directoryHint: .isDirectory)
+    defer { try? FileManager.default.removeItem(at: directory) }
+    let analysis = TempoAnalysis(
+        baseBPM: 168,
+        confidence: 0.9,
+        analyzedDurationSeconds: 30,
+        version: 2
+    )
+    let failures: [TrackAnalysisFailure] = [
+        .rhythmUnclear,
+        .previewUnavailable,
+        .catalogMatchUnavailable,
+        .temporaryCatalogFailure,
+        .temporaryDownloadFailure,
+        .decodeFailure,
+    ]
+    let tracks = (0..<18).map { index in
+        MusicTrack(
+            id: MusicTrackID("track-\(index)"),
+            title: "Track \(index)",
+            durationSeconds: 180,
+            sourceFingerprint: "track-\(index)-v1",
+            analysisState: index < 12
+                ? .ready(analysis)
+                : .failed(failures[index - 12])
+        )
+    }
+    let collection = MusicCollection(
+        id: MusicCollectionID("complete"),
+        name: "Complete",
+        tracks: tracks
+    )
+    let importer = FixtureMusicImporter(collections: ["complete": collection])
+    let model = MusicSelectionModel(
+        store: MusicCollectionStore(directoryURL: directory),
+        importer: importer,
+        configuration: .productionFixture
+    )
+
+    model.selectPlaylist(LibraryPlaylistChoice(id: "complete", name: "Complete"))
+    await waitUntil { model.selectedCollection?.id == collection.id }
+
+    guard case let .ready(presentation) = model.presentation else {
+        Issue.record("Expected complete import presentation")
+        return
+    }
+    #expect(presentation.tracks.count == 18)
+    #expect(presentation.readyTrackCount == 12)
+    #expect(presentation.tracks[12].status == .rhythmUnclear)
+    #expect(presentation.tracks[13].status == .previewUnavailable)
+    #expect(presentation.tracks[14].status == .catalogMatchUnavailable)
+    #expect(presentation.tracks[15].status == .temporaryFailure)
+    #expect(presentation.tracks[16].status == .temporaryFailure)
+    #expect(presentation.tracks[17].status == .temporaryFailure)
+}
+
+@Test @MainActor func transientImportCanRetryTheSamePlaylist() async throws {
+    let directory = FileManager.default.temporaryDirectory
+        .appending(path: UUID().uuidString, directoryHint: .isDirectory)
+    defer { try? FileManager.default.removeItem(at: directory) }
+    let collection = importedCollection(id: "retry", name: "Retry", readyCount: 2)
+    let importer = FixtureMusicImporter(collections: ["retry": collection])
+    let model = MusicSelectionModel(
+        store: MusicCollectionStore(directoryURL: directory),
+        importer: importer,
+        configuration: .productionFixture
+    )
+
+    model.selectPlaylist(LibraryPlaylistChoice(id: "retry", name: "Retry"))
+    await waitUntil { importer.importedIDs.count == 1 }
+    model.retryLastImport()
+    await waitUntil { importer.importedIDs.count == 2 }
+
+    #expect(importer.importedIDs == ["retry", "retry"])
 }
 
 @Test @MainActor func replacementCancelsOlderImportAndPersistsNewestCollection() async throws {
@@ -342,6 +443,7 @@ import Testing
 private final class FixtureMusicImporter: MusicLibraryImporting {
     let collections: [String: MusicCollection]
     let delayedID: String?
+    private(set) var importedIDs: [String] = []
 
     init(collections: [String: MusicCollection], delayedID: String? = nil) {
         self.collections = collections
@@ -356,6 +458,7 @@ private final class FixtureMusicImporter: MusicLibraryImporting {
         id: String,
         progress: @escaping @MainActor (MusicImportProgress) -> Void
     ) async throws -> MusicCollection {
+        importedIDs.append(id)
         if id == delayedID {
             try await Task.sleep(for: .seconds(1))
         }

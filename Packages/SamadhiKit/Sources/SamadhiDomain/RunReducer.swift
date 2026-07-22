@@ -453,10 +453,15 @@ public struct RunReducer: Sendable {
                 active.session.pendingNextTrackID == trackID
             else { return (state, []) }
             var next = active
+            let shouldCommit = active.session.immediateTrackSelectionID == selectionID
             next.session.pendingTrackSelectionID = nil
             next.session.pendingNextTrackID = nil
             next.session.preparedNextTrackID = trackID
-            return (.active(next), [])
+            next.session.immediateTrackSelectionID = nil
+            return (
+                .active(next),
+                shouldCommit ? [.skipTrack(sessionID: sessionID)] : []
+            )
 
         case let (
             .active(active),
@@ -470,6 +475,8 @@ public struct RunReducer: Sendable {
             var next = active
             next.session.pendingTrackSelectionID = nil
             next.session.pendingNextTrackID = nil
+            next.session.immediateTrackSelectionID = nil
+            next.session.adaptationState.commandStatus = .unreachable
             return (.active(next), [])
 
         case let (
@@ -479,7 +486,8 @@ public struct RunReducer: Sendable {
                 operationID,
                 requestID,
                 trackID,
-                rate
+                rate,
+                latencySeconds
             )
         ):
             guard active.session.id == sessionID,
@@ -489,7 +497,20 @@ public struct RunReducer: Sendable {
             else { return (state, []) }
             var next = active
             next.session.appliedPlaybackRate = min(max(rate, 0.94), 1.06)
+            next.session.adaptationState.appliedRateReadback = rate
+            next.session.adaptationState.commandLatencySeconds = max(latencySeconds, 0)
+            if let commandedRate = next.session.pendingCommandedRate,
+                abs(commandedRate - rate) <= 0.005
+            {
+                next.session.adaptationState.commandStatus = .applied
+                next.session.adaptationState.achievableBPM =
+                    next.session.adaptationState.requestedBPM
+            } else {
+                next.session.adaptationState.commandStatus = .rejected
+                next.session.adaptationState.achievableBPM = nil
+            }
             next.session.pendingRateRequestID = nil
+            next.session.pendingCommandedRate = nil
             return (.active(next), [])
 
         case let (
@@ -516,11 +537,13 @@ public struct RunReducer: Sendable {
             next.session.trackElapsedSeconds = 0
             next.session.trackDurationSeconds = nil
             next.session.pendingRateRequestID = nil
+            next.session.pendingCommandedRate = nil
             next.session.incompatibleTrackSeconds = 0
             next.session.pendingTrackSelectionID = nil
             next.session.pendingNextTrackID = nil
             next.session.preparedNextTrackID = nil
-            return adaptManualControlAfterTrackChange(
+            next.session.immediateTrackSelectionID = nil
+            return adaptControlAfterTrackChange(
                 active: next,
                 rateRequestID: rateRequestID
             )

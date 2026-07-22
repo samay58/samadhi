@@ -14,6 +14,50 @@ struct MusicImportProgress: Sendable, Equatable {
     let tracks: [MusicTrack]
 }
 
+struct MusicImportTimingSnapshot: Codable, Equatable, Sendable {
+    struct TrackTiming: Codable, Equatable, Sendable {
+        let index: Int
+        let catalogSeconds: Double
+        let downloadSeconds: Double
+        let analysisSeconds: Double
+        let totalSeconds: Double
+        let outcome: String
+    }
+
+    let schemaVersion: Int
+    let capturedAt: Date
+    let concurrencyLimit: Int
+    let totalWallSeconds: Double
+    let tracks: [TrackTiming]
+}
+
+actor MusicImportDiagnosticsStore {
+    private let directoryURL: URL
+    private let fileURL: URL
+
+    init(directoryURL: URL? = nil) {
+        let directory =
+            directoryURL
+            ?? FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)
+            .first?
+            .appending(path: "Samadhi", directoryHint: .isDirectory)
+            ?? FileManager.default.temporaryDirectory.appending(
+                path: "Samadhi",
+                directoryHint: .isDirectory
+            )
+        self.directoryURL = directory
+        fileURL = directory.appending(path: "latest-import-diagnostics.json")
+    }
+
+    func save(_ snapshot: MusicImportTimingSnapshot) throws {
+        try FileManager.default.createDirectory(at: directoryURL, withIntermediateDirectories: true)
+        let encoder = JSONEncoder()
+        encoder.dateEncodingStrategy = .iso8601
+        encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
+        try encoder.encode(snapshot).write(to: fileURL, options: .atomic)
+    }
+}
+
 @MainActor
 protocol MusicLibraryImporting: AnyObject {
     func loadPlaylists() async throws -> [LibraryPlaylistChoice]
@@ -27,15 +71,18 @@ protocol MusicLibraryImporting: AnyObject {
 final class AppleMusicImportService: MusicLibraryImporting {
     private let store: MusicCollectionStore
     private let analyzer: any TempoAnalyzing
+    private let diagnosticsStore: MusicImportDiagnosticsStore
     private let catalogResolver = AppleMusicCatalogResolver()
     private var playlistsByID: [String: Playlist] = [:]
 
     init(
         store: MusicCollectionStore,
-        analyzer: any TempoAnalyzing = LocalTempoAnalyzer()
+        analyzer: any TempoAnalyzing = LocalTempoAnalyzer(),
+        diagnosticsStore: MusicImportDiagnosticsStore = MusicImportDiagnosticsStore()
     ) {
         self.store = store
         self.analyzer = analyzer
+        self.diagnosticsStore = diagnosticsStore
     }
 
     func loadPlaylists() async throws -> [LibraryPlaylistChoice] {
@@ -60,6 +107,9 @@ final class AppleMusicImportService: MusicLibraryImporting {
         id: String,
         progress: @escaping @MainActor (MusicImportProgress) -> Void
     ) async throws -> MusicCollection {
+        if playlistsByID[id] == nil {
+            _ = try await loadPlaylists()
+        }
         guard let playlist = playlistsByID[id] else {
             throw AppleMusicImportError.playlistUnavailable
         }
@@ -69,28 +119,52 @@ final class AppleMusicImportService: MusicLibraryImporting {
             throw AppleMusicImportError.emptyPlaylist
         }
 
-        var importedTracks: [MusicTrack] = []
-        importedTracks.reserveCapacity(sourceTracks.count)
+        let startedAt = ProcessInfo.processInfo.systemUptime
+        var importedTracks = sourceTracks.map(pendingTrack)
+        var timings: [MusicImportTimingSnapshot.TrackTiming] = []
+        var completedCount = 0
         progress(
             MusicImportProgress(
                 completedCount: 0,
                 totalCount: sourceTracks.count,
-                tracks: []
+                tracks: importedTracks
             )
         )
 
-        for sourceTrack in sourceTracks {
+        let concurrencyLimit = 3
+        for batch in musicImportBatches(count: sourceTracks.count, width: concurrencyLimit) {
             try Task.checkCancellation()
-            let imported = try await importTrack(sourceTrack)
-            importedTracks.append(imported)
-            progress(
-                MusicImportProgress(
-                    completedCount: importedTracks.count,
-                    totalCount: sourceTracks.count,
-                    tracks: importedTracks
+            async let first = importTrackIfPresent(sourceTracks, index: batch[safe: 0])
+            async let second = importTrackIfPresent(sourceTracks, index: batch[safe: 1])
+            async let third = importTrackIfPresent(sourceTracks, index: batch[safe: 2])
+
+            let batchResults = try await [first, second, third].compactMap { $0 }
+            for result in batchResults {
+                try Task.checkCancellation()
+                importedTracks[result.index] = result.track
+                timings.append(result.timing)
+                completedCount += 1
+                progress(
+                    MusicImportProgress(
+                        completedCount: completedCount,
+                        totalCount: sourceTracks.count,
+                        tracks: importedTracks
+                    )
+                )
+            }
+        }
+
+        #if DEBUG
+            try? await diagnosticsStore.save(
+                MusicImportTimingSnapshot(
+                    schemaVersion: 1,
+                    capturedAt: Date(),
+                    concurrencyLimit: concurrencyLimit,
+                    totalWallSeconds: max(ProcessInfo.processInfo.systemUptime - startedAt, 0),
+                    tracks: timings.sorted { $0.index < $1.index }
                 )
             )
-        }
+        #endif
 
         return MusicCollection(
             id: MusicCollectionID(hydrated.id.rawValue),
@@ -99,18 +173,50 @@ final class AppleMusicImportService: MusicLibraryImporting {
         )
     }
 
-    private func importTrack(_ track: Track) async throws -> MusicTrack {
+    private struct ImportedTrackResult: Sendable {
+        let index: Int
+        let track: MusicTrack
+        let timing: MusicImportTimingSnapshot.TrackTiming
+    }
+
+    private func importTrackIfPresent(
+        _ tracks: [Track],
+        index: Int?
+    ) async throws -> ImportedTrackResult? {
+        guard let index, tracks.indices.contains(index) else { return nil }
+        return try await importTrack(tracks[index], index: index)
+    }
+
+    private func importTrack(_ track: Track, index: Int) async throws -> ImportedTrackResult {
+        let totalStartedAt = ProcessInfo.processInfo.systemUptime
         let fingerprint = sourceFingerprint(for: track)
-        guard let song = try await catalogResolver.resolve(track) else {
-            return MusicTrack(
-                id: MusicTrackID(track.id.rawValue),
-                title: track.title,
-                artist: track.artistName,
-                durationSeconds: track.duration ?? 0,
-                sourceFingerprint: fingerprint,
-                analysisState: .failed(.unavailable)
+        let catalogStartedAt = ProcessInfo.processInfo.systemUptime
+        let resolvedSong: Song?
+        do {
+            resolvedSong = try await catalogResolver.resolve(track)
+        } catch is CancellationError {
+            throw CancellationError()
+        } catch {
+            return result(
+                index: index,
+                source: track,
+                fingerprint: fingerprint,
+                failure: .temporaryCatalogFailure,
+                catalogSeconds: elapsed(since: catalogStartedAt),
+                startedAt: totalStartedAt
             )
         }
+        guard let song = resolvedSong else {
+            return result(
+                index: index,
+                source: track,
+                fingerprint: fingerprint,
+                failure: .catalogMatchUnavailable,
+                catalogSeconds: elapsed(since: catalogStartedAt),
+                startedAt: totalStartedAt
+            )
+        }
+        let catalogSeconds = elapsed(since: catalogStartedAt)
 
         let trackID = MusicTrackID(song.id.rawValue)
         let key = TempoAnalysisCacheKey(
@@ -119,65 +225,179 @@ final class AppleMusicImportService: MusicLibraryImporting {
             analyzerVersion: LocalTempoAnalyzer.analysisVersion
         )
         if let cached = try await store.cachedAnalysis(for: key) {
-            return MusicTrack(
-                id: trackID,
-                title: track.title,
-                artist: track.artistName,
-                durationSeconds: song.duration ?? track.duration ?? 0,
-                sourceFingerprint: fingerprint,
-                analysisState: cached.isAdaptiveReady
-                    ? .ready(cached)
-                    : .failed(.couldNotReadTempo)
-            )
-        }
-
-        guard let remoteURL = song.previewAssets?.compactMap({ $0.url ?? $0.hlsURL }).first else {
-            return MusicTrack(
-                id: trackID,
-                title: track.title,
-                artist: track.artistName,
-                durationSeconds: song.duration ?? track.duration ?? 0,
-                sourceFingerprint: fingerprint,
-                analysisState: .failed(.unavailable)
-            )
-        }
-
-        do {
-            let localURL = try await downloadPreview(remoteURL)
-            defer { try? FileManager.default.removeItem(at: localURL) }
-            guard let analysis = try await analyzer.analyze(fileURL: localURL),
-                analysis.isAdaptiveReady
-            else {
-                return MusicTrack(
+            return result(
+                index: index,
+                track: MusicTrack(
                     id: trackID,
                     title: track.title,
                     artist: track.artistName,
                     durationSeconds: song.duration ?? track.duration ?? 0,
                     sourceFingerprint: fingerprint,
-                    analysisState: .failed(.couldNotReadTempo)
-                )
-            }
-            try await store.cache(analysis, for: key)
-            return MusicTrack(
+                    analysisState: cached.isAdaptiveReady
+                        ? .ready(cached)
+                        : .failed(.rhythmUnclear)
+                ),
+                catalogSeconds: catalogSeconds,
+                startedAt: totalStartedAt,
+                outcome: cached.isAdaptiveReady ? "ready_cached" : "rhythm_unclear_cached"
+            )
+        }
+
+        guard let remoteURL = song.previewAssets?.compactMap({ $0.url ?? $0.hlsURL }).first else {
+            return result(
+                index: index,
+                source: track,
+                id: trackID,
+                duration: song.duration ?? track.duration ?? 0,
+                fingerprint: fingerprint,
+                failure: .previewUnavailable,
+                catalogSeconds: catalogSeconds,
+                startedAt: totalStartedAt
+            )
+        }
+
+        let downloadStartedAt = ProcessInfo.processInfo.systemUptime
+        let localURL: URL
+        do {
+            localURL = try await downloadPreview(remoteURL)
+        } catch is CancellationError {
+            throw CancellationError()
+        } catch {
+            return result(
+                index: index,
+                source: track,
+                id: trackID,
+                duration: song.duration ?? track.duration ?? 0,
+                fingerprint: fingerprint,
+                failure: .temporaryDownloadFailure,
+                catalogSeconds: catalogSeconds,
+                downloadSeconds: elapsed(since: downloadStartedAt),
+                startedAt: totalStartedAt
+            )
+        }
+        let downloadSeconds = elapsed(since: downloadStartedAt)
+        defer { try? FileManager.default.removeItem(at: localURL) }
+
+        let analysisStartedAt = ProcessInfo.processInfo.systemUptime
+        let analysis: TempoAnalysis?
+        do {
+            analysis = try await analyzer.analyze(fileURL: localURL)
+        } catch is CancellationError {
+            throw CancellationError()
+        } catch {
+            return result(
+                index: index,
+                source: track,
+                id: trackID,
+                duration: song.duration ?? track.duration ?? 0,
+                fingerprint: fingerprint,
+                failure: .decodeFailure,
+                catalogSeconds: catalogSeconds,
+                downloadSeconds: downloadSeconds,
+                analysisSeconds: elapsed(since: analysisStartedAt),
+                startedAt: totalStartedAt
+            )
+        }
+        let analysisSeconds = elapsed(since: analysisStartedAt)
+        guard let analysis, analysis.isAdaptiveReady else {
+            return result(
+                index: index,
+                source: track,
+                id: trackID,
+                duration: song.duration ?? track.duration ?? 0,
+                fingerprint: fingerprint,
+                failure: .rhythmUnclear,
+                catalogSeconds: catalogSeconds,
+                downloadSeconds: downloadSeconds,
+                analysisSeconds: analysisSeconds,
+                startedAt: totalStartedAt
+            )
+        }
+        try? await store.cache(analysis, for: key)
+        return result(
+            index: index,
+            track: MusicTrack(
                 id: trackID,
                 title: track.title,
                 artist: track.artistName,
                 durationSeconds: song.duration ?? track.duration ?? 0,
                 sourceFingerprint: fingerprint,
                 analysisState: .ready(analysis)
-            )
-        } catch is CancellationError {
-            throw CancellationError()
-        } catch {
-            return MusicTrack(
-                id: trackID,
-                title: track.title,
-                artist: track.artistName,
-                durationSeconds: song.duration ?? track.duration ?? 0,
+            ),
+            catalogSeconds: catalogSeconds,
+            downloadSeconds: downloadSeconds,
+            analysisSeconds: analysisSeconds,
+            startedAt: totalStartedAt,
+            outcome: "ready"
+        )
+    }
+
+    private func pendingTrack(_ track: Track) -> MusicTrack {
+        MusicTrack(
+            id: MusicTrackID(track.id.rawValue),
+            title: track.title,
+            artist: track.artistName,
+            durationSeconds: track.duration ?? 0,
+            sourceFingerprint: sourceFingerprint(for: track),
+            analysisState: .pending
+        )
+    }
+
+    private func result(
+        index: Int,
+        source: Track,
+        id: MusicTrackID? = nil,
+        duration: Double? = nil,
+        fingerprint: String,
+        failure: TrackAnalysisFailure,
+        catalogSeconds: Double,
+        downloadSeconds: Double = 0,
+        analysisSeconds: Double = 0,
+        startedAt: TimeInterval
+    ) -> ImportedTrackResult {
+        result(
+            index: index,
+            track: MusicTrack(
+                id: id ?? MusicTrackID(source.id.rawValue),
+                title: source.title,
+                artist: source.artistName,
+                durationSeconds: duration ?? source.duration ?? 0,
                 sourceFingerprint: fingerprint,
-                analysisState: .failed(.couldNotReadTempo)
+                analysisState: .failed(failure)
+            ),
+            catalogSeconds: catalogSeconds,
+            downloadSeconds: downloadSeconds,
+            analysisSeconds: analysisSeconds,
+            startedAt: startedAt,
+            outcome: failure.rawValue
+        )
+    }
+
+    private func result(
+        index: Int,
+        track: MusicTrack,
+        catalogSeconds: Double,
+        downloadSeconds: Double = 0,
+        analysisSeconds: Double = 0,
+        startedAt: TimeInterval,
+        outcome: String
+    ) -> ImportedTrackResult {
+        ImportedTrackResult(
+            index: index,
+            track: track,
+            timing: MusicImportTimingSnapshot.TrackTiming(
+                index: index,
+                catalogSeconds: catalogSeconds,
+                downloadSeconds: downloadSeconds,
+                analysisSeconds: analysisSeconds,
+                totalSeconds: elapsed(since: startedAt),
+                outcome: outcome
             )
-        }
+        )
+    }
+
+    private func elapsed(since start: TimeInterval) -> Double {
+        max(ProcessInfo.processInfo.systemUptime - start, 0)
     }
 
     private func downloadPreview(_ remoteURL: URL) async throws -> URL {
@@ -218,4 +438,17 @@ enum AppleMusicImportError: Error, Sendable, Equatable {
     case authorizationDenied
     case playlistUnavailable
     case emptyPlaylist
+}
+
+func musicImportBatches(count: Int, width: Int) -> [[Int]] {
+    guard count > 0, width > 0 else { return [] }
+    return stride(from: 0, to: count, by: width).map { start in
+        Array(start..<min(start + width, count))
+    }
+}
+
+private extension Collection {
+    subscript(safe index: Index) -> Element? {
+        indices.contains(index) ? self[index] : nil
+    }
 }

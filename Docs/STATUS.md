@@ -10,16 +10,16 @@
 | State architecture | Complete for prototype | Pure reducer tests |
 | Cadence | Core Motion connected; brief physical observation passed | Deterministic filter tests and 29-second iPhone walk |
 | Audio timing | Real for imported ready tracks; deterministic in fixtures | Production player contract and beat-clock tests |
-| Playlist import | Real selection, 13 ready tracks, restoration, and basic progress passed | Physical ready screen, pulled app-container records, import model tests, and Simulator states |
+| Playlist import | Complete results, typed failures, retry, and bounded analysis implemented | Full-list Simulator proof, import timing diagnostics, model tests, and prior physical collection evidence |
 | Tempo analysis | Version 2 passes a narrow 12-preview real-music corpus | Generated regression tests and opt-in Apple preview validation |
-| Adaptation policy | Physical automatic rate-response check passed | Identified reducer effects, deterministic feedback tests, and 59-second device result |
+| Adaptation policy | Field failure replayed and command truth repaired | Identified effects, prompt MusicKit read-back, compatible-track switching, and deterministic replay tests |
 | Track fit | Connected to run start and next-song planning | Deterministic pulse-family, envelope, hold, identity, order, and retention tests |
-| In-run BPM control | 40-BPM aperture click wheel implemented and Simulator-verified | One revolution, visible detents, Auto and Manual ownership, honest fit feedback, accessibility, and UI tests |
+| In-run BPM control | 40-BPM click wheel reports applied, changing-song, limit, and rejected states honestly | Rapid-detent, compatible-track, unreachable-command, read-back, accessibility, and UI tests |
 | Simulator development loop | Local placeholder playlists and silent simulated playback available in Debug | Normal no-argument launch, model tests, UI flow, screenshot, and interaction recording |
 | Apple Music feasibility | Source selected; 0.90 versus 1.10 was clearly audible on one Bluetooth track; broader quality and long-form reliability remain | Exact-profile traces and explicit product decision |
 | Spotify feasibility | Rejected for adaptive playback | Remote-control architecture, missing music rate control, and content policy conflict |
 | Production player | Apple Music selected; imported ready tracks enter the real player | Source-neutral contract, exact-profile build, and device install |
-| Physical run validation | Source feasibility complete; outdoor run not started | Requires tempo, cadence, adaptation, and route evidence |
+| Physical run validation | First field run failed; remediation build installed for a short focused retest | Audible response, directional haptic feel, import timing, reliability, and final outdoor run remain open |
 
 ## Completed
 
@@ -132,18 +132,29 @@
 - Expanded Auto to a 40-BPM window around measured cadence, capped all requested targets at 120 through 210, and mapped one complete revolution to that 40-BPM span
 - Added 40 restrained visual detents plus low-sharpness Core Haptics feedback, with a fuller notch every five BPM and a soft Auto landing
 - Replaced the tuning sentence with one integrated `Turn` label, three resting grip notches, and one Reduce-Motion-aware teaching movement that retires after first use
+- Replayed the first field failure without committing personal library metadata
+- Made every BPM command resolve to applying, applied, changing song, unreachable, or rejected
+- Made rapid wheel turns coalesce toward the latest requested target while keeping MusicKit read-back authoritative
+- Made compatible large BPM changes commit a better-fitting track immediately and reapply the target after player confirmation
+- Required at least 80 percent verified measurement coverage before showing a tempo-matched percentage
+- Preserved Automatic and Manual seconds in the completed-run diagnostic summary
+- Replaced the truncated import result with three calm preview rows plus a complete grouped track sheet
+- Preserved distinct rhythm, preview, catalog, download, and decode outcomes and added retry after relaunch
+- Limited concurrent import work to three ordered tracks and added private stage timing diagnostics
+- Preserved clockwise and counterclockwise direction through stronger ordinary and five-BPM haptic events
 
 ## Proof
 
-The current serial gate passed on 2026-07-21:
+The current serial gate passed on 2026-07-22:
 
-- 83 Swift package tests
-- 11 app-model tests
+- 92 Swift package tests
+- 14 app-model tests
 - 10 UI tests
 - Swift formatter lint
 - Resource-inclusive Simulator build
-- Unsigned generic iPhone build
-- Signed generic iPhone build with the exact development profile
+- Exact-profile physical iPhone build
+- Embedded profile and application identifier verification
+- Physical installation on Samay's connected iPhone
 
 Durable logs and final visual frames live under Evidence/.
 
@@ -155,8 +166,8 @@ The MusicKit harness and normal app launch in Simulator and on the physical iPho
 
 ## Known limits
 
-The first normal field run failed the product mechanic. The wheel recorded 497 adjustments across a 59-BPM requested span, while MusicKit read-back covered only 0.956 through 1.012 and finished at 1.00 with a manual target of 120 BPM. The app silently treats out-of-envelope targets as incompatible, returns the current song toward 1.00, and continues displaying the requested BPM. Its 99 percent summary came from 140 of 141 eligible automatic seconds while 99 manual seconds were unmeasured. The playlist result is also hard-truncated to five rows. The tested 18-track selection contained 11 ready tracks, 5 tempo-analysis failures, and 2 unavailable tracks, but current persistence and UI collapse several underlying causes. Import performs catalog resolution, preview download, decode, and analysis sequentially for every song. Wheel haptics intentionally use low intensity and discard clockwise versus counterclockwise direction before playback. These are active product failures, not deferred polish. Broader listening, a natural transition, five locked minutes, controlled interruption, route loss, accessibility, and the outdoor run remain blocked behind command truth and felt response.
+The software defects exposed by the first field run are repaired and covered by deterministic tests, but the physical product claim remains open. The installed build has not yet proved that a compatible large wheel turn sounds prompt and obvious, that clockwise and counterclockwise haptics are distinguishable and comfortable, or that three-way import concurrency materially improves a real playlist. The production per-song rate envelope remains 0.94 through 1.06 until broader full-song listening proves a wider clean range. Five locked minutes, a natural track transition, controlled interruption, route loss, full accessibility regression, cadence calibration, and the 20-minute outdoor run also remain open.
 
 ## WHERE WE LEFT OFF
 
-Apple Music remains the selected player only conditionally. The next slice must make requested BPM, achievable effective BPM, commanded rate, MusicKit read-back, audible response, and summary agree. The captured field trace is red evidence that the current slice fails. Start with a deterministic replay test, then repair command truth and felt response before import speed, complete track disclosure, directional haptics, transitions, or reliability work. If public MusicKit cannot make a clean and obvious change after the defined endpoint gate, follow the existing pivot rule rather than continuing to polish a mechanic that does not work.
+Apple Music remains the selected player. The field-failure replay, command truth, honest measurement, complete import disclosure, bounded import work, and directional haptic grammar are implemented and green. The exact-profile build is installed on Samay's iPhone. The next action is one short physical check: import or retry one playlist, turn far enough to require a compatible song change, confirm the audible direction and response, and judge the two haptic directions. Pull the resulting run and import diagnostics immediately afterward. If that check fails, diagnose the recorded command chain before any reliability or visual work. If it passes, continue with background, transition, interruption, route-loss, accessibility, and outdoor-run proof.

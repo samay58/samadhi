@@ -5,6 +5,7 @@ struct ReadyScreen: View {
     let send: @MainActor (RunAction) -> Void
 
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+    @State private var showTrackDetails = false
 
     var body: some View {
         GeometryReader { geometry in
@@ -28,6 +29,14 @@ struct ReadyScreen: View {
             .scrollIndicators(.hidden)
         }
         .accessibilityIdentifier("ready-screen")
+        .sheet(isPresented: $showTrackDetails) {
+            if let collection = presentedCollection {
+                TrackResultsSheet(collection: collection) {
+                    showTrackDetails = false
+                    send(.retryMusicImport)
+                }
+            }
+        }
     }
 
     @ViewBuilder
@@ -85,6 +94,7 @@ struct ReadyScreen: View {
             Text(analyzing ? "Reading the rhythm" : "Run with")
                 .font(.callout.weight(.semibold))
                 .foregroundStyle(SamadhiColor.ink.opacity(0.78))
+                .accessibilityIdentifier(analyzing ? "music-analyzing" : "music-ready")
             Text(collection.name)
                 .font(
                     .system(
@@ -118,7 +128,7 @@ struct ReadyScreen: View {
 
             if !collection.tracks.isEmpty {
                 VStack(alignment: .leading, spacing: Space.x2) {
-                    ForEach(collection.tracks.prefix(5)) { track in
+                    ForEach(collection.tracks.prefix(3)) { track in
                         HStack(spacing: Space.x2) {
                             Image(systemName: statusSymbol(track.status))
                                 .foregroundStyle(statusColor(track.status))
@@ -132,10 +142,17 @@ struct ReadyScreen: View {
                     }
                 }
                 .frame(maxWidth: 320)
+
+                if collection.tracks.count > 3 {
+                    Button("All tracks") {
+                        showTrackDetails = true
+                    }
+                    .font(.callout.weight(.semibold))
+                    .accessibilityIdentifier("all-imported-tracks")
+                }
             }
         }
         .setupIdentityBackground()
-        .accessibilityIdentifier(analyzing ? "music-analyzing" : "music-ready")
     }
 
     @ViewBuilder
@@ -193,8 +210,10 @@ struct ReadyScreen: View {
         switch status {
         case .pending: "Waiting"
         case .ready: "Ready"
-        case .couldNotReadTempo: "Could not read tempo"
-        case .unavailable: "Unavailable"
+        case .rhythmUnclear: "Rhythm unclear"
+        case .previewUnavailable: "Preview unavailable"
+        case .catalogMatchUnavailable: "Not matched"
+        case .temporaryFailure: "Try again"
         }
     }
 
@@ -202,14 +221,26 @@ struct ReadyScreen: View {
         switch status {
         case .pending: "clock"
         case .ready: "checkmark.circle.fill"
-        case .couldNotReadTempo, .unavailable: "minus.circle"
+        case .rhythmUnclear, .previewUnavailable, .catalogMatchUnavailable: "minus.circle"
+        case .temporaryFailure: "arrow.clockwise.circle"
         }
     }
 
     private func statusColor(_ status: MusicTrackImportPresentation) -> Color {
         switch status {
         case .ready: SamadhiColor.olive
-        case .pending, .couldNotReadTempo, .unavailable: SamadhiColor.ink.opacity(0.58)
+        case .pending, .rhythmUnclear, .previewUnavailable, .catalogMatchUnavailable,
+            .temporaryFailure:
+            SamadhiColor.ink.opacity(0.58)
+        }
+    }
+
+    private var presentedCollection: ImportedCollectionPresentation? {
+        switch state.musicSelection {
+        case let .analyzing(collection), let .ready(collection):
+            collection
+        default:
+            nil
         }
     }
 
@@ -218,7 +249,66 @@ struct ReadyScreen: View {
     }
 }
 
+private struct TrackResultsSheet: View {
+    let collection: ImportedCollectionPresentation
+    let retry: () -> Void
+
+    @Environment(\.dismiss) private var dismiss
+
+    var body: some View {
+        NavigationStack {
+            List {
+                trackSection("Ready", status: .ready)
+                trackSection("Rhythm unclear", status: .rhythmUnclear)
+                trackSection("Preview unavailable", status: .previewUnavailable)
+                trackSection("Could not match Apple Music item", status: .catalogMatchUnavailable)
+                trackSection("Temporary download or decode failure", status: .temporaryFailure)
+                trackSection("Waiting", status: .pending)
+
+                if collection.hasTemporaryFailures {
+                    Section {
+                        Button("Retry temporary failures", action: retry)
+                    }
+                }
+            }
+            .scrollContentBackground(.hidden)
+            .background(SamadhiColor.parchment)
+            .navigationTitle(collection.name)
+            .inlineNavigationTitle()
+            .toolbar {
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Done") { dismiss() }
+                }
+            }
+        }
+    }
+
+    @ViewBuilder
+    private func trackSection(
+        _ title: String,
+        status: MusicTrackImportPresentation
+    ) -> some View {
+        let tracks = collection.tracks.filter { $0.status == status }
+        if !tracks.isEmpty {
+            Section(title) {
+                ForEach(tracks) { track in
+                    Text(track.title)
+                }
+            }
+        }
+    }
+}
+
 private extension View {
+    @ViewBuilder
+    func inlineNavigationTitle() -> some View {
+        #if os(iOS)
+            navigationBarTitleDisplayMode(.inline)
+        #else
+            self
+        #endif
+    }
+
     func setupIdentityBackground() -> some View {
         padding(.horizontal, Space.x6)
             .padding(.vertical, Space.x8)

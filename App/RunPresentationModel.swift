@@ -144,6 +144,11 @@ final class RunPresentationModel {
                 manualTargetBPM: session?.rhythmControl.manualTargetBPM ?? 168,
                 requestedBPM: requestedBPM.map { Int($0.rounded()) },
                 appliedBPM: appliedBPM,
+                commandStatus: session?.adaptationState.commandStatus ?? .idle,
+                achievableBPM: session?.adaptationState.achievableBPM.map { Int($0.rounded()) },
+                commandedRate: session?.adaptationState.commandedRate,
+                appliedRate: session?.adaptationState.appliedRateReadback,
+                commandLatencySeconds: session?.adaptationState.commandLatencySeconds,
                 isAtLimit: session?.adaptationState.isAtLimit ?? false,
                 isFindingBetterFit: session?.pendingTrackSelectionID != nil
                     || session?.preparedNextTrackID != nil,
@@ -208,7 +213,7 @@ final class RunPresentationModel {
             dispatch(.routeResumeTapped(acquisitionID: token(), timeoutID: token()))
         case .done:
             dispatch(.summaryDismissed)
-        case .chooseMusic, .changeMusic:
+        case .chooseMusic, .changeMusic, .retryMusicImport:
             break
         }
     }
@@ -544,7 +549,7 @@ final class RunPresentationModel {
         case let .failed(operationID, _):
             dispatch(.playbackFailed(sessionID: session.id, operationID: operationID))
 
-        case let .rateChanged(operationID, requestID, trackID, rate):
+        case let .rateChanged(operationID, requestID, trackID, rate, latencySeconds):
             guard let requestID, let trackID else { return }
             dispatch(
                 .playbackRateApplied(
@@ -552,7 +557,8 @@ final class RunPresentationModel {
                     operationID: operationID,
                     requestID: requestID,
                     trackID: trackID,
-                    rate: rate
+                    rate: rate,
+                    latencySeconds: latencySeconds ?? 0
                 )
             )
 
@@ -589,17 +595,35 @@ final class RunPresentationModel {
 
     private func currentTempoMatch() -> Bool? {
         guard case let .active(active) = state,
-            case let .playing(.locked(spm), _) = active.activity,
+            case .playing = active.activity,
             let trackID = active.session.currentTrackID,
             let tempo = musicCollection.tracks.first(where: { $0.id == trackID })?.tempo
         else { return nil }
 
+        let referenceBPM: Double?
+        let referenceReliable: Bool
+        switch active.session.rhythmControl.mode {
+        case .automatic:
+            if case let .locked(spm) = active.activity.rhythm {
+                referenceBPM = Double(spm)
+                referenceReliable = true
+            } else {
+                referenceBPM = nil
+                referenceReliable = false
+            }
+        case .manual:
+            referenceBPM = active.session.adaptationState.requestedBPM
+            referenceReliable = referenceBPM != nil
+        }
+
         return TempoMatchEvaluator.measure(
-            cadenceSPM: Double(spm),
-            cadenceReliable: true,
+            referenceBPM: referenceBPM,
+            referenceReliable: referenceReliable,
             baseTempoBPM: tempo.baseBPM,
             appliedRate: active.session.appliedPlaybackRate,
-            playbackActive: true
+            playbackActive: true,
+            commandVerified: active.session.adaptationState.commandStatus == .applied
+                && active.session.pendingRateRequestID == nil
         )
     }
 
@@ -632,7 +656,6 @@ private final class RunHapticFeedback {
     private let heavyImpact = UIImpactFeedbackGenerator(style: .heavy)
     private let softImpact = UIImpactFeedbackGenerator(style: .soft)
     private let notification = UINotificationFeedbackGenerator()
-    private let rhythmStep = UISelectionFeedbackGenerator()
     private var rhythmEngine: CHHapticEngine?
     private var nextRhythmTime = 0.0
 
@@ -640,7 +663,7 @@ private final class RunHapticFeedback {
         prepareRhythmEngine()
         try? rhythmEngine?.start()
         nextRhythmTime = rhythmEngine?.currentTime ?? 0
-        rhythmStep.prepare()
+        lightImpact.prepare()
         softImpact.prepare()
     }
 
@@ -654,11 +677,17 @@ private final class RunHapticFeedback {
             mediumImpact.impactOccurred()
         case .finish:
             heavyImpact.impactOccurred()
-        case let .rhythmStep(isMajor):
-            if !playRhythmDetent(isMajor: isMajor) {
-                rhythmStep.selectionChanged()
+        case let .rhythmStep(direction, isMajor):
+            if !playRhythmDetent(direction: direction, isMajor: isMajor) {
+                switch direction {
+                case .increase:
+                    lightImpact.impactOccurred(intensity: isMajor ? 1 : 0.76)
+                case .decrease:
+                    softImpact.impactOccurred(intensity: isMajor ? 1 : 0.88)
+                }
             }
-            rhythmStep.prepare()
+            lightImpact.prepare()
+            softImpact.prepare()
         case .rhythmAuto:
             softImpact.impactOccurred(intensity: 0.82)
             softImpact.prepare()
@@ -685,24 +714,41 @@ private final class RunHapticFeedback {
         }
     }
 
-    private func playRhythmDetent(isMajor: Bool) -> Bool {
+    private func playRhythmDetent(
+        direction: RhythmAdjustmentDirection,
+        isMajor: Bool
+    ) -> Bool {
         guard let engine = rhythmEngine else { return false }
         do {
-            let transient = CHHapticEvent(
+            let primary = CHHapticEvent(
                 eventType: .hapticTransient,
                 parameters: [
                     CHHapticEventParameter(
                         parameterID: .hapticIntensity,
-                        value: isMajor ? 0.52 : 0.28
+                        value: isMajor ? 0.74 : 0.46
                     ),
                     CHHapticEventParameter(
                         parameterID: .hapticSharpness,
-                        value: isMajor ? 0.16 : 0.12
+                        value: direction == .increase ? 0.22 : 0.1
                     ),
                 ],
-                relativeTime: 0
+                relativeTime: direction == .increase ? 0 : 0.012
             )
-            var events = [transient]
+            let directionalAccent = CHHapticEvent(
+                eventType: .hapticTransient,
+                parameters: [
+                    CHHapticEventParameter(
+                        parameterID: .hapticIntensity,
+                        value: isMajor ? 0.3 : 0.18
+                    ),
+                    CHHapticEventParameter(
+                        parameterID: .hapticSharpness,
+                        value: 0.04
+                    ),
+                ],
+                relativeTime: direction == .increase ? 0.012 : 0
+            )
+            var events = [primary, directionalAccent]
             if isMajor {
                 events.append(
                     CHHapticEvent(
@@ -711,8 +757,8 @@ private final class RunHapticFeedback {
                             CHHapticEventParameter(parameterID: .hapticIntensity, value: 0.14),
                             CHHapticEventParameter(parameterID: .hapticSharpness, value: 0.04),
                         ],
-                        relativeTime: 0.012,
-                        duration: 0.04
+                        relativeTime: 0.018,
+                        duration: 0.032
                     )
                 )
             }
@@ -720,7 +766,7 @@ private final class RunHapticFeedback {
             let player = try engine.makePlayer(with: CHHapticPattern(events: events, parameters: []))
             let scheduledTime = max(engine.currentTime, nextRhythmTime)
             try player.start(atTime: scheduledTime)
-            nextRhythmTime = scheduledTime + 0.028
+            nextRhythmTime = scheduledTime + (isMajor ? 0.05 : 0.034)
             return true
         } catch {
             return false

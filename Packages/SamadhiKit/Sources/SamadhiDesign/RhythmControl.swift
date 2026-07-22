@@ -283,11 +283,23 @@ struct RhythmControl: View {
     }
 
     private var feedbackLabel: String {
-        if state.rhythmControl.isFindingBetterFit { return "Finding a better fit" }
-        if let applied = state.rhythmControl.appliedBPM {
-            return state.rhythmControl.isAtLimit ? "Music \(applied) · Steady" : "Music \(applied)"
+        switch state.rhythmControl.commandStatus {
+        case .requiresTrackChange:
+            return "Changing song"
+        case .unreachable:
+            return "Limit"
+        case .rejected:
+            return "Not applied"
+        case .applying:
+            return "Settling"
+        case .applied:
+            if let applied = state.rhythmControl.appliedBPM { return "Music \(applied)" }
+            return "Applied"
+        case .idle:
+            break
         }
-        return state.rhythmControl.isAtLimit ? "Music steady" : "Settling"
+        if state.rhythmControl.isFindingBetterFit { return "Changing song" }
+        return state.rhythmControl.appliedBPM.map { "Music \($0)" } ?? "Settling"
     }
 
     private var effectiveReduceMotion: Bool {

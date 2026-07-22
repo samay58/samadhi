@@ -5,6 +5,15 @@ public enum AdaptationStatus: Sendable, Equatable {
     case musicSteady
 }
 
+public enum TempoCommandStatus: String, Sendable, Equatable, Codable {
+    case idle
+    case applying
+    case applied
+    case requiresTrackChange
+    case unreachable
+    case rejected
+}
+
 public struct AdaptationState: Sendable, Equatable {
     public var targetRate: Double?
     public var baseTempoBPM: Double?
@@ -17,6 +26,11 @@ public struct AdaptationState: Sendable, Equatable {
     public var requestedBPM: Double?
     public var derivedTargetRate: Double?
     public var isAtLimit: Bool
+    public var commandStatus: TempoCommandStatus
+    public var achievableBPM: Double?
+    public var commandedRate: Double?
+    public var appliedRateReadback: Double?
+    public var commandLatencySeconds: Double?
 
     public init(
         targetRate: Double? = nil,
@@ -29,7 +43,12 @@ public struct AdaptationState: Sendable, Equatable {
         hasMatched: Bool = false,
         requestedBPM: Double? = nil,
         derivedTargetRate: Double? = nil,
-        isAtLimit: Bool = false
+        isAtLimit: Bool = false,
+        commandStatus: TempoCommandStatus = .idle,
+        achievableBPM: Double? = nil,
+        commandedRate: Double? = nil,
+        appliedRateReadback: Double? = nil,
+        commandLatencySeconds: Double? = nil
     ) {
         self.targetRate = targetRate
         self.baseTempoBPM = baseTempoBPM
@@ -42,6 +61,11 @@ public struct AdaptationState: Sendable, Equatable {
         self.requestedBPM = requestedBPM
         self.derivedTargetRate = derivedTargetRate
         self.isAtLimit = isAtLimit
+        self.commandStatus = commandStatus
+        self.achievableBPM = achievableBPM
+        self.commandedRate = commandedRate
+        self.appliedRateReadback = appliedRateReadback
+        self.commandLatencySeconds = commandLatencySeconds
     }
 
     public static let initial = AdaptationState()
@@ -164,6 +188,7 @@ public struct AdaptationPolicy: Sendable {
                 )
             }
             next.targetRate = target
+            next.achievableBPM = requestedBPM
             next.baseTempoBPM = input.baseTempoBPM
             if input.cadenceReliable { next.lastReliableCadenceSPM = input.cadenceSPM }
             next.secondsSinceTargetUpdate = 0
@@ -179,6 +204,9 @@ public struct AdaptationPolicy: Sendable {
             toward: target,
             maximumChange: rampPerSecond * input.deltaSeconds
         )
+        next.commandedRate = commandedRate
+        next.commandStatus = .applying
+        next.isAtLimit = false
 
         if abs(input.appliedRate - target) <= 0.005 {
             next.matchedSeconds += input.deltaSeconds
@@ -222,6 +250,7 @@ public struct AdaptationPolicy: Sendable {
         next.confidenceLossStartRate = startRate
         next.confidenceLostSeconds = lostSeconds
         next.matchedSeconds = 0
+        next.commandStatus = input.rhythmControl.mode == .manual ? state.commandStatus : .idle
 
         let commandedRate: Double
         if lostSeconds <= 6 {
@@ -265,8 +294,11 @@ public struct AdaptationPolicy: Sendable {
         next.requestedBPM = requestedBPM
         next.derivedTargetRate = derivedTargetRate
         next.isAtLimit = isAtLimit
+        next.achievableBPM = nil
+        next.commandedRate = nil
+        next.commandStatus = isAtLimit ? .unreachable : .idle
         return AdaptationDecision(
-            commandedRate: move(input.appliedRate, toward: 1, maximumChange: 0.02 * input.deltaSeconds),
+            commandedRate: input.appliedRate,
             targetRate: nil,
             isTrackCompatible: false,
             status: .musicSteady,
@@ -285,23 +317,25 @@ public struct AdaptationPolicy: Sendable {
 
 public enum TempoMatchEvaluator {
     public static func measure(
-        cadenceSPM: Double?,
-        cadenceReliable: Bool,
+        referenceBPM: Double?,
+        referenceReliable: Bool,
         baseTempoBPM: Double?,
         appliedRate: Double?,
-        playbackActive: Bool
+        playbackActive: Bool,
+        commandVerified: Bool = true
     ) -> Bool? {
         guard playbackActive,
-            cadenceReliable,
-            let cadenceSPM,
+            referenceReliable,
+            commandVerified,
+            let referenceBPM,
             let baseTempoBPM,
             let appliedRate
         else { return nil }
 
         let closestEffectiveTempo = [baseTempoBPM / 2, baseTempoBPM, baseTempoBPM * 2]
             .map { $0 * appliedRate }
-            .min { abs($0 - cadenceSPM) < abs($1 - cadenceSPM) }
+            .min { abs($0 - referenceBPM) < abs($1 - referenceBPM) }
         guard let closestEffectiveTempo else { return nil }
-        return abs(closestEffectiveTempo - cadenceSPM) <= 3
+        return abs(closestEffectiveTempo - referenceBPM) <= 3
     }
 }

@@ -3,6 +3,11 @@ public enum RhythmControlMode: String, Sendable, Equatable, Codable {
     case manual
 }
 
+public enum RhythmAdjustmentDirection: String, Sendable, Equatable, Codable {
+    case increase
+    case decrease
+}
+
 public struct RhythmControlState: Sendable, Equatable, Codable {
     public static let runningTargetRange = 120...210
     public static let automaticCorrectionRange = -20...20

@@ -21,6 +21,7 @@ final class MusicSelectionModel {
     @ObservationIgnored private var operationTask: Task<Void, Never>?
     @ObservationIgnored private var nextOperationID = 1
     @ObservationIgnored private var currentOperationID: Int?
+    @ObservationIgnored private var lastSelectedChoice: LibraryPlaylistChoice?
 
     init(
         store: MusicCollectionStore = MusicCollectionStore(),
@@ -60,6 +61,10 @@ final class MusicSelectionModel {
                 presentation = .none
                 return
             }
+            lastSelectedChoice = LibraryPlaylistChoice(
+                id: collection.id.rawValue,
+                name: collection.name
+            )
             apply(collection)
         } catch {
             presentation = .failed("Your saved music could not be opened.")
@@ -90,6 +95,7 @@ final class MusicSelectionModel {
     }
 
     func selectPlaylist(_ choice: LibraryPlaylistChoice) {
+        lastSelectedChoice = choice
         playlistSheet = nil
         let operationID = beginOperation()
         presentation = .analyzing(
@@ -127,6 +133,11 @@ final class MusicSelectionModel {
                 presentation = .failed(Self.message(for: error))
             }
         }
+    }
+
+    func retryLastImport() {
+        guard let lastSelectedChoice else { return }
+        selectPlaylist(lastSelectedChoice)
     }
 
     private func beginOperation() -> Int {
@@ -210,11 +221,16 @@ final class MusicSelectionModel {
         case .pending:
             .pending
         case let .ready(analysis):
-            analysis.isAdaptiveReady ? .ready : .couldNotReadTempo
-        case .failed(.couldNotReadTempo):
-            .couldNotReadTempo
-        case .failed(.unavailable):
-            .unavailable
+            analysis.isAdaptiveReady ? .ready : .rhythmUnclear
+        case .failed(.rhythmUnclear), .failed(.couldNotReadTempo):
+            .rhythmUnclear
+        case .failed(.previewUnavailable):
+            .previewUnavailable
+        case .failed(.catalogMatchUnavailable), .failed(.unavailable):
+            .catalogMatchUnavailable
+        case .failed(.temporaryCatalogFailure), .failed(.temporaryDownloadFailure),
+            .failed(.decodeFailure):
+            .temporaryFailure
         }
     }
 

@@ -35,6 +35,12 @@ public struct TempoAnalysis: Sendable, Equatable, Codable {
 }
 
 public enum TrackAnalysisFailure: String, Sendable, Equatable, Codable {
+    case rhythmUnclear
+    case previewUnavailable
+    case catalogMatchUnavailable
+    case temporaryCatalogFailure
+    case temporaryDownloadFailure
+    case decodeFailure
     case couldNotReadTempo
     case unavailable
 }

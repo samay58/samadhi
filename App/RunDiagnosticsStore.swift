@@ -6,6 +6,9 @@ struct RunDiagnosticSnapshot: Codable, Equatable, Sendable {
         let durationSeconds: Int
         let averageCadence: Int?
         let tempoMatchedPercent: Int?
+        let tempoMatchedCoveragePercent: Int
+        let automaticSeconds: Int
+        let manualSeconds: Int
         let songCount: Int
     }
 
@@ -42,6 +45,10 @@ struct RunDiagnosticSnapshot: Codable, Equatable, Sendable {
         let requestedBPM: Double?
         let derivedTargetRate: Double?
         let atLimit: Bool?
+        let commandStatus: String?
+        let achievableBPM: Double?
+        let commandedRate: Double?
+        let commandLatencySeconds: Double?
         let appliedRate: Double
         let awaitingRateFeedback: Bool
         let trackID: String?
@@ -63,6 +70,10 @@ struct RunDiagnosticSnapshot: Codable, Equatable, Sendable {
             requestedBPM: Double? = nil,
             derivedTargetRate: Double? = nil,
             atLimit: Bool = false,
+            commandStatus: String? = nil,
+            achievableBPM: Double? = nil,
+            commandedRate: Double? = nil,
+            commandLatencySeconds: Double? = nil,
             appliedRate: Double,
             awaitingRateFeedback: Bool,
             trackID: String?,
@@ -83,6 +94,10 @@ struct RunDiagnosticSnapshot: Codable, Equatable, Sendable {
             self.requestedBPM = requestedBPM
             self.derivedTargetRate = derivedTargetRate
             self.atLimit = atLimit
+            self.commandStatus = commandStatus
+            self.achievableBPM = achievableBPM
+            self.commandedRate = commandedRate
+            self.commandLatencySeconds = commandLatencySeconds
             self.appliedRate = appliedRate
             self.awaitingRateFeedback = awaitingRateFeedback
             self.trackID = trackID
@@ -196,6 +211,10 @@ struct RunDiagnosticsRecorder {
                 requestedBPM: session?.adaptationState.requestedBPM,
                 derivedTargetRate: session?.adaptationState.derivedTargetRate,
                 atLimit: session?.adaptationState.isAtLimit ?? false,
+                commandStatus: session?.adaptationState.commandStatus.rawValue,
+                achievableBPM: session?.adaptationState.achievableBPM,
+                commandedRate: session?.adaptationState.commandedRate,
+                commandLatencySeconds: session?.adaptationState.commandLatencySeconds,
                 appliedRate: session?.appliedPlaybackRate ?? 1,
                 awaitingRateFeedback: session?.pendingRateRequestID != nil,
                 trackID: session?.currentTrackID?.rawValue,
@@ -209,7 +228,7 @@ struct RunDiagnosticsRecorder {
 
         guard case let .summary(summary) = newState else { return nil }
         let snapshot = RunDiagnosticSnapshot(
-            schemaVersion: 2,
+            schemaVersion: 3,
             capturedAt: now(),
             collectionID: collection.id.rawValue,
             collectionName: collection.name,
@@ -218,6 +237,9 @@ struct RunDiagnosticsRecorder {
                 durationSeconds: summary.durationSeconds,
                 averageCadence: summary.averageCadence,
                 tempoMatchedPercent: summary.tempoMatchedPercent,
+                tempoMatchedCoveragePercent: summary.tempoMatchedCoveragePercent,
+                automaticSeconds: summary.automaticSeconds,
+                manualSeconds: summary.manualSeconds,
                 songCount: summary.songCount
             ),
             timeline: timeline

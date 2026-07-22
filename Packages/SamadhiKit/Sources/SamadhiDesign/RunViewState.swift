@@ -36,8 +36,10 @@ public enum RunVisualPhase: Sendable, Equatable {
 public enum MusicTrackImportPresentation: Sendable, Equatable {
     case pending
     case ready
-    case couldNotReadTempo
-    case unavailable
+    case rhythmUnclear
+    case previewUnavailable
+    case catalogMatchUnavailable
+    case temporaryFailure
 }
 
 public struct ImportedTrackPresentation: Sendable, Equatable, Identifiable {
@@ -58,6 +60,10 @@ public struct ImportedCollectionPresentation: Sendable, Equatable {
     public let readyTrackCount: Int
     public let completedTrackCount: Int
     public let tracks: [ImportedTrackPresentation]
+
+    public var hasTemporaryFailures: Bool {
+        tracks.contains { $0.status == .temporaryFailure }
+    }
 
     public init(
         name: String,
@@ -88,6 +94,11 @@ public struct RhythmControlPresentation: Sendable, Equatable {
     public var manualTargetBPM: Int
     public var requestedBPM: Int?
     public var appliedBPM: Int?
+    public var commandStatus: TempoCommandStatus
+    public var achievableBPM: Int?
+    public var commandedRate: Double?
+    public var appliedRate: Double?
+    public var commandLatencySeconds: Double?
     public var isAtLimit: Bool
     public var isFindingBetterFit: Bool
     public var isVisible: Bool
@@ -99,6 +110,11 @@ public struct RhythmControlPresentation: Sendable, Equatable {
         manualTargetBPM: Int = 168,
         requestedBPM: Int? = nil,
         appliedBPM: Int? = nil,
+        commandStatus: TempoCommandStatus = .idle,
+        achievableBPM: Int? = nil,
+        commandedRate: Double? = nil,
+        appliedRate: Double? = nil,
+        commandLatencySeconds: Double? = nil,
         isAtLimit: Bool = false,
         isFindingBetterFit: Bool = false,
         isVisible: Bool = false,
@@ -109,6 +125,11 @@ public struct RhythmControlPresentation: Sendable, Equatable {
         self.manualTargetBPM = manualTargetBPM
         self.requestedBPM = requestedBPM
         self.appliedBPM = appliedBPM
+        self.commandStatus = commandStatus
+        self.achievableBPM = achievableBPM
+        self.commandedRate = commandedRate
+        self.appliedRate = appliedRate
+        self.commandLatencySeconds = commandLatencySeconds
         self.isAtLimit = isAtLimit
         self.isFindingBetterFit = isFindingBetterFit
         self.isVisible = isVisible
@@ -189,4 +210,5 @@ public enum RunAction: Sendable, Equatable {
     case done
     case chooseMusic
     case changeMusic
+    case retryMusicImport
 }
