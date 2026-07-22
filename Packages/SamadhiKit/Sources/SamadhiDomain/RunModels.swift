@@ -14,12 +14,26 @@ public struct RunSummary: Sendable, Equatable {
     public let durationSeconds: Int
     public let averageCadence: Int?
     public let tempoMatchedPercent: Int?
+    public let tempoMatchedCoveragePercent: Int
+    public let automaticSeconds: Int
+    public let manualSeconds: Int
     public let songCount: Int
 
-    public init(durationSeconds: Int, averageCadence: Int?, tempoMatchedPercent: Int?, songCount: Int) {
+    public init(
+        durationSeconds: Int,
+        averageCadence: Int?,
+        tempoMatchedPercent: Int?,
+        tempoMatchedCoveragePercent: Int = 0,
+        automaticSeconds: Int = 0,
+        manualSeconds: Int = 0,
+        songCount: Int
+    ) {
         self.durationSeconds = durationSeconds
         self.averageCadence = averageCadence
         self.tempoMatchedPercent = tempoMatchedPercent
+        self.tempoMatchedCoveragePercent = tempoMatchedCoveragePercent
+        self.automaticSeconds = automaticSeconds
+        self.manualSeconds = manualSeconds
         self.songCount = songCount
     }
 }
@@ -32,6 +46,8 @@ public struct RunSession: Sendable, Equatable {
     public var cadenceSamples: Int
     public var tempoMatchedSamples: Int
     public var eligibleTempoMatchSamples: Int
+    public var automaticActiveSeconds: Int
+    public var manualActiveSeconds: Int
     public var songCount: Int
     public var trackIndex: Int
     public var trackElapsedSeconds: Int
@@ -43,10 +59,12 @@ public struct RunSession: Sendable, Equatable {
     public var rhythmControl: RhythmControlState
     public var appliedPlaybackRate: Double
     public var pendingRateRequestID: Int?
+    public var pendingCommandedRate: Double?
     public var incompatibleTrackSeconds: Double
     public var pendingTrackSelectionID: Int?
     public var pendingNextTrackID: MusicTrackID?
     public var preparedNextTrackID: MusicTrackID?
+    public var immediateTrackSelectionID: Int?
 
     public init(id: Int, mode: RunMode = .adaptive, playbackOperationID: Int? = nil) {
         self.id = id
@@ -56,6 +74,8 @@ public struct RunSession: Sendable, Equatable {
         cadenceSamples = 0
         tempoMatchedSamples = 0
         eligibleTempoMatchSamples = 0
+        automaticActiveSeconds = 0
+        manualActiveSeconds = 0
         songCount = 1
         trackIndex = 0
         trackElapsedSeconds = 0
@@ -67,15 +87,23 @@ public struct RunSession: Sendable, Equatable {
         rhythmControl = .initial
         appliedPlaybackRate = 1
         pendingRateRequestID = nil
+        pendingCommandedRate = nil
         incompatibleTrackSeconds = 0
         pendingTrackSelectionID = nil
         pendingNextTrackID = nil
         preparedNextTrackID = nil
+        immediateTrackSelectionID = nil
     }
 
     public mutating func recordSecond(cadence: Int?, tempoMatched: Bool?) {
         elapsedActiveSeconds += 1
         trackElapsedSeconds += 1
+        switch rhythmControl.mode {
+        case .automatic:
+            automaticActiveSeconds += 1
+        case .manual:
+            manualActiveSeconds += 1
+        }
         if let cadence {
             cadenceTotal += cadence
             cadenceSamples += 1
@@ -87,12 +115,19 @@ public struct RunSession: Sendable, Equatable {
     }
 
     public var summary: RunSummary {
-        RunSummary(
+        let coveragePercent =
+            elapsedActiveSeconds == 0
+            ? 0
+            : (eligibleTempoMatchSamples * 100) / elapsedActiveSeconds
+        return RunSummary(
             durationSeconds: elapsedActiveSeconds,
             averageCadence: cadenceSamples == 0 ? nil : cadenceTotal / cadenceSamples,
-            tempoMatchedPercent: mode == .fixed || eligibleTempoMatchSamples == 0
+            tempoMatchedPercent: mode == .fixed || coveragePercent < 80
                 ? nil
                 : (tempoMatchedSamples * 100) / eligibleTempoMatchSamples,
+            tempoMatchedCoveragePercent: coveragePercent,
+            automaticSeconds: automaticActiveSeconds,
+            manualSeconds: manualActiveSeconds,
             songCount: songCount
         )
     }
@@ -190,7 +225,7 @@ public enum HapticEvent: Sendable, Equatable {
     case pause
     case resume
     case finish
-    case rhythmStep(isMajor: Bool)
+    case rhythmStep(direction: RhythmAdjustmentDirection, isMajor: Bool)
     case rhythmAuto
     case rhythmLimit
 }
@@ -315,7 +350,8 @@ public enum RunEvent: Sendable, Equatable {
         operationID: Int,
         requestID: Int,
         trackID: MusicTrackID,
-        rate: Double
+        rate: Double,
+        latencySeconds: Double
     )
     case playbackTrackChanged(
         sessionID: Int,

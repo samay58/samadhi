@@ -65,6 +65,8 @@ struct RootView: View {
         switch action {
         case .chooseMusic, .changeMusic:
             musicModel.beginChoosing()
+        case .retryMusicImport:
+            musicModel.retryLastImport()
         default:
             runModel.send(action)
         }

@@ -13,7 +13,8 @@ public enum MusicPlaybackEvent: Sendable, Equatable {
         operationID: Int,
         requestID: Int?,
         trackID: MusicTrackID?,
-        rate: Double
+        rate: Double,
+        latencySeconds: Double?
     )
     case progress(operationID: Int, PlaybackProgress)
     case trackChanged(operationID: Int, trackID: MusicTrackID)
@@ -154,7 +155,8 @@ public final class SimulatedMusicPlayer: MusicPlaybackProviding {
                 operationID: operationID,
                 requestID: requestID,
                 trackID: trackID,
-                rate: min(max(rate, 0.94), 1.06)
+                rate: min(max(rate, 0.94), 1.06),
+                latencySeconds: 0
             )
         )
     }

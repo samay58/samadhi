@@ -47,7 +47,8 @@ import Testing
                 operationID: 41,
                 requestID: 42,
                 trackID: MusicTrackID("track-1"),
-                rate: 1.06
+                rate: 1.06,
+                latencySeconds: 0
             ))
     #expect(await events.next() == .stateChanged(operationID: 41, state: .paused))
     #expect(await events.next() == .stateChanged(operationID: 41, state: .stopped))

@@ -93,9 +93,13 @@ final class SamadhiUITests: XCTestCase {
         app.launch()
 
         XCTAssertTrue(element("music-ready").waitForExistence(timeout: 2))
-        XCTAssertTrue(app.staticTexts["Could not read tempo"].exists)
-        XCTAssertTrue(app.staticTexts["Unavailable"].exists)
+        XCTAssertTrue(app.staticTexts["Rhythm unclear"].exists)
+        XCTAssertTrue(app.staticTexts["Preview unavailable"].exists)
         XCTAssertTrue(app.buttons["start-run"].exists)
+        app.buttons["all-imported-tracks"].tap()
+        XCTAssertTrue(app.staticTexts["Distant Signal"].waitForExistence(timeout: 2))
+        XCTAssertTrue(app.staticTexts["Warm Static"].exists)
+        XCTAssertTrue(app.staticTexts["Side Street"].exists)
     }
 
     func testImportFailureOffersRetry() {

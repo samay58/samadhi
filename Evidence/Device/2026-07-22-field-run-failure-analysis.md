@@ -52,3 +52,13 @@ The direct trace check is red when more than 100 wheel adjustments and at least 
 ## Decision
 
 Command truth and felt response are the highest priority. No visual polish, reliability work, or additional feature should proceed until the app either produces a prompt, verified, audible change or explicitly explains that the current track cannot reach the request. If public MusicKit cannot pass that gate, use the existing source pivot instead of preserving a false control.
+
+## Remediation status
+
+The captured behavior now has a privacy-safe replay test. The repair separates requested BPM, achievable BPM, commanded rate, MusicKit read-back, latency, and command status. An unreachable detent returns to the last truthful target. A compatible alternate track is prepared and committed immediately for direct wheel input, then the current target is reapplied after the player confirms the change. Rapid detents coalesce toward the latest requested target while the interface continues to wait for real read-back before calling it applied.
+
+Tempo matched now requires verified player feedback and at least 80 percent measurement coverage. Automatic and Manual seconds remain explicit in schema-version-3 diagnostics. The recorded 141 eligible seconds across a 240-second field run therefore produce 58 percent coverage and Not measured instead of a misleading 99 percent.
+
+The import path now preserves every source track, records distinct rhythm, preview, catalog, download, and decode outcomes, runs three ordered tracks at a time, supports retry after relaunch, and saves private stage timings. The primary ready composition shows three rows and opens every result through `All tracks`. Clockwise and counterclockwise wheel direction now reach stronger, distinct haptic patterns.
+
+Verification on 2026-07-22 passed formatter lint, 92 package tests, 14 app-model tests, 10 UI tests, the exact-profile physical build, embedded application identifier verification, and installation on Samay's connected iPhone. These checks prove command logic, import disclosure, accessibility structure, signing, and installation. They do not prove audible response, haptic comfort, or real import duration. One short physical check remains required before this failure can be closed.

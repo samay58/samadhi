@@ -33,7 +33,7 @@ private let previewSend: @MainActor (RunAction) -> Void = { _ in }
                         ImportedTrackPresentation(
                             id: "two",
                             title: "Afterimage",
-                            status: .couldNotReadTempo
+                            status: .rhythmUnclear
                         ),
                     ]
                 )
@@ -62,12 +62,12 @@ private let previewSend: @MainActor (RunAction) -> Void = { _ in }
                         ImportedTrackPresentation(
                             id: "two",
                             title: "Afterimage",
-                            status: .couldNotReadTempo
+                            status: .rhythmUnclear
                         ),
                         ImportedTrackPresentation(
                             id: "three",
                             title: "Quiet Arcade",
-                            status: .unavailable
+                            status: .catalogMatchUnavailable
                         ),
                     ]
                 )

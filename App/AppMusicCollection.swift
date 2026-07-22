@@ -92,7 +92,7 @@ enum AppMusicCollection {
                 artist: "Static Gardens",
                 durationSeconds: 190,
                 sourceFingerprint: "fixture-unreadable-v1",
-                analysisState: .failed(.couldNotReadTempo)
+                analysisState: .failed(.rhythmUnclear)
             ),
             MusicTrack(
                 id: MusicTrackID("fixture-unavailable"),
@@ -100,7 +100,31 @@ enum AppMusicCollection {
                 artist: "Paper Cinema",
                 durationSeconds: 198,
                 sourceFingerprint: "fixture-unavailable-v1",
-                analysisState: .failed(.unavailable)
+                analysisState: .failed(.previewUnavailable)
+            ),
+            MusicTrack(
+                id: MusicTrackID("fixture-unmatched"),
+                title: "Distant Signal",
+                artist: "Night Geometry",
+                durationSeconds: 201,
+                sourceFingerprint: "fixture-unmatched-v1",
+                analysisState: .failed(.catalogMatchUnavailable)
+            ),
+            MusicTrack(
+                id: MusicTrackID("fixture-network"),
+                title: "Warm Static",
+                artist: "Field Note",
+                durationSeconds: 184,
+                sourceFingerprint: "fixture-network-v1",
+                analysisState: .failed(.temporaryDownloadFailure)
+            ),
+            MusicTrack(
+                id: MusicTrackID("fixture-decode"),
+                title: "Side Street",
+                artist: "Paper Coast",
+                durationSeconds: 219,
+                sourceFingerprint: "fixture-decode-v1",
+                analysisState: .failed(.decodeFailure)
             ),
         ]
     )

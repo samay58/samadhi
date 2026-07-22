@@ -19,7 +19,15 @@
         private var lastState: MusicPlaybackState?
         private var lastRate: Double?
         private var lastTrackID: MusicTrackID?
-        private var pendingRateRequest: (id: Int, trackID: MusicTrackID)?
+        private struct PendingRateRequest {
+            let id: Int
+            let trackID: MusicTrackID
+            let commandedRate: Double
+            let startedAt: TimeInterval
+        }
+
+        private var pendingRateRequest: PendingRateRequest?
+        private var rateReadbackTask: Task<Void, Never>?
         private var preparedNextTrackID: MusicTrackID?
         private var latestSelectionID = 0
 
@@ -75,6 +83,8 @@
             lastRate = nil
             lastTrackID = trackID
             pendingRateRequest = nil
+            rateReadbackTask?.cancel()
+            rateReadbackTask = nil
             preparedNextTrackID = nil
             latestSelectionID = 0
             continuation?.yield(.prepared(operationID: operationID, trackID: trackID))
@@ -135,8 +145,21 @@
                 currentTrackID == trackID
             else { return }
             let boundedRate = Double(Float(min(max(rate, 0.94), 1.06)))
-            pendingRateRequest = (requestID, trackID)
+            rateReadbackTask?.cancel()
+            pendingRateRequest = PendingRateRequest(
+                id: requestID,
+                trackID: trackID,
+                commandedRate: boundedRate,
+                startedAt: ProcessInfo.processInfo.systemUptime
+            )
             player.state.playbackRate = Float(boundedRate)
+            rateReadbackTask = Task { [weak self] in
+                for attempt in 0..<8 {
+                    try? await Task.sleep(for: .milliseconds(50))
+                    guard !Task.isCancelled, let self else { return }
+                    if publishPendingRateReadback(force: attempt == 7) { return }
+                }
+            }
         }
 
         func stop(operationID: Int) {
@@ -150,6 +173,8 @@
             lastRate = nil
             lastTrackID = nil
             pendingRateRequest = nil
+            rateReadbackTask?.cancel()
+            rateReadbackTask = nil
             preparedNextTrackID = nil
             latestSelectionID = 0
         }
@@ -227,17 +252,8 @@
             }
 
             let rate = Double(player.state.playbackRate)
-            if let request = pendingRateRequest {
-                pendingRateRequest = nil
-                lastRate = rate
-                continuation?.yield(
-                    .rateChanged(
-                        operationID: operationID,
-                        requestID: request.id,
-                        trackID: request.trackID,
-                        rate: rate
-                    )
-                )
+            if pendingRateRequest != nil {
+                _ = publishPendingRateReadback(force: true)
             } else if rate != lastRate {
                 lastRate = rate
                 continuation?.yield(
@@ -245,7 +261,8 @@
                         operationID: operationID,
                         requestID: nil,
                         trackID: currentTrackID,
-                        rate: rate
+                        rate: rate,
+                        latencySeconds: nil
                     )
                 )
             }
@@ -255,6 +272,8 @@
             if trackID != lastTrackID {
                 lastTrackID = trackID
                 pendingRateRequest = nil
+                rateReadbackTask?.cancel()
+                rateReadbackTask = nil
                 preparedNextTrackID = nil
                 continuation?.yield(.trackChanged(operationID: operationID, trackID: trackID))
             }
@@ -284,6 +303,30 @@
 
         private func isCurrent(_ operationID: Int) -> Bool {
             self.operationID == operationID && collection != nil
+        }
+
+        @discardableResult
+        private func publishPendingRateReadback(force: Bool) -> Bool {
+            guard let operationID, let request = pendingRateRequest else { return false }
+            let rate = Double(player.state.playbackRate)
+            guard force || abs(rate - request.commandedRate) <= 0.005 else { return false }
+
+            pendingRateRequest = nil
+            rateReadbackTask = nil
+            lastRate = rate
+            continuation?.yield(
+                .rateChanged(
+                    operationID: operationID,
+                    requestID: request.id,
+                    trackID: request.trackID,
+                    rate: rate,
+                    latencySeconds: max(
+                        ProcessInfo.processInfo.systemUptime - request.startedAt,
+                        0
+                    )
+                )
+            )
+            return true
         }
 
         private func applyPreparedNextIfNeeded() throws {

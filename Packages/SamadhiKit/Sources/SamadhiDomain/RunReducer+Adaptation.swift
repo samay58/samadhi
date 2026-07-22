@@ -149,6 +149,25 @@ extension RunReducer {
             next.session.rhythmControl.resetToAutomatic()
         }
 
+        if let requestedBPM = next.session.rhythmControl.requestedBPM(cadenceSPM: cadenceSPM),
+            TrackMatchPlanner().select(
+                requestedBPM: requestedBPM,
+                from: tracks,
+                currentTrackID: next.session.currentTrackID
+            ) == nil
+        {
+            next.session.rhythmControl = priorControl
+            next.session.adaptationState.commandStatus = .unreachable
+            next.session.adaptationState.isAtLimit = true
+            return (
+                .active(next),
+                [
+                    .emitHaptic(.rhythmLimit),
+                    .scheduleControlsTimeout(sessionID: active.session.id, timeoutID: timeoutID),
+                ]
+            )
+        }
+
         next.activity = .playing(
             rhythm: rhythm,
             controls: .timed(surface: .rhythm, timeoutID: timeoutID)
@@ -176,7 +195,8 @@ extension RunReducer {
         let transition = planTrackTransition(
             session: next.session,
             deltaSeconds: 0,
-            selectionID: rateRequestID
+            selectionID: rateRequestID,
+            immediate: true
         )
         next.session = transition.session
 
@@ -190,7 +210,10 @@ extension RunReducer {
                 next.session.rhythmControl.mode == .automatic
                 ? next.session.rhythmControl.automaticCorrectionBPM
                 : next.session.rhythmControl.manualTargetBPM
-            haptic = .rhythmStep(isMajor: detentValue.isMultiple(of: 5))
+            haptic = .rhythmStep(
+                direction: detentValue >= priorDetentValue(priorControl) ? .increase : .decrease,
+                isMajor: detentValue.isMultiple(of: 5)
+            )
         }
 
         return (
@@ -201,14 +224,10 @@ extension RunReducer {
         )
     }
 
-    func adaptManualControlAfterTrackChange(
+    func adaptControlAfterTrackChange(
         active: ActiveRun,
         rateRequestID: Int
     ) -> (RunState, [RunEffect]) {
-        guard active.session.rhythmControl.mode == .manual else {
-            return (.active(active), [])
-        }
-
         let cadenceSPM: Double?
         let cadenceReliable: Bool
         switch active.activity.rhythm {
@@ -251,6 +270,7 @@ extension RunReducer {
         else { return (session, []) }
 
         var next = session
+        let rampOriginRate = session.pendingCommandedRate ?? session.appliedPlaybackRate
         let decision = adaptationPolicy.update(
             state: session.adaptationState,
             input: AdaptationInput(
@@ -258,7 +278,7 @@ extension RunReducer {
                 cadenceReliable: cadenceReliable,
                 baseTempoBPM: tempo.baseBPM,
                 analysisConfidence: tempo.confidence,
-                appliedRate: session.appliedPlaybackRate,
+                appliedRate: rampOriginRate,
                 deltaSeconds: deltaSeconds,
                 rhythmControl: session.rhythmControl,
                 forceTargetUpdate: forceTargetUpdate
@@ -266,11 +286,17 @@ extension RunReducer {
         )
         next.adaptationState = decision.nextState
 
-        guard abs(decision.commandedRate - session.appliedPlaybackRate) > 0.000_1 else {
+        guard abs(decision.commandedRate - rampOriginRate) > 0.000_1 else {
+            if decision.isTrackCompatible, session.pendingRateRequestID == nil {
+                next.adaptationState.commandStatus = .applied
+                next.adaptationState.appliedRateReadback = session.appliedPlaybackRate
+                next.adaptationState.achievableBPM = decision.requestedBPM
+            }
             return (next, [])
         }
 
         next.pendingRateRequestID = rateRequestID
+        next.pendingCommandedRate = decision.commandedRate
         return (
             next,
             [
@@ -288,7 +314,8 @@ extension RunReducer {
     private func planTrackTransition(
         session: RunSession,
         deltaSeconds: Double,
-        selectionID: Int
+        selectionID: Int,
+        immediate: Bool = false
     ) -> (session: RunSession, effects: [RunEffect]) {
         var next = session
         guard session.adaptationState.isAtLimit,
@@ -307,6 +334,7 @@ extension RunReducer {
             next.pendingTrackSelectionID = nil
             next.pendingNextTrackID = nil
             next.preparedNextTrackID = nil
+            next.immediateTrackSelectionID = nil
             return (
                 next,
                 shouldClearPlan
@@ -321,7 +349,10 @@ extension RunReducer {
             )
         }
 
-        next.incompatibleTrackSeconds += max(deltaSeconds, 0)
+        next.incompatibleTrackSeconds =
+            immediate
+            ? 5
+            : next.incompatibleTrackSeconds + max(deltaSeconds, 0)
         guard next.incompatibleTrackSeconds >= 5 else { return (next, []) }
         guard next.pendingNextTrackID != match.trackID,
             next.preparedNextTrackID != match.trackID
@@ -330,6 +361,9 @@ extension RunReducer {
         next.pendingTrackSelectionID = selectionID
         next.pendingNextTrackID = match.trackID
         next.preparedNextTrackID = nil
+        next.immediateTrackSelectionID = immediate ? selectionID : nil
+        next.adaptationState.commandStatus = .requiresTrackChange
+        next.adaptationState.achievableBPM = requestedBPM
         return (
             next,
             [
@@ -341,5 +375,14 @@ extension RunReducer {
                 )
             ]
         )
+    }
+
+    private func priorDetentValue(_ control: RhythmControlState) -> Int {
+        switch control.mode {
+        case .automatic:
+            control.automaticCorrectionBPM
+        case .manual:
+            control.manualTargetBPM
+        }
     }
 }

@@ -226,15 +226,15 @@ private let policy = AdaptationPolicy()
 
 @Test func honestTempoMeasurementRequiresAllInputsAndUsesEffectiveTempo() {
     let matched = TempoMatchEvaluator.measure(
-        cadenceSPM: 170,
-        cadenceReliable: true,
+        referenceBPM: 170,
+        referenceReliable: true,
         baseTempoBPM: 85,
         appliedRate: 1,
         playbackActive: true
     )
     let unavailable = TempoMatchEvaluator.measure(
-        cadenceSPM: 170,
-        cadenceReliable: true,
+        referenceBPM: 170,
+        referenceReliable: true,
         baseTempoBPM: 85,
         appliedRate: nil,
         playbackActive: true
@@ -242,6 +242,28 @@ private let policy = AdaptationPolicy()
 
     #expect(matched == true)
     #expect(unavailable == nil)
+}
+
+@Test func manualTempoMeasurementRequiresVerifiedReadback() {
+    let verified = TempoMatchEvaluator.measure(
+        referenceBPM: 160,
+        referenceReliable: true,
+        baseTempoBPM: 80,
+        appliedRate: 1,
+        playbackActive: true,
+        commandVerified: true
+    )
+    let pending = TempoMatchEvaluator.measure(
+        referenceBPM: 160,
+        referenceReliable: true,
+        baseTempoBPM: 80,
+        appliedRate: 1,
+        playbackActive: true,
+        commandVerified: false
+    )
+
+    #expect(verified == true)
+    #expect(pending == nil)
 }
 
 private func input(

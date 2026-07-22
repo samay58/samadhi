@@ -139,3 +139,23 @@ The control spans 40 BPM around measured cadence in Auto, capped by the accepted
 The closed aperture teaches its interaction without tutorial copy. Three grip notches appear in the same rim used by the full wheel and make one restrained clockwise-and-back movement after cadence locks. `Turn` is etched into the lower aperture as the only visible word because it names the physical gesture directly. Opening the control removes that label, expands the marks into all 40 detents, and permanently retires the teaching movement. Reduce Motion keeps the static cues and skips the movement.
 
 Adaptive run start uses `TrackMatchPlanner` with 168 BPM only as an initial prior. During a run, five seconds of stable incompatibility may prepare a better-fitting next song. The current song continues unless the runner skips or reaches its natural boundary. Song identity, index, and count change only after the player confirms the transition. Every prepared choice carries selection identity so a stale callback cannot replace newer intent.
+
+## Requested BPM is intent; player read-back is truth
+
+The wheel may request a broad running target, but the interface may call it applied only after `ApplicationMusicPlayer` reports the commanded rate for the current session, operation, request, and track. Every request resolves to applying, applied, changing song, unreachable, or rejected. Rapid detents ramp from the latest pending command so the control follows the runner's latest intent without inventing player feedback.
+
+An unreachable target does not return the music silently toward 1.00 while leaving the requested BPM on screen. The reducer rejects the detent and keeps the last truthful target. If another ready track can reach the request within the quality envelope, direct wheel intent prepares and commits that track immediately, then reapplies the target after the player confirms the change. Natural cadence mismatch keeps the existing five-second stability hold.
+
+## Tempo-matched summaries require verified coverage
+
+Tempo-matched time is eligible only while playback is active, a valid Automatic cadence or Manual reference exists, and MusicKit has verified the current rate command. A run must reach 80 percent eligible coverage before showing a percentage. Lower coverage reports Not measured. Debug diagnostics also preserve coverage plus Automatic and Manual seconds so a high percentage cannot hide a long unmeasured segment.
+
+## Complete import results with bounded work
+
+The setup screen keeps three result rows in the primary composition and exposes every track in a native grouped sheet. Failures remain distinct: unclear rhythm, unavailable preview, catalog mismatch, temporary catalog or download failure, and decode failure. Temporary failures can be retried after relaunch. Legacy collapsed values remain decodable only for persisted compatibility.
+
+Import runs at most three ordered tracks at once. Progress begins with the complete pending source list, stays deterministic, and preserves playlist order. Debug timing records catalog, download, analysis, total track time, and total wall time without song metadata. Concurrency may change only from physical timing evidence.
+
+## Direction is part of the wheel haptic
+
+Clockwise and counterclockwise detents remain distinct through the domain event and Core Haptics pattern. Ordinary detents are stronger than the first field build, every fifth BPM keeps a fuller landmark, and unsupported devices receive direction-specific system impact fallbacks. Physical comfort and direction recognition remain required before this decision is considered tuned.
