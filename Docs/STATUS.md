@@ -12,7 +12,7 @@
 | Audio timing | Real for imported ready tracks; deterministic in fixtures | Production player contract and beat-clock tests |
 | Playlist import | Complete results, typed failures, retry, and bounded analysis implemented | Full-list Simulator proof, import timing diagnostics, model tests, and prior physical collection evidence |
 | Tempo analysis | Version 4 keeps measured musical pulse separate from an independently supported stride pulse; the public corpus passes 12 of 12 | Generated regressions, private playlist replay, and opt-in Apple preview validation |
-| Adaptation policy | Manual commits apply directly; Auto settles across the proven range in about five seconds; an unreachable request uses the nearest honest rate | Identified effects, MusicKit read-back, boundary behavior, and deterministic replay tests |
+| Adaptation policy | Manual commits apply directly; Auto retargets within one second and settles across the proven range within five seconds; an unreachable request uses the nearest honest rate | Identified effects, MusicKit read-back, boundary behavior, and deterministic replay tests |
 | Track fit | Connected to run start and next-song preparation without hidden transport changes | Deterministic pulse, envelope, coalescing, identity, order, and retention tests |
 | In-run BPM control | The wheel stays pinned during a turn, previews detents, then commits one absolute Manual BPM at finger-up | Exact-target, compatible-track, read-back, accessibility, and UI tests |
 | Simulator development loop | Local placeholder playlists and silent simulated playback available in Debug | Normal no-argument launch, model tests, UI flow, screenshot, and interaction recording |
@@ -146,17 +146,17 @@
 
 ## Proof
 
-The current serial gate passed on 2026-07-22:
+The current software gate passed on 2026-07-23:
 
-- 102 Swift package tests
+- 103 Swift package tests
 - 15 app-model tests
 - 10 UI tests
 - Swift formatter lint
 - Resource-inclusive Simulator build
-- Exact-profile physical iPhone build
-- Embedded profile and application identifier verification
+- Focused rotary-control UI proof
+- Runtime review of the ready and active-run screens on iPhone 17 Simulator
 
-The repaired build is signed and ready. Samay's paired iPhone was unavailable at the end of this gate, so this specific build was not installed. Earlier physical installations remain recorded below.
+The paired iPhone is available. The prior exact profile expired on 2026-07-23 UTC. Automatic signing selected a valid wildcard profile, so that build was rejected before installation because MusicKit requires the explicit Samadhi application identifier. Exact-profile renewal is the remaining release blocker.
 
 Durable logs and final visual frames live under Evidence/.
 
@@ -172,4 +172,4 @@ The field report exposed two more defects. Version 3 rejected lower musical puls
 
 ## WHERE WE LEFT OFF
 
-Apple Music remains the selected player. The signed repair build contains tempo estimator version 4 and removes the hidden wheel-to-Skip path. Install it when the paired iPhone reconnects, reimport the saved playlist once, confirm the visible ready count reaches the private replay expectation of about 14 of 18, then start one song and make several large wheel changes. Requested BPM should move, Music BPM should stop truthfully at the song's reachable boundary, and the song must not change until Skip or its natural end. Pull the import and run diagnostics afterward. That is the shortest remaining physical check.
+Apple Music remains the selected player. Tempo estimator version 4 removes the lost-coverage regression, and the hidden wheel-to-Skip path is gone. Manual commits are immediate. Auto now retargets within one second and reaches a full 10 percent change within five seconds. Renew the exact App ID profile, build and inspect the signed application identifier, push `main`, then install without erasing the app container. On the phone, reimport once, confirm about 14 of 18 tracks are ready, and make several large wheel changes while one song continues. Pull the diagnostics afterward. That is the shortest remaining physical check.

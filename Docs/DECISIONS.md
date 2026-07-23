@@ -142,7 +142,7 @@ Adaptive run start uses `TrackMatchPlanner` with 168 BPM only as an initial prio
 
 ## Requested BPM is intent; player read-back is truth
 
-The wheel previews one-BPM detents and haptics locally, stays pinned for the full gesture, then sends one absolute target when the finger lifts. Turning the wheel takes Manual ownership. That final target is durable when cadence changes and jumps directly to its compatible playback rate. Auto remains filtered, but moves at 0.02 rate units per second so the full production range settles in about five seconds. The interface may call a value applied only after `ApplicationMusicPlayer` reports the commanded rate for the current session, operation, request, and track.
+The wheel previews one-BPM detents and haptics locally, stays pinned for the full gesture, then sends one absolute target when the finger lifts. Turning the wheel takes Manual ownership. That final target is durable when cadence changes and jumps directly to its compatible playback rate. Auto remains filtered by cadence confidence and the 2 SPM deadband, retargets after one second, and moves at 0.02 rate units per second so the full production range settles within five seconds of a fresh reliable change. The interface may call a value applied only after `ApplicationMusicPlayer` reports the commanded rate for the current session, operation, request, and track.
 
 Core Motion cadence is current only when `CMPedometerData.endDate` is no more than two seconds old and the value lies inside the running range. Stale, missing, and out-of-range samples all reduce confidence. Three consecutive invalid samples return Auto to acquisition instead of preserving an old cycling or walking cadence.
 

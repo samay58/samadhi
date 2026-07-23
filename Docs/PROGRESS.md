@@ -352,3 +352,14 @@ Milestones 0 and 1 are complete. Milestone 2 is still open. The next checkpoint 
 - Bumped persisted tempo and run-diagnostic semantics to version 4 so older selections reanalyze once
 - Passed formatter lint, 102 package tests, 15 app-model tests, and 10 UI tests in the final serial gate
 - Built the repair with the exact `Samadhi Development` profile and verified the embedded application identifier; the paired iPhone was unavailable, so installation remains open
+
+## 2026-07-23. Response latency and release gate
+
+- Launched the normal app on iPhone 17 Simulator and reviewed the ready and active-run screens at runtime
+- Re-ran the focused rotary UI flow; four strong clockwise turns reached the truthful simulated player boundary within two seconds without changing the song
+- Confirmed Manual commits already send one immediate absolute rate command at finger-up
+- Reduced reliable Auto target recomputation from two seconds to one after the cadence filter and 2 SPM deadband
+- Added deterministic proof that a fresh 10 percent Auto change reaches the full proven rate envelope within five seconds
+- Passed formatter lint, 103 package tests, 15 app-model tests, and 10 UI tests in the final serial gate
+- Rejected an automatically signed physical build because Xcode selected a wildcard application identifier
+- Confirmed the prior exact profile expired on 2026-07-23 UTC; exact App ID profile renewal remains the only installation blocker
