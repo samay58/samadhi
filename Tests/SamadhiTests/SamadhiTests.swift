@@ -312,7 +312,7 @@ import Testing
                         baseBPM: 168,
                         confidence: 0.6,
                         analyzedDurationSeconds: 30,
-                        version: 2
+                        version: 3
                     )
                 )
             )
@@ -333,6 +333,28 @@ import Testing
     }
     #expect(presentation.readyTrackCount == 0)
     #expect(presentation.tracks.first?.status == .rhythmUnclear)
+}
+
+@Test @MainActor func staleTempoAnalysisIsReimportedBeforeUse() async throws {
+    let directory = FileManager.default.temporaryDirectory
+        .appending(path: UUID().uuidString, directoryHint: .isDirectory)
+    defer { try? FileManager.default.removeItem(at: directory) }
+    let store = MusicCollectionStore(directoryURL: directory)
+    let stale = importedCollection(id: "saved", name: "Saved", readyCount: 2, analysisVersion: 2)
+    let refreshed = importedCollection(id: "saved", name: "Saved", readyCount: 2)
+    try await store.replaceSelection(stale)
+    let importer = FixtureMusicImporter(collections: ["saved": refreshed])
+    let model = MusicSelectionModel(
+        store: store,
+        importer: importer,
+        configuration: .productionFixture
+    )
+
+    await model.restore()
+    await waitUntil { model.selectedCollection == refreshed }
+
+    #expect(importer.importedIDs == ["saved"])
+    #expect(try await store.selectedCollection() == refreshed)
 }
 
 @Test @MainActor func importPresentationKeepsEveryTrackAndItsFailureReason() async throws {
@@ -490,13 +512,14 @@ private func waitUntil(
 private func importedCollection(
     id: String,
     name: String,
-    readyCount: Int
+    readyCount: Int,
+    analysisVersion: Int = 3
 ) -> MusicCollection {
     let analysis = TempoAnalysis(
         baseBPM: 168,
         confidence: 0.9,
         analyzedDurationSeconds: 30,
-        version: 2
+        version: analysisVersion
     )
     return MusicCollection(
         id: MusicCollectionID(id),

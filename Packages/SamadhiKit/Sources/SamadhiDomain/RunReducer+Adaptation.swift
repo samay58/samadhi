@@ -1,6 +1,7 @@
 extension RunReducer {
     enum RhythmControlChange: Sendable, Equatable {
         case adjust(Int)
+        case target(Int)
         case manual
         case automatic
     }
@@ -142,6 +143,8 @@ extension RunReducer {
         switch change {
         case let .adjust(steps):
             _ = next.session.rhythmControl.adjust(by: steps)
+        case let .target(bpm):
+            next.session.rhythmControl.setManualTargetBPM(bpm)
         case .manual:
             let seed = next.session.adaptationState.requestedBPM ?? cadenceSPM ?? 168
             next.session.rhythmControl.useManual(seedBPM: seed)

@@ -198,6 +198,14 @@ public struct RunReducer: Sendable {
                 timeoutID: timeoutID
             )
 
+        case let (.active(active), .rhythmControlTargetCommitted(bpm, rateRequestID, timeoutID)):
+            return reduceRhythmControlChange(
+                active: active,
+                change: .target(bpm),
+                rateRequestID: rateRequestID,
+                timeoutID: timeoutID
+            )
+
         case let (.active(active), .rhythmControlSetManual(rateRequestID, timeoutID)):
             return reduceRhythmControlChange(
                 active: active,
@@ -222,14 +230,14 @@ public struct RunReducer: Sendable {
             next.activity = .playing(rhythm: rhythm, controls: .hidden)
             return (.active(next), [])
 
-        case let (.active(active), .controlsFocusEntered):
-            // Visible controls stay pinned while VoiceOver owns focus.
+        case let (.active(active), .controlsInteractionBegan):
+            // Controls cannot disappear while a person is turning the wheel or using VoiceOver.
             guard case let .playing(rhythm, controls) = active.activity, case .hidden = controls else {
                 if case let .playing(rhythm, .timed(surface, _)) = active.activity {
                     var next = active
                     next.activity = .playing(
                         rhythm: rhythm,
-                        controls: .voiceOverPinned(surface: surface)
+                        controls: .pinned(surface: surface)
                     )
                     return (.active(next), [.cancelTask(sessionID: active.session.id, .controlsTimeout)])
                 }
@@ -238,12 +246,12 @@ public struct RunReducer: Sendable {
             var next = active
             next.activity = .playing(
                 rhythm: rhythm,
-                controls: .voiceOverPinned(surface: .transport)
+                controls: .pinned(surface: .transport)
             )
             return (.active(next), [])
 
-        case let (.active(active), .controlsFocusExited(timeoutID)):
-            guard case let .playing(rhythm, .voiceOverPinned(surface)) = active.activity else {
+        case let (.active(active), .controlsInteractionEnded(timeoutID)):
+            guard case let .playing(rhythm, .pinned(surface)) = active.activity else {
                 return (state, [])
             }
             var next = active
@@ -496,7 +504,7 @@ public struct RunReducer: Sendable {
                 active.session.currentTrackID == trackID
             else { return (state, []) }
             var next = active
-            next.session.appliedPlaybackRate = min(max(rate, 0.94), 1.06)
+            next.session.appliedPlaybackRate = min(max(rate, 0.90), 1.10)
             next.session.adaptationState.appliedRateReadback = rate
             next.session.adaptationState.commandLatencySeconds = max(latencySeconds, 0)
             if let commandedRate = next.session.pendingCommandedRate,

@@ -117,7 +117,7 @@ public struct AdaptationPolicy: Sendable {
     public let minimumRate: Double
     public let maximumRate: Double
 
-    public init(minimumRate: Double = 0.94, maximumRate: Double = 1.06) {
+    public init(minimumRate: Double = 0.90, maximumRate: Double = 1.10) {
         self.minimumRate = minimumRate
         self.maximumRate = maximumRate
     }
@@ -198,12 +198,14 @@ public struct AdaptationPolicy: Sendable {
             return musicSteady(state: next, input: input)
         }
 
-        let rampPerSecond = next.hasMatched ? 0.005 : 0.02
-        let commandedRate = move(
-            input.appliedRate,
-            toward: target,
-            maximumChange: rampPerSecond * input.deltaSeconds
-        )
+        let commandedRate =
+            input.rhythmControl.mode == .manual && input.forceTargetUpdate
+            ? target
+            : move(
+                input.appliedRate,
+                toward: target,
+                maximumChange: 0.02 * input.deltaSeconds
+            )
         next.commandedRate = commandedRate
         next.commandStatus = .applying
         next.isAtLimit = false
@@ -235,12 +237,8 @@ public struct AdaptationPolicy: Sendable {
     }
 
     private func targetRate(requestedBPM: Double, baseTempo: Double) -> Double? {
-        let candidates = [baseTempo / 2, baseTempo, baseTempo * 2]
-            .filter { (120...210).contains($0) }
-        return
-            candidates
-            .map { requestedBPM / $0 }
-            .min { abs($0 - 1) < abs($1 - 1) }
+        guard (120...210).contains(baseTempo) else { return nil }
+        return requestedBPM / baseTempo
     }
 
     private func confidenceLost(state: AdaptationState, input: AdaptationInput) -> AdaptationDecision {
@@ -332,10 +330,7 @@ public enum TempoMatchEvaluator {
             let appliedRate
         else { return nil }
 
-        let closestEffectiveTempo = [baseTempoBPM / 2, baseTempoBPM, baseTempoBPM * 2]
-            .map { $0 * appliedRate }
-            .min { abs($0 - referenceBPM) < abs($1 - referenceBPM) }
-        guard let closestEffectiveTempo else { return nil }
-        return abs(closestEffectiveTempo - referenceBPM) <= 3
+        guard (120...210).contains(baseTempoBPM) else { return nil }
+        return abs((baseTempoBPM * appliedRate) - referenceBPM) <= 3
     }
 }

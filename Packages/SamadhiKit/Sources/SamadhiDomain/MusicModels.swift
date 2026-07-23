@@ -161,9 +161,15 @@ public struct PlaybackProgress: Sendable, Equatable {
 public struct CadenceObservation: Sendable, Equatable {
     public let stepsPerMinute: Double?
     public let elapsedSeconds: Double
+    public let sampleAgeSeconds: Double
 
-    public init(stepsPerMinute: Double?, elapsedSeconds: Double) {
+    public init(
+        stepsPerMinute: Double?,
+        elapsedSeconds: Double,
+        sampleAgeSeconds: Double = 0
+    ) {
         self.stepsPerMinute = stepsPerMinute
         self.elapsedSeconds = max(elapsedSeconds, 0)
+        self.sampleAgeSeconds = max(sampleAgeSeconds, 0)
     }
 }

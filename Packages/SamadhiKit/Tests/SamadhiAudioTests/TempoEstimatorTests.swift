@@ -4,14 +4,14 @@ import SamadhiAudio
 import SamadhiDomain
 import Testing
 
-@Test func periodicOnsetsProduceTheExpectedTempoFamily() async throws {
+@Test func periodicOnsetsProduceTheExpectedRunningPulse() async throws {
     let sampleRate = 8_000.0
     let samples = pulseTrain(bpm: 168, durationSeconds: 20, sampleRate: sampleRate)
 
     let result = try await analyze(samples: samples, sampleRate: sampleRate)
 
     #expect(result != nil)
-    #expect(tempoFamilyError(result?.baseBPM ?? 0, referenceBPM: 168) <= 0.02)
+    #expect(tempoError(result?.baseBPM ?? 0, referenceBPM: 168) <= 0.02)
     #expect(result?.confidence ?? 0 >= 0.72)
 }
 
@@ -39,7 +39,7 @@ func generatedTempoCorpusStaysInsideTwoPercent(_ referenceBPM: Double) async thr
     let result = try await analyze(samples: samples, sampleRate: sampleRate)
 
     #expect(result != nil)
-    #expect(tempoFamilyError(result?.baseBPM ?? 0, referenceBPM: referenceBPM) <= 0.02)
+    #expect(tempoError(result?.baseBPM ?? 0, referenceBPM: referenceBPM) <= 0.02)
 }
 
 @Test func irregularOnsetsAreRejected() async throws {
@@ -58,7 +58,7 @@ func generatedTempoCorpusStaysInsideTwoPercent(_ referenceBPM: Double) async thr
     let result = try await analyze(samples: samples, sampleRate: sampleRate, channels: 2)
 
     #expect(result != nil)
-    #expect(tempoFamilyError(result?.baseBPM ?? 0, referenceBPM: 150) <= 0.02)
+    #expect(tempoError(result?.baseBPM ?? 0, referenceBPM: 150) <= 0.02)
 }
 
 @Test func aStrongEveryThirdBeatAccentIsRejectedRatherThanMislabelled() async throws {
@@ -73,7 +73,7 @@ func generatedTempoCorpusStaysInsideTwoPercent(_ referenceBPM: Double) async thr
     let result = try await analyze(samples: samples, sampleRate: sampleRate)
 
     if let result {
-        #expect(tempoFamilyError(result.baseBPM, referenceBPM: 180) <= 0.02)
+        #expect(tempoError(result.baseBPM, referenceBPM: 180) <= 0.02)
     }
 }
 
@@ -179,8 +179,6 @@ private enum TempoFixtureError: Error {
     case couldNotCreateBuffer
 }
 
-private func tempoFamilyError(_ actual: Double, referenceBPM: Double) -> Double {
-    [referenceBPM / 2, referenceBPM, referenceBPM * 2]
-        .map { abs(actual - $0) / $0 }
-        .min() ?? .infinity
+private func tempoError(_ actual: Double, referenceBPM: Double) -> Double {
+    abs(actual - referenceBPM) / referenceBPM
 }

@@ -57,6 +57,11 @@ public struct RhythmControlState: Sendable, Equatable, Codable {
         return self != prior
     }
 
+    public mutating func setManualTargetBPM(_ bpm: Int) {
+        mode = .manual
+        manualTargetBPM = Self.manualTargetRange.clamped(bpm)
+    }
+
     public mutating func useManual(seedBPM: Double?) {
         mode = .manual
         if let seedBPM {

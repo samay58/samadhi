@@ -10,7 +10,6 @@ struct RhythmControl: View {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Environment(\.accessibilityVoiceOverEnabled) private var voiceOverEnabled
     @AppStorage("samadhi.tempoControlDiscovered") private var tempoControlDiscovered = false
-    @State private var dragAutomaticBaseBPM: Int?
     @State private var dragOriginBPM: Int?
     @State private var frozenDisplayBPM: Int?
     @State private var rotaryTracker = RotaryDetentTracker()
@@ -58,9 +57,9 @@ struct RhythmControl: View {
             .accessibilityAdjustableAction { direction in
                 switch direction {
                 case .increment:
-                    send(.adjustRhythmControl(1))
+                    commitAccessibleChange(1)
                 case .decrement:
-                    send(.adjustRhythmControl(-1))
+                    commitAccessibleChange(-1)
                 @unknown default:
                     break
                 }
@@ -226,12 +225,9 @@ struct RhythmControl: View {
                 guard rotaryTracker.isTracking || startRadius >= size * 0.28 else { return }
                 guard rotaryTracker.isTracking else {
                     dragOriginBPM = displayBPM
-                    if state.rhythmControl.mode == .automatic, let displayBPM {
-                        dragAutomaticBaseBPM =
-                            displayBPM - state.rhythmControl.automaticCorrectionBPM
-                    }
                     frozenDisplayBPM = displayBPM
                     rotaryTracker.begin(at: startAngle)
+                    send(.controlsInteractionChanged(true))
                     wheelIndicatorAngle = angle
                     _ = rotaryTracker.update(to: angle)
                     applyTrackedDetent()
@@ -243,13 +239,18 @@ struct RhythmControl: View {
                 applyTrackedDetent()
             }
             .onEnded { _ in
-                dragAutomaticBaseBPM = nil
+                let committedBPM = frozenDisplayBPM
+                let originBPM = dragOriginBPM
                 dragOriginBPM = nil
                 frozenDisplayBPM = nil
                 rotaryTracker.reset()
                 withAnimation(effectiveReduceMotion ? nil : .easeOut(duration: MotionToken.control)) {
                     wheelIndicatorAngle = nil
                 }
+                if let committedBPM, committedBPM != originBPM {
+                    send(.commitRhythmTarget(committedBPM))
+                }
+                send(.controlsInteractionChanged(false))
             }
     }
 
@@ -338,21 +339,11 @@ struct RhythmControl: View {
         guard state.rhythmControl.isAvailable else { return }
         tempoControlDiscovered = true
         if !state.rhythmControl.isVisible { send(.revealRhythmControl) }
-        if voiceOverEnabled { send(.controlsFocusChanged(true)) }
+        if voiceOverEnabled { send(.controlsInteractionChanged(true)) }
     }
 
     private func boundedDisplayBPM(_ bpm: Int) -> Int {
-        switch state.rhythmControl.mode {
-        case .automatic:
-            guard let base = dragAutomaticBaseBPM else { return bpm }
-            let lowerBound = base + RhythmControlState.automaticCorrectionRange.lowerBound
-            let upperBound = base + RhythmControlState.automaticCorrectionRange.upperBound
-            return RhythmControlState.runningTargetRange.clamped(
-                min(max(bpm, lowerBound), upperBound)
-            )
-        case .manual:
-            return RhythmControlState.manualTargetRange.clamped(bpm)
-        }
+        RhythmControlState.manualTargetRange.clamped(bpm)
     }
 
     private func applyTrackedDetent() {
@@ -362,11 +353,17 @@ struct RhythmControl: View {
         guard change != 0 else { return }
         frozenDisplayBPM = nextDisplayBPM
 
-        // Each crossed detent gets one state change and one haptic click.
         let step = change > 0 ? 1 : -1
-        for _ in 0..<abs(change) {
-            send(.adjustRhythmControl(step))
+        let direction: RhythmAdjustmentDirection = step > 0 ? .increase : .decrease
+        for offset in 1...abs(change) {
+            let value = (frozenDisplayBPM ?? origin) - change + (step * offset)
+            send(.previewRhythmStep(direction: direction, isMajor: value.isMultiple(of: 5)))
         }
+    }
+
+    private func commitAccessibleChange(_ step: Int) {
+        guard let current = displayBPM else { return }
+        send(.commitRhythmTarget(boundedDisplayBPM(current + step)))
     }
 }
 

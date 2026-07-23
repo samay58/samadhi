@@ -54,9 +54,9 @@ The adapter stays behind a source-neutral main-actor contract. MusicKit's async 
 
 ## One local tempo-analysis interface
 
-Preview audio and future imported files both become a local audio-file URL before analysis. `LocalTempoAnalyzer` hides off-main PCM decoding and returns a versioned source-neutral result. `TempoEstimator` version 2 contains Accelerate spectral flux, fractional-lag autocorrelation, and conservative triple-meter rejection.
+Preview audio and future imported files both become a local audio-file URL before analysis. `LocalTempoAnalyzer` hides off-main PCM decoding and returns a versioned source-neutral result. `TempoEstimator` version 3 contains Accelerate spectral flux and fractional-lag autocorrelation constrained to the accepted 120 through 210 BPM running pulse.
 
-Version 1 passed 11 of 12 tempo-declared Apple workout previews but confidently labelled one 180 BPM mix as 60 BPM. Version 2 passes 12 of 12. The opt-in validator downloads provider-hosted previews temporarily and commits only metadata and results. This is an engineering accuracy result, not public-distribution permission for preview analysis.
+Version 1 passed 11 of 12 tempo-declared Apple workout previews but confidently labelled one 180 BPM mix as 60 BPM. Version 2 passed 12 of 12 only because it accepted half-time equivalence, including a declared 180 BPM track analyzed at 89.5 BPM. Version 3 passes 11 of 12 against the exact declared running pulse and rejects the remaining preview. Persisted version-2 selections are reimported before use. The opt-in validator downloads provider-hosted previews temporarily and commits only metadata and results.
 
 ## Honest tempo matching
 
@@ -126,9 +126,9 @@ This is not a settings system and it does not bypass the reducer. SwiftUI sends 
 
 Weav achieved broad adaptation through licensed multi-arrangement material, not one extreme rate control applied to ordinary masters. djay treats song compatibility, BPM correction, beat alignment, key lock, and transitions as separate responsibilities. Samadhi will use the same separation without importing a DJ interface.
 
-The production mechanic is coarse track fit followed by fine rate correction. `TrackMatchPlanner` ranks adaptive-ready tracks by the smallest pitch-stable correction across half-time, full-time, and double-time pulse interpretations. It keeps the current song when another candidate is only marginally better and preserves source order as the tie-breaker.
+The production mechanic is coarse track fit followed by fine rate correction. `TrackMatchPlanner` ranks adaptive-ready tracks by the smallest pitch-stable correction against one analyzed running pulse. It does not silently multiply a slow beat to make the displayed target look matched. It keeps the current song when another candidate is only marginally better and preserves source order as the tie-breaker.
 
-The 0.94 through 1.06 envelope remains authoritative until a physical MusicKit comparison proves a wider clean range. If 0.92 versus 1.08 is not both clean and unmistakable, Apple Music returns to a source decision instead of becoming a permanent compromised path. The evidence and pivot order live in [ADAPTIVE-AUDIO-PLAYBOOK.md](ADAPTIVE-AUDIO-PLAYBOOK.md).
+The production envelope is 0.90 through 1.10. Samay heard those endpoints clearly on Bluetooth, reported no unpleasant artifacts in earlier rate listening, and later reported approximately 95 percent confidence that the mechanism worked. Full-song listening and the final outdoor run remain required quality gates, but the older 0.94 through 1.06 limit no longer blocks a useful response.
 
 On 2026-07-21, one Beoplay Eleven check made the 0.90 versus 1.10 difference unmistakable on `LITE SPOTS`, with matching MusicKit read-back. Samay reported approximately 95 percent confidence that the mechanism worked and asked implementation to continue. Apple Music remains authoritative. This does not expand the production quality envelope because the wider endpoints have not passed full-song artifact listening.
 
@@ -142,7 +142,9 @@ Adaptive run start uses `TrackMatchPlanner` with 168 BPM only as an initial prio
 
 ## Requested BPM is intent; player read-back is truth
 
-The wheel may request a broad running target, but the interface may call it applied only after `ApplicationMusicPlayer` reports the commanded rate for the current session, operation, request, and track. Every request resolves to applying, applied, changing song, unreachable, or rejected. Rapid detents ramp from the latest pending command so the control follows the runner's latest intent without inventing player feedback.
+The wheel previews one-BPM detents and haptics locally, stays pinned for the full gesture, then sends one absolute target when the finger lifts. Turning the wheel takes Manual ownership. That final target is durable when cadence changes and jumps directly to its compatible playback rate. Auto remains filtered, but moves at 0.02 rate units per second so the full production range settles in about five seconds. The interface may call a value applied only after `ApplicationMusicPlayer` reports the commanded rate for the current session, operation, request, and track.
+
+Core Motion cadence is current only when `CMPedometerData.endDate` is no more than two seconds old and the value lies inside the running range. Stale, missing, and out-of-range samples all reduce confidence. Three consecutive invalid samples return Auto to acquisition instead of preserving an old cycling or walking cadence.
 
 An unreachable target does not return the music silently toward 1.00 while leaving the requested BPM on screen. The reducer rejects the detent and keeps the last truthful target. If another ready track can reach the request within the quality envelope, direct wheel intent prepares and commits that track immediately, then reapplies the target after the player confirms the change. Natural cadence mismatch keeps the existing five-second stability hold.
 

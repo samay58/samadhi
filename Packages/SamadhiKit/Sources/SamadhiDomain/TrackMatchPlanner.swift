@@ -29,8 +29,8 @@ public struct TrackMatchPlanner: Sendable {
     public let currentTrackRetention: Double
 
     public init(
-        minimumRate: Double = 0.94,
-        maximumRate: Double = 1.06,
+        minimumRate: Double = 0.90,
+        maximumRate: Double = 1.10,
         currentTrackRetention: Double = 0.01
     ) {
         self.minimumRate = minimumRate
@@ -65,19 +65,16 @@ public struct TrackMatchPlanner: Sendable {
     ) -> TrackTempoMatch? {
         guard let tempo = track.tempo, tempo.isAdaptiveReady, tempo.baseBPM > 0 else { return nil }
 
-        return [tempo.baseBPM / 2, tempo.baseBPM, tempo.baseBPM * 2]
-            .filter { (120...210).contains($0) }
-            .compactMap { pulse -> TrackTempoMatch? in
-                let rate = requestedBPM / pulse
-                guard (minimumRate...maximumRate).contains(rate) else { return nil }
-                return TrackTempoMatch(
-                    trackID: track.id,
-                    collectionIndex: index,
-                    pulseBPM: pulse,
-                    requiredRate: rate
-                )
-            }
-            .min(by: isBetter)
+        let pulse = tempo.baseBPM
+        guard (120...210).contains(pulse) else { return nil }
+        let rate = requestedBPM / pulse
+        guard (minimumRate...maximumRate).contains(rate) else { return nil }
+        return TrackTempoMatch(
+            trackID: track.id,
+            collectionIndex: index,
+            pulseBPM: pulse,
+            requiredRate: rate
+        )
     }
 
     private func isBetter(_ lhs: TrackTempoMatch, than rhs: TrackTempoMatch) -> Bool {

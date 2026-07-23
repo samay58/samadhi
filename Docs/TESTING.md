@@ -9,7 +9,7 @@
 
 Scripts/test.sh runs Swift package tests, app-model tests, and UI tests serially on iPhone 17 Pro Simulator.
 
-The 2026-07-22 full serial gate passed 92 package tests, 14 app-model tests, and 10 UI tests.
+The 2026-07-22 adaptive-audio repair gate passed 97 package tests, 15 app-model tests, and 10 UI tests serially.
 
 Formatter gate:
 
@@ -31,11 +31,11 @@ Domain tests cover:
 - Route loss and explicit resume
 - Finish visibility and hold identity
 - Cancellation ordering
-- VoiceOver control pinning
+- Active wheel and VoiceOver control pinning
 - Mixed summary metrics
 - Track progress reset and configured collection wraparound
-- Half-time and double-time tempo normalization
-- Safe rate bounds, initial and ongoing ramps, deadband, and target update interval
+- Rejection of half-time and double-time aliases outside the analyzed running-pulse range
+- The 0.90 through 1.10 rate bounds, audible Auto ramp, deadband, and target update interval
 - The 149.75 BPM focused fixture ramping from 1.00 through 0.98 and 0.96 toward a safe 142 SPM target
 - Target recomputation when the track changes at a steady cadence
 - Confidence hold, return to normal rate, and reacquisition reset
@@ -50,7 +50,7 @@ Domain tests cover:
 - Auto correction, Manual targeting, reset, bounds, and honest limit reporting
 - Manual behavior before cadence lock, through confidence loss, pause, resume, and track change
 - Prevention of a general surface tap replacing an open rhythm control
-- Compatible-track ranking across half-time, full-time, and double-time pulse families
+- Compatible-track ranking against one analyzed 120 through 210 BPM running pulse
 - Quality-envelope exclusion, source-order ties, and current-track retention
 - Compatible adaptive starting-song selection from the initial cadence prior
 - Five-second mismatch hold, prepared-next identity, recovery clearing, and stale preparation rejection
@@ -79,13 +79,13 @@ The Core Motion adapter compiles for a generic iPhone target. A 29-second physic
 Tempo-analysis tests cover:
 
 - Periodic onset detection at 120, 150, 168, and 190 BPM
-- Half and double tempo equivalence within 2 percent
+- Exact running-pulse agreement within 2 percent
 - Alternating accents
 - Strong every-third-beat accents reject instead of producing a confident triple-meter error
 - Silence and irregular-onset rejection
 - Mono and stereo audio-file decoding through the public analysis interface
 
-These generated fixtures validate the module seam. The opt-in `TempoCorpusValidator` adds network evidence against 12 provider-hosted Apple previews whose catalog titles declare tempos from 130 through 180 BPM. Version 2 passed 12 of 12 within 2 percent of the reference or its half or double. No preview audio is committed, and normal tests remain offline.
+These generated fixtures validate the module seam. The opt-in `TempoCorpusValidator` adds network evidence against 12 provider-hosted Apple previews whose catalog titles declare tempos from 130 through 180 BPM. Version 3 passed 11 of 12 within 2 percent of the exact declared pulse and rejected the remaining preview. No preview audio is committed, and normal tests remain offline.
 
 UI tests cover:
 
@@ -154,12 +154,12 @@ The `Samadhi MusicKit Gate` scheme verifies that the harness and framework calls
 - Paired iPhone state on 2026-07-21: connected over the local network; the exact-profile MusicKit harness built, installed, launched, and showed Beoplay Eleven as its Bluetooth A2DP route
 - Exact profile state on 2026-07-21: embedded `Samadhi Development` profile verified with application identifier `ZL5U59XBJ6.com.samaydhawan.Samadhi`; it expires on 2026-07-23 UTC
 - One-track perceptibility result: 0.90 versus 1.10 was clearly audible on `LITE SPOTS` through Beoplay Eleven, with repeated requested and reported rate agreement
-- Full perceptibility protocol: open; four-of-five blinded recognition and full-song endpoint quality were not completed, so the production envelope remains 0.94 through 1.06
+- Full perceptibility protocol: open; 0.90 versus 1.10 is now the production envelope because that pair was clearly audible, while full-song endpoint quality remains a completion gate
 - Production track-fit and rotary-control build: exact-profile signing, embedded application identifier, wireless installation, foreground launch, and normal setup rendering passed on the restored iPhone on 2026-07-22
 - First normal field run: historical red evidence; 497 wheel adjustments and a 59-BPM requested span produced only a 0.056 MusicKit read-back span, while the summary reported 99 percent from automatic-only eligible samples
 - Field-run remediation: privacy-safe replay, truthful command states, prompt read-back, immediate compatible-track commitment, target reapplication, and honest coverage pass deterministically
 - Import remediation: full six-track disclosure fixture, typed failure sections, retry after relaunch, ordered three-track batching, and timing persistence pass in Simulator and model tests
-- Current remediation build: exact `Samadhi Development` profile, application identifier, signed physical build, and installation passed on 2026-07-22; foreground launch waited on the locked phone and was not claimed
+- Exact BPM and fresh Auto repair: formatter lint, 97 package tests, 15 app-model tests, 10 UI tests, exact `Samadhi Development` signing, application identifier verification, physical build, and installation passed on 2026-07-22; foreground launch waited on the locked phone and was not claimed
 - Physical remediation check: open for audible direction, command latency, compatible track change, clockwise versus counterclockwise haptics, and real import wall time
 
 ## Felt-synchronization gate

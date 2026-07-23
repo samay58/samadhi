@@ -143,7 +143,7 @@ struct ActiveRunScreen: View {
         guard state.phase == .running || state.phase == .acquiring else { return }
         guard !state.rhythmControl.isVisible else { return }
         send(.revealControls)
-        if voiceOverEnabled { send(.controlsFocusChanged(true)) }
+        if voiceOverEnabled { send(.controlsInteractionChanged(true)) }
     }
 
     private func beginFinish() {

@@ -53,3 +53,33 @@ import Testing
 
     #expect(result == .acquiring)
 }
+
+@Test func sustainedOutOfRangeCadenceReturnsToAcquiring() {
+    var filter = CadenceFilter()
+    for value in [168.0, 168, 168, 168, 168] {
+        _ = filter.ingest(CadenceObservation(stepsPerMinute: value, elapsedSeconds: 0))
+    }
+
+    _ = filter.ingest(CadenceObservation(stepsPerMinute: 0, elapsedSeconds: 1))
+    _ = filter.ingest(CadenceObservation(stepsPerMinute: 0, elapsedSeconds: 2))
+    let result = filter.ingest(CadenceObservation(stepsPerMinute: 0, elapsedSeconds: 3))
+
+    #expect(result == .acquiring)
+}
+
+@Test func staleCadenceSamplesCannotAcquire() {
+    var filter = CadenceFilter()
+    var result = CadenceEstimate.acquiring
+
+    for index in 0..<5 {
+        result = filter.ingest(
+            CadenceObservation(
+                stepsPerMinute: 180,
+                elapsedSeconds: Double(index),
+                sampleAgeSeconds: 5
+            )
+        )
+    }
+
+    #expect(result == .acquiring)
+}

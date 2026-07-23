@@ -6,7 +6,7 @@ Samadhi succeeds only when a runner can feel music and stride become one system.
 
 Treat synchronization as three related mechanics:
 
-- **Track fit** chooses a recording whose native pulse or half/double interpretation sits near the requested cadence. D-Jogger changed songs when a target stayed outside its empirically acceptable stretch range, and Spotify Running selected music by detected cadence rather than stretching every song. Sources: [D-Jogger implementation](https://backoffice.biblio.ugent.be/download/8551818/8551819), [Spotify Running](https://techcrunch.com/2015/05/20/spotify-for-runners/).
+- **Track fit** chooses a recording whose analyzed running pulse sits near the requested cadence. Mathematical half-time equivalence is not enough when the slower pulse is what the runner hears. D-Jogger changed songs when a target stayed outside its empirically acceptable stretch range, and Spotify Running selected music by detected cadence rather than stretching every song. Sources: [D-Jogger implementation](https://backoffice.biblio.ugent.be/download/8551818/8551819), [Spotify Running](https://techcrunch.com/2015/05/20/spotify-for-runners/).
 - **Tempo match** applies a bounded rate correction so the effective musical tempo approaches cadence. Small 1 to 3 percent changes can influence running even when listeners do not consciously notice them. Source: [Music tempo and running cadence study](https://pmc.ncbi.nlm.nih.gov/articles/PMC4526248/).
 - **Beat lock** aligns musical beat position with footfall timing. D-Jogger found that continuous tempo matching alone produced limited phase synchronization, while beat-phase correction produced much stronger synchronization. Sources: [D-Jogger phase study](https://pubmed.ncbi.nlm.nih.gov/25489742/), [continuous relative-phase study](https://pmc.ncbi.nlm.nih.gov/articles/PMC6283599/).
 
@@ -87,7 +87,7 @@ Any wider MusicKit rate remains an empirical device capability. Test it. Do not 
 
 ## Current Samadhi gap
 
-The source-neutral planner now selects the best ready fit at run start and prepares a better fit after five seconds of stable incompatibility. The 40-BPM wheel can therefore express a broad target without widening one song's rate envelope. Three physical truths remain open:
+The source-neutral planner selects the best ready fit at run start and prepares a better fit after five seconds of stable incompatibility. Tempo estimator version 3, the planner, the applied-BPM readout, and summary measurement now share one 120 through 210 BPM pulse instead of treating half-time as perceptually equivalent. The wheel commits one absolute target at finger-up, and the production rate envelope is the already audible 0.90 through 1.10 range. Three physical truths remain open:
 
 - One imported run must cross a natural prepared transition without a gap, stale feedback, or a false summary.
 - The wider dial must agree with the requested BPM, selected pulse, MusicKit rate read-back, and audible result on the physical phone.
@@ -99,15 +99,15 @@ Do not mistake the completed control surface for a completed body-to-music loop.
 
 Use a two-layer match:
 
-1. **Coarse match by song.** Normalize each ready track into plausible half, full, or double-time pulse families. Rank tracks by the absolute logarithmic distance between requested BPM and native pulse. Prefer strong-beat tracks and keep the current track when it remains inside a hysteresis band. D-Jogger used the same broad pattern of bounded stretching plus closer-tempo selection. Source: [D-Jogger implementation](https://backoffice.biblio.ugent.be/download/8551818/8551819).
-2. **Fine match by rate.** Apply pitch-stable playback rate only inside a physically proven quality envelope. Start by testing 0.92 through 1.08, then 0.90 through 1.10 if the first range is clean. D-Jogger found roughly ±10 percent acceptable for its own phase-vocoder implementation, but that result is engine-specific. Source: [D-Jogger implementation](https://backoffice.biblio.ugent.be/download/8551818/8551819).
+1. **Coarse match by song.** Rank tracks by the absolute logarithmic distance between requested BPM and the analyzed running pulse. Reject ambiguous or out-of-range pulse estimates instead of silently doubling them. Prefer strong-beat tracks and keep the current track when it remains inside a hysteresis band. D-Jogger used the same broad pattern of bounded stretching plus closer-tempo selection. Source: [D-Jogger implementation](https://backoffice.biblio.ugent.be/download/8551818/8551819).
+2. **Fine match by rate.** Apply pitch-stable playback rate from 0.90 through 1.10. Those endpoints were clearly distinguishable in the physical Bluetooth check. D-Jogger also found roughly ±10 percent acceptable for its own phase-vocoder implementation, but full-song MusicKit quality still needs its own final listening gate. Source: [D-Jogger implementation](https://backoffice.biblio.ugent.be/download/8551818/8551819).
 3. **Transition musically.** Reorder or select the next compatible song at a natural boundary. Do not jump tracks for every cadence fluctuation. djay applies tempo alignment around selected transition regions and holds a common BPM when songs are already close. Source: [djay Automix](https://help.algoriddim.com/user-manual/djay-pro-mac/mixing-basics/using-automix).
 4. **Preserve truthful control.** If the current track cannot reach the target, hold the nearest proven boundary only during an explicit audition, or label the current song steady while preparing a compatible next track. Do not show `At limit` while silently returning to 1.00.
 
 Auto and Manual remain distinct:
 
 - **Auto follows.** It starts from reliable cadence, settles inside the entrainment basin, and stays calm.
-- **Manual leads.** It lets the runner choose a training cadence, auditions an unmistakable change, then supports one-BPM trim. Weav and RockMyRun both treated detected and fixed tempo as first-class modes. Sources: [Weav review](https://www.runnersworld.com/runners-stories/a32257227/running-app-weav-improves-cadence-stride/), [RockMyRun myBeat](https://rockmyrun.com/myBeat.php).
+- **Manual leads.** Turning the wheel transfers ownership to one absolute BPM. Detents are tactile previews; finger-up sends one rate command and the final target does not drift with later cadence. Weav and RockMyRun both treated detected and fixed tempo as first-class modes. Sources: [Weav review](https://www.runnersworld.com/runners-stories/a32257227/running-app-weav-improves-cadence-stride/), [RockMyRun myBeat](https://rockmyrun.com/myBeat.php).
 
 ## Perceptibility gate
 
@@ -125,7 +125,7 @@ The 5 to 8 percent comparison is grounded in published tempo-discrimination rang
 
 ### Track-fit proof
 
-- Given one stable cadence, show that the planner selects the closest ready tempo family.
+- Given one stable cadence, show that the planner selects the closest ready running pulse.
 - Given a cadence change that makes the current song incompatible for at least five seconds, prepare a compatible next song without oscillating between candidates. D-Jogger used a five-second outside-range trigger before selecting a closer song. Source: [D-Jogger implementation](https://backoffice.biblio.ugent.be/download/8551818/8551819).
 - Verify requested BPM, selected pulse family, derived rate, MusicKit read-back, and effective BPM agree.
 - Keep playlist order only as a tie-breaker. Product usefulness outranks strict source order.
@@ -165,6 +165,9 @@ Reject the middle path: do not polish a ±6 percent tempo-only system and market
 - https://developer.apple.com/documentation/applemusicapi/songs/attributes-data.dictionary
 - https://developer.apple.com/documentation/musickit/previewasset
 - https://developer.apple.com/documentation/musickit/song
+- https://developer.apple.com/documentation/coremotion/cmpedometerdata/currentcadence
+- https://developer.apple.com/documentation/coremotion/cmpedometerdata/enddate
+- https://developer.apple.com/documentation/coremotion/cmpedometer/startupdates(from:withhandler:)
 - https://developer.apple.com/documentation/avfaudio/avaudiounittimepitch/rate
 - https://developer.apple.com/documentation/avfaudio/avaudiounittimepitch/overlap
 - https://developer.apple.com/documentation/avfaudio/avaudioplayernode
@@ -206,4 +209,4 @@ Reject the middle path: do not polish a ±6 percent tempo-only system and market
 
 ---
 
-*Captured: 2026-07-21*
+*Updated: 2026-07-22*

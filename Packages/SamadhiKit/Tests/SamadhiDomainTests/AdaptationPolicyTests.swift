@@ -4,7 +4,7 @@ import Testing
 
 private let policy = AdaptationPolicy()
 
-@Test func halfAndDoubleTempoCandidatesCanMatchRunningCadence() {
+@Test func halfAndDoubleTempoAliasesCannotClaimRunningCadence() {
     let halfTime = policy.update(
         state: .initial,
         input: input(cadence: 170, tempo: 85)
@@ -14,10 +14,10 @@ private let policy = AdaptationPolicy()
         input: input(cadence: 170, tempo: 340)
     )
 
-    #expect(halfTime.targetRate == 1)
-    #expect(doubleTime.targetRate == 1)
-    #expect(halfTime.isTrackCompatible)
-    #expect(doubleTime.isTrackCompatible)
+    #expect(halfTime.targetRate == nil)
+    #expect(doubleTime.targetRate == nil)
+    #expect(!halfTime.isTrackCompatible)
+    #expect(!doubleTime.isTrackCompatible)
 }
 
 @Test func unsafeRateLeavesMusicSteady() {
@@ -32,7 +32,7 @@ private let policy = AdaptationPolicy()
     #expect(decision.isAtLimit)
 }
 
-@Test func initialAndOngoingRateChangesUseDifferentRampLimits() {
+@Test func automaticRateChangesStayAudibleAfterTheFirstMatch() {
     let initial = policy.update(
         state: .initial,
         input: input(cadence: 171, tempo: 165, appliedRate: 1, deltaSeconds: 1)
@@ -46,7 +46,7 @@ private let policy = AdaptationPolicy()
     )
 
     #expect(initial.commandedRate == 1.02)
-    #expect(ongoing.commandedRate == 1.005)
+    #expect(ongoing.commandedRate == 1.02)
 }
 
 @Test func walkingFixtureCreatesClearSafeRamp() {
@@ -161,7 +161,7 @@ private let policy = AdaptationPolicy()
 
     #expect(decision.requestedBPM == 168)
     #expect(decision.targetRate == 1.05)
-    #expect(decision.commandedRate == 1.02)
+    #expect(decision.commandedRate == 1.05)
     #expect(decision.nextState.lastReliableCadenceSPM == nil)
 }
 
@@ -228,14 +228,14 @@ private let policy = AdaptationPolicy()
     let matched = TempoMatchEvaluator.measure(
         referenceBPM: 170,
         referenceReliable: true,
-        baseTempoBPM: 85,
+        baseTempoBPM: 170,
         appliedRate: 1,
         playbackActive: true
     )
     let unavailable = TempoMatchEvaluator.measure(
         referenceBPM: 170,
         referenceReliable: true,
-        baseTempoBPM: 85,
+        baseTempoBPM: 170,
         appliedRate: nil,
         playbackActive: true
     )
@@ -248,7 +248,7 @@ private let policy = AdaptationPolicy()
     let verified = TempoMatchEvaluator.measure(
         referenceBPM: 160,
         referenceReliable: true,
-        baseTempoBPM: 80,
+        baseTempoBPM: 160,
         appliedRate: 1,
         playbackActive: true,
         commandVerified: true
@@ -256,7 +256,7 @@ private let policy = AdaptationPolicy()
     let pending = TempoMatchEvaluator.measure(
         referenceBPM: 160,
         referenceReliable: true,
-        baseTempoBPM: 80,
+        baseTempoBPM: 160,
         appliedRate: 1,
         playbackActive: true,
         commandVerified: false

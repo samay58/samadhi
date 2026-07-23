@@ -193,9 +193,11 @@ public enum RunAction: Sendable, Equatable {
     case revealControls
     case revealRhythmControl
     case adjustRhythmControl(Int)
+    case previewRhythmStep(direction: RhythmAdjustmentDirection, isMajor: Bool)
+    case commitRhythmTarget(Int)
     case useManualRhythm
     case resetRhythmControl
-    case controlsFocusChanged(Bool)
+    case controlsInteractionChanged(Bool)
     case previous
     case pause
     case resume

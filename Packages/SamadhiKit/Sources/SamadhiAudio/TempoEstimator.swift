@@ -2,7 +2,7 @@ import Accelerate
 import SamadhiDomain
 
 struct TempoEstimator: Sendable {
-    static let analysisVersion = 2
+    static let analysisVersion = 3
 
     init() {}
 
@@ -18,7 +18,7 @@ struct TempoEstimator: Sendable {
             envelope.values.max() ?? 0 > 0.000_1
         else { return nil }
 
-        let scores = stride(from: 60.0, through: 200.0, by: 0.25).map { tempo in
+        let scores = stride(from: 120.0, through: 210.0, by: 0.25).map { tempo in
             let lag = 60 * envelope.rate / tempo
             let correlation = normalizedCorrelation(envelope.values, lag: lag)
             return TempoScore(
@@ -29,18 +29,9 @@ struct TempoEstimator: Sendable {
         guard let best = scores.max(by: { $0.correlation < $1.correlation }),
             best.correlation >= 0.32
         else { return nil }
-        if best.tempo < 80,
-            let tripleMeterAlias = score(near: best.tempo * 1.5, in: scores),
-            let doubleTempo = score(near: best.tempo * 2, in: scores),
-            tripleMeterAlias.correlation >= 0.3,
-            doubleTempo.correlation < 0.3
-        {
-            return nil
-        }
-
         let competingScore =
             scores
-            .filter { !sameTempoFamily($0.tempo, best.tempo) }
+            .filter { abs($0.tempo - best.tempo) / best.tempo > 0.04 }
             .map(\.correlation)
             .max() ?? 0
         let separation = max(best.correlation - competingScore, 0)
@@ -202,13 +193,6 @@ struct TempoEstimator: Sendable {
         return scale > 0 ? dot / scale : 0
     }
 
-    private func sameTempoFamily(_ lhs: Double, _ rhs: Double) -> Bool {
-        [rhs / 2, rhs, rhs * 2].contains { abs(lhs - $0) / $0 <= 0.04 }
-    }
-
-    private func score(near tempo: Double, in scores: [TempoScore]) -> TempoScore? {
-        scores.min { abs($0.tempo - tempo) < abs($1.tempo - tempo) }
-    }
 }
 
 private struct TempoScore {

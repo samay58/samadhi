@@ -144,7 +144,7 @@
                 collection?.tracks.contains(where: { $0.id == trackID }) == true,
                 currentTrackID == trackID
             else { return }
-            let boundedRate = Double(Float(min(max(rate, 0.94), 1.06)))
+            let boundedRate = Double(Float(min(max(rate, 0.90), 1.10)))
             rateReadbackTask?.cancel()
             pendingRateRequest = PendingRateRequest(
                 id: requestID,

@@ -61,7 +61,7 @@ enum AppMusicCollection {
                     baseBPM: 149.75,
                     confidence: 1,
                     analyzedDurationSeconds: 30,
-                    version: 2
+                    version: 3
                 )
             )
         ]
@@ -82,7 +82,7 @@ enum AppMusicCollection {
                         baseBPM: 168,
                         confidence: 0.94,
                         analyzedDurationSeconds: 30,
-                        version: 2
+                        version: 3
                     )
                 )
             ),
