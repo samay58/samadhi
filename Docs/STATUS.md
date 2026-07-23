@@ -156,7 +156,7 @@ The current software gate passed on 2026-07-23:
 - Focused rotary-control UI proof
 - Runtime review of the ready and active-run screens on iPhone 17 Simulator
 
-The paired iPhone is available. The prior exact profile expired on 2026-07-23 UTC. Automatic signing selected a valid wildcard profile, so that build was rejected before installation because MusicKit requires the explicit Samadhi application identifier. Exact-profile renewal is the remaining release blocker.
+The paired iPhone is available. Automatic signing selected a valid wildcard profile, so that build was rejected before installation because MusicKit requires the explicit Samadhi application identifier. The renewed exact profile expires on 2026-07-30 UTC. Commit `66e0616` was rebuilt from a clean detached worktree, signed with the exact application identifier, and installed without changing the selected-collection checksum. Foreground launch was blocked only because the phone was locked.
 
 Durable logs and final visual frames live under Evidence/.
 
@@ -172,4 +172,4 @@ The field report exposed two more defects. Version 3 rejected lower musical puls
 
 ## WHERE WE LEFT OFF
 
-Apple Music remains the selected player. Tempo estimator version 4 removes the lost-coverage regression, and the hidden wheel-to-Skip path is gone. Manual commits are immediate. Auto now retargets within one second and reaches a full 10 percent change within five seconds. Renew the exact App ID profile, build and inspect the signed application identifier, push `main`, then install without erasing the app container. On the phone, reimport once, confirm about 14 of 18 tracks are ready, and make several large wheel changes while one song continues. Pull the diagnostics afterward. That is the shortest remaining physical check.
+Apple Music remains the selected player. Tempo estimator version 4 removes the lost-coverage regression, and the hidden wheel-to-Skip path is gone. Manual commits are immediate. Auto now retargets within one second and reaches a full 10 percent change within five seconds. Commit `66e0616` is installed with the selected collection preserved. Unlock and open Samadhi, let the playlist reanalyze once, confirm about 14 of 18 tracks are ready, and make several large wheel changes while one song continues. Pull the diagnostics afterward. That is the shortest remaining physical check.

@@ -362,4 +362,7 @@ Milestones 0 and 1 are complete. Milestone 2 is still open. The next checkpoint 
 - Added deterministic proof that a fresh 10 percent Auto change reaches the full proven rate envelope within five seconds
 - Passed formatter lint, 103 package tests, 15 app-model tests, and 10 UI tests in the final serial gate
 - Rejected an automatically signed physical build because Xcode selected a wildcard application identifier
-- Confirmed the prior exact profile expired on 2026-07-23 UTC; exact App ID profile renewal remains the only installation blocker
+- Renewed the exact `Samadhi Development` profile through 2026-07-30 UTC
+- Rebuilt pushed commit `66e0616` from a clean detached worktree and verified the exact embedded application identifier and signature
+- Installed the verified build without uninstalling the app; the selected-collection checksum stayed byte-for-byte identical
+- Left foreground launch honest and open because the phone was locked
