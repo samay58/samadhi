@@ -164,7 +164,8 @@ The `Samadhi MusicKit Gate` scheme verifies that the harness and framework calls
 - Import remediation: full six-track disclosure fixture, typed failure sections, retry after relaunch, ordered three-track batching, and timing persistence pass in Simulator and model tests
 - Exact BPM and fresh Auto repair: formatter lint, 97 package tests, 15 app-model tests, 10 UI tests, exact `Samadhi Development` signing, application identifier verification, physical build, and installation passed on 2026-07-22; foreground launch waited on the locked phone and was not claimed
 - Physical remediation check: open for audible direction, command latency, compatible track change, clockwise versus counterclockwise haptics, and real import wall time
-- Current release profile: blocked; the prior exact `Samadhi Development` profile expired on 2026-07-23 UTC, and the automatically selected wildcard profile was rejected before installation
+- Current release profile: renewed; `Samadhi Development` UUID `982e709d-7aa8-4d79-aca3-7759c8f70fc5` expires on 2026-07-30 UTC and embeds `ZL5U59XBJ6.com.samaydhawan.Samadhi`
+- Current response-latency build: clean commit `66e0616`, exact-profile build, signature inspection, physical installation, and selected-collection checksum preservation passed; foreground launch was blocked by the locked phone
 
 ## Felt-synchronization gate
 

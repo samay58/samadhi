@@ -38,4 +38,4 @@ Gate:
 - Swift formatter lint passed.
 - Resource-inclusive Simulator build passed.
 
-Physical installation was not attempted. The prior exact profile expired on 2026-07-23 UTC, and the valid wildcard profile selected by automatic signing was rejected because MusicKit depends on the explicit application identifier.
+The first physical build was rejected because automatic signing selected a wildcard profile. After the exact profile was renewed, pushed commit `66e0616` was rebuilt in a clean detached worktree, inspected, and installed. Physical evidence is recorded separately under `Evidence/Device/`.

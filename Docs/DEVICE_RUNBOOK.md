@@ -4,7 +4,7 @@
 
 Apple team `ZL5U59XBJ6` is saved in `project.yml`. Signed compilation and installation pass with an Apple Development certificate. Samay's iPhone 17 Pro runs iOS 27.0 with Developer Mode enabled. The explicit App ID exists and the MusicKit App Service is user-confirmed as enabled. On 2026-07-21 the exact-profile harness ran over Beoplay Eleven and made 0.90 versus 1.10 clearly audible on one track. The normal app now contains compatible-song start selection, prepared next-song fit, and the aperture click wheel.
 
-Automatic signing can select a wildcard profile even when an exact profile exists. For MusicKit work, inspect the embedded profile before installation and require an unexpired profile with application identifier `ZL5U59XBJ6.com.samaydhawan.Samadhi`. The prior `Samadhi Development` profile expired on 2026-07-23 UTC and must be renewed before the next install.
+Automatic signing can select a wildcard profile even when an exact profile exists. For MusicKit work, inspect the embedded profile before installation and require an unexpired profile with application identifier `ZL5U59XBJ6.com.samaydhawan.Samadhi`. The current `Samadhi Development` profile UUID is `982e709d-7aa8-4d79-aca3-7759c8f70fc5` and expires on 2026-07-30 UTC.
 
 ## Denver test build
 
@@ -15,7 +15,7 @@ Automatic signing can select a wildcard profile even when an exact profile exist
 5. Close and reopen Samadhi. Confirm the same playlist returns without another choice.
 6. During a short run, turn the aperture perimeter to adjust BPM. Check that playback starts on a suitable ready song, cadence changes, and one song crosses naturally into a prepared better fit.
 
-The build is suitable for product testing, not public distribution. The prior offline profile expired on 2026-07-23 UTC. Physical selection, analysis, reinstall and relaunch restoration, basic player progress, Bluetooth routing, and one-track perceptibility passed before the device restore. Commit `c8e195e` was installed and launched wirelessly on the restored iPhone on 2026-07-22. The normal setup screen rendered cleanly, but playlist reimport, physical click-wheel feel, and a natural prepared transition remain open.
+The build is suitable for product testing, not public distribution. Commit `66e0616` was built from a clean detached worktree, signed with the renewed exact profile, and installed on 2026-07-23 without uninstalling the prior app. The selected collection survived byte-for-byte. Foreground launch was blocked by the locked phone. Playlist reanalysis, physical click-wheel feel, and a natural prepared transition remain open.
 
 After a debug run finishes, pull `Library/Application Support/Samadhi/latest-run-diagnostics.json` directly from the app container. The file overwrites the prior run and contains progress, cadence, target and applied rates, track changes, recovery events, and the honest summary.
 
@@ -30,7 +30,7 @@ xcrun devicectl device copy from \
 
 ## Completed Apple token repair
 
-Automatic token generation and 10 of 10 preview decodes pass with exact App ID signing. The prior `Samadhi Development` profile is expired. Complete the renewal steps below before another physical installation.
+Automatic token generation and 10 of 10 preview decodes pass with exact App ID signing. The current `Samadhi Development` profile expires on 2026-07-30 UTC. Repeat the renewal steps below before a later physical installation if it has expired.
 
 1. In Certificates, Identifiers & Profiles, confirm MusicKit remains enabled for the explicit App ID `com.samaydhawan.Samadhi`.
 2. Create a new iOS App Development provisioning profile for that exact App ID, the current Apple Development certificate, and Samay's registered iPhone.
