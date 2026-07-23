@@ -174,7 +174,7 @@ Safety and stability rules:
 - A track is cadence-compatible only when its unclamped target falls inside that range.
 - Apply an initial lock ramp no faster than 2 percentage points of rate per second.
 - After lock, change rate no faster than 0.5 percentage points per second.
-- Recompute the target at most once every 2 seconds.
+- Recompute the target at most once every second after the cadence filter and 2 SPM deadband.
 - Do not change rate for cadence movement inside the 2 SPM deadband.
 - If cadence confidence drops, hold the last good rate for 6 seconds.
 - If confidence does not recover, ease to 1.00 over 4 seconds and return to acquiring.

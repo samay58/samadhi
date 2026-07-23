@@ -165,7 +165,7 @@ public struct AdaptationPolicy: Sendable {
         let trackChanged = state.baseTempoBPM != input.baseTempoBPM
         let canUpdateTarget =
             state.targetRate == nil || trackChanged || input.forceTargetUpdate
-            || (requestedChanged && next.secondsSinceTargetUpdate >= 2)
+            || (requestedChanged && next.secondsSinceTargetUpdate >= 1)
 
         if canUpdateTarget {
             if trackChanged {

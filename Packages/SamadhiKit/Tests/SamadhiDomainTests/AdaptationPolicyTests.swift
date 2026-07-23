@@ -73,7 +73,7 @@ private let policy = AdaptationPolicy()
     #expect(abs(third.commandedRate - target) < 0.000_1)
 }
 
-@Test func deadbandAndUpdateIntervalKeepTheCurrentTarget() {
+@Test func deadbandHoldsAndMeaningfulCadenceChangesRetargetAfterOneSecond() {
     var state = AdaptationState.initial
     state.targetRate = 1.02
     state.baseTempoBPM = 165
@@ -87,11 +87,38 @@ private let policy = AdaptationPolicy()
     )
     let beforeInterval = policy.update(
         state: state,
+        input: input(cadence: 174, tempo: 165, appliedRate: 1.02, deltaSeconds: 0.5)
+    )
+    let atInterval = policy.update(
+        state: state,
         input: input(cadence: 174, tempo: 165, appliedRate: 1.02, deltaSeconds: 1)
     )
 
     #expect(insideDeadband.targetRate == 1.02)
     #expect(beforeInterval.targetRate == 1.02)
+    #expect(atInterval.targetRate == 174.0 / 165.0)
+}
+
+@Test func automaticFullEnvelopeChangeSettlesWithinFiveSecondsOfFreshCadence() {
+    var state = AdaptationState(
+        targetRate: 1,
+        baseTempoBPM: 160,
+        lastReliableCadenceSPM: 160,
+        requestedBPM: 160
+    )
+    var rate = 1.0
+
+    for _ in 0..<5 {
+        let decision = policy.update(
+            state: state,
+            input: input(cadence: 176, tempo: 160, appliedRate: rate, deltaSeconds: 1)
+        )
+        state = decision.nextState
+        rate = decision.commandedRate
+    }
+
+    #expect(state.targetRate == 1.10)
+    #expect(abs(rate - 1.10) < 0.000_1)
 }
 
 @Test func aNewTrackRecomputesTargetEvenWhenCadenceIsSteady() {

@@ -9,7 +9,7 @@
 
 Scripts/test.sh runs Swift package tests, app-model tests, and UI tests serially on iPhone 17 Pro Simulator.
 
-The 2026-07-22 tempo-coverage and transport repair gate passed 102 package tests, 15 app-model tests, and 10 UI tests serially.
+The 2026-07-23 response-latency gate passed 103 package tests, 15 app-model tests, and 10 UI tests serially.
 
 Formatter gate:
 
@@ -35,7 +35,7 @@ Domain tests cover:
 - Mixed summary metrics
 - Track progress reset and configured collection wraparound
 - Rejection of half-time and double-time aliases outside the analyzed running-pulse range
-- The 0.90 through 1.10 rate bounds, audible Auto ramp, deadband, and target update interval
+- The 0.90 through 1.10 rate bounds, one-second Auto retarget, five-second full-envelope response, deadband, and target update interval
 - The 149.75 BPM focused fixture ramping from 1.00 through 0.98 and 0.96 toward a safe 142 SPM target
 - Target recomputation when the track changes at a steady cadence
 - Confidence hold, return to normal rate, and reacquisition reset
@@ -107,6 +107,8 @@ App-model tests cover ready mapping, start transition, atomic store round trips,
 
 Final frames under Evidence/Simulator/ cover ready, imported empty and partial states, complete import disclosure, locked run, controls, summary, Home Screen icon, BPM Auto fine-tune, the Manual safety limit, accessibility-size BPM controls, the resting `Turn` affordance, the 40-detent rotary BPM click wheel, and normal local-demo readiness. The short rotary recording shows clockwise, counterclockwise, protected-center, Manual, and Auto behavior. The focused UI test confirms the control opens through its existing accessible button and the former instruction sentence is absent. Evidence/Previews/ covers other accessibility and state-specific visual checks.
 
+The 2026-07-23 runtime review launched the normal app on iPhone 17 Simulator and inspected the ready and active-run screens. The focused rotary UI test made four strong clockwise turns, reached a requested target above 188 BPM, settled simulated Music BPM at the truthful 185 BPM boundary within two seconds, kept the same song, and never showed `Changing song`.
+
 ## Truth boundary
 
 Simulator verifies interaction, accessibility structure, reducer behavior, resource packaging, and deterministic motion. Normal Debug Simulator launches use two local placeholder playlists, simulated cadence, and silent simulated playback. This path is disabled on physical devices and in Release builds. Simulator cannot validate physical cadence quality, real headphone route behavior, audible tempo adaptation, listening artifacts, or the tactile character of haptics.
@@ -162,6 +164,7 @@ The `Samadhi MusicKit Gate` scheme verifies that the harness and framework calls
 - Import remediation: full six-track disclosure fixture, typed failure sections, retry after relaunch, ordered three-track batching, and timing persistence pass in Simulator and model tests
 - Exact BPM and fresh Auto repair: formatter lint, 97 package tests, 15 app-model tests, 10 UI tests, exact `Samadhi Development` signing, application identifier verification, physical build, and installation passed on 2026-07-22; foreground launch waited on the locked phone and was not claimed
 - Physical remediation check: open for audible direction, command latency, compatible track change, clockwise versus counterclockwise haptics, and real import wall time
+- Current release profile: blocked; the prior exact `Samadhi Development` profile expired on 2026-07-23 UTC, and the automatically selected wildcard profile was rejected before installation
 
 ## Felt-synchronization gate
 
