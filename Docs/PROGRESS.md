@@ -336,4 +336,19 @@
 
 ## Current checkpoint
 
-Milestones 0 and 1 are complete. Milestone 2 is still open. The next checkpoint is one short physical proof on the new build: let the playlist reanalyze once, commit a clearly different wheel BPM, confirm displayed target and `Music` read-back agree, then return to Auto and verify a fresh cadence produces an audible response within about five seconds. Pull diagnostics immediately afterward. No visual expansion or reliability work outranks that result.
+Milestones 0 and 1 are complete. Milestone 2 is still open. The next checkpoint is one short physical proof on the new build: let the playlist reanalyze once, confirm the ready count, make several large wheel changes without an unexpected song change, then use Skip and one natural boundary to prove the only allowed transition paths. Pull diagnostics immediately afterward. No visual expansion outranks that result.
+
+## 2026-07-22. Tempo coverage and transport repair
+
+- Reproduced the hidden transition path where a direct wheel target marked a selection immediate and preparation completion emitted Skip
+- Removed immediate-selection state and made Manual and Auto preparation coalesce without changing transport
+- Kept unreachable requests while moving the current song to its nearest truthful rate; requested BPM, achievable Music BPM, and player read-back remain separate
+- Added deterministic coverage for one large target, rapid targets, stable Auto mismatch, stale preparation, explicit Skip, player-confirmed natural transition, and nearest-boundary truth
+- Pulled the current selected collection and import diagnostics into temporary storage without committing track metadata
+- Found 11 prior ready analyses, 10 version-3 ready tracks, six rhythm-unclear tracks, and two catalog-unavailable tracks in the current 18-track collection
+- Expanded estimator version 4 to preserve the measured 60 through 210 BPM musical pulse and record an independently supported stride pulse separately
+- Replayed all 16 preview-available private tracks: 14 are ready under version 4, four version-3 rejections recover, no version-3 ready track is lost, and two remain ambiguous
+- Passed all 12 public tempo-declared previews within 2 percent while keeping the prior 89.5-versus-180 regression, silence, irregular rhythm, and triple-meter ambiguity closed
+- Bumped persisted tempo and run-diagnostic semantics to version 4 so older selections reanalyze once
+- Passed formatter lint, 102 package tests, 15 app-model tests, and 10 UI tests in the final serial gate
+- Built the repair with the exact `Samadhi Development` profile and verified the embedded application identifier; the paired iPhone was unavailable, so installation remains open

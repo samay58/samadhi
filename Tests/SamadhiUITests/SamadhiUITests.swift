@@ -124,30 +124,29 @@ final class SamadhiUITests: XCTestCase {
         XCTAssertTrue(app.buttons["rhythm-auto"].exists)
         XCTAssertTrue(app.buttons["rhythm-manual"].exists)
 
+        let trackIdentity = element("track-identity")
+        XCTAssertTrue(trackIdentity.exists)
+        let originalTrackLabel = trackIdentity.label
         let dial = element("rhythm-dial")
         let top = dial.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.08))
         let right = dial.coordinate(withNormalizedOffset: CGVector(dx: 0.92, dy: 0.5))
-        top.press(
-            forDuration: 0.12,
-            thenDragTo: right,
-            withVelocity: .slow,
-            thenHoldForDuration: 0.2
-        )
-        XCTAssertTrue(app.staticTexts["178"].waitForExistence(timeout: 2))
-        XCTAssertTrue(app.staticTexts["Music 178"].waitForExistence(timeout: 2))
+        for _ in 0..<4 {
+            top.press(
+                forDuration: 0.12,
+                thenDragTo: right,
+                withVelocity: .slow,
+                thenHoldForDuration: 0.2
+            )
+        }
 
-        right.press(
-            forDuration: 0.12,
-            thenDragTo: top,
-            withVelocity: .slow,
-            thenHoldForDuration: 0.2
-        )
-        let reverseTarget = waitForDialAgreement(dial, below: 178)
-        XCTAssertNotNil(reverseTarget)
+        let limitedState = waitForDialState(dial, requestedAtLeast: 188, applied: 185)
+        XCTAssertNotNil(limitedState)
+        XCTAssertEqual(trackIdentity.label, originalTrackLabel)
+        XCTAssertFalse(app.staticTexts["Changing song"].exists)
 
         dial.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5)).tap()
-        if let reverseTarget {
-            XCTAssertTrue(app.staticTexts[String(reverseTarget)].exists)
+        if let limitedState {
+            XCTAssertTrue(app.staticTexts[String(limitedState.requested)].exists)
         }
 
         app.buttons["rhythm-manual"].tap()
@@ -173,18 +172,19 @@ final class SamadhiUITests: XCTestCase {
         app.descendants(matching: .any).matching(identifier: identifier).firstMatch
     }
 
-    private func waitForDialAgreement(
+    private func waitForDialState(
         _ dial: XCUIElement,
-        below upperBound: Int,
+        requestedAtLeast lowerBound: Int,
+        applied: Int,
         timeout: TimeInterval = 2
-    ) -> Int? {
+    ) -> (requested: Int, applied: Int)? {
         let deadline = Date().addingTimeInterval(timeout)
         repeat {
-            let numbers = String(describing: dial.value ?? "")
+            let values = String(describing: dial.value ?? "")
                 .split(whereSeparator: { !$0.isNumber })
                 .compactMap { Int($0) }
-            if numbers.count >= 2, numbers[0] < upperBound, numbers[0] == numbers[1] {
-                return numbers[0]
+            if values.count >= 2, values[0] >= lowerBound, values[1] == applied {
+                return (values[0], values[1])
             }
             RunLoop.current.run(until: Date().addingTimeInterval(0.05))
         } while Date() < deadline

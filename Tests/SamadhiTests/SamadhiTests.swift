@@ -206,7 +206,7 @@ import Testing
     )
     #expect(snapshot.timeline[2].appliedRate == 0.98)
     #expect(snapshot.timeline[3].trackElapsedSeconds == 12)
-    #expect(snapshot.schemaVersion == 3)
+    #expect(snapshot.schemaVersion == 4)
     #expect(snapshot.timeline[1].controlMode == RhythmControlMode.automatic.rawValue)
     #expect(snapshot.timeline[1].automaticCorrectionBPM == 0)
     #expect(snapshot.timeline[1].requestedBPM == 162)
@@ -312,7 +312,7 @@ import Testing
                         baseBPM: 168,
                         confidence: 0.6,
                         analyzedDurationSeconds: 30,
-                        version: 3
+                        version: 4
                     )
                 )
             )
@@ -340,7 +340,7 @@ import Testing
         .appending(path: UUID().uuidString, directoryHint: .isDirectory)
     defer { try? FileManager.default.removeItem(at: directory) }
     let store = MusicCollectionStore(directoryURL: directory)
-    let stale = importedCollection(id: "saved", name: "Saved", readyCount: 2, analysisVersion: 2)
+    let stale = importedCollection(id: "saved", name: "Saved", readyCount: 2, analysisVersion: 3)
     let refreshed = importedCollection(id: "saved", name: "Saved", readyCount: 2)
     try await store.replaceSelection(stale)
     let importer = FixtureMusicImporter(collections: ["saved": refreshed])
@@ -513,7 +513,7 @@ private func importedCollection(
     id: String,
     name: String,
     readyCount: Int,
-    analysisVersion: Int = 3
+    analysisVersion: Int = 4
 ) -> MusicCollection {
     let analysis = TempoAnalysis(
         baseBPM: 168,

@@ -54,9 +54,9 @@ The adapter stays behind a source-neutral main-actor contract. MusicKit's async 
 
 ## One local tempo-analysis interface
 
-Preview audio and future imported files both become a local audio-file URL before analysis. `LocalTempoAnalyzer` hides off-main PCM decoding and returns a versioned source-neutral result. `TempoEstimator` version 3 contains Accelerate spectral flux and fractional-lag autocorrelation constrained to the accepted 120 through 210 BPM running pulse.
+Preview audio and future imported files both become a local audio-file URL before analysis. `LocalTempoAnalyzer` hides off-main PCM decoding and returns a versioned source-neutral result. `TempoEstimator` version 4 uses Accelerate spectral flux and fractional-lag autocorrelation from 60 through 210 BPM. It stores the measured musical pulse separately from an independently supported alternate pulse that can relate slower music to running cadence.
 
-Version 1 passed 11 of 12 tempo-declared Apple workout previews but confidently labelled one 180 BPM mix as 60 BPM. Version 2 passed 12 of 12 only because it accepted half-time equivalence, including a declared 180 BPM track analyzed at 89.5 BPM. Version 3 passes 11 of 12 against the exact declared running pulse and rejects the remaining preview. Persisted version-2 selections are reimported before use. The opt-in validator downloads provider-hosted previews temporarily and commits only metadata and results.
+Version 1 passed 11 of 12 tempo-declared Apple workout previews but confidently labelled one 180 BPM mix as 60 BPM. Version 2 passed 12 of 12 only because it silently accepted half-time equivalence, including a declared 180 BPM track analyzed at 89.5 BPM. Version 3 restored exact pulse truth but rejected lower musical pulses by searching only 120 through 210 BPM. Version 4 keeps the musical pulse truthful, exposes any supported stride relationship explicitly, and passes all 12 public previews. In a private replay of the current 18-track selection, the saved version-2 analysis had 11 ready, version 3 had 10, and version 4 projects 14. Persisted results with older semantics reimport once. The validator and private replay download previews temporarily and commit only privacy-safe aggregates.
 
 ## Honest tempo matching
 
@@ -146,7 +146,7 @@ The wheel previews one-BPM detents and haptics locally, stays pinned for the ful
 
 Core Motion cadence is current only when `CMPedometerData.endDate` is no more than two seconds old and the value lies inside the running range. Stale, missing, and out-of-range samples all reduce confidence. Three consecutive invalid samples return Auto to acquisition instead of preserving an old cycling or walking cadence.
 
-An unreachable target does not return the music silently toward 1.00 while leaving the requested BPM on screen. The reducer rejects the detent and keeps the last truthful target. If another ready track can reach the request within the quality envelope, direct wheel intent prepares and commits that track immediately, then reapplies the target after the player confirms the change. Natural cadence mismatch keeps the existing five-second stability hold.
+An unreachable target does not return the music silently toward 1.00 or act as a hidden Skip. The reducer preserves the requested BPM and moves the current song to the nearest reachable rate inside 0.90 through 1.10. Requested BPM and achievable Music BPM remain separate truths. Manual intent may prepare a compatible replacement immediately; stable Auto mismatch may prepare one after five seconds. Preparation coalesces to the latest target and never changes transport. Only explicit Skip or a player-confirmed natural boundary may commit the latest prepared song.
 
 ## Tempo-matched summaries require verified coverage
 

@@ -64,7 +64,6 @@ public struct RunSession: Sendable, Equatable {
     public var pendingTrackSelectionID: Int?
     public var pendingNextTrackID: MusicTrackID?
     public var preparedNextTrackID: MusicTrackID?
-    public var immediateTrackSelectionID: Int?
 
     public init(id: Int, mode: RunMode = .adaptive, playbackOperationID: Int? = nil) {
         self.id = id
@@ -92,7 +91,6 @@ public struct RunSession: Sendable, Equatable {
         pendingTrackSelectionID = nil
         pendingNextTrackID = nil
         preparedNextTrackID = nil
-        immediateTrackSelectionID = nil
     }
 
     public mutating func recordSecond(cadence: Int?, tempoMatched: Bool?) {

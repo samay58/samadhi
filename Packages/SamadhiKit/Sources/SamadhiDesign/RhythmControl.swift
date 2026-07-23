@@ -285,8 +285,6 @@ struct RhythmControl: View {
 
     private var feedbackLabel: String {
         switch state.rhythmControl.commandStatus {
-        case .requiresTrackChange:
-            return "Changing song"
         case .unreachable:
             return "Limit"
         case .rejected:
@@ -299,7 +297,7 @@ struct RhythmControl: View {
         case .idle:
             break
         }
-        if state.rhythmControl.isFindingBetterFit { return "Changing song" }
+        if state.rhythmControl.isFindingBetterFit { return "Music steady" }
         return state.rhythmControl.appliedBPM.map { "Music \($0)" } ?? "Settling"
     }
 

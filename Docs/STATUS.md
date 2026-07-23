@@ -11,9 +11,9 @@
 | Cadence | Core Motion connected; stale and invalid samples now force reacquisition | Deterministic freshness, filter, and 29-second iPhone walk evidence |
 | Audio timing | Real for imported ready tracks; deterministic in fixtures | Production player contract and beat-clock tests |
 | Playlist import | Complete results, typed failures, retry, and bounded analysis implemented | Full-list Simulator proof, import timing diagnostics, model tests, and prior physical collection evidence |
-| Tempo analysis | Version 3 passes 11 of 12 against the exact 120 to 210 BPM running pulse | Generated regression tests and opt-in Apple preview validation |
-| Adaptation policy | Manual commits apply directly; Auto settles across the proven range in about five seconds | Identified effects, MusicKit read-back, compatible-track switching, and deterministic replay tests |
-| Track fit | Connected to run start and next-song planning without half-time relabeling | Deterministic running-pulse, envelope, hold, identity, order, and retention tests |
+| Tempo analysis | Version 4 keeps measured musical pulse separate from an independently supported stride pulse; the public corpus passes 12 of 12 | Generated regressions, private playlist replay, and opt-in Apple preview validation |
+| Adaptation policy | Manual commits apply directly; Auto settles across the proven range in about five seconds; an unreachable request uses the nearest honest rate | Identified effects, MusicKit read-back, boundary behavior, and deterministic replay tests |
+| Track fit | Connected to run start and next-song preparation without hidden transport changes | Deterministic pulse, envelope, coalescing, identity, order, and retention tests |
 | In-run BPM control | The wheel stays pinned during a turn, previews detents, then commits one absolute Manual BPM at finger-up | Exact-target, compatible-track, read-back, accessibility, and UI tests |
 | Simulator development loop | Local placeholder playlists and silent simulated playback available in Debug | Normal no-argument launch, model tests, UI flow, screenshot, and interaction recording |
 | Apple Music feasibility | Source selected; 0.90 versus 1.10 was clearly audible on one Bluetooth track; broader quality and long-form reliability remain | Exact-profile traces and explicit product decision |
@@ -115,12 +115,12 @@
 - Built, signed, and installed the diagnostics-capable app while preserving the selected playlist byte-for-byte; foreground launch remains blocked by the locked phone
 - Added one in-run rhythm control with Auto fine-tune from minus 8 through plus 8 BPM, Manual targets from 120 through 200 BPM, and one-step return to neutral Auto
 - Kept safe rate bounds, ramping, deadband, confidence handling, track compatibility, identified player feedback, and honest summary measurement authoritative in the reducer
-- Added explicit `At limit` feedback when the current track cannot safely reach the requested BPM
+- Kept requested BPM distinct from the nearest achievable Music BPM when one song reaches its rate boundary
 - Extended latest-run diagnostics with control mode, correction or Manual target, requested BPM, derived rate, MusicKit read-back, and limit state
 - Resolved the control as direct manipulation of the existing tempo aperture with large touch targets, restrained haptics, VoiceOver adjustment, Dynamic Type, increased contrast, and Reduce Motion support
 - Reviewed final Auto fine-tune, Manual safety-limit, and accessibility-size frames in the iPhone 17 Pro Simulator without changing the wider visual system
 - Added a debug-only blinded 0.92 versus 1.08 comparison that captures rate read-back and direction recognition with optional 0.90 and 1.10 endpoint controls
-- Started adaptive runs on the ready song whose half-time, full-time, or double-time pulse requires the least safe correction, using 168 BPM only as an initial prior
+- Started adaptive runs on the ready song whose measured running-range pulse requires the least safe correction, using 168 BPM only as an initial prior
 - Kept song identity and count authoritative to real player callbacks instead of predicting the result of Previous or Skip
 - Added a five-second mismatch hold that prepares a better-fitting next song while allowing the current song to finish naturally
 - Protected next-song preparation with selection identity so late preparation cannot replace a newer choice
@@ -133,9 +133,9 @@
 - Added 40 restrained visual detents plus low-sharpness Core Haptics feedback, with a fuller notch every five BPM and a soft Auto landing
 - Replaced the tuning sentence with one integrated `Turn` label, three resting grip notches, and one Reduce-Motion-aware teaching movement that retires after first use
 - Replayed the first field failure without committing personal library metadata
-- Made every BPM command resolve to applying, applied, changing song, unreachable, or rejected
+- Made every BPM command resolve against requested BPM, achievable BPM, commanded rate, and player read-back without treating incompatibility as a transport command
 - Made rapid wheel turns coalesce toward the latest requested target while keeping MusicKit read-back authoritative
-- Made compatible large BPM changes commit a better-fitting track immediately and reapply the target after player confirmation
+- Made compatible large BPM changes prepare only the latest better-fitting track; only Skip or a player-confirmed natural boundary may commit it
 - Required at least 80 percent verified measurement coverage before showing a tempo-matched percentage
 - Preserved Automatic and Manual seconds in the completed-run diagnostic summary
 - Replaced the truncated import result with three calm preview rows plus a complete grouped track sheet
@@ -148,14 +148,15 @@
 
 The current serial gate passed on 2026-07-22:
 
-- 97 Swift package tests
+- 102 Swift package tests
 - 15 app-model tests
 - 10 UI tests
 - Swift formatter lint
 - Resource-inclusive Simulator build
 - Exact-profile physical iPhone build
 - Embedded profile and application identifier verification
-- Physical installation on Samay's connected iPhone
+
+The repaired build is signed and ready. Samay's paired iPhone was unavailable at the end of this gate, so this specific build was not installed. Earlier physical installations remain recorded below.
 
 Durable logs and final visual frames live under Evidence/.
 
@@ -167,8 +168,8 @@ The MusicKit harness and normal app launch in Simulator and on the physical iPho
 
 ## Known limits
 
-The software defects exposed by the first field run and the stale-180 report are repaired and covered by deterministic tests. The repaired build is installed on Samay's iPhone. It uses the already audible 0.90 through 1.10 range, rejects stale Core Motion samples, removes half-time relabeling, applies one final wheel target immediately, keeps the wheel visible through the gesture, and makes Auto settle at 0.02 rate units per second. A short physical run must still prove that those changes feel prompt and correct. Five locked minutes, a natural track transition, controlled interruption, route loss, full accessibility regression, cadence calibration, and the 20-minute outdoor run also remain open.
+The field report exposed two more defects. Version 3 rejected lower musical pulses because it searched only 120 through 210 BPM, and prepared-track completion could call Skip after a large or repeated wheel change. Version 4 now records the measured musical pulse separately from an independently supported stride pulse. A private replay of the current 18-track selection projects 14 ready tracks, up from 10 under version 3 and 11 in the prior saved analysis. The current song now stays in place while Manual or Auto moves it to the nearest truthful rate. A prepared replacement can commit only after Skip or a player-confirmed natural boundary. One device reimport and a short playback check remain before these field failures are physically closed.
 
 ## WHERE WE LEFT OFF
 
-Apple Music remains the selected player. The stale-cadence bug, slow adaptation ramp, per-detent command flood, half-time BPM relabeling, interruptible wheel gesture, and narrow production range have been replaced by one coherent contract. The repaired build is installed. It must reanalyze the saved playlist once, then prove two things in one short run: a wheel target becomes the same verified Music BPM, and fresh Auto cadence produces an audible matching response. Pull the run diagnostics afterward. Do not resume reliability or visual work until that result passes.
+Apple Music remains the selected player. The signed repair build contains tempo estimator version 4 and removes the hidden wheel-to-Skip path. Install it when the paired iPhone reconnects, reimport the saved playlist once, confirm the visible ready count reaches the private replay expectation of about 14 of 18, then start one song and make several large wheel changes. Requested BPM should move, Music BPM should stop truthfully at the song's reachable boundary, and the song must not change until Skip or its natural end. Pull the import and run diagnostics afterward. That is the shortest remaining physical check.

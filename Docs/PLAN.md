@@ -24,9 +24,9 @@ The first normal field run disproved the original product mechanic. A later repo
 
 Continue in this order:
 
-1. Open the installed exact-profile build and let the saved playlist reanalyze once under tempo estimator version 3.
-2. Run one short physical product check. Turn to a clearly different BPM, release, and confirm the main number and `Music` read-back agree. Return to Auto, move at a fresh cadence, and confirm the audible tempo follows within roughly five seconds rather than preserving an old sample.
-3. Pull `latest-run-diagnostics.json`, `latest-import-diagnostics.json`, and the selected collection. Record requested BPM, analyzed pulse, commanded and applied rate, latency, cadence freshness, track change, and import result without committing personal metadata.
+1. Install the verified version-4 build and let the saved playlist reanalyze once. Confirm the ready count against the privacy-safe 14-of-18 replay, allowing the two catalog-unavailable and two still-ambiguous tracks to remain unavailable.
+2. Run one short transport check. Make one large Manual change and several rapid follow-up changes. Requested BPM should move, Music BPM should stop at the current song's honest reachable boundary, and the current song must continue.
+3. Use Skip once, then allow one prepared candidate to commit at a player-confirmed natural boundary. Pull `latest-run-diagnostics.json`, `latest-import-diagnostics.json`, and the selected collection. Record requested BPM, musical pulse, stride pulse, commanded and applied rate, latency, and track identity without committing personal metadata.
 4. If audible response or command truth fails, stop and repair that recorded chain. Do not proceed to reliability or visual work.
 5. If the focused physical check passes, prove a natural compatible transition, five locked minutes, controlled interruption, route loss, accessibility, and cadence calibration.
 6. Complete one 20-minute outdoor run with an imported playlist. The run must feel good, survive normal phone conditions, and end with a summary whose measurement coverage and Automatic versus Manual time are honest.
@@ -36,15 +36,15 @@ Continue in this order:
 - Apple Music feasibility: authorization, library loading, automatic token generation, strict catalog resolution, 10 of 10 local preview decodes, playback, rate writes, pause, and resume passed
 - Token remediation: complete; exact profile `Samadhi Development` fixed catalog access
 - Tempo-source feasibility: passed for City Pocket at 10 of 10 decoded previews
-- Tempo-analysis implementation: version 3 uses Accelerate spectral flux and fractional-lag autocorrelation inside the 120 through 210 BPM running-pulse range; 11 of 12 tempo-declared Apple previews pass exact-pulse validation and one is conservatively rejected
+- Tempo-analysis implementation: version 4 searches 60 through 210 BPM, preserves the measured musical pulse, records an independently supported alternate stride pulse separately, passes 12 of 12 tempo-declared Apple previews, and rejects silent, irregular, and triple-meter ambiguity
 - Spotify feasibility: rejected for adaptive playback; it cannot supply the required app-owned, analyzable, rate-controlled audio path
 - Source decision: Apple Music selected on 2026-07-16; remaining manual drills moved to the reliability gate
-- Source-neutral domain and adaptation rules: bounded rate behavior and coarse track fit are connected; a five-second stable mismatch prepares the next better fit with stale-selection protection
+- Source-neutral domain and adaptation rules: bounded rate behavior and coarse track fit are connected; a mismatch may prepare only the latest better fit, while Skip or a player-confirmed natural boundary remains the only commit authority
 - Cadence boundary, deterministic filter, and Core Motion adapter: connected in the focused core loop and normal imported run; a 29-second walk produced live cadence and a 142 SPM average, but calibration remains open
 - Production playback: validated catalog fixture `1558215042`, live cadence updates, bounded reducer effects, identified MusicKit read-back, and honest measurement are connected
 - Playlist import and persistence: implemented with strict resolution, local preview analysis, versioned cache keys, atomic replacement, complete typed per-track results, retry after relaunch, three-track bounded concurrency, private timing diagnostics, and ready-only production filtering
 - Normal run composition: restored imported tracks use Apple Music playback and Core Motion; Debug Simulator uses isolated local placeholder playlists with simulated cadence and silent playback
-- Automated body-to-music gate: 97 package tests, 15 app-model tests, 10 UI tests, formatter, normal Simulator build, exact-profile signed build, embedded-profile verification, and physical installation pass
+- Automated body-to-music gate: 102 package tests, 15 app-model tests, 10 UI tests, formatter, normal Simulator build, and refreshed exact-profile build pass; installation remains open because the paired iPhone was unavailable
 - Physical body-to-music observation: passed; the corrected 59-second run averaged 155 SPM and measured 98 percent tempo matched from MusicKit read-back
 - Physical imported-collection gate: real playlist selection, local analysis, reinstall and relaunch restoration, and basic progress passed at 13 of 25 ready tracks; a natural transition remains open
 - Device evidence: debug builds persist one latest completed-run diagnostic file for direct container retrieval; the BPM-control build, installation, and launch pass on the physical iPhone

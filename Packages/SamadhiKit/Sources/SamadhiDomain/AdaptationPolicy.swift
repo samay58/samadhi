@@ -9,7 +9,6 @@ public enum TempoCommandStatus: String, Sendable, Equatable, Codable {
     case idle
     case applying
     case applied
-    case requiresTrackChange
     case unreachable
     case rejected
 }
@@ -194,6 +193,16 @@ public struct AdaptationPolicy: Sendable {
             next.secondsSinceTargetUpdate = 0
         }
 
+        if !canUpdateTarget, state.isAtLimit {
+            return musicSteady(
+                state: next,
+                input: input,
+                requestedBPM: requestedBPM,
+                derivedTargetRate: state.derivedTargetRate,
+                isAtLimit: true
+            )
+        }
+
         guard let target = next.targetRate else {
             return musicSteady(state: next, input: input)
         }
@@ -283,7 +292,21 @@ public struct AdaptationPolicy: Sendable {
         isAtLimit: Bool = false
     ) -> AdaptationDecision {
         var next = state
-        next.targetRate = nil
+        let boundaryRate = derivedTargetRate.map { min(max($0, minimumRate), maximumRate) }
+        let commandedRate: Double
+        if isAtLimit, let boundaryRate {
+            commandedRate =
+                input.rhythmControl.mode == .manual && input.forceTargetUpdate
+                ? boundaryRate
+                : move(
+                    input.appliedRate,
+                    toward: boundaryRate,
+                    maximumChange: 0.02 * input.deltaSeconds
+                )
+        } else {
+            commandedRate = input.appliedRate
+        }
+        next.targetRate = isAtLimit ? boundaryRate : nil
         next.baseTempoBPM = input.baseTempoBPM
         next.matchedSeconds = 0
         next.hasMatched = false
@@ -292,12 +315,15 @@ public struct AdaptationPolicy: Sendable {
         next.requestedBPM = requestedBPM
         next.derivedTargetRate = derivedTargetRate
         next.isAtLimit = isAtLimit
-        next.achievableBPM = nil
-        next.commandedRate = nil
-        next.commandStatus = isAtLimit ? .unreachable : .idle
+        next.achievableBPM = boundaryRate.map { input.baseTempoBPM * $0 }
+        next.commandedRate = isAtLimit ? commandedRate : nil
+        next.commandStatus =
+            isAtLimit
+            ? (abs(commandedRate - input.appliedRate) <= 0.000_1 ? .applied : .applying)
+            : .idle
         return AdaptationDecision(
-            commandedRate: input.appliedRate,
-            targetRate: nil,
+            commandedRate: commandedRate,
+            targetRate: next.targetRate,
             isTrackCompatible: false,
             status: .musicSteady,
             nextState: next,

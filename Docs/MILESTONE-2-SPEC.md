@@ -132,16 +132,16 @@ Use Apple frameworks only for the first implementation. Decode a mono analysis w
 
 Analysis rules:
 
-- Evaluate tempo candidates from 60 through 200 BPM.
-- Normalize half-time and double-time candidates later against running cadence instead of forcing one interpretation during analysis.
-- Produce base BPM, confidence from 0 through 1, analyzed duration, and analysis version.
-- A track is adaptive-ready at confidence 0.72 or higher.
+- Evaluate tempo candidates from 60 through 210 BPM.
+- Preserve the measured musical pulse. Record an independently supported alternate stride pulse separately instead of silently multiplying the displayed BPM.
+- Produce musical BPM, optional alternate pulse, confidence from 0 through 1, analyzed duration, and analysis version.
+- A track is adaptive-ready at confidence 0.72 or higher only when its measured musical pulse or independently supported alternate pulse reaches the running range.
 - A lower-confidence track remains visible but is excluded from automatic adaptive selection.
 - Wrong confident tempo is worse than rejection. Prefer “Could not read tempo” over a false result.
 - Cache successful analysis by stable track identity plus analysis version.
 - Run analysis before the run and off the main actor.
 
-The validation corpus contains generated metronome and syncopation fixtures plus twelve provider-hosted Apple previews whose exact catalog titles declare tempos from 130 through 180 BPM. The validator downloads those previews temporarily and does not redistribute them. At least ten of twelve music excerpts must land within 2 percent of the accepted tempo or its half/double equivalent. The analyzer must reject rather than confidently mislabel deliberately ambiguous fixtures. Public-distribution permission for preview analysis remains a separate requirement.
+The validation corpus contains generated metronome and syncopation fixtures plus twelve provider-hosted Apple previews whose exact catalog titles declare tempos from 130 through 180 BPM. The validator downloads those previews temporarily and does not redistribute them. At least ten of twelve music excerpts must land within 2 percent of the declared musical pulse. Half-time arithmetic cannot make a wrong displayed pulse pass. The analyzer must reject deliberately ambiguous fixtures. Public-distribution permission for preview analysis remains a separate requirement.
 
 ### Cadence acquisition
 
@@ -166,11 +166,11 @@ Cadence rules:
 
 Adaptation is a source-neutral domain system with two layers. A track-fit planner chooses the ready track and native pulse requiring the least stretch. The adaptation policy then receives stable cadence, chosen pulse, analysis confidence, prior rate, and elapsed time and returns a fine-rate decision that the reducer turns into an audio effect.
 
-For a base tempo `B` and cadence `C`, consider `B / 2`, `B`, and `B * 2`. Keep candidates inside the running range, then choose the candidate that requires the smallest speed change. The target playback rate is `C / candidate`.
+For a measured musical pulse `B`, optional independently supported stride pulse `S`, and cadence `C`, use `B` when it already lies inside the running range. Otherwise use `S` only when the analyzer independently found it. The target playback rate is `C / selected pulse`. Never manufacture a fit by multiplying `B` after analysis.
 
 Safety and stability rules:
 
-- Keep 0.94 through 1.06 as the current verified range. Expand only after the physical perceptibility and quality gate establishes a wider envelope.
+- Keep 0.90 through 1.10 as the current physically audible range. Full-song artifact listening remains a completion gate.
 - A track is cadence-compatible only when its unclamped target falls inside that range.
 - Apply an initial lock ramp no faster than 2 percentage points of rate per second.
 - After lock, change rate no faster than 0.5 percentage points per second.
@@ -181,9 +181,9 @@ Safety and stability rules:
 - Never claim matched until the applied player rate is within 0.5 percent of target for at least 1 second.
 - Do not jump to a new track merely because cadence drifts. Finish the current track safely and choose a compatible next track.
 
-At run start, choose the ready track whose half-time, full-time, or double-time pulse needs the least correction for the last reliable cadence. If no prior cadence exists, use 168 SPM only for initial track selection, never as measured cadence. Prefer the current or next source-order track when its fit is within the retention tolerance so small improvements do not interrupt the music. Once real cadence locks, adapt the chosen track inside the proven envelope. If it becomes incompatible for a sustained interval, keep playback stable and prepare a compatible track for the next natural transition.
+At run start, choose the ready track whose explicit running pulse needs the least correction for the last reliable cadence. If no prior cadence exists, use 168 SPM only for initial track selection, never as measured cadence. Prefer the current or next source-order track when its fit is within the retention tolerance so small improvements do not interrupt the music. Once real cadence locks, adapt the chosen track inside the proven envelope. If it becomes incompatible for a sustained interval, keep playback at the nearest truthful boundary and prepare one latest compatible track. Preparation may commit only after explicit Skip or a player-confirmed natural transition.
 
-Skip chooses the next adaptive-ready track in original collection order. If no compatible track exists, playback may continue at 1.00, but the interface must say “Music steady” rather than “Tempo matched.”
+Skip chooses the latest prepared compatible track when one exists, otherwise the next adaptive-ready track in original collection order. If no compatible track exists, the requested BPM remains visible and playback holds the nearest proven boundary without claiming that the request was reached.
 
 Before broad reliability work, pass the perceptibility gate in [ADAPTIVE-AUDIO-PLAYBOOK.md](ADAPTIVE-AUDIO-PLAYBOOK.md). A successful property write or tempo-matched percentage does not prove that the runner can feel the mechanic. Beat lock remains a separate claim requiring measured step-to-beat phase and route latency.
 
@@ -261,7 +261,7 @@ Extend the current reducer suite to cover:
 
 - Start with and without a ready collection
 - Stable cadence lock and timeout
-- Half-time and double-time tempo normalization
+- Truthful musical pulse and explicit stride-pulse relationships
 - Rate bounds, deadband, ramp limits, and target update interval
 - Confidence loss, hold, and return to normal rate
 - Incompatible current and next tracks
@@ -285,7 +285,7 @@ Run physical calibration at 160, 170, and 180 SPM for 60 seconds each. The locke
 
 Use generated fixtures for exact tempo, half-time ambiguity, syncopation, silence, long intro, tempo drift, and low confidence. Add legally usable music excerpts with documented reference tempo.
 
-The corpus gate is at least ten of twelve music excerpts within 2 percent of accepted tempo or its half/double equivalent. Version 2 passes 12 of 12 tempo-declared Apple previews. A confident wrong answer still fails harder than a rejection, so broader music coverage remains conservative.
+The corpus gate is at least ten of twelve music excerpts within 2 percent of the declared musical pulse. Version 4 passes 12 of 12 tempo-declared Apple previews and keeps the earlier 89.5-versus-180 false-pulse case closed. A confident wrong answer still fails harder than a rejection, so broader music coverage remains conservative.
 
 ### Audio tests
 
@@ -324,12 +324,12 @@ The implemented rhythm control helps both the runner and the physical test. It e
 
 Behavior:
 
-- Auto follows stable Core Motion cadence through the existing deadband, ramp, confidence, compatibility, and 0.94 through 1.06 rate limits.
+- Auto follows stable Core Motion cadence through the existing deadband, ramp, confidence, compatibility, and 0.90 through 1.10 rate limits.
 - Fine-tune applies a signed BPM correction to Auto. The range is minus 20 through plus 20 BPM in one-BPM steps, clipped to the accepted 120 through 210 running range.
 - Manual lets the runner choose a target BPM directly from 120 through 210 BPM in one-BPM steps.
 - Reset returns to Auto with zero correction.
 - Each run starts in Auto. Manual state does not silently carry into a later run.
-- The control shows the requested BPM and whether the current track can reach it. At the safe-rate boundary it says `At limit`; it never pretends the request was fully applied.
+- The control keeps requested BPM and achievable Music BPM distinct. At the safe-rate boundary it keeps the request, applies the nearest honest rate, and never changes the song without Skip or a natural boundary.
 - The reducer derives the target rate. The control never writes the player directly.
 - Rate changes still ramp, preserve pitch, carry request identity, and accept only matching MusicKit read-back.
 - Diagnostics record control mode, requested BPM, derived target rate, applied rate, and limit state.
@@ -369,7 +369,7 @@ Acceptance:
 
 ### Where we are now
 
-Milestones 0 and 1 are complete. Apple Music is the selected Milestone 2 source. A validated 149.75 BPM fixture, Core Motion cadence, bounded reducer adaptation, identified MusicKit read-back, and honest measurement pass together in the focused core-loop scheme. The corrected 59-second physical run averaged 155 SPM and measured 98 percent tempo matched. Analyzer version 2 uses Accelerate spectral flux and fractional-lag autocorrelation and passes the narrow 12-preview corpus. One physical 25-track playlist restores after reinstall and relaunch with 13 ready tracks, and basic production-player progress passes. Playlist persistence, ready-track filtering, the normal production composition, and the source-neutral BPM control are implemented. The control's physical MusicKit response, natural imported-track transition, and listening behavior remain open.
+Milestones 0 and 1 are complete. Apple Music is the selected Milestone 2 source. A validated 149.75 BPM fixture, Core Motion cadence, bounded reducer adaptation, identified MusicKit read-back, and honest measurement pass together in the focused core-loop scheme. The corrected 59-second physical run averaged 155 SPM and measured 98 percent tempo matched. Analyzer version 4 uses Accelerate spectral flux and fractional-lag autocorrelation across 60 through 210 BPM. It preserves the measured musical pulse, records only independently supported stride relationships, and passes 12 of 12 public preview references. One physical 25-track playlist restores after reinstall and relaunch with 13 ready tracks, and basic production-player progress passes. Playlist persistence, ready-track filtering, the normal production composition, and the source-neutral BPM control are implemented. The repaired build prevents Manual or Auto changes from committing transport. Its physical reimport, natural imported-track transition, and listening behavior remain open.
 
 ### Build order
 

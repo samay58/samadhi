@@ -63,9 +63,11 @@ public struct TrackMatchPlanner: Sendable {
         at index: Int,
         requestedBPM: Double
     ) -> TrackTempoMatch? {
-        guard let tempo = track.tempo, tempo.isAdaptiveReady, tempo.baseBPM > 0 else { return nil }
+        guard let tempo = track.tempo, tempo.isAdaptiveReady, tempo.runningPulseBPM > 0 else {
+            return nil
+        }
 
-        let pulse = tempo.baseBPM
+        let pulse = tempo.runningPulseBPM
         guard (120...210).contains(pulse) else { return nil }
         let rate = requestedBPM / pulse
         guard (minimumRate...maximumRate).contains(rate) else { return nil }

@@ -72,9 +72,38 @@ func generatedTempoCorpusStaysInsideTwoPercent(_ referenceBPM: Double) async thr
 
     let result = try await analyze(samples: samples, sampleRate: sampleRate)
 
-    if let result {
-        #expect(tempoError(result.baseBPM, referenceBPM: 180) <= 0.02)
-    }
+    #expect(result == nil)
+}
+
+@Test func aStableNinetyBPMMusicalPulseIsMeasuredTruthfullyWithoutInventingStrideEvidence()
+    async throws
+{
+    let sampleRate = 8_000.0
+    let samples = pulseTrain(bpm: 90, durationSeconds: 24, sampleRate: sampleRate)
+
+    let result = try await analyze(samples: samples, sampleRate: sampleRate)
+
+    #expect(result != nil)
+    #expect(tempoError(result?.baseBPM ?? 0, referenceBPM: 90) <= 0.02)
+    #expect(result?.alternatePulseBPM == nil)
+    #expect(tempoError(result?.runningPulseBPM ?? 0, referenceBPM: 90) <= 0.02)
+    #expect(result?.isAdaptiveReady == false)
+}
+
+@Test func aOneEightyPulseWithAlternatingAccentsStaysOneEighty() async throws {
+    let sampleRate = 8_000.0
+    let samples = pulseTrain(
+        bpm: 180,
+        durationSeconds: 24,
+        sampleRate: sampleRate,
+        accentEveryOtherBeat: true
+    )
+
+    let result = try await analyze(samples: samples, sampleRate: sampleRate)
+
+    #expect(result != nil)
+    #expect(tempoError(result?.baseBPM ?? 0, referenceBPM: 180) <= 0.02)
+    #expect(tempoError(result?.runningPulseBPM ?? 0, referenceBPM: 180) <= 0.02)
 }
 
 private func analyze(

@@ -152,25 +152,6 @@ extension RunReducer {
             next.session.rhythmControl.resetToAutomatic()
         }
 
-        if let requestedBPM = next.session.rhythmControl.requestedBPM(cadenceSPM: cadenceSPM),
-            TrackMatchPlanner().select(
-                requestedBPM: requestedBPM,
-                from: tracks,
-                currentTrackID: next.session.currentTrackID
-            ) == nil
-        {
-            next.session.rhythmControl = priorControl
-            next.session.adaptationState.commandStatus = .unreachable
-            next.session.adaptationState.isAtLimit = true
-            return (
-                .active(next),
-                [
-                    .emitHaptic(.rhythmLimit),
-                    .scheduleControlsTimeout(sessionID: active.session.id, timeoutID: timeoutID),
-                ]
-            )
-        }
-
         next.activity = .playing(
             rhythm: rhythm,
             controls: .timed(surface: .rhythm, timeoutID: timeoutID)
@@ -199,7 +180,7 @@ extension RunReducer {
             session: next.session,
             deltaSeconds: 0,
             selectionID: rateRequestID,
-            immediate: true
+            prepareImmediately: true
         )
         next.session = transition.session
 
@@ -279,7 +260,7 @@ extension RunReducer {
             input: AdaptationInput(
                 cadenceSPM: cadenceSPM,
                 cadenceReliable: cadenceReliable,
-                baseTempoBPM: tempo.baseBPM,
+                baseTempoBPM: tempo.runningPulseBPM,
                 analysisConfidence: tempo.confidence,
                 appliedRate: rampOriginRate,
                 deltaSeconds: deltaSeconds,
@@ -318,7 +299,7 @@ extension RunReducer {
         session: RunSession,
         deltaSeconds: Double,
         selectionID: Int,
-        immediate: Bool = false
+        prepareImmediately: Bool = false
     ) -> (session: RunSession, effects: [RunEffect]) {
         var next = session
         guard session.adaptationState.isAtLimit,
@@ -337,7 +318,6 @@ extension RunReducer {
             next.pendingTrackSelectionID = nil
             next.pendingNextTrackID = nil
             next.preparedNextTrackID = nil
-            next.immediateTrackSelectionID = nil
             return (
                 next,
                 shouldClearPlan
@@ -353,7 +333,7 @@ extension RunReducer {
         }
 
         next.incompatibleTrackSeconds =
-            immediate
+            prepareImmediately
             ? 5
             : next.incompatibleTrackSeconds + max(deltaSeconds, 0)
         guard next.incompatibleTrackSeconds >= 5 else { return (next, []) }
@@ -364,9 +344,6 @@ extension RunReducer {
         next.pendingTrackSelectionID = selectionID
         next.pendingNextTrackID = match.trackID
         next.preparedNextTrackID = nil
-        next.immediateTrackSelectionID = immediate ? selectionID : nil
-        next.adaptationState.commandStatus = .requiresTrackChange
-        next.adaptationState.achievableBPM = requestedBPM
         return (
             next,
             [

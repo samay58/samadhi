@@ -9,7 +9,7 @@
 
 Scripts/test.sh runs Swift package tests, app-model tests, and UI tests serially on iPhone 17 Pro Simulator.
 
-The 2026-07-22 adaptive-audio repair gate passed 97 package tests, 15 app-model tests, and 10 UI tests serially.
+The 2026-07-22 tempo-coverage and transport repair gate passed 102 package tests, 15 app-model tests, and 10 UI tests serially.
 
 Formatter gate:
 
@@ -57,8 +57,9 @@ Domain tests cover:
 - Player-confirmed Previous and Skip truth instead of predicted song state
 - One haptic for each accepted Auto detent, a fuller event every five BPM, and one distinct warning beyond the 40-BPM window
 - Privacy-safe replay of the first field failure across broad Manual wheel input
-- Applied, changing-song, unreachable, and rejected command outcomes
-- Immediate compatible-track commitment for direct wheel intent
+- Applied, boundary-limited, and rejected command outcomes
+- Manual and Auto candidate preparation without an implicit track change
+- Rapid target coalescing, stale candidate rejection, explicit Skip authority, and player-confirmed natural-boundary authority
 - Target reapplication after a player-confirmed track change
 - Rapid detents coalescing toward the latest requested target before read-back
 - Mismatched read-back rejecting the command and preserving latency evidence
@@ -85,7 +86,7 @@ Tempo-analysis tests cover:
 - Silence and irregular-onset rejection
 - Mono and stereo audio-file decoding through the public analysis interface
 
-These generated fixtures validate the module seam. The opt-in `TempoCorpusValidator` adds network evidence against 12 provider-hosted Apple previews whose catalog titles declare tempos from 130 through 180 BPM. Version 3 passed 11 of 12 within 2 percent of the exact declared pulse and rejected the remaining preview. No preview audio is committed, and normal tests remain offline.
+These generated fixtures validate the module seam. The opt-in `TempoCorpusValidator` adds network evidence against 12 provider-hosted Apple previews whose catalog titles declare tempos from 130 through 180 BPM. Version 4 passed all 12 within 2 percent of the exact declared musical pulse. Lower-pulse, exact-180, silence, irregular-onset, and triple-meter regressions remain offline. No preview audio is committed.
 
 UI tests cover:
 
@@ -100,7 +101,7 @@ UI tests cover:
 - In-run aperture click-wheel reveal, clockwise and counterclockwise angular adjustment, fixed Auto bounds, protected center, Manual ownership, and return to Auto
 - Normal no-argument Simulator launch through local demo music and cadence lock
 
-App-model tests cover ready mapping, start transition, atomic store round trips, corrupt persistence, restored selection, cancellation of stale replacement work, complete typed import presentation, ordered three-track import batches, retry of the same playlist, retry after relaunch, schema-version-3 run diagnostics, a reducer-driven diagnostic timeline through finish, immediate Simulator demo readiness, and replacement with a second local playlist.
+App-model tests cover ready mapping, start transition, atomic store round trips, corrupt persistence, restored selection, cancellation of stale replacement work, complete typed import presentation, ordered three-track import batches, retry of the same playlist, retry after relaunch, schema-version-4 run diagnostics, a reducer-driven diagnostic timeline through finish, immediate Simulator demo readiness, and replacement with a second local playlist.
 
 ## Visual proof
 
@@ -157,7 +158,7 @@ The `Samadhi MusicKit Gate` scheme verifies that the harness and framework calls
 - Full perceptibility protocol: open; 0.90 versus 1.10 is now the production envelope because that pair was clearly audible, while full-song endpoint quality remains a completion gate
 - Production track-fit and rotary-control build: exact-profile signing, embedded application identifier, wireless installation, foreground launch, and normal setup rendering passed on the restored iPhone on 2026-07-22
 - First normal field run: historical red evidence; 497 wheel adjustments and a 59-BPM requested span produced only a 0.056 MusicKit read-back span, while the summary reported 99 percent from automatic-only eligible samples
-- Field-run remediation: privacy-safe replay, truthful command states, prompt read-back, immediate compatible-track commitment, target reapplication, and honest coverage pass deterministically
+- Field-run remediation: privacy-safe replay, truthful command states, prompt read-back, nearest-boundary behavior, noncommitting candidate preparation, target reapplication, and honest coverage pass deterministically
 - Import remediation: full six-track disclosure fixture, typed failure sections, retry after relaunch, ordered three-track batching, and timing persistence pass in Simulator and model tests
 - Exact BPM and fresh Auto repair: formatter lint, 97 package tests, 15 app-model tests, 10 UI tests, exact `Samadhi Development` signing, application identifier verification, physical build, and installation passed on 2026-07-22; foreground launch waited on the locked phone and was not claimed
 - Physical remediation check: open for audible direction, command latency, compatible track change, clockwise versus counterclockwise haptics, and real import wall time
@@ -168,7 +169,7 @@ Use five analyzed songs with prominent, stable beats. Compare 0.92, 1.00, and 1.
 
 The complete sequence, pivot rules, phase questions, and final evidence packet live in [FELT-SYNCHRONIZATION-EXECUTION-SPEC.md](FELT-SYNCHRONIZATION-EXECUTION-SPEC.md).
 
-Next, use the installed remediation build for one short normal imported run. Turn far enough to require a compatible track, then pull `latest-run-diagnostics.json` and `latest-import-diagnostics.json`. Confirm requested and achievable BPM, commanded rate, MusicKit read-back, latency, track change, import wall time, progress, and summary agree. Renew the exact profile first if testing occurs after 2026-07-23 UTC. Before Milestone 2 completion, complete the broader listening note and prove five screen-locked minutes, controlled interruption, and route loss.
+Next, install the signed version-4 build when the paired iPhone reconnects and let it reanalyze once. Confirm about 14 of 18 tracks are ready, then make one large and several rapid Manual changes while one song plays. Confirm requested and achievable BPM, commanded rate, MusicKit read-back, and track identity agree, with no song change before Skip or a natural boundary. Before Milestone 2 completion, complete the broader listening note and prove five screen-locked minutes, controlled interruption, and route loss.
 
 ## Known environment behavior
 

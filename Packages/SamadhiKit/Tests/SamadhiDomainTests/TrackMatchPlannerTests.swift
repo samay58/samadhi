@@ -29,6 +29,29 @@ import Testing
     #expect(match == nil)
 }
 
+@Test func anExplicitAlternatePulseCanRelateSlowMusicToRunningCadence() throws {
+    let slowMusic = MusicTrack(
+        id: MusicTrackID("slow-with-stride"),
+        title: "Slow with stride",
+        durationSeconds: 180,
+        tempo: TempoAnalysis(
+            baseBPM: 90,
+            alternatePulseBPM: 180,
+            confidence: 0.9,
+            analyzedDurationSeconds: 30,
+            version: 4
+        )
+    )
+
+    let match = try #require(
+        TrackMatchPlanner().select(requestedBPM: 180, from: [slowMusic])
+    )
+
+    #expect(slowMusic.tempo?.baseBPM == 90)
+    #expect(match.pulseBPM == 180)
+    #expect(match.requiredRate == 1)
+}
+
 @Test func defaultEnvelopeIncludesThePhysicallyProvenTenPercentEndpoints() throws {
     let slower = try #require(
         TrackMatchPlanner().select(requestedBPM: 153, from: [track("slower", tempo: 170)])

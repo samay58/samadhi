@@ -632,7 +632,7 @@ final class RunPresentationModel {
         return TempoMatchEvaluator.measure(
             referenceBPM: referenceBPM,
             referenceReliable: referenceReliable,
-            baseTempoBPM: tempo.baseBPM,
+            baseTempoBPM: tempo.runningPulseBPM,
             appliedRate: active.session.appliedPlaybackRate,
             playbackActive: true,
             commandVerified: active.session.adaptationState.commandStatus == .applied
@@ -645,7 +645,7 @@ final class RunPresentationModel {
         rate: Double?
     ) -> Int? {
         guard let tempo = track.tempo, let rate else { return nil }
-        guard (120...210).contains(tempo.baseBPM) else { return nil }
+        guard (60...210).contains(tempo.baseBPM) else { return nil }
         return Int((tempo.baseBPM * rate).rounded())
     }
 

@@ -87,7 +87,7 @@ Any wider MusicKit rate remains an empirical device capability. Test it. Do not 
 
 ## Current Samadhi gap
 
-The source-neutral planner selects the best ready fit at run start and prepares a better fit after five seconds of stable incompatibility. Tempo estimator version 3, the planner, the applied-BPM readout, and summary measurement now share one 120 through 210 BPM pulse instead of treating half-time as perceptually equivalent. The wheel commits one absolute target at finger-up, and the production rate envelope is the already audible 0.90 through 1.10 range. Three physical truths remain open:
+The source-neutral planner selects the best ready fit at run start and prepares a better fit after five seconds of stable incompatibility. Tempo estimator version 4 keeps the measured musical pulse separate from an independently supported stride pulse. The planner and summary use the running-range pulse; the visible Music BPM uses the musical pulse. The wheel commits one absolute target at finger-up, and the production rate envelope is the already audible 0.90 through 1.10 range. Three physical truths remain open:
 
 - One imported run must cross a natural prepared transition without a gap, stale feedback, or a false summary.
 - The wider dial must agree with the requested BPM, selected pulse, MusicKit rate read-back, and audible result on the physical phone.
@@ -102,7 +102,7 @@ Use a two-layer match:
 1. **Coarse match by song.** Rank tracks by the absolute logarithmic distance between requested BPM and the analyzed running pulse. Reject ambiguous or out-of-range pulse estimates instead of silently doubling them. Prefer strong-beat tracks and keep the current track when it remains inside a hysteresis band. D-Jogger used the same broad pattern of bounded stretching plus closer-tempo selection. Source: [D-Jogger implementation](https://backoffice.biblio.ugent.be/download/8551818/8551819).
 2. **Fine match by rate.** Apply pitch-stable playback rate from 0.90 through 1.10. Those endpoints were clearly distinguishable in the physical Bluetooth check. D-Jogger also found roughly ±10 percent acceptable for its own phase-vocoder implementation, but full-song MusicKit quality still needs its own final listening gate. Source: [D-Jogger implementation](https://backoffice.biblio.ugent.be/download/8551818/8551819).
 3. **Transition musically.** Reorder or select the next compatible song at a natural boundary. Do not jump tracks for every cadence fluctuation. djay applies tempo alignment around selected transition regions and holds a common BPM when songs are already close. Source: [djay Automix](https://help.algoriddim.com/user-manual/djay-pro-mac/mixing-basics/using-automix).
-4. **Preserve truthful control.** If the current track cannot reach the target, hold the nearest proven boundary only during an explicit audition, or label the current song steady while preparing a compatible next track. Do not show `At limit` while silently returning to 1.00.
+4. **Preserve truthful control.** If the current track cannot reach the target, keep the request visible and hold the nearest proven boundary while preparing one latest compatible candidate. Preparation is not transport permission. Only Skip or a player-confirmed natural boundary changes the song.
 
 Auto and Manual remain distinct:
 
