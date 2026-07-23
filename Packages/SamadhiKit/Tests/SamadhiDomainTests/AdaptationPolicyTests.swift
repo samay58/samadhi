@@ -20,14 +20,16 @@ private let policy = AdaptationPolicy()
     #expect(!doubleTime.isTrackCompatible)
 }
 
-@Test func unsafeRateLeavesMusicSteady() {
+@Test func unsafeAutomaticRateMovesTowardTheNearestTruthfulBoundary() {
     let decision = policy.update(
         state: .initial,
         input: input(cadence: 180, tempo: 160)
     )
 
     #expect(!decision.isTrackCompatible)
-    #expect(decision.commandedRate == 1)
+    #expect(decision.commandedRate == 1.02)
+    #expect(decision.targetRate == 1.10)
+    #expect(decision.nextState.achievableBPM == 176)
     #expect(decision.status == .musicSteady)
     #expect(decision.isAtLimit)
 }
@@ -177,10 +179,11 @@ private let policy = AdaptationPolicy()
         )
     )
 
-    #expect(decision.targetRate == nil)
+    #expect(decision.targetRate == 1.10)
     #expect(decision.derivedTargetRate == 200.0 / 170.0)
     #expect(decision.isAtLimit)
-    #expect(decision.commandedRate == 1)
+    #expect(decision.commandedRate == 1.10)
+    #expect(abs((decision.nextState.achievableBPM ?? 0) - 187) < 0.000_1)
 }
 
 @Test func rhythmControlClampsBothModesAndResetReturnsToNeutralAuto() {

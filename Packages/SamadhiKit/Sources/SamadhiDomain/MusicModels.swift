@@ -18,19 +18,35 @@ public struct TempoAnalysis: Sendable, Equatable, Codable {
     public static let readyConfidence = 0.72
 
     public let baseBPM: Double
+    public let alternatePulseBPM: Double?
     public let confidence: Double
     public let analyzedDurationSeconds: Double
     public let version: Int
 
-    public init(baseBPM: Double, confidence: Double, analyzedDurationSeconds: Double, version: Int) {
+    public init(
+        baseBPM: Double,
+        alternatePulseBPM: Double? = nil,
+        confidence: Double,
+        analyzedDurationSeconds: Double,
+        version: Int
+    ) {
         self.baseBPM = baseBPM
+        self.alternatePulseBPM = alternatePulseBPM
         self.confidence = min(max(confidence, 0), 1)
         self.analyzedDurationSeconds = max(analyzedDurationSeconds, 0)
         self.version = version
     }
 
     public var isAdaptiveReady: Bool {
-        confidence >= Self.readyConfidence
+        confidence >= Self.readyConfidence && (120...210).contains(runningPulseBPM)
+    }
+
+    public var runningPulseBPM: Double {
+        if (120...210).contains(baseBPM) { return baseBPM }
+        if let alternatePulseBPM, (120...210).contains(alternatePulseBPM) {
+            return alternatePulseBPM
+        }
+        return baseBPM
     }
 }
 

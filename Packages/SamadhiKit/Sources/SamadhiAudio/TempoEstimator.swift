@@ -2,7 +2,7 @@ import Accelerate
 import SamadhiDomain
 
 struct TempoEstimator: Sendable {
-    static let analysisVersion = 3
+    static let analysisVersion = 4
 
     init() {}
 
@@ -18,7 +18,7 @@ struct TempoEstimator: Sendable {
             envelope.values.max() ?? 0 > 0.000_1
         else { return nil }
 
-        let scores = stride(from: 120.0, through: 210.0, by: 0.25).map { tempo in
+        let scores = stride(from: 60.0, through: 210.0, by: 0.25).map { tempo in
             let lag = 60 * envelope.rate / tempo
             let correlation = normalizedCorrelation(envelope.values, lag: lag)
             return TempoScore(
@@ -26,24 +26,108 @@ struct TempoEstimator: Sendable {
                 correlation: correlation
             )
         }
-        guard let best = scores.max(by: { $0.correlation < $1.correlation }),
-            best.correlation >= 0.32
+        guard let estimate = estimate(from: scores) else { return nil }
+
+        return TempoAnalysis(
+            baseBPM: estimate.primary.tempo,
+            alternatePulseBPM: estimate.alternate?.tempo,
+            confidence: estimate.confidence,
+            analyzedDurationSeconds: Double(samples.count) / sampleRate,
+            version: Self.analysisVersion
+        )
+    }
+
+    private func estimate(from scores: [TempoScore]) -> TempoEstimate? {
+        guard
+            let lower = scores.filter({ $0.tempo < 120 }).max(
+                by: { $0.correlation < $1.correlation }
+            ),
+            let running = scores.filter({ $0.tempo >= 120 }).max(
+                by: { $0.correlation < $1.correlation }
+            )
         else { return nil }
+
+        let pairIsSupported =
+            isDoublePulse(lower: lower, running: running)
+            && lower.correlation >= 0.32
+            && running.correlation >= 0.32
+        if pairIsSupported {
+            let primary: TempoScore
+            let alternate: TempoScore
+            if running.tempo > 190 {
+                primary = lower
+                alternate = running
+            } else if running.correlation >= 0.50
+                || running.correlation >= lower.correlation * 1.10
+            {
+                primary = running
+                alternate = lower
+            } else {
+                primary = lower
+                alternate = running
+            }
+            let harmonicConfidence = min(
+                max((((lower.correlation + running.correlation) / 2) - 0.18) / 0.29, 0),
+                1
+            )
+            let confidence = max(
+                confidence(for: primary, among: scores),
+                harmonicConfidence
+            )
+            guard confidence >= TempoAnalysis.readyConfidence else { return nil }
+            return TempoEstimate(
+                primary: primary,
+                alternate: alternate,
+                confidence: confidence
+            )
+        }
+
+        if running.correlation >= 0.50 {
+            let confidence = confidence(for: running, among: scores)
+            guard confidence >= TempoAnalysis.readyConfidence else { return nil }
+            return TempoEstimate(primary: running, alternate: nil, confidence: confidence)
+        }
+
+        if let triple = score(near: lower.tempo * 3, in: scores),
+            triple.correlation >= 0.32
+        {
+            return nil
+        }
+
+        if lower.correlation >= 0.50 {
+            let confidence = confidence(for: lower, among: scores)
+            guard confidence >= TempoAnalysis.readyConfidence else { return nil }
+            return TempoEstimate(primary: lower, alternate: nil, confidence: confidence)
+        }
+
+        guard running.correlation >= 0.32 else { return nil }
+        let confidence = confidence(for: running, among: scores)
+        guard confidence >= TempoAnalysis.readyConfidence else { return nil }
+        return TempoEstimate(primary: running, alternate: nil, confidence: confidence)
+    }
+
+    private func confidence(for best: TempoScore, among scores: [TempoScore]) -> Double {
         let competingScore =
             scores
             .filter { abs($0.tempo - best.tempo) / best.tempo > 0.04 }
             .map(\.correlation)
             .max() ?? 0
         let separation = max(best.correlation - competingScore, 0)
-        let confidence = min(max((best.correlation - 0.18) / 0.55 + separation, 0), 1)
-        guard confidence >= TempoAnalysis.readyConfidence else { return nil }
+        return min(max((best.correlation - 0.18) / 0.55 + separation, 0), 1)
+    }
 
-        return TempoAnalysis(
-            baseBPM: best.tempo,
-            confidence: confidence,
-            analyzedDurationSeconds: Double(samples.count) / sampleRate,
-            version: Self.analysisVersion
-        )
+    private func isDoublePulse(lower: TempoScore, running: TempoScore) -> Bool {
+        abs(running.tempo - (lower.tempo * 2)) / running.tempo <= 0.02
+    }
+
+    private func score(near tempo: Double, in scores: [TempoScore]) -> TempoScore? {
+        guard
+            let score = scores.min(
+                by: { abs($0.tempo - tempo) < abs($1.tempo - tempo) }
+            ),
+            abs(score.tempo - tempo) / tempo <= 0.02
+        else { return nil }
+        return score
     }
 
     private func spectralFluxEnvelope(
@@ -198,4 +282,10 @@ struct TempoEstimator: Sendable {
 private struct TempoScore {
     let tempo: Double
     let correlation: Double
+}
+
+private struct TempoEstimate {
+    let primary: TempoScore
+    let alternate: TempoScore?
+    let confidence: Double
 }

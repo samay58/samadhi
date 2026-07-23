@@ -43,6 +43,11 @@ struct RunDiagnosticSnapshot: Codable, Equatable, Sendable {
         let automaticCorrectionBPM: Int?
         let manualTargetBPM: Int?
         let requestedBPM: Double?
+        let musicalPulseBPM: Double?
+        let alternatePulseBPM: Double?
+        let runningPulseBPM: Double?
+        let appliedMusicalBPM: Double?
+        let appliedRunningPulseBPM: Double?
         let derivedTargetRate: Double?
         let atLimit: Bool?
         let commandStatus: String?
@@ -68,6 +73,11 @@ struct RunDiagnosticSnapshot: Codable, Equatable, Sendable {
             automaticCorrectionBPM: Int? = nil,
             manualTargetBPM: Int? = nil,
             requestedBPM: Double? = nil,
+            musicalPulseBPM: Double? = nil,
+            alternatePulseBPM: Double? = nil,
+            runningPulseBPM: Double? = nil,
+            appliedMusicalBPM: Double? = nil,
+            appliedRunningPulseBPM: Double? = nil,
             derivedTargetRate: Double? = nil,
             atLimit: Bool = false,
             commandStatus: String? = nil,
@@ -92,6 +102,11 @@ struct RunDiagnosticSnapshot: Codable, Equatable, Sendable {
             self.automaticCorrectionBPM = automaticCorrectionBPM
             self.manualTargetBPM = manualTargetBPM
             self.requestedBPM = requestedBPM
+            self.musicalPulseBPM = musicalPulseBPM
+            self.alternatePulseBPM = alternatePulseBPM
+            self.runningPulseBPM = runningPulseBPM
+            self.appliedMusicalBPM = appliedMusicalBPM
+            self.appliedRunningPulseBPM = appliedRunningPulseBPM
             self.derivedTargetRate = derivedTargetRate
             self.atLimit = atLimit
             self.commandStatus = commandStatus
@@ -209,6 +224,15 @@ struct RunDiagnosticsRecorder {
                 automaticCorrectionBPM: session?.rhythmControl.automaticCorrectionBPM,
                 manualTargetBPM: session?.rhythmControl.manualTargetBPM,
                 requestedBPM: session?.adaptationState.requestedBPM,
+                musicalPulseBPM: track?.tempo?.baseBPM,
+                alternatePulseBPM: track?.tempo?.alternatePulseBPM,
+                runningPulseBPM: track?.tempo?.runningPulseBPM,
+                appliedMusicalBPM: track?.tempo.map {
+                    $0.baseBPM * (session?.appliedPlaybackRate ?? 1)
+                },
+                appliedRunningPulseBPM: track?.tempo.map {
+                    $0.runningPulseBPM * (session?.appliedPlaybackRate ?? 1)
+                },
                 derivedTargetRate: session?.adaptationState.derivedTargetRate,
                 atLimit: session?.adaptationState.isAtLimit ?? false,
                 commandStatus: session?.adaptationState.commandStatus.rawValue,
@@ -228,7 +252,7 @@ struct RunDiagnosticsRecorder {
 
         guard case let .summary(summary) = newState else { return nil }
         let snapshot = RunDiagnosticSnapshot(
-            schemaVersion: 3,
+            schemaVersion: 4,
             capturedAt: now(),
             collectionID: collection.id.rawValue,
             collectionName: collection.name,

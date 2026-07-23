@@ -55,7 +55,7 @@ Stale events carry session, acquisition, timeout, or hold identifiers. Reducer i
 
 Reducer receives the selected tracks. Production composition passes only adaptive-ready imported tracks while deterministic fixtures retain their configured collection. Domain no longer assumes collection size.
 
-`TrackMatchPlanner` is the source-neutral coarse-matching seam. Given a requested musical BPM and a quality envelope, it ranks ready tracks across half-time, full-time, and double-time pulses by required stretch. It preserves source order for ties and retains the current song when switching would provide only a marginal improvement. Production connection remains a reducer and player-queue task, not a SwiftUI responsibility.
+`TrackMatchPlanner` is the source-neutral coarse-matching seam. Given a requested BPM and a quality envelope, it ranks ready tracks by the smallest stretch against the measured running-range pulse. A lower musical pulse participates only when analysis independently found a supported stride pulse. The planner preserves source order for ties and retains the current song when switching would provide only a marginal improvement. Preparation may update the next queue candidate, but only Skip or a player-confirmed natural boundary changes transport. Production connection remains a reducer and player-queue task, not a SwiftUI responsibility.
 
 ## Production seams
 
