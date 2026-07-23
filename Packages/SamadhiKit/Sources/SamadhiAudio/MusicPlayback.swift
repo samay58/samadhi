@@ -155,7 +155,7 @@ public final class SimulatedMusicPlayer: MusicPlaybackProviding {
                 operationID: operationID,
                 requestID: requestID,
                 trackID: trackID,
-                rate: min(max(rate, 0.94), 1.06),
+                rate: min(max(rate, 0.90), 1.10),
                 latencySeconds: 0
             )
         )

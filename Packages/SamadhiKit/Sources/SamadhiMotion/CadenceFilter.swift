@@ -16,18 +16,11 @@ public struct CadenceFilter: Sendable {
     }
 
     public mutating func ingest(_ observation: CadenceObservation) -> CadenceEstimate {
-        guard let value = observation.stepsPerMinute else {
-            missingCount += 1
-            if missingCount >= 3 {
-                priorSPM = publishedSPM ?? priorSPM
-                publishedSPM = nil
-                recentValues.removeAll(keepingCapacity: true)
-            }
-            return publishedSPM.map(CadenceEstimate.locked) ?? .acquiring
-        }
-
-        guard (120...210).contains(value) else {
-            return publishedSPM.map(CadenceEstimate.locked) ?? .acquiring
+        guard observation.sampleAgeSeconds <= 2,
+            let value = observation.stepsPerMinute,
+            (120...210).contains(value)
+        else {
+            return recordMissing()
         }
 
         missingCount = 0
@@ -85,5 +78,15 @@ public struct CadenceFilter: Sendable {
     private func move(_ value: Double, toward target: Double, maximumChange: Double) -> Double {
         if value < target { return min(value + maximumChange, target) }
         return max(value - maximumChange, target)
+    }
+
+    private mutating func recordMissing() -> CadenceEstimate {
+        missingCount += 1
+        if missingCount >= 3 {
+            priorSPM = publishedSPM ?? priorSPM
+            publishedSPM = nil
+            recentValues.removeAll(keepingCapacity: true)
+        }
+        return publishedSPM.map(CadenceEstimate.locked) ?? .acquiring
     }
 }

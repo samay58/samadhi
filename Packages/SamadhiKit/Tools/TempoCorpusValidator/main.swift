@@ -28,7 +28,7 @@ private struct FixtureResult: Codable {
     let estimatedBPM: Double?
     let confidence: Double?
     let analysisVersion: Int?
-    let familyError: Double?
+    let pulseError: Double?
     let passed: Bool
     let error: String?
 }
@@ -37,7 +37,7 @@ private struct CorpusReport: Codable {
     let generatedAt: Date
     let source: String
     let referenceBasis: String
-    let allowedFamilyError: Double
+    let allowedPulseError: Double
     let requiredPassCount: Int
     let passedCount: Int
     let totalCount: Int
@@ -70,7 +70,7 @@ private enum TempoCorpusValidator {
             generatedAt: Date(),
             source: "Apple catalog lookup and provider-hosted preview assets",
             referenceBasis: "The exact Apple catalog title declares the reference tempo",
-            allowedFamilyError: 0.02,
+            allowedPulseError: 0.02,
             requiredPassCount: 10,
             passedCount: passedCount,
             totalCount: results.count,
@@ -150,14 +150,8 @@ private enum TempoCorpusValidator {
         analysis: TempoAnalysis?,
         error: String?
     ) -> FixtureResult {
-        let familyError = analysis.map { analysis in
-            [
-                fixture.referenceBPM / 2,
-                fixture.referenceBPM,
-                fixture.referenceBPM * 2,
-            ]
-            .map { candidate in abs(analysis.baseBPM - candidate) / candidate }
-            .min() ?? .infinity
+        let pulseError = analysis.map { analysis in
+            abs(analysis.baseBPM - fixture.referenceBPM) / fixture.referenceBPM
         }
         return FixtureResult(
             catalogID: fixture.catalogID,
@@ -167,8 +161,8 @@ private enum TempoCorpusValidator {
             estimatedBPM: analysis?.baseBPM,
             confidence: analysis?.confidence,
             analysisVersion: analysis?.version,
-            familyError: familyError,
-            passed: familyError.map { $0 <= 0.02 } ?? false,
+            pulseError: pulseError,
+            passed: pulseError.map { $0 <= 0.02 } ?? false,
             error: error
         )
     }

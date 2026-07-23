@@ -319,6 +319,21 @@
 - Built with the exact `Samadhi Development` profile, verified the embedded application identifier, and installed the remediation build on Samay's connected iPhone
 - Left audible response, haptic feel, and real import timing open because they require a short physical perception check
 
+## 2026-07-22. Exact BPM and fresh Auto repair
+
+- Reproduced the moving Manual target, stale cadence lock, half-time relabeling, narrow rate envelope, and slow matched ramp in deterministic tests
+- Changed wheel detents to local visual and haptic previews, with one absolute Manual BPM committed at finger-up
+- Made Manual commit its compatible target rate immediately and made Auto move at 0.02 rate units per second
+- Expanded production playback to the physically audible 0.90 through 1.10 range
+- Used `CMPedometerData.endDate` to reject samples more than two seconds old and made three stale, missing, or invalid samples return Auto to acquisition
+- Removed half-time and double-time relabeling from track planning, adaptation, applied BPM, and summary measurement
+- Added tempo estimator version 3 and automatic reimport of persisted version-2 analysis
+- Passed 11 of 12 real Apple previews against the exact declared running pulse; the remaining preview was rejected
+- Added UI proof that a completed wheel turn reaches matching simulated player read-back
+- Fixed a serial UI failure that exposed the wheel timeout hiding the control during an active turn
+- Passed formatter lint, 97 package tests, 15 app-model tests, and 10 UI tests
+- Rebuilt with the exact `Samadhi Development` profile, verified the embedded application identifier, and installed the final repair on Samay's connected iPhone
+
 ## Current checkpoint
 
-Milestones 0 and 1 are complete. Milestone 2 is still open. The software defects from the first normal field run now have deterministic repairs, complete import disclosure, bounded analysis, and an installed physical build. The next checkpoint is deliberately small: use one real playlist, turn far enough to trigger a compatible song, judge the audible response and both haptic directions, then pull the run and import diagnostics. A failure returns directly to the recorded command chain. A pass unlocks background, transition, interruption, route-loss, accessibility, cadence-calibration, and final outdoor-run proof. No visual expansion or new feature outranks that checkpoint.
+Milestones 0 and 1 are complete. Milestone 2 is still open. The next checkpoint is one short physical proof on the new build: let the playlist reanalyze once, commit a clearly different wheel BPM, confirm displayed target and `Music` read-back agree, then return to Auto and verify a fresh cadence produces an audible response within about five seconds. Pull diagnostics immediately afterward. No visual expansion or reliability work outranks that result.

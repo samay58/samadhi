@@ -41,11 +41,14 @@
                         return
                     }
 
+                    let now = Date()
+                    let sampleDate = data?.endDate ?? now
                     continuation.yield(
                         .observation(
                             CadenceObservation(
                                 stepsPerMinute: data?.currentCadence.map { $0.doubleValue * 60 },
-                                elapsedSeconds: Date().timeIntervalSince(start)
+                                elapsedSeconds: sampleDate.timeIntervalSince(start),
+                                sampleAgeSeconds: now.timeIntervalSince(sampleDate)
                             )
                         )
                     )

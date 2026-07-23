@@ -555,7 +555,7 @@ private let slowTrack = MusicTrack(
                 operationID: 79,
                 requestID: 84,
                 trackID: transitionTrack.id,
-                rate: 1.02
+                rate: 1.05
             )
         ]
     )
@@ -601,16 +601,16 @@ private let slowTrack = MusicTrack(
         ])
 }
 
-@Test func voiceOverFocusPinsControlsAndReschedulesTimeoutOnExit() {
+@Test func activeControlInteractionPinsControlsAndReschedulesTimeoutOnExit() {
     var state = reducer.reduce(state: lockedRun(), event: .surfaceTapped(timeoutID: 5)).0
-    var result = reducer.reduce(state: state, event: .controlsFocusEntered)
+    var result = reducer.reduce(state: state, event: .controlsInteractionBegan)
     state = result.0
     #expect(result.1 == [.cancelTask(sessionID: 1, .controlsTimeout)])
 
     result = reducer.reduce(state: state, event: .controlsTimedOut(timeoutID: 5))
     #expect(result.0 == state)
 
-    result = reducer.reduce(state: state, event: .controlsFocusExited(timeoutID: 6))
+    result = reducer.reduce(state: state, event: .controlsInteractionEnded(timeoutID: 6))
     #expect(result.1 == [.scheduleControlsTimeout(sessionID: 1, timeoutID: 6)])
 }
 
@@ -1038,30 +1038,13 @@ private let slowTrack = MusicTrack(
 }
 
 @Test func unreachableAdjustmentStopsAtTheLastTruthfulTarget() {
-    var state = acquiringCoreLoopRun(sessionID: 430)
-    state =
-        coreLoopReducer.reduce(
-            state: state,
-            event: .rhythmControlSetManual(rateRequestID: 431, timeoutID: 432)
-        ).0
-    for step in 0..<8 {
-        state =
-            coreLoopReducer.reduce(
-                state: state,
-                event: .rhythmControlAdjusted(
-                    steps: -1,
-                    rateRequestID: 433 + step,
-                    timeoutID: 450 + step
-                )
-            ).0
-    }
-
+    let state = acquiringCoreLoopRun(sessionID: 430)
     let rejected = coreLoopReducer.reduce(
         state: state,
-        event: .rhythmControlAdjusted(steps: -1, rateRequestID: 470, timeoutID: 471)
+        event: .rhythmControlTargetCommitted(bpm: 120, rateRequestID: 470, timeoutID: 471)
     )
 
-    #expect(rejected.0.session?.rhythmControl.manualTargetBPM == 161)
+    #expect(rejected.0.session?.rhythmControl == .initial)
     #expect(rejected.0.session?.adaptationState.commandStatus == .unreachable)
     #expect(rejected.1.contains(.emitHaptic(.rhythmLimit)))
 }
@@ -1120,6 +1103,38 @@ private let slowTrack = MusicTrack(
     #expect((state.session?.pendingCommandedRate ?? 1) < 0.97)
     #expect(state.session?.adaptationState.commandStatus == .applying)
     #expect(state.session?.adaptationState.appliedRateReadback == nil)
+}
+
+@Test func wheelCommitKeepsTheChosenBPMFixedWhenCadenceChanges() {
+    var session = RunSession(id: 449)
+    session.currentTrackID = coreLoopTrack.id
+    var state: RunState = .active(
+        ActiveRun(
+            session: session,
+            activity: .playing(rhythm: .locked(spm: 168), controls: .hidden)
+        )
+    )
+
+    state =
+        coreLoopReducer.reduce(
+            state: state,
+            event: .rhythmControlTargetCommitted(bpm: 163, rateRequestID: 450, timeoutID: 451)
+        ).0
+    #expect(state.session?.adaptationState.requestedBPM == 163)
+
+    state =
+        coreLoopReducer.reduce(
+            state: state,
+            event: .cadenceUpdated(
+                sessionID: 449,
+                acquisitionID: 1,
+                stepsPerMinute: 174,
+                deltaSeconds: 1,
+                rateRequestID: 452
+            )
+        ).0
+
+    #expect(state.session?.rhythmControl.requestedBPM(cadenceSPM: 174) == 163)
 }
 
 @Test func partialAutomaticCoverageCannotHideUnmeasuredManualTime() {

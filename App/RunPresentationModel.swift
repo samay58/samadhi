@@ -122,8 +122,7 @@ final class RunPresentationModel {
             ) ?? session?.adaptationState.requestedBPM
         let appliedBPM = appliedTempoBPM(
             for: domainTrack,
-            rate: session?.appliedPlaybackRate,
-            referenceBPM: requestedBPM ?? cadence.map(Double.init)
+            rate: session?.appliedPlaybackRate
         )
 
         return RunViewState(
@@ -175,12 +174,26 @@ final class RunPresentationModel {
                     timeoutID: token()
                 )
             )
+        case let .previewRhythmStep(direction, isMajor):
+            hapticFeedback.emit(.rhythmStep(direction: direction, isMajor: isMajor))
+        case let .commitRhythmTarget(bpm):
+            dispatch(
+                .rhythmControlTargetCommitted(
+                    bpm: bpm,
+                    rateRequestID: token(),
+                    timeoutID: token()
+                )
+            )
         case .useManualRhythm:
             dispatch(.rhythmControlSetManual(rateRequestID: token(), timeoutID: token()))
         case .resetRhythmControl:
             dispatch(.rhythmControlReset(rateRequestID: token(), timeoutID: token()))
-        case let .controlsFocusChanged(isFocused):
-            dispatch(isFocused ? .controlsFocusEntered : .controlsFocusExited(timeoutID: token()))
+        case let .controlsInteractionChanged(isActive):
+            dispatch(
+                isActive
+                    ? .controlsInteractionBegan
+                    : .controlsInteractionEnded(timeoutID: token())
+            )
         case .previous:
             dispatch(.previousTapped)
         case .pause:
@@ -629,19 +642,11 @@ final class RunPresentationModel {
 
     private func appliedTempoBPM(
         for track: MusicTrack,
-        rate: Double?,
-        referenceBPM: Double?
+        rate: Double?
     ) -> Int? {
         guard let tempo = track.tempo, let rate else { return nil }
-        let candidates = [tempo.baseBPM / 2, tempo.baseBPM, tempo.baseBPM * 2]
-            .filter { (120...210).contains($0) }
-            .map { $0 * rate }
-        guard !candidates.isEmpty else { return nil }
-        let reference = referenceBPM ?? candidates.min(by: { abs($0 - 168) < abs($1 - 168) })
-        guard let reference,
-            let closest = candidates.min(by: { abs($0 - reference) < abs($1 - reference) })
-        else { return nil }
-        return Int(closest.rounded())
+        guard (120...210).contains(tempo.baseBPM) else { return nil }
+        return Int((tempo.baseBPM * rate).rounded())
     }
 
     private func emitHaptic(_ event: HapticEvent) {

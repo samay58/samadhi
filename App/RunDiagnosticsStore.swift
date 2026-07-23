@@ -279,7 +279,7 @@ struct RunDiagnosticsRecorder {
             .playbackFailed
         case .activeSecond:
             .activeSecond
-        case .rhythmControlAdjusted:
+        case .rhythmControlAdjusted, .rhythmControlTargetCommitted:
             .rhythmAdjusted
         case .rhythmControlSetManual, .rhythmControlReset:
             .rhythmModeChanged

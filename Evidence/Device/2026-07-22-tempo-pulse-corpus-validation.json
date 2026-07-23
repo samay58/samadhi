@@ -1,0 +1,141 @@
+{
+  "allowedPulseError" : 0.02,
+  "generatedAt" : "2026-07-23T00:18:38Z",
+  "passed" : true,
+  "passedCount" : 11,
+  "referenceBasis" : "The exact Apple catalog title declares the reference tempo",
+  "requiredPassCount" : 10,
+  "results" : [
+    {
+      "analysisVersion" : 3,
+      "artist" : "Power Music Workout",
+      "catalogID" : "1598194487",
+      "confidence" : 1,
+      "estimatedBPM" : 130.25,
+      "passed" : true,
+      "pulseError" : 0.0019230769230769232,
+      "referenceBPM" : 130,
+      "title" : "Friday (Workout Remix 130 BPM)"
+    },
+    {
+      "artist" : "Power Music Workout",
+      "catalogID" : "1383986831",
+      "error" : "Analyzer rejected preview",
+      "passed" : false,
+      "referenceBPM" : 130,
+      "title" : "Beast (Workout Remix 130 BPM)"
+    },
+    {
+      "analysisVersion" : 3,
+      "artist" : "Power Music Workout",
+      "catalogID" : "1434921088",
+      "confidence" : 1,
+      "estimatedBPM" : 139.5,
+      "passed" : true,
+      "pulseError" : 0.0035714285714285713,
+      "referenceBPM" : 140,
+      "title" : "Can't Stop the Feeling! (Workout Remix 140 BPM)"
+    },
+    {
+      "analysisVersion" : 3,
+      "artist" : "Power Music Workout",
+      "catalogID" : "1434921085",
+      "confidence" : 1,
+      "estimatedBPM" : 139.5,
+      "passed" : true,
+      "pulseError" : 0.0035714285714285713,
+      "referenceBPM" : 140,
+      "title" : "Level Up (Workout Remix 140 BPM)"
+    },
+    {
+      "analysisVersion" : 3,
+      "artist" : "Power Music Workout",
+      "catalogID" : "1558215042",
+      "confidence" : 1,
+      "estimatedBPM" : 149.75,
+      "passed" : true,
+      "pulseError" : 0.0016666666666666668,
+      "referenceBPM" : 150,
+      "title" : "Astronaut In the Ocean (Workout Remix 150 BPM)"
+    },
+    {
+      "analysisVersion" : 3,
+      "artist" : "Power Music Workout",
+      "catalogID" : "1585442488",
+      "confidence" : 1,
+      "estimatedBPM" : 149.75,
+      "passed" : true,
+      "pulseError" : 0.0016666666666666668,
+      "referenceBPM" : 150,
+      "title" : "Industry Baby (Workout Remix 150 BPM)"
+    },
+    {
+      "analysisVersion" : 3,
+      "artist" : "Power Music Workout",
+      "catalogID" : "1323303912",
+      "confidence" : 1,
+      "estimatedBPM" : 160.75,
+      "passed" : true,
+      "pulseError" : 0.0046875,
+      "referenceBPM" : 160,
+      "title" : "Feel It Still (Workout Remix 160 BPM)"
+    },
+    {
+      "analysisVersion" : 3,
+      "artist" : "Power Music Workout",
+      "catalogID" : "1323303916",
+      "confidence" : 1,
+      "estimatedBPM" : 160.75,
+      "passed" : true,
+      "pulseError" : 0.0046875,
+      "referenceBPM" : 160,
+      "title" : "Rockstar (Workout Remix 160 BPM)"
+    },
+    {
+      "analysisVersion" : 3,
+      "artist" : "Hanna",
+      "catalogID" : "1066177773",
+      "confidence" : 1,
+      "estimatedBPM" : 170.25,
+      "passed" : true,
+      "pulseError" : 0.0014705882352941176,
+      "referenceBPM" : 170,
+      "title" : "Shake It Off (Workout Remix 170 Bpm)"
+    },
+    {
+      "analysisVersion" : 3,
+      "artist" : "Speedmaster",
+      "catalogID" : "1066177779",
+      "confidence" : 1,
+      "estimatedBPM" : 170.25,
+      "passed" : true,
+      "pulseError" : 0.0014705882352941176,
+      "referenceBPM" : 170,
+      "title" : "Try (Workout Remix 170 Bpm)"
+    },
+    {
+      "analysisVersion" : 3,
+      "artist" : "Power Music Workout",
+      "catalogID" : "1441808823",
+      "confidence" : 1,
+      "estimatedBPM" : 180.75,
+      "passed" : true,
+      "pulseError" : 0.004166666666666667,
+      "referenceBPM" : 180,
+      "title" : "Somebody Told Me (Workout Remix 180 BPM)"
+    },
+    {
+      "analysisVersion" : 3,
+      "artist" : "Power Music Workout",
+      "catalogID" : "1307211987",
+      "confidence" : 1,
+      "estimatedBPM" : 181.25,
+      "passed" : true,
+      "pulseError" : 0.006944444444444444,
+      "referenceBPM" : 180,
+      "title" : "Believer (Workout Remix 180 BPM)"
+    }
+  ],
+  "source" : "Apple catalog lookup and provider-hosted preview assets",
+  "totalCount" : 12
+}

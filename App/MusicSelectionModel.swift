@@ -1,5 +1,6 @@
 import Foundation
 import Observation
+import SamadhiAudio
 import SamadhiDesign
 import SamadhiDomain
 
@@ -61,10 +62,17 @@ final class MusicSelectionModel {
                 presentation = .none
                 return
             }
-            lastSelectedChoice = LibraryPlaylistChoice(
+            let choice = LibraryPlaylistChoice(
                 id: collection.id.rawValue,
                 name: collection.name
             )
+            lastSelectedChoice = choice
+            if collection.tracks.contains(where: {
+                $0.tempo.map { $0.version != LocalTempoAnalyzer.analysisVersion } ?? false
+            }) {
+                selectPlaylist(choice)
+                return
+            }
             apply(collection)
         } catch {
             presentation = .failed("Your saved music could not be opened.")

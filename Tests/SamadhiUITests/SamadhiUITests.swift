@@ -134,6 +134,7 @@ final class SamadhiUITests: XCTestCase {
             thenHoldForDuration: 0.2
         )
         XCTAssertTrue(app.staticTexts["178"].waitForExistence(timeout: 2))
+        XCTAssertTrue(app.staticTexts["Music 178"].waitForExistence(timeout: 2))
 
         right.press(
             forDuration: 0.12,
@@ -141,10 +142,13 @@ final class SamadhiUITests: XCTestCase {
             withVelocity: .slow,
             thenHoldForDuration: 0.2
         )
-        XCTAssertTrue(app.staticTexts["168"].waitForExistence(timeout: 2))
+        let reverseTarget = waitForDialAgreement(dial, below: 178)
+        XCTAssertNotNil(reverseTarget)
 
         dial.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5)).tap()
-        XCTAssertTrue(app.staticTexts["168"].exists)
+        if let reverseTarget {
+            XCTAssertTrue(app.staticTexts[String(reverseTarget)].exists)
+        }
 
         app.buttons["rhythm-manual"].tap()
         XCTAssertTrue(app.buttons["rhythm-manual"].isSelected)
@@ -167,6 +171,24 @@ final class SamadhiUITests: XCTestCase {
 
     private func element(_ identifier: String) -> XCUIElement {
         app.descendants(matching: .any).matching(identifier: identifier).firstMatch
+    }
+
+    private func waitForDialAgreement(
+        _ dial: XCUIElement,
+        below upperBound: Int,
+        timeout: TimeInterval = 2
+    ) -> Int? {
+        let deadline = Date().addingTimeInterval(timeout)
+        repeat {
+            let numbers = String(describing: dial.value ?? "")
+                .split(whereSeparator: { !$0.isNumber })
+                .compactMap { Int($0) }
+            if numbers.count >= 2, numbers[0] < upperBound, numbers[0] == numbers[1] {
+                return numbers[0]
+            }
+            RunLoop.current.run(until: Date().addingTimeInterval(0.05))
+        } while Date() < deadline
+        return nil
     }
 
     private func prepareApp(_ additionalArgument: String? = nil) {

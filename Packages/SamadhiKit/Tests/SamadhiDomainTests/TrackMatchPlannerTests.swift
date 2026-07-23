@@ -15,18 +15,30 @@ import Testing
     #expect(match.requiredRate == 170.0 / 168.0)
 }
 
-@Test func halfAndDoubleTempoFamiliesCanSupplyTheSamePulse() throws {
-    let half = try #require(
-        TrackMatchPlanner().select(requestedBPM: 170, from: [track("half", tempo: 85)])
-    )
-    let double = try #require(
-        TrackMatchPlanner().select(requestedBPM: 170, from: [track("double", tempo: 340)])
+@Test func tracksOutsideTheRunningPulseRangeAreRejected() {
+    #expect(TrackMatchPlanner().select(requestedBPM: 170, from: [track("half", tempo: 85)]) == nil)
+    #expect(TrackMatchPlanner().select(requestedBPM: 170, from: [track("double", tempo: 340)]) == nil)
+}
+
+@Test func halfTimeAliasCannotPretendASlowBeatIsA180BPMRunningPulse() {
+    let match = TrackMatchPlanner().select(
+        requestedBPM: 180,
+        from: [track("slow-beat", tempo: 90)]
     )
 
-    #expect(half.pulseBPM == 170)
-    #expect(double.pulseBPM == 170)
-    #expect(half.requiredRate == 1)
-    #expect(double.requiredRate == 1)
+    #expect(match == nil)
+}
+
+@Test func defaultEnvelopeIncludesThePhysicallyProvenTenPercentEndpoints() throws {
+    let slower = try #require(
+        TrackMatchPlanner().select(requestedBPM: 153, from: [track("slower", tempo: 170)])
+    )
+    let faster = try #require(
+        TrackMatchPlanner().select(requestedBPM: 187, from: [track("faster", tempo: 170)])
+    )
+
+    #expect(abs(slower.requiredRate - 0.9) < 0.000_1)
+    #expect(abs(faster.requiredRate - 1.1) < 0.000_1)
 }
 
 @Test func unavailableAndIncompatibleTracksAreExcluded() throws {
@@ -81,18 +93,18 @@ import Testing
     #expect(match.trackID == MusicTrackID("better"))
 }
 
-@Test func plannerUsesItsConfiguredQualityEnvelope() {
-    let conservative = TrackMatchPlanner().select(
-        requestedBPM: 180,
+@Test func plannerUsesItsConfiguredRateEnvelope() {
+    let standard = TrackMatchPlanner().select(
+        requestedBPM: 187,
         from: [track("candidate", tempo: 168)]
     )
-    let provenWiderRange = TrackMatchPlanner(minimumRate: 0.92, maximumRate: 1.08).select(
-        requestedBPM: 180,
+    let wider = TrackMatchPlanner(minimumRate: 0.88, maximumRate: 1.12).select(
+        requestedBPM: 187,
         from: [track("candidate", tempo: 168)]
     )
 
-    #expect(conservative == nil)
-    #expect(provenWiderRange?.trackID == MusicTrackID("candidate"))
+    #expect(standard == nil)
+    #expect(wider?.trackID == MusicTrackID("candidate"))
 }
 
 private func track(_ id: String, tempo: Double) -> MusicTrack {

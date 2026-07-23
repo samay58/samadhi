@@ -157,13 +157,13 @@ public enum RunControlSurface: Sendable, Equatable {
 public enum ControlsState: Sendable, Equatable {
     case hidden
     case timed(surface: RunControlSurface, timeoutID: Int)
-    case voiceOverPinned(surface: RunControlSurface)
+    case pinned(surface: RunControlSurface)
 
     public var surface: RunControlSurface? {
         switch self {
         case .hidden:
             nil
-        case let .timed(surface, _), let .voiceOverPinned(surface):
+        case let .timed(surface, _), let .pinned(surface):
             surface
         }
     }
@@ -318,11 +318,12 @@ public enum RunEvent: Sendable, Equatable {
     case surfaceTapped(timeoutID: Int)
     case rhythmControlRevealed(timeoutID: Int)
     case rhythmControlAdjusted(steps: Int, rateRequestID: Int, timeoutID: Int)
+    case rhythmControlTargetCommitted(bpm: Int, rateRequestID: Int, timeoutID: Int)
     case rhythmControlSetManual(rateRequestID: Int, timeoutID: Int)
     case rhythmControlReset(rateRequestID: Int, timeoutID: Int)
     case controlsTimedOut(timeoutID: Int)
-    case controlsFocusEntered
-    case controlsFocusExited(timeoutID: Int)
+    case controlsInteractionBegan
+    case controlsInteractionEnded(timeoutID: Int)
     case pauseTapped
     case resumeTapped(acquisitionID: Int, timeoutID: Int)
     case previousTapped
