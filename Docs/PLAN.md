@@ -26,10 +26,9 @@ Manual control has one additional release-blocking contract. The wheel cannot di
 
 Continue in this order:
 
-1. Build the verified candidate with the exact profile. Inspect the embedded application identifier, push `main`, then install without replacing the app container.
-2. Run one short physical check. The first ready track must stay current. Make one deliberate Manual turn into each reachable boundary, return to Auto, change cadence, and confirm display, MusicKit read-back, audible direction, boundary feel, and reverse response. Pull the rolling diagnostics even if the run is abandoned.
-3. If that trace passes, prove explicit Skip, one natural boundary, five locked minutes, controlled interruption, and route loss. If cadence coverage still feels constrained, reopen the source and mechanics decision before more interface work.
-4. Complete one 20-minute outdoor run with an imported playlist. The run must feel good, survive normal phone conditions, and end with a summary whose measurement coverage and Automatic versus Manual time are honest.
+1. Run one short physical check. The first ready track must stay current. Make one deliberate Manual turn into each reachable boundary, return to Auto, change cadence, and confirm display, MusicKit read-back, audible direction, boundary feel, and reverse response. Pull the rolling diagnostics even if the run is abandoned.
+2. If that trace passes, prove explicit Skip, one natural boundary, five locked minutes, controlled interruption, and route loss. If cadence coverage still feels constrained, reopen the source and mechanics decision before more interface work.
+3. Complete one 20-minute outdoor run with an imported playlist. The run must feel good, survive normal phone conditions, and end with a summary whose measurement coverage and Automatic versus Manual time are honest.
 
 ## Current gate state
 
@@ -47,9 +46,9 @@ Continue in this order:
 - Last released body-to-music gate: 103 package tests, 15 app-model tests, 10 UI tests, formatter, normal Simulator build, focused rotary-control UI proof, runtime screen review, renewed exact-profile build, embedded application identifier verification, and physical installation pass
 - Physical body-to-music observation: passed; the corrected 59-second run averaged 155 SPM and measured 98 percent tempo matched from MusicKit read-back
 - Physical imported-collection gate: real playlist selection, local analysis, reinstall and relaunch restoration, and basic progress passed at 13 of 25 ready tracks; a natural transition remains open
-- Device evidence: the candidate persists one bounded latest diagnostic during the run and after completion; commit `66e0616` remains installed with the selected collection preserved
+- Device evidence: the candidate persists one bounded latest diagnostic during the run and after completion; commit `42f4dd5` is installed with the selected collection preserved
 - Rhythm control: the candidate uses 30 BPM per revolution, reverse hysteresis, a current-song integer BPM envelope, one terminal boundary haptic, frozen visual travel at the boundary, one Manual command at finger-up, and explicit return to Auto; physical audible and tactile proof remains open
-- Candidate verification: formatter lint, 116 package tests, a resource-inclusive Simulator build, 16 app-model tests, and 10 UI tests pass; exact-profile build, installation, and current physical evidence remain required before release
+- Candidate verification: formatter lint, 116 package tests, a resource-inclusive Simulator build, 16 app-model tests, 10 UI tests, exact-profile signing, installation, and selected-collection preservation pass; current physical behavior remains required before release
 - Felt-synchronization research: complete enough to set direction; Weav used adaptive arrangements, djay separates BPM from beat sync, and published running work supports compatible-track selection plus phase-aware control
 - Device harness: exact-profile catalog search, strict identity resolution, temporary preview download, local PCM decoding, playback, rate controls, route observation, and trace export remain available on the physical iPhone 17 Pro
 - Perceptibility result: 0.90 versus 1.10 was clearly audible on `LITE SPOTS` through Beoplay Eleven; Apple Music stays authoritative while broader blinded and full-song quality evidence remains open

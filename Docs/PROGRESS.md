@@ -396,3 +396,12 @@ Milestones 0 and 1 remain complete. Milestone 2 is open. The local software gate
 - Kept the current song fixed throughout wheel movement and retained explicit Skip or natural boundary as the only forward transport authority
 - Replaced the fixture-specific UI assertion with a flow that discovers the real song boundary, pushes beyond it twice, reverses, and verifies track retention
 - Passed formatter lint, 116 package tests, a resource-inclusive Simulator build, 16 app-model tests, and 10 serial UI tests
+
+## 2026-07-25. Field repair installation
+
+- Pushed commit `42f4dd5` to `main`
+- Rebuilt that commit from a clean detached worktree with the exact `Samadhi Development` profile
+- Verified the embedded application identifier and code signature
+- Installed over the existing app without uninstalling or replacing its container
+- Confirmed the selected-collection checksum remained byte-for-byte identical
+- Attempted foreground launch but left it open because the phone was locked

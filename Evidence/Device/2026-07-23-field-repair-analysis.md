@@ -73,6 +73,6 @@ Thirty BPM per revolution is deterministically covered but not yet physically ac
 - 10 serial UI tests
 - Focused wheel proof that discovers the current song's upper boundary, blocks further outward travel, reverses immediately, retains the current track, and never presents `Changing song`
 
-Exact-profile physical build, installation, boundary feel, audible response, and the physical latency trace remain open. No release claim should be made until those gates run.
+Exact-profile physical build and installation passed on 2026-07-25 for commit `42f4dd5`. Boundary feel, audible response, and the physical latency trace remain open. No product-behavior claim should be made until those checks run.
 
 The installed `Samadhi Development` profile still verifies with UUID `982e709d-7aa8-4d79-aca3-7759c8f70fc5`, application identifier `ZL5U59XBJ6.com.samaydhawan.Samadhi`, and expiration on 2026-07-30. The current shell reports no valid code-signing identity, so profile presence alone is not a physical-build pass.

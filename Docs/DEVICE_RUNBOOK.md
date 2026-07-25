@@ -15,7 +15,7 @@ Automatic signing can select a wildcard profile even when an exact profile exist
 5. Close and reopen Samadhi. Confirm the same playlist returns without another choice.
 6. During a short run, turn the aperture perimeter to adjust BPM. Check that playback starts on a suitable ready song, cadence changes, and one song crosses naturally into a prepared better fit.
 
-The build is suitable for product testing, not public distribution. Commit `66e0616` was built from a clean detached worktree, signed with the renewed exact profile, and installed on 2026-07-23 without uninstalling the prior app. The selected collection survived byte-for-byte. Foreground launch was blocked by the locked phone. Playlist reanalysis, physical click-wheel feel, and a natural prepared transition remain open.
+The build is suitable for product testing, not public distribution. Commit `42f4dd5` was built from a clean detached worktree, signed with the renewed exact profile, and installed on 2026-07-25 without uninstalling the prior app. The selected collection survived byte-for-byte. Foreground launch was blocked by the locked phone. Physical click-wheel feel, audible Auto response, and a natural prepared transition remain open.
 
 After a debug run finishes, pull `Library/Application Support/Samadhi/latest-run-diagnostics.json` directly from the app container. The file overwrites the prior run and contains progress, cadence, target and applied rates, track changes, recovery events, and the honest summary.
 
