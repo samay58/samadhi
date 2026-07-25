@@ -55,7 +55,7 @@ Domain tests cover:
 - Compatible adaptive starting-song selection from the initial cadence prior
 - Five-second mismatch hold, prepared-next identity, recovery clearing, and stale preparation rejection
 - Player-confirmed Previous and Skip truth instead of predicted song state
-- One haptic for each accepted Auto detent, a fuller event every five BPM, and one distinct warning beyond the 40-BPM window
+- One haptic for each accepted detent, a fuller event every five BPM, and one distinct warning at a requested limit
 - Privacy-safe replay of the first field failure across broad Manual wheel input
 - Applied, boundary-limited, and rejected command outcomes
 - Manual and Auto candidate preparation without an implicit track change
@@ -66,7 +66,7 @@ Domain tests cover:
 - Tempo-matched coverage preventing unmeasured Manual time from producing a misleading percentage
 - Clockwise and counterclockwise haptic direction through the reducer event
 
-Design tests cover clockwise and counterclockwise one-BPM detents, partial-turn accumulation, direction reversal, angle wraparound, reset between gestures, and exactly 40 BPM per revolution.
+Design tests cover clockwise and counterclockwise one-BPM detents, partial-turn accumulation, reverse hysteresis, direction reversal, angle wraparound, multiple revolutions, reset between gestures, and exactly 30 BPM per revolution.
 
 Motion tests cover:
 
@@ -101,11 +101,11 @@ UI tests cover:
 - In-run aperture click-wheel reveal, clockwise and counterclockwise angular adjustment, fixed Auto bounds, protected center, Manual ownership, and return to Auto
 - Normal no-argument Simulator launch through local demo music and cadence lock
 
-App-model tests cover ready mapping, start transition, atomic store round trips, corrupt persistence, restored selection, cancellation of stale replacement work, complete typed import presentation, ordered three-track import batches, retry of the same playlist, retry after relaunch, schema-version-4 run diagnostics, a reducer-driven diagnostic timeline through finish, immediate Simulator demo readiness, and replacement with a second local playlist.
+App-model tests cover ready mapping, start transition, atomic store round trips, corrupt persistence, restored selection, cancellation of stale replacement work, complete typed import presentation, ordered three-track import batches, retry of the same playlist, retry after relaunch, schema-version-5 rolling run diagnostics, unfinished-run survival, a reducer-driven diagnostic timeline through finish, immediate Simulator demo readiness, and replacement with a second local playlist.
 
 ## Visual proof
 
-Final frames under Evidence/Simulator/ cover ready, imported empty and partial states, complete import disclosure, locked run, controls, summary, Home Screen icon, BPM Auto fine-tune, the Manual safety limit, accessibility-size BPM controls, the resting `Turn` affordance, the 40-detent rotary BPM click wheel, and normal local-demo readiness. The short rotary recording shows clockwise, counterclockwise, protected-center, Manual, and Auto behavior. The focused UI test confirms the control opens through its existing accessible button and the former instruction sentence is absent. Evidence/Previews/ covers other accessibility and state-specific visual checks.
+Released frames under Evidence/Simulator/ cover ready, imported empty and partial states, complete import disclosure, locked run, controls, summary, Home Screen icon, BPM Auto fine-tune, the Manual safety limit, accessibility-size BPM controls, the resting `Turn` affordance, the prior 40-detent rotary BPM click wheel, and normal local-demo readiness. The 30-detent candidate still requires a fresh runtime frame and interaction pass. Evidence/Previews/ covers other accessibility and state-specific visual checks.
 
 The 2026-07-23 runtime review launched the normal app on iPhone 17 Simulator and inspected the ready and active-run screens. The focused rotary UI test made four strong clockwise turns, reached a requested target above 188 BPM, settled simulated Music BPM at the truthful 185 BPM boundary within two seconds, kept the same song, and never showed `Changing song`.
 
@@ -173,7 +173,9 @@ Use five analyzed songs with prominent, stable beats. Compare 0.92, 1.00, and 1.
 
 The complete sequence, pivot rules, phase questions, and final evidence packet live in [FELT-SYNCHRONIZATION-EXECUTION-SPEC.md](FELT-SYNCHRONIZATION-EXECUTION-SPEC.md).
 
-Next, install the signed version-4 build when the paired iPhone reconnects and let it reanalyze once. Confirm about 14 of 18 tracks are ready, then make one large and several rapid Manual changes while one song plays. Confirm requested and achievable BPM, commanded rate, MusicKit read-back, and track identity agree, with no song change before Skip or a natural boundary. Before Milestone 2 completion, complete the broader listening note and prove five screen-locked minutes, controlled interruption, and route loss.
+The current field-repair candidate passes formatter lint, 116 package tests, a resource-inclusive Simulator build, 16 app-model tests, and 10 serial UI tests. It deterministically covers first-ready startup, the LITE SPOTS to Gorilla regression values, explicit transition authority, bounded rolling diagnostics, stale-prior rejection, irregular callback timing, sustained 150 to 175 SPM tracking, isolated-spike rejection, 30 BPM per revolution, current-song Manual bounds, one terminal boundary signal, frozen indicator travel, immediate reverse response, angle wraparound, multiple revolutions, and one Manual commit at finger-up.
+
+The focused Simulator UI flow reaches the actual current-song boundary, ignores two further outward turns, reverses below the boundary, retains the same track, and never presents `Changing song`. Exact-profile physical build, installation, and the current device latency trace remain release blockers. After those gates pass, run one short physical check. Confirm the first ready song stays current, both Manual boundaries match MusicKit read-back and audible response, Auto follows a fresh cadence change, and the wheel feels calmer. Pull the rolling diagnostics immediately afterward. Before Milestone 2 completion, prove one natural transition, five screen-locked minutes, controlled interruption, and route loss.
 
 ## Known environment behavior
 

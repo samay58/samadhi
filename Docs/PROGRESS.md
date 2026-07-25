@@ -366,3 +366,33 @@ Milestones 0 and 1 are complete. Milestone 2 is still open. The next checkpoint 
 - Rebuilt pushed commit `66e0616` from a clean detached worktree and verified the exact embedded application identifier and signature
 - Installed the verified build without uninstalling the app; the selected-collection checksum stayed byte-for-byte identical
 - Left foreground launch honest and open because the phone was locked
+
+## 2026-07-23. Field startup, Auto, and control repair
+
+- Pulled the current container and confirmed 18 selected tracks: 14 ready under estimator version 4, two rhythm unclear, and two catalog unavailable
+- Proved LITE SPOTS was ready and appeared to skip only because startup selected against a hardcoded 168 SPM prior; Gorilla fit that invented target more closely
+- Replaced cadence-guess startup with the first ready track in imported source order
+- Added explicit one-step-per-beat and supported two-steps-per-beat relationships without relabelling measured musical BPM
+- Measured representative private cadence compatibility at 13 of 56 exact matrix cells and 16 of 56 with explicit relationships plus a three-SPM truthful boundary
+- Recorded that the improvement is not broad enough to close the range problem; wider MusicKit rate or a different source mechanic still needs evidence
+- Replaced callback-count tracking with explicit acquisition, tracking, and reacquisition behavior based on sample timing
+- Made three agreeing fresh samples authoritative, rejected a stale 180 SPM prior, required corroboration for a large change, and tracked a sustained 150 to 175 SPM step to at least 169 SPM by the third changed observation
+- Preserved raw cadence, `CMPedometerData.endDate`, callback interval, filter state, target, command, MusicKit read-back, track identity, and transition reason in bounded schema-version-5 diagnostics during unfinished runs
+- Required every player-confirmed track change to be labelled Previous, Skip, natural boundary, or recovery
+- Slowed the rotary control from 40 to 30 BPM per revolution and added reverse hysteresis while preserving wraparound, multiple revolutions, center protection, directional haptics, and one Manual commit at finger-up
+- Passed formatter lint, 112 package tests, iPhone and Simulator package compilation, and iPhone and Simulator app-model typechecking
+- Left the implementation uncommitted because CoreSimulator service access is refused from the current tool process; the resource app build, serial UI suite, exact-profile build, installation, and current physical timing trace remain required
+
+## Current checkpoint
+
+Milestones 0 and 1 remain complete. Milestone 2 is open. The local software gate now passes. Build the same candidate with the exact profile, push it, and install that exact commit. The shortest physical check is one song: source-order startup, both Manual boundaries, immediate reverse, return to Auto with a cadence change, and a quick audible and tactile judgment. Pull rolling diagnostics even if the run is not finished.
+
+## 2026-07-24. Honest Manual wheel boundary
+
+- Derived the Manual integer BPM range from the current cadence projection and proven 0.90 through 1.10 player envelope
+- Clamped local preview, final Manual commit, reducer state, and accessibility adjustment to the same range
+- Stopped the number, visual marker, detent haptics, and final command at each boundary
+- Added one restrained terminal haptic, discarded repeated outward overshoot, and preserved immediate reverse response
+- Kept the current song fixed throughout wheel movement and retained explicit Skip or natural boundary as the only forward transport authority
+- Replaced the fixture-specific UI assertion with a flow that discovers the real song boundary, pushes beyond it twice, reverses, and verifies track retention
+- Passed formatter lint, 116 package tests, a resource-inclusive Simulator build, 16 app-model tests, and 10 serial UI tests

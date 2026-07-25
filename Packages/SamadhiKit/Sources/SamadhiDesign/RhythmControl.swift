@@ -11,8 +11,10 @@ struct RhythmControl: View {
     @Environment(\.accessibilityVoiceOverEnabled) private var voiceOverEnabled
     @AppStorage("samadhi.tempoControlDiscovered") private var tempoControlDiscovered = false
     @State private var dragOriginBPM: Int?
+    @State private var dragBPMRange: ClosedRange<Int>?
     @State private var frozenDisplayBPM: Int?
     @State private var rotaryTracker = RotaryDetentTracker()
+    @State private var signaledBoundary: RhythmAdjustmentDirection?
     @State private var wheelIndicatorAngle: Double?
     @State private var affordanceCueRotation = 0.0
     @State private var didPresentAffordanceCue = false
@@ -136,7 +138,7 @@ struct RhythmControl: View {
 
     private var wheelDetents: some View {
         ZStack {
-            ForEach(0..<40, id: \.self) { index in
+            ForEach(0..<RotaryDetentTracker.detentsPerRevolution, id: \.self) { index in
                 let isMajor = index.isMultiple(of: 5)
                 Capsule()
                     .fill(
@@ -144,7 +146,11 @@ struct RhythmControl: View {
                     )
                     .frame(width: isMajor ? 2 : 1, height: isMajor ? 9 : 5)
                     .offset(y: -(size * 0.445))
-                    .rotationEffect(.degrees(Double(index) * 9))
+                    .rotationEffect(
+                        .degrees(
+                            Double(index) * (360 / Double(RotaryDetentTracker.detentsPerRevolution))
+                        )
+                    )
             }
         }
         .accessibilityHidden(true)
@@ -224,25 +230,38 @@ struct RhythmControl: View {
 
                 guard rotaryTracker.isTracking || startRadius >= size * 0.28 else { return }
                 guard rotaryTracker.isTracking else {
-                    dragOriginBPM = displayBPM
-                    frozenDisplayBPM = displayBPM
-                    rotaryTracker.begin(at: startAngle)
+                    let range = activeBPMRange
+                    let seed = range.clamped(
+                        state.rhythmControl.achievableBPM
+                            ?? displayBPM
+                            ?? state.rhythmControl.manualTargetBPM
+                    )
+                    dragOriginBPM = seed
+                    dragBPMRange = range
+                    frozenDisplayBPM = seed
+                    signaledBoundary = nil
+                    rotaryTracker.begin(
+                        at: startAngle,
+                        detentRange: (range.lowerBound - seed)...(range.upperBound - seed)
+                    )
                     send(.controlsInteractionChanged(true))
-                    wheelIndicatorAngle = angle
                     _ = rotaryTracker.update(to: angle)
+                    wheelIndicatorAngle = rotaryTracker.indicatorAngle
                     applyTrackedDetent()
                     return
                 }
 
                 _ = rotaryTracker.update(to: angle)
-                wheelIndicatorAngle = angle
+                wheelIndicatorAngle = rotaryTracker.indicatorAngle
                 applyTrackedDetent()
             }
             .onEnded { _ in
                 let committedBPM = frozenDisplayBPM
                 let originBPM = dragOriginBPM
                 dragOriginBPM = nil
+                dragBPMRange = nil
                 frozenDisplayBPM = nil
+                signaledBoundary = nil
                 rotaryTracker.reset()
                 withAnimation(effectiveReduceMotion ? nil : .easeOut(duration: MotionToken.control)) {
                     wheelIndicatorAngle = nil
@@ -340,14 +359,27 @@ struct RhythmControl: View {
         if voiceOverEnabled { send(.controlsInteractionChanged(true)) }
     }
 
+    // Frozen at finger-down so the reachable range cannot shift under a gesture in progress.
+    private var activeBPMRange: ClosedRange<Int> {
+        dragBPMRange ?? state.rhythmControl.manualBPMRange ?? TempoEnvelope.runningCadenceRange
+    }
+
     private func boundedDisplayBPM(_ bpm: Int) -> Int {
-        RhythmControlState.manualTargetRange.clamped(bpm)
+        activeBPMRange.clamped(bpm)
     }
 
     private func applyTrackedDetent() {
         let origin = dragOriginBPM ?? 168
         let nextDisplayBPM = boundedDisplayBPM(origin + rotaryTracker.currentDetent)
         let change = nextDisplayBPM - (frozenDisplayBPM ?? origin)
+        if let boundary = rotaryTracker.boundaryDirection {
+            if signaledBoundary != boundary {
+                signaledBoundary = boundary
+                send(.previewRhythmLimit)
+            }
+        } else {
+            signaledBoundary = nil
+        }
         guard change != 0 else { return }
         frozenDisplayBPM = nextDisplayBPM
 
@@ -366,17 +398,28 @@ struct RhythmControl: View {
 }
 
 final class RotaryDetentTracker {
-    static let radiansPerDetent = 2 * Double.pi / 40
+    static let detentsPerRevolution = 30
+    static let radiansPerDetent = 2 * Double.pi / Double(detentsPerRevolution)
+    private static let reverseHysteresis = 0.55
 
     private(set) var currentDetent = 0
+    private(set) var boundaryDirection: RhythmAdjustmentDirection?
     private var lastAngle: Double?
+    private var originAngle: Double?
     private var accumulatedRotation = 0.0
+    private var detentRange: ClosedRange<Int>?
 
     var isTracking: Bool { lastAngle != nil }
+    var indicatorAngle: Double? {
+        originAngle.map { $0 + accumulatedRotation }
+    }
 
-    func begin(at angle: Double) {
+    func begin(at angle: Double, detentRange: ClosedRange<Int>? = nil) {
         currentDetent = 0
         accumulatedRotation = 0
+        boundaryDirection = nil
+        self.detentRange = detentRange
+        originAngle = angle
         lastAngle = angle
     }
 
@@ -389,18 +432,56 @@ final class RotaryDetentTracker {
         var delta = angle - priorAngle
         if delta > .pi { delta -= 2 * .pi }
         if delta < -.pi { delta += 2 * .pi }
-        accumulatedRotation += delta
+        let proposedRotation = accumulatedRotation + delta
+        if let detentRange {
+            let lowerRotation = Double(detentRange.lowerBound) * Self.radiansPerDetent
+            let upperRotation = Double(detentRange.upperBound) * Self.radiansPerDetent
+            if proposedRotation < lowerRotation {
+                accumulatedRotation = lowerRotation
+                boundaryDirection = .decrease
+            } else if proposedRotation > upperRotation {
+                accumulatedRotation = upperRotation
+                boundaryDirection = .increase
+            } else {
+                accumulatedRotation = proposedRotation
+                boundaryDirection = nil
+            }
+        } else {
+            accumulatedRotation = proposedRotation
+            boundaryDirection = nil
+        }
         lastAngle = angle
-        currentDetent = Int(
-            (accumulatedRotation / Self.radiansPerDetent).rounded(.towardZero)
-        )
+        let rawDetent = accumulatedRotation / Self.radiansPerDetent
+        settleCurrentDetent(toward: rawDetent)
         return currentDetent
     }
 
     func reset() {
         currentDetent = 0
         accumulatedRotation = 0
+        boundaryDirection = nil
+        detentRange = nil
+        originAngle = nil
         lastAngle = nil
+    }
+
+    private func settleCurrentDetent(toward rawDetent: Double) {
+        while rawDetent >= positiveThreshold {
+            currentDetent += 1
+        }
+        while rawDetent <= negativeThreshold {
+            currentDetent -= 1
+        }
+    }
+
+    private var positiveThreshold: Double {
+        let distance = currentDetent < 0 ? Self.reverseHysteresis : 1
+        return Double(currentDetent) + distance
+    }
+
+    private var negativeThreshold: Double {
+        let distance = currentDetent > 0 ? Self.reverseHysteresis : 1
+        return Double(currentDetent) - distance
     }
 }
 

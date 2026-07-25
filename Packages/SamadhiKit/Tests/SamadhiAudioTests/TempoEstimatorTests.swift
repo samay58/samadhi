@@ -87,7 +87,7 @@ func generatedTempoCorpusStaysInsideTwoPercent(_ referenceBPM: Double) async thr
     #expect(tempoError(result?.baseBPM ?? 0, referenceBPM: 90) <= 0.02)
     #expect(result?.alternatePulseBPM == nil)
     #expect(tempoError(result?.runningPulseBPM ?? 0, referenceBPM: 90) <= 0.02)
-    #expect(result?.isAdaptiveReady == false)
+    #expect(result?.isAdaptiveReady == true)
 }
 
 @Test func aOneEightyPulseWithAlternatingAccentsStaysOneEighty() async throws {

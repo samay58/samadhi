@@ -8,13 +8,13 @@
 | Visual system | Complete prototype | Final Simulator frames |
 | Accessibility | Covered in prototype | Dynamic Type, Reduce Motion, contrast, VoiceOver behavior |
 | State architecture | Complete for prototype | Pure reducer tests |
-| Cadence | Core Motion connected; stale and invalid samples now force reacquisition | Deterministic freshness, filter, and 29-second iPhone walk evidence |
+| Cadence | Core Motion connected; acquisition, tracking, confidence loss, and reacquisition are explicit | Deterministic freshness and response traces plus prior iPhone evidence |
 | Audio timing | Real for imported ready tracks; deterministic in fixtures | Production player contract and beat-clock tests |
 | Playlist import | Complete results, typed failures, retry, and bounded analysis implemented | Full-list Simulator proof, import timing diagnostics, model tests, and prior physical collection evidence |
 | Tempo analysis | Version 4 keeps measured musical pulse separate from an independently supported stride pulse; the public corpus passes 12 of 12 | Generated regressions, private playlist replay, and opt-in Apple preview validation |
-| Adaptation policy | Manual commits apply directly; Auto retargets within one second and settles across the proven range within five seconds; an unreachable request uses the nearest honest rate | Identified effects, MusicKit read-back, boundary behavior, and deterministic replay tests |
-| Track fit | Connected to run start and next-song preparation without hidden transport changes | Deterministic pulse, envelope, coalescing, identity, order, and retention tests |
-| In-run BPM control | The wheel stays pinned during a turn, previews detents, then commits one absolute Manual BPM at finger-up | Exact-target, compatible-track, read-back, accessibility, and UI tests |
+| Adaptation policy | Manual commits apply directly; Auto tracks fresh cadence through a time-based filter; an unreachable request uses the nearest honest rate | Identified effects, boundary behavior, and deterministic replay tests; current physical latency remains open |
+| Track fit | Source order is preserved at startup; next-song preparation cannot change current transport | Deterministic relationship, envelope, coalescing, identity, order, and retention tests |
+| In-run BPM control | The wheel uses 30 BPM per revolution, reverse hysteresis, local detent previews, and one absolute Manual commit at finger-up | Deterministic geometry and command tests; current physical feel remains open |
 | Simulator development loop | Local placeholder playlists and silent simulated playback available in Debug | Normal no-argument launch, model tests, UI flow, screenshot, and interaction recording |
 | Apple Music feasibility | Source selected; 0.90 versus 1.10 was clearly audible on one Bluetooth track; broader quality and long-form reliability remain | Exact-profile traces and explicit product decision |
 | Spotify feasibility | Rejected for adaptive playback | Remote-control architecture, missing music rate control, and content policy conflict |
@@ -120,7 +120,7 @@
 - Resolved the control as direct manipulation of the existing tempo aperture with large touch targets, restrained haptics, VoiceOver adjustment, Dynamic Type, increased contrast, and Reduce Motion support
 - Reviewed final Auto fine-tune, Manual safety-limit, and accessibility-size frames in the iPhone 17 Pro Simulator without changing the wider visual system
 - Added a debug-only blinded 0.92 versus 1.08 comparison that captures rate read-back and direction recognition with optional 0.90 and 1.10 endpoint controls
-- Started adaptive runs on the ready song whose measured running-range pulse requires the least safe correction, using 168 BPM only as an initial prior
+- Preserved imported playlist order at adaptive run start instead of selecting against a cadence guess before live cadence exists
 - Kept song identity and count authoritative to real player callbacks instead of predicting the result of Previous or Skip
 - Added a five-second mismatch hold that prepares a better-fitting next song while allowing the current song to finish naturally
 - Protected next-song preparation with selection identity so late preparation cannot replace a newer choice
@@ -129,8 +129,8 @@
 - Added a Debug Simulator-only local music path with two placeholder playlists so the normal app flow no longer depends on unavailable Simulator MusicKit state
 - Anchored rotary movement to finger-down, kept the automatic range fixed through a gesture, protected the center, and emitted one state change plus one selection haptic per crossed BPM detent
 - Reused prepared haptic generators so the first click is not weakened by generator startup
-- Expanded Auto to a 40-BPM window around measured cadence, capped all requested targets at 120 through 210, and mapped one complete revolution to that 40-BPM span
-- Added 40 restrained visual detents plus low-sharpness Core Haptics feedback, with a fuller notch every five BPM and a soft Auto landing
+- Kept the broad requested BPM range separate from per-song playback limits and mapped one complete revolution to 30 BPM for calmer control
+- Added 30 restrained visual detents plus low-sharpness Core Haptics feedback, with a fuller notch every five BPM and a soft Auto landing
 - Replaced the tuning sentence with one integrated `Turn` label, three resting grip notches, and one Reduce-Motion-aware teaching movement that retires after first use
 - Replayed the first field failure without committing personal library metadata
 - Made every BPM command resolve against requested BPM, achievable BPM, commanded rate, and player read-back without treating incompatibility as a transport command
@@ -168,8 +168,12 @@ The MusicKit harness and normal app launch in Simulator and on the physical iPho
 
 ## Known limits
 
-The field report exposed two more defects. Version 3 rejected lower musical pulses because it searched only 120 through 210 BPM, and prepared-track completion could call Skip after a large or repeated wheel change. Version 4 now records the measured musical pulse separately from an independently supported stride pulse. A private replay of the current 18-track selection projects 14 ready tracks, up from 10 under version 3 and 11 in the prior saved analysis. The current song now stays in place while Manual or Auto moves it to the nearest truthful rate. A prepared replacement can commit only after Skip or a player-confirmed natural boundary. One device reimport and a short playback check remain before these field failures are physically closed.
+The current 18-track selection contains 14 ready tracks, two unclear rhythms, and two catalog-unavailable tracks. LITE SPOTS was ready, but the former hardcoded 168 SPM startup prior selected the later Gorilla because it fit that guess. Startup now preserves the first ready track in source order. Manual and Auto may prepare one latest next candidate but cannot change current transport. Only Previous, Skip, or a player-confirmed natural boundary may do that.
+
+Explicit one-step-per-beat and two-steps-per-beat relationships improve representative cadence compatibility from 13 to 16 of 56 private matrix cells without changing the 0.90 through 1.10 playback envelope. This is truthful but not broad enough to close the product range problem. A wider MusicKit rate needs physical quality proof. If the outdoor run still feels constrained, reopen the source and mechanics decision.
+
+The current candidate passes formatter lint, 116 package tests, a resource-inclusive Simulator build, 16 app-model tests, and 10 serial UI tests. The focused wheel flow reaches the current song's actual upper boundary, rejects further outward travel, reverses immediately, keeps the same song, and never shows `Changing song`. Exact-profile physical build, installation, and current physical timing evidence remain open. The last installed app remains commit `66e0616`.
 
 ## WHERE WE LEFT OFF
 
-Apple Music remains the selected player. Tempo estimator version 4 removes the lost-coverage regression, and the hidden wheel-to-Skip path is gone. Manual commits are immediate. Auto now retargets within one second and reaches a full 10 percent change within five seconds. Commit `66e0616` is installed with the selected collection preserved. Unlock and open Samadhi, let the playlist reanalyze once, confirm about 14 of 18 tracks are ready, and make several large wheel changes while one song continues. Pull the diagnostics afterward. That is the shortest remaining physical check.
+The field repair is implemented and passes the local software gate, but it is not released. It preserves source order, records every transition reason, separates musical BPM from explicit cadence relationships, replaces stale cadence anchoring with a responsive stateful filter, persists bounded diagnostics during unfinished runs, and makes the 30-BPM wheel stop at each current-song boundary. The next action is the exact-profile build, push, and installation of the same verified commit. The shortest user check is one song: confirm startup stays on the first ready track, reach and leave both Manual boundaries, return to Auto while changing cadence, and judge audible response and wheel feel. Pull rolling diagnostics immediately afterward.

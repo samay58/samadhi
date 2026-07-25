@@ -2,6 +2,11 @@ import Foundation
 import SamadhiDomain
 
 struct RunDiagnosticSnapshot: Codable, Equatable, Sendable {
+    enum CompletionState: String, Codable, Sendable {
+        case inProgress
+        case completed
+    }
+
     struct Summary: Codable, Equatable, Sendable {
         let durationSeconds: Int
         let averageCadence: Int?
@@ -15,6 +20,7 @@ struct RunDiagnosticSnapshot: Codable, Equatable, Sendable {
     struct Entry: Codable, Equatable, Sendable {
         enum Kind: String, Codable, Sendable {
             case started
+            case cadenceObserved
             case cadenceUpdated
             case cadenceLost
             case rateApplied
@@ -38,6 +44,12 @@ struct RunDiagnosticSnapshot: Codable, Equatable, Sendable {
         let kind: Kind
         let activeSeconds: Int
         let cadenceSPM: Double?
+        let rawCadenceSPM: Double?
+        let sampleAgeSeconds: Double?
+        let sampleEndDateSeconds: Double?
+        let callbackIntervalSeconds: Double?
+        let cadenceFilterState: String?
+        let filteredCadenceSPM: Double?
         let targetRate: Double?
         let controlMode: String?
         let automaticCorrectionBPM: Int?
@@ -46,6 +58,7 @@ struct RunDiagnosticSnapshot: Codable, Equatable, Sendable {
         let musicalPulseBPM: Double?
         let alternatePulseBPM: Double?
         let runningPulseBPM: Double?
+        let stepBeatRelationship: String?
         let appliedMusicalBPM: Double?
         let appliedRunningPulseBPM: Double?
         let derivedTargetRate: Double?
@@ -62,12 +75,19 @@ struct RunDiagnosticSnapshot: Codable, Equatable, Sendable {
         let trackElapsedSeconds: Int
         let trackDurationSeconds: Int?
         let tempoMatched: Bool?
+        let trackChangeReason: String?
 
         init(
             offsetSeconds: Double,
             kind: Kind,
             activeSeconds: Int,
             cadenceSPM: Double?,
+            rawCadenceSPM: Double? = nil,
+            sampleAgeSeconds: Double? = nil,
+            sampleEndDateSeconds: Double? = nil,
+            callbackIntervalSeconds: Double? = nil,
+            cadenceFilterState: String? = nil,
+            filteredCadenceSPM: Double? = nil,
             targetRate: Double?,
             controlMode: String? = nil,
             automaticCorrectionBPM: Int? = nil,
@@ -76,6 +96,7 @@ struct RunDiagnosticSnapshot: Codable, Equatable, Sendable {
             musicalPulseBPM: Double? = nil,
             alternatePulseBPM: Double? = nil,
             runningPulseBPM: Double? = nil,
+            stepBeatRelationship: String? = nil,
             appliedMusicalBPM: Double? = nil,
             appliedRunningPulseBPM: Double? = nil,
             derivedTargetRate: Double? = nil,
@@ -91,12 +112,19 @@ struct RunDiagnosticSnapshot: Codable, Equatable, Sendable {
             trackIndex: Int,
             trackElapsedSeconds: Int,
             trackDurationSeconds: Int?,
-            tempoMatched: Bool?
+            tempoMatched: Bool?,
+            trackChangeReason: String? = nil
         ) {
             self.offsetSeconds = offsetSeconds
             self.kind = kind
             self.activeSeconds = activeSeconds
             self.cadenceSPM = cadenceSPM
+            self.rawCadenceSPM = rawCadenceSPM
+            self.sampleAgeSeconds = sampleAgeSeconds
+            self.sampleEndDateSeconds = sampleEndDateSeconds
+            self.callbackIntervalSeconds = callbackIntervalSeconds
+            self.cadenceFilterState = cadenceFilterState
+            self.filteredCadenceSPM = filteredCadenceSPM
             self.targetRate = targetRate
             self.controlMode = controlMode
             self.automaticCorrectionBPM = automaticCorrectionBPM
@@ -105,6 +133,7 @@ struct RunDiagnosticSnapshot: Codable, Equatable, Sendable {
             self.musicalPulseBPM = musicalPulseBPM
             self.alternatePulseBPM = alternatePulseBPM
             self.runningPulseBPM = runningPulseBPM
+            self.stepBeatRelationship = stepBeatRelationship
             self.appliedMusicalBPM = appliedMusicalBPM
             self.appliedRunningPulseBPM = appliedRunningPulseBPM
             self.derivedTargetRate = derivedTargetRate
@@ -121,16 +150,38 @@ struct RunDiagnosticSnapshot: Codable, Equatable, Sendable {
             self.trackElapsedSeconds = trackElapsedSeconds
             self.trackDurationSeconds = trackDurationSeconds
             self.tempoMatched = tempoMatched
+            self.trackChangeReason = trackChangeReason
         }
     }
 
     let schemaVersion: Int
     let capturedAt: Date
+    let completionState: CompletionState?
     let collectionID: String
     let collectionName: String
     let readyTrackCount: Int
     let summary: Summary
     let timeline: [Entry]
+
+    init(
+        schemaVersion: Int,
+        capturedAt: Date,
+        completionState: CompletionState? = .completed,
+        collectionID: String,
+        collectionName: String,
+        readyTrackCount: Int,
+        summary: Summary,
+        timeline: [Entry]
+    ) {
+        self.schemaVersion = schemaVersion
+        self.capturedAt = capturedAt
+        self.completionState = completionState
+        self.collectionID = collectionID
+        self.collectionName = collectionName
+        self.readyTrackCount = readyTrackCount
+        self.summary = summary
+        self.timeline = timeline
+    }
 }
 
 actor RunDiagnosticsStore {
@@ -178,9 +229,24 @@ actor RunDiagnosticsStore {
     }
 }
 
+// One raw Core Motion sample and what the filter made of it. This changes no product state, so it
+// never becomes a RunEvent; the shell hands it straight to the recorder.
+struct CadenceDiagnosticSample {
+    let rawStepsPerMinute: Double?
+    let sampleAgeSeconds: Double
+    let sampleEndDateSeconds: Double
+    let callbackIntervalSeconds: Double
+    let filterState: CadenceTrackingState
+    let filteredStepsPerMinute: Double?
+}
+
 struct RunDiagnosticsRecorder {
+    private static let maximumEntries = 512
+    private static let checkpointInterval: TimeInterval = 5
+
     private let now: () -> Date
     private var startedAt: Date?
+    private var lastCheckpointAt: Date?
     private var timeline: [RunDiagnosticSnapshot.Entry] = []
 
     init(now: @escaping () -> Date = Date.init) {
@@ -195,22 +261,72 @@ struct RunDiagnosticsRecorder {
     ) -> RunDiagnosticSnapshot? {
         if case .startTapped = event, newState != oldState {
             startedAt = now()
+            lastCheckpointAt = nil
             timeline.removeAll(keepingCapacity: true)
         }
 
-        guard let startedAt, newState != oldState, let kind = kind(for: event) else { return nil }
-        let stateForEntry = newState.session == nil ? oldState : newState
-        let session = stateForEntry.session
-        let track = session.flatMap { session in
-            collection.tracks.indices.contains(session.trackIndex)
-                ? collection.tracks[session.trackIndex]
-                : nil
-        }
+        guard startedAt != nil, newState != oldState, let kind = kind(for: event) else { return nil }
         let tempoMatched: Bool?
         if case let .activeSecond(value) = event {
             tempoMatched = value
         } else {
             tempoMatched = nil
+        }
+
+        // A finish leaves no session on the new state, so the entry still reads the run it ended.
+        let stateForEntry = newState.session == nil ? oldState : newState
+        append(
+            kind: kind,
+            state: stateForEntry,
+            collection: collection,
+            tempoMatched: tempoMatched,
+            trackChangeReason: trackChangeReason(for: event),
+            cadenceSample: nil
+        )
+        return checkpoint(
+            completingWith: newState,
+            session: stateForEntry.session,
+            collection: collection,
+            isImmediate: isImmediateCheckpoint(kind)
+        )
+    }
+
+    mutating func record(
+        cadenceSample: CadenceDiagnosticSample,
+        state: RunState,
+        collection: MusicCollection
+    ) -> RunDiagnosticSnapshot? {
+        guard startedAt != nil else { return nil }
+        append(
+            kind: .cadenceObserved,
+            state: state,
+            collection: collection,
+            tempoMatched: nil,
+            trackChangeReason: nil,
+            cadenceSample: cadenceSample
+        )
+        return checkpoint(
+            completingWith: state,
+            session: state.session,
+            collection: collection,
+            isImmediate: false
+        )
+    }
+
+    private mutating func append(
+        kind: RunDiagnosticSnapshot.Entry.Kind,
+        state stateForEntry: RunState,
+        collection: MusicCollection,
+        tempoMatched: Bool?,
+        trackChangeReason: TrackChangeReason?,
+        cadenceSample cadenceObservation: CadenceDiagnosticSample?
+    ) {
+        guard let startedAt else { return }
+        let session = stateForEntry.session
+        let track = session.flatMap { session in
+            collection.tracks.indices.contains(session.trackIndex)
+                ? collection.tracks[session.trackIndex]
+                : nil
         }
 
         timeline.append(
@@ -219,19 +335,29 @@ struct RunDiagnosticsRecorder {
                 kind: kind,
                 activeSeconds: session?.elapsedActiveSeconds ?? 0,
                 cadenceSPM: cadence(in: stateForEntry),
+                rawCadenceSPM: cadenceObservation?.rawStepsPerMinute,
+                sampleAgeSeconds: cadenceObservation?.sampleAgeSeconds,
+                sampleEndDateSeconds: cadenceObservation?.sampleEndDateSeconds,
+                callbackIntervalSeconds: cadenceObservation?.callbackIntervalSeconds,
+                cadenceFilterState: cadenceObservation?.filterState.rawValue,
+                filteredCadenceSPM: cadenceObservation?.filteredStepsPerMinute,
                 targetRate: session?.adaptationState.targetRate,
                 controlMode: session?.rhythmControl.mode.rawValue,
                 automaticCorrectionBPM: session?.rhythmControl.automaticCorrectionBPM,
                 manualTargetBPM: session?.rhythmControl.manualTargetBPM,
                 requestedBPM: session?.adaptationState.requestedBPM,
-                musicalPulseBPM: track?.tempo?.baseBPM,
+                musicalPulseBPM: session?.adaptationState.musicalTempoBPM
+                    ?? track?.tempo?.baseBPM,
                 alternatePulseBPM: track?.tempo?.alternatePulseBPM,
-                runningPulseBPM: track?.tempo?.runningPulseBPM,
+                runningPulseBPM: session?.adaptationState.baseTempoBPM
+                    ?? track?.tempo?.runningPulseBPM,
+                stepBeatRelationship: session?.adaptationState.stepBeatRelationship?.rawValue,
                 appliedMusicalBPM: track?.tempo.map {
                     $0.baseBPM * (session?.appliedPlaybackRate ?? 1)
                 },
                 appliedRunningPulseBPM: track?.tempo.map {
-                    $0.runningPulseBPM * (session?.appliedPlaybackRate ?? 1)
+                    (session?.adaptationState.baseTempoBPM ?? $0.runningPulseBPM)
+                        * (session?.appliedPlaybackRate ?? 1)
                 },
                 derivedTargetRate: session?.adaptationState.derivedTargetRate,
                 atLimit: session?.adaptationState.isAtLimit ?? false,
@@ -246,14 +372,39 @@ struct RunDiagnosticsRecorder {
                 trackIndex: session?.trackIndex ?? 0,
                 trackElapsedSeconds: session?.trackElapsedSeconds ?? 0,
                 trackDurationSeconds: session?.trackDurationSeconds,
-                tempoMatched: tempoMatched
+                tempoMatched: tempoMatched,
+                trackChangeReason: trackChangeReason?.rawValue
             )
         )
+        if timeline.count > Self.maximumEntries {
+            timeline.removeFirst(timeline.count - Self.maximumEntries)
+        }
+    }
 
-        guard case let .summary(summary) = newState else { return nil }
+    // An unfinished run still writes evidence so an abandoned field check is not lost. Frequent
+    // entries are throttled; anything that changes the run writes immediately.
+    private mutating func checkpoint(
+        completingWith state: RunState,
+        session: RunSession?,
+        collection: MusicCollection,
+        isImmediate: Bool
+    ) -> RunDiagnosticSnapshot? {
+        let completedSummary: RunSummary?
+        if case let .summary(summary) = state {
+            completedSummary = summary
+        } else {
+            completedSummary = nil
+        }
+        let throttleElapsed =
+            lastCheckpointAt.map { now().timeIntervalSince($0) >= Self.checkpointInterval } ?? true
+        guard completedSummary != nil || isImmediate || throttleElapsed else { return nil }
+        // Never fabricate a summary. Without a run there is nothing honest to write.
+        guard let summary = completedSummary ?? session?.summary else { return nil }
+        lastCheckpointAt = now()
         let snapshot = RunDiagnosticSnapshot(
-            schemaVersion: 4,
+            schemaVersion: 5,
             capturedAt: now(),
+            completionState: completedSummary == nil ? .inProgress : .completed,
             collectionID: collection.id.rawValue,
             collectionName: collection.name,
             readyTrackCount: collection.tracks.count,
@@ -268,8 +419,11 @@ struct RunDiagnosticsRecorder {
             ),
             timeline: timeline
         )
-        self.startedAt = nil
-        timeline.removeAll(keepingCapacity: true)
+        if completedSummary != nil {
+            self.startedAt = nil
+            lastCheckpointAt = nil
+            timeline.removeAll(keepingCapacity: true)
+        }
         return snapshot
     }
 
@@ -314,6 +468,23 @@ struct RunDiagnosticsRecorder {
         default:
             nil
         }
+    }
+
+    private func isImmediateCheckpoint(_ kind: RunDiagnosticSnapshot.Entry.Kind) -> Bool {
+        switch kind {
+        case .started, .cadenceUpdated, .cadenceLost, .rateApplied, .trackChanged,
+            .paused, .resumeRequested, .routeLost, .routeRestored, .interruptionBegan,
+            .interruptionEnded, .playbackFailed, .rhythmAdjusted, .rhythmModeChanged,
+            .finishRequested, .finished:
+            true
+        case .cadenceObserved, .playerProgress, .activeSecond:
+            false
+        }
+    }
+
+    private func trackChangeReason(for event: RunEvent) -> TrackChangeReason? {
+        guard case let .playbackTrackChanged(_, _, _, _, reason, _) = event else { return nil }
+        return reason
     }
 
     private func cadence(in state: RunState) -> Double? {

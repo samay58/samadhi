@@ -15,18 +15,22 @@ import Testing
     #expect(match.requiredRate == 170.0 / 168.0)
 }
 
-@Test func tracksOutsideTheRunningPulseRangeAreRejected() {
-    #expect(TrackMatchPlanner().select(requestedBPM: 170, from: [track("half", tempo: 85)]) == nil)
+@Test func pulsesWithNoTruthfulCadenceProjectionAreRejected() {
     #expect(TrackMatchPlanner().select(requestedBPM: 170, from: [track("double", tempo: 340)]) == nil)
 }
 
-@Test func halfTimeAliasCannotPretendASlowBeatIsA180BPMRunningPulse() {
-    let match = TrackMatchPlanner().select(
-        requestedBPM: 180,
-        from: [track("slow-beat", tempo: 90)]
-    )
+@Test func aSlowBeatCanSupportTwoStepsWithoutBecomingFalseMusicalTempo() throws {
+    let music = track("slow-beat", tempo: 90)
+    let match = try #require(
+        TrackMatchPlanner().select(
+            requestedBPM: 180,
+            from: [music]
+        ))
 
-    #expect(match == nil)
+    #expect(music.tempo?.baseBPM == 90)
+    #expect(music.tempo?.runningPulseBPM == 90)
+    #expect(match.relationship == .twoStepsPerBeat)
+    #expect(match.pulseBPM == 180)
 }
 
 @Test func anExplicitAlternatePulseCanRelateSlowMusicToRunningCadence() throws {
@@ -49,7 +53,87 @@ import Testing
 
     #expect(slowMusic.tempo?.baseBPM == 90)
     #expect(match.pulseBPM == 180)
+    #expect(match.relationship == .twoStepsPerBeat)
     #expect(match.requiredRate == 1)
+}
+
+@Test func detectedStepBeatRelationshipsStayExplicit() throws {
+    let analysis = TempoAnalysis(
+        baseBPM: 60.5,
+        alternatePulseBPM: 121.25,
+        confidence: 0.9,
+        analyzedDurationSeconds: 30,
+        version: 4
+    )
+
+    let projection = try #require(analysis.cadenceProjections.first)
+
+    #expect(analysis.baseBPM == 60.5)
+    #expect(projection.relationship == .twoStepsPerBeat)
+    #expect(projection.musicalPulseBPM == 60.5)
+    #expect(projection.cadencePulseBPM == 121.25)
+}
+
+@Test func anUnprovenFractionalRelationshipDoesNotCreateAFalseMatch() {
+    let music = MusicTrack(
+        id: MusicTrackID("fractional"),
+        title: "Fractional",
+        durationSeconds: 180,
+        tempo: TempoAnalysis(
+            baseBPM: 102.5,
+            alternatePulseBPM: 204,
+            confidence: 0.9,
+            analyzedDurationSeconds: 30,
+            version: 4
+        )
+    )
+
+    let match = TrackMatchPlanner().select(requestedBPM: 160, from: [music])
+
+    #expect(match == nil)
+    #expect(music.tempo?.baseBPM == 102.5)
+}
+
+@Test func liteSpotsPulseStaysTruthfulWhenTheRequestedCadenceIsOutOfRange() {
+    let music = MusicTrack(
+        id: MusicTrackID("user-example"),
+        title: "User example",
+        durationSeconds: 180,
+        tempo: TempoAnalysis(
+            baseBPM: 60.5,
+            alternatePulseBPM: 121.25,
+            confidence: 0.892,
+            analyzedDurationSeconds: 30,
+            version: 4
+        )
+    )
+
+    let match = TrackMatchPlanner().select(requestedBPM: 175, from: [music])
+
+    #expect(match == nil)
+    #expect(music.tempo?.baseBPM == 60.5)
+}
+
+@Test func aTruthfulBoundaryWithinMatchToleranceClosesSmallPlaylistGaps() throws {
+    let match = try #require(
+        TrackMatchPlanner().select(
+            requestedBPM: 160,
+            from: [track("upper-boundary", tempo: 145)]
+        )
+    )
+
+    #expect(match.requiredRate == 1.1)
+    #expect(abs(match.achievableCadenceBPM - 159.5) < 0.000_1)
+    #expect(abs(match.cadenceErrorBPM - 0.5) < 0.000_1)
+}
+
+@Test func aBoundaryOutsideTempoMatchToleranceStillFailsClosed() {
+    let match = TrackMatchPlanner().select(
+        requestedBPM: 210,
+        from: [track("far-away", tempo: 120)]
+    )
+
+    #expect(match == nil)
 }
 
 @Test func defaultEnvelopeIncludesThePhysicallyProvenTenPercentEndpoints() throws {
@@ -118,11 +202,11 @@ import Testing
 
 @Test func plannerUsesItsConfiguredRateEnvelope() {
     let standard = TrackMatchPlanner().select(
-        requestedBPM: 187,
+        requestedBPM: 189,
         from: [track("candidate", tempo: 168)]
     )
     let wider = TrackMatchPlanner(minimumRate: 0.88, maximumRate: 1.12).select(
-        requestedBPM: 187,
+        requestedBPM: 189,
         from: [track("candidate", tempo: 168)]
     )
 

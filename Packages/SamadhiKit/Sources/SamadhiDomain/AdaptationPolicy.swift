@@ -15,7 +15,12 @@ public enum TempoCommandStatus: String, Sendable, Equatable, Codable {
 
 public struct AdaptationState: Sendable, Equatable {
     public var targetRate: Double?
+    // The cadence pulse the playback rate multiplies. It is the chosen projection, not the song's
+    // own tempo, which stays separately in musicalTempoBPM so neither value relabels the other.
     public var baseTempoBPM: Double?
+    public var musicalTempoBPM: Double?
+    public var cadenceProjectionSourceBPM: Double?
+    public var stepBeatRelationship: StepBeatRelationship?
     public var lastReliableCadenceSPM: Double?
     public var secondsSinceTargetUpdate: Double
     public var confidenceLostSeconds: Double?
@@ -34,6 +39,9 @@ public struct AdaptationState: Sendable, Equatable {
     public init(
         targetRate: Double? = nil,
         baseTempoBPM: Double? = nil,
+        musicalTempoBPM: Double? = nil,
+        cadenceProjectionSourceBPM: Double? = nil,
+        stepBeatRelationship: StepBeatRelationship? = nil,
         lastReliableCadenceSPM: Double? = nil,
         secondsSinceTargetUpdate: Double = 0,
         confidenceLostSeconds: Double? = nil,
@@ -51,6 +59,9 @@ public struct AdaptationState: Sendable, Equatable {
     ) {
         self.targetRate = targetRate
         self.baseTempoBPM = baseTempoBPM
+        self.musicalTempoBPM = musicalTempoBPM
+        self.cadenceProjectionSourceBPM = cadenceProjectionSourceBPM
+        self.stepBeatRelationship = stepBeatRelationship
         self.lastReliableCadenceSPM = lastReliableCadenceSPM
         self.secondsSinceTargetUpdate = max(secondsSinceTargetUpdate, 0)
         self.confidenceLostSeconds = confidenceLostSeconds
@@ -74,6 +85,9 @@ public struct AdaptationInput: Sendable, Equatable {
     public let cadenceSPM: Double?
     public let cadenceReliable: Bool
     public let baseTempoBPM: Double
+    public let musicalTempoBPM: Double
+    public let cadenceProjectionSourceBPM: Double
+    public let stepBeatRelationship: StepBeatRelationship
     public let analysisConfidence: Double
     public let appliedRate: Double
     public let deltaSeconds: Double
@@ -84,6 +98,9 @@ public struct AdaptationInput: Sendable, Equatable {
         cadenceSPM: Double?,
         cadenceReliable: Bool,
         baseTempoBPM: Double,
+        musicalTempoBPM: Double? = nil,
+        cadenceProjectionSourceBPM: Double? = nil,
+        stepBeatRelationship: StepBeatRelationship = .oneStepPerBeat,
         analysisConfidence: Double,
         appliedRate: Double,
         deltaSeconds: Double,
@@ -93,6 +110,9 @@ public struct AdaptationInput: Sendable, Equatable {
         self.cadenceSPM = cadenceSPM
         self.cadenceReliable = cadenceReliable
         self.baseTempoBPM = baseTempoBPM
+        self.musicalTempoBPM = musicalTempoBPM ?? baseTempoBPM
+        self.cadenceProjectionSourceBPM = cadenceProjectionSourceBPM ?? baseTempoBPM
+        self.stepBeatRelationship = stepBeatRelationship
         self.analysisConfidence = analysisConfidence
         self.appliedRate = appliedRate
         self.deltaSeconds = max(deltaSeconds, 0)
@@ -116,9 +136,16 @@ public struct AdaptationPolicy: Sendable {
     public let minimumRate: Double
     public let maximumRate: Double
 
-    public init(minimumRate: Double = 0.90, maximumRate: Double = 1.10) {
+    public init(
+        minimumRate: Double = TempoEnvelope.rateRange.lowerBound,
+        maximumRate: Double = TempoEnvelope.rateRange.upperBound
+    ) {
         self.minimumRate = minimumRate
         self.maximumRate = maximumRate
+    }
+
+    public func clampRate(_ rate: Double) -> Double {
+        min(max(rate, minimumRate), maximumRate)
     }
 
     public func update(state: AdaptationState, input: AdaptationInput) -> AdaptationDecision {
@@ -133,7 +160,7 @@ public struct AdaptationPolicy: Sendable {
         case .automatic:
             guard input.cadenceReliable,
                 let cadence = input.cadenceSPM,
-                (120...210).contains(cadence),
+                TempoEnvelope.runningCadenceBPM.contains(cadence),
                 let requested = input.rhythmControl.requestedBPM(cadenceSPM: cadence)
             else {
                 return confidenceLost(state: state, input: input)
@@ -189,6 +216,9 @@ public struct AdaptationPolicy: Sendable {
             next.targetRate = target
             next.achievableBPM = requestedBPM
             next.baseTempoBPM = input.baseTempoBPM
+            next.musicalTempoBPM = input.musicalTempoBPM
+            next.cadenceProjectionSourceBPM = input.cadenceProjectionSourceBPM
+            next.stepBeatRelationship = input.stepBeatRelationship
             if input.cadenceReliable { next.lastReliableCadenceSPM = input.cadenceSPM }
             next.secondsSinceTargetUpdate = 0
         }
@@ -246,7 +276,7 @@ public struct AdaptationPolicy: Sendable {
     }
 
     private func targetRate(requestedBPM: Double, baseTempo: Double) -> Double? {
-        guard (120...210).contains(baseTempo) else { return nil }
+        guard TempoEnvelope.runningCadenceBPM.contains(baseTempo) else { return nil }
         return requestedBPM / baseTempo
     }
 
@@ -292,7 +322,7 @@ public struct AdaptationPolicy: Sendable {
         isAtLimit: Bool = false
     ) -> AdaptationDecision {
         var next = state
-        let boundaryRate = derivedTargetRate.map { min(max($0, minimumRate), maximumRate) }
+        let boundaryRate = derivedTargetRate.map(clampRate)
         let commandedRate: Double
         if isAtLimit, let boundaryRate {
             commandedRate =
@@ -308,6 +338,9 @@ public struct AdaptationPolicy: Sendable {
         }
         next.targetRate = isAtLimit ? boundaryRate : nil
         next.baseTempoBPM = input.baseTempoBPM
+        next.musicalTempoBPM = input.musicalTempoBPM
+        next.cadenceProjectionSourceBPM = input.cadenceProjectionSourceBPM
+        next.stepBeatRelationship = input.stepBeatRelationship
         next.matchedSeconds = 0
         next.hasMatched = false
         next.confidenceLostSeconds = nil
@@ -356,7 +389,7 @@ public enum TempoMatchEvaluator {
             let appliedRate
         else { return nil }
 
-        guard (120...210).contains(baseTempoBPM) else { return nil }
+        guard TempoEnvelope.runningCadenceBPM.contains(baseTempoBPM) else { return nil }
         return abs((baseTempoBPM * appliedRate) - referenceBPM) <= 3
     }
 }

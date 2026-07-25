@@ -71,7 +71,14 @@ import Testing
     try await player.skipToNext(operationID: 50)
 
     #expect(await events.next() == .prepared(operationID: 50, trackID: second.id))
-    #expect(await events.next() == .trackChanged(operationID: 50, trackID: first.id))
+    #expect(
+        await events.next()
+            == .trackChanged(
+                operationID: 50,
+                trackID: first.id,
+                reason: .explicitSkip
+            )
+    )
 }
 
 @Test @MainActor func newerSelectionInvalidationRejectsLatePreparation() async throws {
@@ -93,5 +100,12 @@ import Testing
     try await player.skipToNext(operationID: 60)
 
     #expect(await events.next() == .prepared(operationID: 60, trackID: second.id))
-    #expect(await events.next() == .trackChanged(operationID: 60, trackID: third.id))
+    #expect(
+        await events.next()
+            == .trackChanged(
+                operationID: 60,
+                trackID: third.id,
+                reason: .explicitSkip
+            )
+    )
 }

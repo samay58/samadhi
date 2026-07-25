@@ -30,6 +30,18 @@
         private var rateReadbackTask: Task<Void, Never>?
         private var preparedNextTrackID: MusicTrackID?
         private var latestSelectionID = 0
+        private struct PendingTrackChange {
+            static let attributionWindowSeconds: TimeInterval = 5
+
+            let reason: TrackChangeReason
+            let startedAt: TimeInterval
+
+            func reason(at now: TimeInterval) -> TrackChangeReason? {
+                now - startedAt <= Self.attributionWindowSeconds ? reason : nil
+            }
+        }
+
+        private var pendingTrackChange: PendingTrackChange?
 
         func events() -> AsyncStream<MusicPlaybackEvent> {
             AsyncStream(bufferingPolicy: .bufferingNewest(128)) { continuation in
@@ -87,6 +99,7 @@
             rateReadbackTask = nil
             preparedNextTrackID = nil
             latestSelectionID = 0
+            pendingTrackChange = nil
             continuation?.yield(.prepared(operationID: operationID, trackID: trackID))
         }
 
@@ -106,13 +119,36 @@
 
         func skipToPrevious(operationID: Int) async throws {
             guard isCurrent(operationID) else { return }
-            try await player.skipToPreviousEntry()
+            try await claimingTrackChange(.explicitPrevious) {
+                try await player.skipToPreviousEntry()
+            }
         }
 
         func skipToNext(operationID: Int) async throws {
             guard isCurrent(operationID) else { return }
             try applyPreparedNextIfNeeded()
-            try await player.skipToNextEntry()
+            try await claimingTrackChange(.explicitSkip) {
+                try await player.skipToNextEntry()
+            }
+        }
+
+        // MusicKit reports that the entry changed, never why. Claiming the reason around the command
+        // lets the monitor attribute the next observed change; a failed command drops the claim so a
+        // later natural boundary is not mislabelled.
+        private func claimingTrackChange(
+            _ reason: TrackChangeReason,
+            _ command: () async throws -> Void
+        ) async rethrows {
+            pendingTrackChange = PendingTrackChange(
+                reason: reason,
+                startedAt: ProcessInfo.processInfo.systemUptime
+            )
+            do {
+                try await command()
+            } catch {
+                pendingTrackChange = nil
+                throw error
+            }
         }
 
         func prepareNext(
@@ -144,7 +180,7 @@
                 collection?.tracks.contains(where: { $0.id == trackID }) == true,
                 currentTrackID == trackID
             else { return }
-            let boundedRate = Double(Float(min(max(rate, 0.90), 1.10)))
+            let boundedRate = Double(Float(TempoEnvelope.clampRate(rate)))
             rateReadbackTask?.cancel()
             pendingRateRequest = PendingRateRequest(
                 id: requestID,
@@ -177,6 +213,7 @@
             rateReadbackTask = nil
             preparedNextTrackID = nil
             latestSelectionID = 0
+            pendingTrackChange = nil
         }
 
         private func startMonitoring() {
@@ -270,12 +307,22 @@
             guard let itemID = player.queue.currentEntry?.item?.id.rawValue else { return }
             let trackID = MusicTrackID(itemID)
             if trackID != lastTrackID {
+                let reason =
+                    pendingTrackChange?.reason(at: ProcessInfo.processInfo.systemUptime)
+                    ?? .naturalBoundary
                 lastTrackID = trackID
+                pendingTrackChange = nil
                 pendingRateRequest = nil
                 rateReadbackTask?.cancel()
                 rateReadbackTask = nil
                 preparedNextTrackID = nil
-                continuation?.yield(.trackChanged(operationID: operationID, trackID: trackID))
+                continuation?.yield(
+                    .trackChanged(
+                        operationID: operationID,
+                        trackID: trackID,
+                        reason: reason
+                    )
+                )
             }
             guard let track = collection.tracks.first(where: { $0.id == trackID }) else { return }
             continuation?.yield(

@@ -48,7 +48,8 @@
                             CadenceObservation(
                                 stepsPerMinute: data?.currentCadence.map { $0.doubleValue * 60 },
                                 elapsedSeconds: sampleDate.timeIntervalSince(start),
-                                sampleAgeSeconds: now.timeIntervalSince(sampleDate)
+                                sampleAgeSeconds: now.timeIntervalSince(sampleDate),
+                                sampleEndDateSeconds: sampleDate.timeIntervalSince1970
                             )
                         )
                     )

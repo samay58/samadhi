@@ -20,16 +20,16 @@ Milestone 2 turns the interaction prototype into a useful music product.
 
 The finish line is one real outdoor run, not a feature checklist. Samay should be able to import one Apple Music playlist, start running, hear music settle into his cadence, lock the phone, recover from normal interruptions, finish, and trust the summary. Stop expanding scope until that run works.
 
-The first normal field run disproved the original product mechanic. A later report exposed three more causes: stale Core Motion cadence could stay locked, the wheel sent a player command for every detent, and a matched Auto ramp could take about 20 seconds to traverse 10 percent. Half-time analysis could also label a perceptually slow 90 BPM pulse as 180 BPM. Those paths now have deterministic repairs.
+The first normal field run disproved the original product mechanic. Later field evidence exposed stale cadence, over-sensitive wheel movement, startup selection against an invented 168 SPM prior, and a cadence range too narrow for the current playlist. The current repair addresses cadence freshness, source-order startup, transport authority, rolling diagnostics, and control sensitivity. Honest cadence compatibility improves only from 13 to 16 of 56 representative matrix cells, so broad range remains an open mechanics decision rather than a solved UI problem.
+
+Manual control has one additional release-blocking contract. The wheel cannot display or commit a BPM the current song cannot produce inside its proven playback-rate envelope. Its integer range must come from the current cadence projection and player limits. At either boundary, value movement and detent feedback stop together, one restrained terminal haptic marks the limit, and reversing responds immediately. Playlist-wide range remains available through explicit Skip or a natural boundary. It must not appear as unreachable wheel travel.
 
 Continue in this order:
 
-1. Install the verified version-4 build and let the saved playlist reanalyze once. Confirm the ready count against the privacy-safe 14-of-18 replay, allowing the two catalog-unavailable and two still-ambiguous tracks to remain unavailable.
-2. Run one short transport check. Make one large Manual change and several rapid follow-up changes. Requested BPM should move, Music BPM should stop at the current song's honest reachable boundary, and the current song must continue.
-3. Use Skip once, then allow one prepared candidate to commit at a player-confirmed natural boundary. Pull `latest-run-diagnostics.json`, `latest-import-diagnostics.json`, and the selected collection. Record requested BPM, musical pulse, stride pulse, commanded and applied rate, latency, and track identity without committing personal metadata.
-4. If audible response or command truth fails, stop and repair that recorded chain. Do not proceed to reliability or visual work.
-5. If the focused physical check passes, prove a natural compatible transition, five locked minutes, controlled interruption, route loss, accessibility, and cadence calibration.
-6. Complete one 20-minute outdoor run with an imported playlist. The run must feel good, survive normal phone conditions, and end with a summary whose measurement coverage and Automatic versus Manual time are honest.
+1. Build the verified candidate with the exact profile. Inspect the embedded application identifier, push `main`, then install without replacing the app container.
+2. Run one short physical check. The first ready track must stay current. Make one deliberate Manual turn into each reachable boundary, return to Auto, change cadence, and confirm display, MusicKit read-back, audible direction, boundary feel, and reverse response. Pull the rolling diagnostics even if the run is abandoned.
+3. If that trace passes, prove explicit Skip, one natural boundary, five locked minutes, controlled interruption, and route loss. If cadence coverage still feels constrained, reopen the source and mechanics decision before more interface work.
+4. Complete one 20-minute outdoor run with an imported playlist. The run must feel good, survive normal phone conditions, and end with a summary whose measurement coverage and Automatic versus Manual time are honest.
 
 ## Current gate state
 
@@ -44,11 +44,12 @@ Continue in this order:
 - Production playback: validated catalog fixture `1558215042`, live cadence updates, bounded reducer effects, identified MusicKit read-back, and honest measurement are connected
 - Playlist import and persistence: implemented with strict resolution, local preview analysis, versioned cache keys, atomic replacement, complete typed per-track results, retry after relaunch, three-track bounded concurrency, private timing diagnostics, and ready-only production filtering
 - Normal run composition: restored imported tracks use Apple Music playback and Core Motion; Debug Simulator uses isolated local placeholder playlists with simulated cadence and silent playback
-- Automated body-to-music gate: 103 package tests, 15 app-model tests, 10 UI tests, formatter, normal Simulator build, focused rotary-control UI proof, runtime screen review, renewed exact-profile build, embedded application identifier verification, and physical installation pass
+- Last released body-to-music gate: 103 package tests, 15 app-model tests, 10 UI tests, formatter, normal Simulator build, focused rotary-control UI proof, runtime screen review, renewed exact-profile build, embedded application identifier verification, and physical installation pass
 - Physical body-to-music observation: passed; the corrected 59-second run averaged 155 SPM and measured 98 percent tempo matched from MusicKit read-back
 - Physical imported-collection gate: real playlist selection, local analysis, reinstall and relaunch restoration, and basic progress passed at 13 of 25 ready tracks; a natural transition remains open
-- Device evidence: debug builds persist one latest completed-run diagnostic file for direct container retrieval; commit `66e0616` is installed with the selected collection preserved, while foreground launch remains unclaimed because the phone was locked
-- Rhythm control: detents preview locally with haptics, the control stays pinned throughout a turn, finger-up commits one absolute Manual BPM and one player command, and Auto resets cadence ownership; Auto retargets a fresh reliable change within one second and reaches the full proven envelope within five seconds; physical audible and tactile proof remains open
+- Device evidence: the candidate persists one bounded latest diagnostic during the run and after completion; commit `66e0616` remains installed with the selected collection preserved
+- Rhythm control: the candidate uses 30 BPM per revolution, reverse hysteresis, a current-song integer BPM envelope, one terminal boundary haptic, frozen visual travel at the boundary, one Manual command at finger-up, and explicit return to Auto; physical audible and tactile proof remains open
+- Candidate verification: formatter lint, 116 package tests, a resource-inclusive Simulator build, 16 app-model tests, and 10 UI tests pass; exact-profile build, installation, and current physical evidence remain required before release
 - Felt-synchronization research: complete enough to set direction; Weav used adaptive arrangements, djay separates BPM from beat sync, and published running work supports compatible-track selection plus phase-aware control
 - Device harness: exact-profile catalog search, strict identity resolution, temporary preview download, local PCM decoding, playback, rate controls, route observation, and trace export remain available on the physical iPhone 17 Pro
 - Perceptibility result: 0.90 versus 1.10 was clearly audible on `LITE SPOTS` through Beoplay Eleven; Apple Music stays authoritative while broader blinded and full-song quality evidence remains open

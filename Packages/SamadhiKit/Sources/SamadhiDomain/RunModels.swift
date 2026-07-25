@@ -5,6 +5,12 @@ public enum MotionAuthorization: Sendable, Equatable {
     case unavailable
 }
 
+public enum CadenceTrackingState: String, Sendable, Equatable, Codable {
+    case acquiring
+    case tracking
+    case reacquiring
+}
+
 public enum RunMode: Sendable, Equatable {
     case adaptive
     case fixed
@@ -200,6 +206,13 @@ public enum RouteAvailability: Sendable, Equatable {
     case restored
 }
 
+public enum TrackChangeReason: String, Sendable, Equatable, Codable {
+    case explicitPrevious
+    case explicitSkip
+    case naturalBoundary
+    case recovery
+}
+
 public struct RouteRecovery: Sendable, Equatable {
     public var session: RunSession
     public var origin: RunActivity
@@ -357,6 +370,7 @@ public enum RunEvent: Sendable, Equatable {
         operationID: Int,
         trackID: MusicTrackID,
         trackIndex: Int,
+        reason: TrackChangeReason,
         rateRequestID: Int
     )
     case playbackFailed(sessionID: Int, operationID: Int)

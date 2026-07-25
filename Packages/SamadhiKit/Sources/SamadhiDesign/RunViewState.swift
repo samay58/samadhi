@@ -92,6 +92,7 @@ public struct RhythmControlPresentation: Sendable, Equatable {
     public var mode: RhythmControlMode
     public var automaticCorrectionBPM: Int
     public var manualTargetBPM: Int
+    public var manualBPMRange: ClosedRange<Int>?
     public var requestedBPM: Int?
     public var appliedBPM: Int?
     public var commandStatus: TempoCommandStatus
@@ -108,6 +109,7 @@ public struct RhythmControlPresentation: Sendable, Equatable {
         mode: RhythmControlMode = .automatic,
         automaticCorrectionBPM: Int = 0,
         manualTargetBPM: Int = 168,
+        manualBPMRange: ClosedRange<Int>? = nil,
         requestedBPM: Int? = nil,
         appliedBPM: Int? = nil,
         commandStatus: TempoCommandStatus = .idle,
@@ -123,6 +125,7 @@ public struct RhythmControlPresentation: Sendable, Equatable {
         self.mode = mode
         self.automaticCorrectionBPM = automaticCorrectionBPM
         self.manualTargetBPM = manualTargetBPM
+        self.manualBPMRange = manualBPMRange
         self.requestedBPM = requestedBPM
         self.appliedBPM = appliedBPM
         self.commandStatus = commandStatus
@@ -194,6 +197,7 @@ public enum RunAction: Sendable, Equatable {
     case revealRhythmControl
     case adjustRhythmControl(Int)
     case previewRhythmStep(direction: RhythmAdjustmentDirection, isMajor: Bool)
+    case previewRhythmLimit
     case commitRhythmTarget(Int)
     case useManualRhythm
     case resetRhythmControl

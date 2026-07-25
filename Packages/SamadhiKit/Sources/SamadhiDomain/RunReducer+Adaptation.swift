@@ -1,3 +1,5 @@
+import Foundation
+
 extension RunReducer {
     enum RhythmControlChange: Sendable, Equatable {
         case adjust(Int)
@@ -140,14 +142,28 @@ extension RunReducer {
 
         var next = active
         let priorControl = next.session.rhythmControl
+        let priorRequestedBPM =
+            priorControl.requestedBPM(cadenceSPM: cadenceSPM)
+            ?? next.session.adaptationState.requestedBPM
+            ?? Double(priorControl.manualTargetBPM)
+        let manualEnvelope = manualTempoEnvelope(for: next.session)
         switch change {
         case let .adjust(steps):
-            _ = next.session.rhythmControl.adjust(by: steps)
+            _ = next.session.rhythmControl.adjust(
+                by: steps,
+                manualEnvelope: manualEnvelope
+            )
         case let .target(bpm):
-            next.session.rhythmControl.setManualTargetBPM(bpm)
+            next.session.rhythmControl.setManualTargetBPM(
+                bpm,
+                manualEnvelope: manualEnvelope
+            )
         case .manual:
             let seed = next.session.adaptationState.requestedBPM ?? cadenceSPM ?? 168
-            next.session.rhythmControl.useManual(seedBPM: seed)
+            next.session.rhythmControl.useManual(
+                seedBPM: seed,
+                manualEnvelope: manualEnvelope
+            )
         case .automatic:
             next.session.rhythmControl.resetToAutomatic()
         }
@@ -194,8 +210,25 @@ extension RunReducer {
                 next.session.rhythmControl.mode == .automatic
                 ? next.session.rhythmControl.automaticCorrectionBPM
                 : next.session.rhythmControl.manualTargetBPM
+            let direction: RhythmAdjustmentDirection
+            switch (priorControl.mode, next.session.rhythmControl.mode) {
+            case (.automatic, .automatic):
+                direction =
+                    next.session.rhythmControl.automaticCorrectionBPM
+                        >= priorControl.automaticCorrectionBPM
+                    ? .increase
+                    : .decrease
+            case (.manual, .manual):
+                direction =
+                    next.session.rhythmControl.manualTargetBPM
+                        >= priorControl.manualTargetBPM
+                    ? .increase
+                    : .decrease
+            default:
+                direction = Double(detentValue) >= priorRequestedBPM ? .increase : .decrease
+            }
             haptic = .rhythmStep(
-                direction: detentValue >= priorDetentValue(priorControl) ? .increase : .decrease,
+                direction: direction,
                 isMajor: detentValue.isMultiple(of: 5)
             )
         }
@@ -250,7 +283,12 @@ extension RunReducer {
         guard session.mode == .adaptive,
             let trackID = session.currentTrackID,
             let track = tracks.first(where: { $0.id == trackID }),
-            let tempo = track.tempo
+            let tempo = track.tempo,
+            let projection = cadenceProjection(
+                for: tempo,
+                requestedBPM: session.rhythmControl.requestedBPM(cadenceSPM: cadenceSPM),
+                retaining: session.adaptationState
+            )
         else { return (session, []) }
 
         var next = session
@@ -260,7 +298,10 @@ extension RunReducer {
             input: AdaptationInput(
                 cadenceSPM: cadenceSPM,
                 cadenceReliable: cadenceReliable,
-                baseTempoBPM: tempo.runningPulseBPM,
+                baseTempoBPM: projection.cadencePulseBPM,
+                musicalTempoBPM: projection.musicalPulseBPM,
+                cadenceProjectionSourceBPM: projection.sourcePulseBPM,
+                stepBeatRelationship: projection.relationship,
                 analysisConfidence: tempo.confidence,
                 appliedRate: rampOriginRate,
                 deltaSeconds: deltaSeconds,
@@ -357,12 +398,60 @@ extension RunReducer {
         )
     }
 
-    private func priorDetentValue(_ control: RhythmControlState) -> Int {
-        switch control.mode {
-        case .automatic:
-            control.automaticCorrectionBPM
-        case .manual:
-            control.manualTargetBPM
-        }
+    private func manualTempoEnvelope(for session: RunSession) -> ManualTempoEnvelope? {
+        guard let trackID = session.currentTrackID,
+            let tempo = tracks.first(where: { $0.id == trackID })?.tempo
+        else { return nil }
+
+        let projection = cadenceProjection(
+            for: tempo,
+            requestedBPM: session.adaptationState.requestedBPM,
+            retaining: session.adaptationState
+        )
+        guard let projection else { return nil }
+        return ManualTempoEnvelope(
+            cadencePulseBPM: projection.cadencePulseBPM,
+            minimumRate: adaptationPolicy.minimumRate,
+            maximumRate: adaptationPolicy.maximumRate
+        )
+    }
+
+    private func cadenceProjection(
+        for tempo: TempoAnalysis,
+        requestedBPM: Double?,
+        retaining state: AdaptationState
+    ) -> CadenceProjection? {
+        guard let requestedBPM else { return tempo.cadenceProjections.first }
+        let candidates = tempo.cadenceProjections
+        guard
+            let best = candidates.min(by: {
+                projectionCost($0, requestedBPM: requestedBPM)
+                    < projectionCost($1, requestedBPM: requestedBPM)
+            })
+        else { return nil }
+
+        guard let relationship = state.stepBeatRelationship,
+            let sourcePulse = state.cadenceProjectionSourceBPM,
+            let current = candidates.first(where: {
+                $0.relationship == relationship
+                    && abs($0.sourcePulseBPM - sourcePulse) <= 0.5
+            })
+        else { return best }
+
+        let currentRate = adaptationPolicy.clampRate(requestedBPM / current.cadencePulseBPM)
+        let currentError = abs((current.cadencePulseBPM * currentRate) - requestedBPM)
+        guard currentError <= 3,
+            projectionCost(current, requestedBPM: requestedBPM)
+                <= projectionCost(best, requestedBPM: requestedBPM) + 0.04
+        else { return best }
+        return current
+    }
+
+    private func projectionCost(
+        _ projection: CadenceProjection,
+        requestedBPM: Double
+    ) -> Double {
+        abs(log(requestedBPM / projection.cadencePulseBPM))
+            + projection.relationship.selectionCost
     }
 }

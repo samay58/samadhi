@@ -498,7 +498,7 @@ public struct RunReducer: Sendable {
                 active.session.currentTrackID == trackID
             else { return (state, []) }
             var next = active
-            next.session.appliedPlaybackRate = min(max(rate, 0.90), 1.10)
+            next.session.appliedPlaybackRate = adaptationPolicy.clampRate(rate)
             next.session.adaptationState.appliedRateReadback = rate
             next.session.adaptationState.commandLatencySeconds = max(latencySeconds, 0)
             if let commandedRate = next.session.pendingCommandedRate,
@@ -522,6 +522,7 @@ public struct RunReducer: Sendable {
                 operationID,
                 trackID,
                 trackIndex,
+                _,
                 rateRequestID
             )
         ):
@@ -623,8 +624,7 @@ public struct RunReducer: Sendable {
 
     private var adaptiveStartingTrackID: MusicTrackID? {
         if tracks.isEmpty { return MusicTrackID("demo-0") }
-        return TrackMatchPlanner().select(requestedBPM: 168, from: tracks)?.trackID
-            ?? tracks.first(where: \.isAdaptiveReady)?.id
+        return tracks.first(where: \.isAdaptiveReady)?.id
     }
 
 }
