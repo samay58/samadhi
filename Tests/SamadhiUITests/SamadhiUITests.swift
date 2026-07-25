@@ -130,24 +130,33 @@ final class SamadhiUITests: XCTestCase {
         let dial = element("rhythm-dial")
         let top = dial.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.08))
         let right = dial.coordinate(withNormalizedOffset: CGVector(dx: 0.92, dy: 0.5))
-        for _ in 0..<4 {
-            top.press(
-                forDuration: 0.12,
-                thenDragTo: right,
-                withVelocity: .slow,
-                thenHoldForDuration: 0.2
-            )
+        let initialBPM = currentDisplayedBPM()
+        XCTAssertNotNil(initialBPM)
+        for _ in 0..<8 {
+            turn(from: top, to: right)
         }
 
-        let limitedState = waitForDialState(dial, requestedAtLeast: 188, applied: 185)
-        XCTAssertNotNil(limitedState)
+        guard let upperBoundaryBPM = currentDisplayedBPM() else {
+            XCTFail("The dial must keep showing its current BPM")
+            return
+        }
+        XCTAssertGreaterThan(upperBoundaryBPM, initialBPM ?? 0)
         XCTAssertEqual(trackIdentity.label, originalTrackLabel)
         XCTAssertFalse(app.staticTexts["Changing song"].exists)
 
-        dial.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5)).tap()
-        if let limitedState {
-            XCTAssertTrue(app.staticTexts[String(limitedState.requested)].exists)
+        for _ in 0..<2 {
+            turn(from: top, to: right)
         }
+        XCTAssertEqual(currentDisplayedBPM(), upperBoundaryBPM)
+        XCTAssertEqual(trackIdentity.label, originalTrackLabel)
+
+        turn(from: right, to: top)
+        guard let reversedBPM = currentDisplayedBPM() else {
+            XCTFail("The dial must keep showing its current BPM")
+            return
+        }
+        XCTAssertLessThan(reversedBPM, upperBoundaryBPM)
+        XCTAssertEqual(trackIdentity.label, originalTrackLabel)
 
         app.buttons["rhythm-manual"].tap()
         XCTAssertTrue(app.buttons["rhythm-manual"].isSelected)
@@ -172,23 +181,20 @@ final class SamadhiUITests: XCTestCase {
         app.descendants(matching: .any).matching(identifier: identifier).firstMatch
     }
 
-    private func waitForDialState(
-        _ dial: XCUIElement,
-        requestedAtLeast lowerBound: Int,
-        applied: Int,
-        timeout: TimeInterval = 2
-    ) -> (requested: Int, applied: Int)? {
-        let deadline = Date().addingTimeInterval(timeout)
-        repeat {
-            let values = String(describing: dial.value ?? "")
-                .split(whereSeparator: { !$0.isNumber })
-                .compactMap { Int($0) }
-            if values.count >= 2, values[0] >= lowerBound, values[1] == applied {
-                return (values[0], values[1])
-            }
-            RunLoop.current.run(until: Date().addingTimeInterval(0.05))
-        } while Date() < deadline
-        return nil
+    private func currentDisplayedBPM() -> Int? {
+        app.staticTexts.allElementsBoundByIndex
+            .lazy
+            .compactMap { Int($0.label) }
+            .first { 120...210 ~= $0 }
+    }
+
+    private func turn(from start: XCUICoordinate, to end: XCUICoordinate) {
+        start.press(
+            forDuration: 0.12,
+            thenDragTo: end,
+            withVelocity: .slow,
+            thenHoldForDuration: 0.2
+        )
     }
 
     private func prepareApp(_ additionalArgument: String? = nil) {

@@ -8,10 +8,41 @@ public enum RhythmAdjustmentDirection: String, Sendable, Equatable, Codable {
     case decrease
 }
 
+// The BPM a single song can actually reach. Manual travel is bounded by this so the wheel never
+// offers a value the current track cannot produce inside the proven rate envelope.
+public struct ManualTempoEnvelope: Sendable, Equatable {
+    public let bpmRange: ClosedRange<Int>
+
+    public init?(
+        cadencePulseBPM: Double,
+        minimumRate: Double = TempoEnvelope.rateRange.lowerBound,
+        maximumRate: Double = TempoEnvelope.rateRange.upperBound,
+        targetRange: ClosedRange<Int> = TempoEnvelope.runningCadenceRange
+    ) {
+        guard cadencePulseBPM > 0, minimumRate > 0, minimumRate <= maximumRate else {
+            return nil
+        }
+        // Nudge before rounding so a bound that is exactly an integer in real arithmetic is not
+        // pushed off the envelope by binary floating-point error.
+        let lower = max(
+            targetRange.lowerBound,
+            Int(((cadencePulseBPM * minimumRate) - 0.000_001).rounded(.up))
+        )
+        let upper = min(
+            targetRange.upperBound,
+            Int(((cadencePulseBPM * maximumRate) + 0.000_001).rounded(.down))
+        )
+        guard lower <= upper else { return nil }
+        bpmRange = lower...upper
+    }
+
+    public func clamped(_ bpm: Int) -> Int {
+        bpmRange.clamped(bpm)
+    }
+}
+
 public struct RhythmControlState: Sendable, Equatable, Codable {
-    public static let runningTargetRange = 120...210
     public static let automaticCorrectionRange = -20...20
-    public static let manualTargetRange = runningTargetRange
 
     public var mode: RhythmControlMode
     public var automaticCorrectionBPM: Int
@@ -24,7 +55,7 @@ public struct RhythmControlState: Sendable, Equatable, Codable {
     ) {
         self.mode = mode
         self.automaticCorrectionBPM = Self.automaticCorrectionRange.clamped(automaticCorrectionBPM)
-        self.manualTargetBPM = Self.manualTargetRange.clamped(manualTargetBPM)
+        self.manualTargetBPM = TempoEnvelope.runningCadenceRange.clamped(manualTargetBPM)
     }
 
     public static let initial = RhythmControlState()
@@ -35,8 +66,8 @@ public struct RhythmControlState: Sendable, Equatable, Codable {
             cadenceSPM.map {
                 let requested = $0 + Double(automaticCorrectionBPM)
                 return min(
-                    max(requested, Double(Self.runningTargetRange.lowerBound)),
-                    Double(Self.runningTargetRange.upperBound)
+                    max(requested, TempoEnvelope.runningCadenceBPM.lowerBound),
+                    TempoEnvelope.runningCadenceBPM.upperBound
                 )
             }
         case .manual:
@@ -44,7 +75,10 @@ public struct RhythmControlState: Sendable, Equatable, Codable {
         }
     }
 
-    public mutating func adjust(by steps: Int) -> Bool {
+    public mutating func adjust(
+        by steps: Int,
+        manualEnvelope: ManualTempoEnvelope? = nil
+    ) -> Bool {
         let prior = self
         switch mode {
         case .automatic:
@@ -52,26 +86,43 @@ public struct RhythmControlState: Sendable, Equatable, Codable {
                 automaticCorrectionBPM + steps
             )
         case .manual:
-            manualTargetBPM = Self.manualTargetRange.clamped(manualTargetBPM + steps)
+            manualTargetBPM = Self.clampManualTarget(manualTargetBPM + steps, within: manualEnvelope)
         }
         return self != prior
     }
 
-    public mutating func setManualTargetBPM(_ bpm: Int) {
+    public mutating func setManualTargetBPM(
+        _ bpm: Int,
+        manualEnvelope: ManualTempoEnvelope? = nil
+    ) {
         mode = .manual
-        manualTargetBPM = Self.manualTargetRange.clamped(bpm)
+        manualTargetBPM = Self.clampManualTarget(bpm, within: manualEnvelope)
     }
 
-    public mutating func useManual(seedBPM: Double?) {
+    public mutating func useManual(
+        seedBPM: Double?,
+        manualEnvelope: ManualTempoEnvelope? = nil
+    ) {
         mode = .manual
         if let seedBPM {
-            manualTargetBPM = Self.manualTargetRange.clamped(Int(seedBPM.rounded()))
+            manualTargetBPM = Self.clampManualTarget(
+                Int(seedBPM.rounded()),
+                within: manualEnvelope
+            )
         }
     }
 
     public mutating func resetToAutomatic() {
         mode = .automatic
         automaticCorrectionBPM = 0
+    }
+
+    // Without a current track there is no per-song envelope, so the broad running range applies.
+    private static func clampManualTarget(
+        _ bpm: Int,
+        within envelope: ManualTempoEnvelope?
+    ) -> Int {
+        envelope?.clamped(bpm) ?? TempoEnvelope.runningCadenceRange.clamped(bpm)
     }
 }
 

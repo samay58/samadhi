@@ -124,6 +124,14 @@ final class RunPresentationModel {
             for: domainTrack,
             rate: session?.appliedPlaybackRate
         )
+        // Before the first adaptation tick there is no chosen projection yet, and the reducer makes
+        // the same choice in that case: the first one. Both sides bound the wheel identically.
+        let cadenceProjectionBPM =
+            session?.adaptationState.baseTempoBPM
+            ?? domainTrack.tempo?.cadenceProjections.first?.cadencePulseBPM
+        let manualBPMRange = cadenceProjectionBPM.flatMap {
+            ManualTempoEnvelope(cadencePulseBPM: $0)?.bpmRange
+        }
 
         return RunViewState(
             phase: phase,
@@ -141,6 +149,7 @@ final class RunPresentationModel {
                 mode: session?.rhythmControl.mode ?? .automatic,
                 automaticCorrectionBPM: session?.rhythmControl.automaticCorrectionBPM ?? 0,
                 manualTargetBPM: session?.rhythmControl.manualTargetBPM ?? 168,
+                manualBPMRange: manualBPMRange,
                 requestedBPM: requestedBPM.map { Int($0.rounded()) },
                 appliedBPM: appliedBPM,
                 commandStatus: session?.adaptationState.commandStatus ?? .idle,
@@ -176,6 +185,8 @@ final class RunPresentationModel {
             )
         case let .previewRhythmStep(direction, isMajor):
             hapticFeedback.emit(.rhythmStep(direction: direction, isMajor: isMajor))
+        case .previewRhythmLimit:
+            hapticFeedback.emit(.rhythmLimit)
         case let .commitRhythmTarget(bpm):
             dispatch(
                 .rhythmControlTargetCommitted(
@@ -245,16 +256,14 @@ final class RunPresentationModel {
         }
 
         #if DEBUG
-            if let snapshot = diagnosticsRecorder.record(
-                event: event,
-                oldState: oldState,
-                newState: newState,
-                collection: musicCollection
-            ) {
-                Task { [diagnosticsStore] in
-                    try? await diagnosticsStore.save(snapshot)
-                }
-            }
+            persist(
+                diagnosticsRecorder.record(
+                    event: event,
+                    oldState: oldState,
+                    newState: newState,
+                    collection: musicCollection
+                )
+            )
         #endif
 
         if case .cadenceUpdated = event,
@@ -275,6 +284,42 @@ final class RunPresentationModel {
             execute(effect)
         }
     }
+
+    // Raw sampling is evidence, not product state, so it never becomes a RunEvent and never reaches
+    // the reducer. The recorder receives it directly.
+    private func recordCadenceSample(
+        _ observation: CadenceObservation,
+        estimate: CadenceEstimate,
+        filterState: CadenceTrackingState,
+        callbackIntervalSeconds: Double
+    ) {
+        #if DEBUG
+            persist(
+                diagnosticsRecorder.record(
+                    cadenceSample: CadenceDiagnosticSample(
+                        rawStepsPerMinute: observation.stepsPerMinute,
+                        sampleAgeSeconds: observation.sampleAgeSeconds,
+                        sampleEndDateSeconds: observation.sampleEndDateSeconds
+                            ?? (Date().timeIntervalSince1970 - observation.sampleAgeSeconds),
+                        callbackIntervalSeconds: callbackIntervalSeconds,
+                        filterState: filterState,
+                        filteredStepsPerMinute: estimate.lockedStepsPerMinute
+                    ),
+                    state: state,
+                    collection: musicCollection
+                )
+            )
+        #endif
+    }
+
+    #if DEBUG
+        private func persist(_ snapshot: RunDiagnosticSnapshot?) {
+            guard let snapshot else { return }
+            Task { [diagnosticsStore] in
+                try? await diagnosticsStore.save(snapshot)
+            }
+        }
+    #endif
 
     private func execute(_ effect: RunEffect) {
         // Platform services execute reducer effects and return identified events through dispatch.
@@ -342,7 +387,7 @@ final class RunPresentationModel {
 
         case let .beginCadenceAcquisition(sessionID, acquisitionID, priorSPM):
             taskStore.replace(.acquisition) { [weak self, cadenceProvider] in
-                var filter = CadenceFilter(priorSPM: priorSPM.map(Double.init))
+                var filter = CadenceFilter(isResuming: priorSPM != nil)
                 var lastElapsedSeconds: Double?
                 var hasLocked = false
 
@@ -362,7 +407,15 @@ final class RunPresentationModel {
                             : 1
                         lastElapsedSeconds = observation.elapsedSeconds
 
-                        switch filter.ingest(observation) {
+                        let estimate = filter.ingest(observation)
+                        recordCadenceSample(
+                            observation,
+                            estimate: estimate,
+                            filterState: filter.state,
+                            callbackIntervalSeconds: rawDelta > 0 ? rawDelta : 1
+                        )
+
+                        switch estimate {
                         case let .locked(stepsPerMinute):
                             hasLocked = true
                             dispatch(
@@ -575,7 +628,7 @@ final class RunPresentationModel {
                 )
             )
 
-        case let .trackChanged(operationID, trackID):
+        case let .trackChanged(operationID, trackID, reason):
             guard let trackIndex = musicCollection.tracks.firstIndex(where: { $0.id == trackID })
             else { return }
             dispatch(
@@ -584,6 +637,7 @@ final class RunPresentationModel {
                     operationID: operationID,
                     trackID: trackID,
                     trackIndex: trackIndex,
+                    reason: reason,
                     rateRequestID: token()
                 )
             )
@@ -632,7 +686,8 @@ final class RunPresentationModel {
         return TempoMatchEvaluator.measure(
             referenceBPM: referenceBPM,
             referenceReliable: referenceReliable,
-            baseTempoBPM: tempo.runningPulseBPM,
+            baseTempoBPM: active.session.adaptationState.baseTempoBPM
+                ?? tempo.runningPulseBPM,
             appliedRate: active.session.appliedPlaybackRate,
             playbackActive: true,
             commandVerified: active.session.adaptationState.commandStatus == .applied

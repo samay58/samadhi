@@ -124,66 +124,52 @@ import Testing
         )
     }
 
-    #expect(apply(.startTapped(sessionID: 1)) == nil)
-    #expect(apply(.authorizationResolved(sessionID: 1, .authorized)) == nil)
-    #expect(
-        apply(
-            .playbackPrepared(
-                sessionID: 1,
-                trackID: collection.tracks[0].id
-            )
-        ) == nil
+    _ = apply(.startTapped(sessionID: 1))
+    _ = apply(.authorizationResolved(sessionID: 1, .authorized))
+    _ = apply(.playbackPrepared(sessionID: 1, trackID: collection.tracks[0].id))
+    _ = apply(
+        .cadenceUpdated(
+            sessionID: 1,
+            acquisitionID: 1,
+            stepsPerMinute: 162,
+            deltaSeconds: 1,
+            rateRequestID: 3
+        )
     )
-    #expect(
-        apply(
-            .cadenceUpdated(
-                sessionID: 1,
-                acquisitionID: 1,
-                stepsPerMinute: 162,
-                deltaSeconds: 1,
-                rateRequestID: 3
-            )
-        ) == nil
+    _ = apply(
+        .playbackRateApplied(
+            sessionID: 1,
+            operationID: 1,
+            requestID: 3,
+            trackID: collection.tracks[0].id,
+            rate: 0.98,
+            latencySeconds: 0
+        )
     )
-    #expect(
-        apply(
-            .playbackRateApplied(
-                sessionID: 1,
-                operationID: 1,
-                requestID: 3,
-                trackID: collection.tracks[0].id,
-                rate: 0.98,
-                latencySeconds: 0
-            )
-        ) == nil
+    _ = apply(
+        .playbackProgress(
+            sessionID: 1,
+            operationID: 1,
+            trackIndex: 0,
+            elapsedSeconds: 12,
+            durationSeconds: 180
+        )
     )
-    #expect(
-        apply(
-            .playbackProgress(
-                sessionID: 1,
-                operationID: 1,
-                trackIndex: 0,
-                elapsedSeconds: 12,
-                durationSeconds: 180
-            )
-        ) == nil
+    _ = apply(.activeSecond(tempoMatched: true))
+    _ = apply(
+        .playbackTrackChanged(
+            sessionID: 1,
+            operationID: 1,
+            trackID: collection.tracks[1].id,
+            trackIndex: 1,
+            reason: .naturalBoundary,
+            rateRequestID: 4
+        )
     )
-    #expect(apply(.activeSecond(tempoMatched: true)) == nil)
-    #expect(
-        apply(
-            .playbackTrackChanged(
-                sessionID: 1,
-                operationID: 1,
-                trackID: collection.tracks[1].id,
-                trackIndex: 1,
-                rateRequestID: 4
-            )
-        ) == nil
-    )
-    #expect(apply(.surfaceTapped(timeoutID: 4)) == nil)
-    #expect(apply(.finishTapped) == nil)
-    #expect(apply(.finishHoldBegan(holdID: 5)) == nil)
-    #expect(apply(.finishHoldCompleted(holdID: 5)) == nil)
+    _ = apply(.surfaceTapped(timeoutID: 4))
+    _ = apply(.finishTapped)
+    _ = apply(.finishHoldBegan(holdID: 5))
+    _ = apply(.finishHoldCompleted(holdID: 5))
     let snapshot = try #require(apply(.finishCompleted(sessionID: 1)))
 
     #expect(snapshot.summary.averageCadence == 162)
@@ -206,11 +192,60 @@ import Testing
     )
     #expect(snapshot.timeline[2].appliedRate == 0.98)
     #expect(snapshot.timeline[3].trackElapsedSeconds == 12)
-    #expect(snapshot.schemaVersion == 4)
+    #expect(snapshot.schemaVersion == 5)
+    #expect(snapshot.completionState == .completed)
     #expect(snapshot.timeline[1].controlMode == RhythmControlMode.automatic.rawValue)
     #expect(snapshot.timeline[1].automaticCorrectionBPM == 0)
     #expect(snapshot.timeline[1].requestedBPM == 162)
     #expect(snapshot.timeline[1].derivedTargetRate != nil)
+    #expect(snapshot.timeline[5].trackChangeReason == TrackChangeReason.naturalBoundary.rawValue)
+}
+
+@Test func runDiagnosticsSurviveAnUnfinishedRunAndKeepCadenceTiming() throws {
+    var time = Date(timeIntervalSince1970: 1_721_000_000)
+    var recorder = RunDiagnosticsRecorder(now: { time })
+    let collection = importedCollection(id: "playlist", name: "Field fixture", readyCount: 3)
+    let reducer = RunReducer(tracks: collection.tracks)
+    var state: RunState = .ready
+
+    func apply(_ event: RunEvent) -> RunDiagnosticSnapshot? {
+        let oldState = state
+        state = reducer.reduce(state: state, event: event).0
+        let snapshot = recorder.record(
+            event: event,
+            oldState: oldState,
+            newState: state,
+            collection: collection
+        )
+        time = time.addingTimeInterval(1)
+        return snapshot
+    }
+
+    _ = apply(.startTapped(sessionID: 7))
+    _ = apply(.authorizationResolved(sessionID: 7, .authorized))
+    _ = apply(.playbackPrepared(sessionID: 7, trackID: collection.tracks[0].id))
+    time = time.addingTimeInterval(3)
+    let cadenceSnapshot = recorder.record(
+        cadenceSample: CadenceDiagnosticSample(
+            rawStepsPerMinute: 161,
+            sampleAgeSeconds: 0.2,
+            sampleEndDateSeconds: 1_721_000_003,
+            callbackIntervalSeconds: 1.4,
+            filterState: .tracking,
+            filteredStepsPerMinute: 159
+        ),
+        state: state,
+        collection: collection
+    )
+    let rolling = try #require(cadenceSnapshot)
+
+    #expect(rolling.completionState == .inProgress)
+    #expect(rolling.schemaVersion == 5)
+    #expect(rolling.timeline.last?.kind == .cadenceObserved)
+    #expect(rolling.timeline.last?.rawCadenceSPM == 161)
+    #expect(rolling.timeline.last?.callbackIntervalSeconds == 1.4)
+    #expect(rolling.timeline.last?.cadenceFilterState == "tracking")
+    #expect(rolling.timeline.last?.filteredCadenceSPM == 159)
 }
 
 @Test func collectionStoreRoundTripsSelectionAndCache() async throws {

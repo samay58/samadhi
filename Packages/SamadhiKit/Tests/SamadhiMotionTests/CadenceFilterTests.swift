@@ -3,9 +3,9 @@ import Testing
 
 @testable import SamadhiMotion
 
-@Test func fiveStableObservationsAcquireCadence() {
+@Test func threeStableObservationsAcquireCadence() {
     var filter = CadenceFilter()
-    let values = [168.0, 169, 167, 168, 168]
+    let values = [168.0, 169, 167]
     var result = CadenceEstimate.acquiring
 
     for (index, value) in values.enumerated() {
@@ -30,15 +30,27 @@ import Testing
     #expect(spike == .locked(stepsPerMinute: 168))
 }
 
-@Test func resumedAcquisitionUsesThreeStableObservations() {
-    var filter = CadenceFilter(priorSPM: 170)
+@Test func resumedAcquisitionUsesThreeFreshStableObservations() {
+    var filter = CadenceFilter(isResuming: true)
     var result = filter.ingest(CadenceObservation(stepsPerMinute: 172, elapsedSeconds: 0))
     #expect(result == .acquiring)
     result = filter.ingest(CadenceObservation(stepsPerMinute: 171, elapsedSeconds: 1))
     #expect(result == .acquiring)
     result = filter.ingest(CadenceObservation(stepsPerMinute: 172, elapsedSeconds: 2))
 
-    #expect(result == .locked(stepsPerMinute: 170.4))
+    #expect(result == .locked(stepsPerMinute: 172))
+}
+
+@Test func stalePriorCadenceCannotOverrideFreshRunningSamples() {
+    var filter = CadenceFilter(isResuming: true)
+
+    _ = filter.ingest(CadenceObservation(stepsPerMinute: 150, elapsedSeconds: 0))
+    _ = filter.ingest(CadenceObservation(stepsPerMinute: 151, elapsedSeconds: 1))
+    let result = filter.ingest(
+        CadenceObservation(stepsPerMinute: 150, elapsedSeconds: 2)
+    )
+
+    #expect(result == .locked(stepsPerMinute: 150))
 }
 
 @Test func sustainedMissingCadenceReturnsToAcquiring() {
@@ -82,4 +94,75 @@ import Testing
     }
 
     #expect(result == .acquiring)
+}
+
+@Test func sustainedCadenceChangeTracksMostOfTheStepWithinThreeSeconds() {
+    var filter = CadenceFilter()
+    for index in 0..<5 {
+        _ = filter.ingest(
+            CadenceObservation(stepsPerMinute: 150, elapsedSeconds: Double(index))
+        )
+    }
+
+    let first = filter.ingest(
+        CadenceObservation(stepsPerMinute: 175, elapsedSeconds: 5)
+    )
+    let second = filter.ingest(
+        CadenceObservation(stepsPerMinute: 175, elapsedSeconds: 6)
+    )
+    let third = filter.ingest(
+        CadenceObservation(stepsPerMinute: 175, elapsedSeconds: 7)
+    )
+
+    #expect(first == .locked(stepsPerMinute: 150))
+    guard case let .locked(secondSPM) = second,
+        case let .locked(thirdSPM) = third
+    else {
+        Issue.record("Expected tracking estimates")
+        return
+    }
+    #expect(secondSPM >= 162)
+    #expect(thirdSPM >= 169)
+    #expect(filter.state == .tracking)
+}
+
+@Test func oneLargeSpikeDoesNotMoveATrackedCadence() {
+    var filter = CadenceFilter()
+    for index in 0..<5 {
+        _ = filter.ingest(
+            CadenceObservation(stepsPerMinute: 160, elapsedSeconds: Double(index))
+        )
+    }
+
+    let spike = filter.ingest(
+        CadenceObservation(stepsPerMinute: 190, elapsedSeconds: 5)
+    )
+    let recovered = filter.ingest(
+        CadenceObservation(stepsPerMinute: 160, elapsedSeconds: 6)
+    )
+
+    #expect(spike == .locked(stepsPerMinute: 160))
+    #expect(recovered == .locked(stepsPerMinute: 160))
+}
+
+@Test func irregularCallbackIntervalsProduceTimeBasedResponse() {
+    var filter = CadenceFilter()
+    for index in 0..<5 {
+        _ = filter.ingest(
+            CadenceObservation(stepsPerMinute: 150, elapsedSeconds: Double(index))
+        )
+    }
+
+    _ = filter.ingest(
+        CadenceObservation(stepsPerMinute: 175, elapsedSeconds: 4.4)
+    )
+    let tracked = filter.ingest(
+        CadenceObservation(stepsPerMinute: 175, elapsedSeconds: 6.2)
+    )
+
+    guard case let .locked(spm) = tracked else {
+        Issue.record("Expected a tracking estimate")
+        return
+    }
+    #expect(spm >= 168)
 }

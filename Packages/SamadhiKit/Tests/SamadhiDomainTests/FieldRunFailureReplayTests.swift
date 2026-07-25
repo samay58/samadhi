@@ -51,13 +51,11 @@ import Testing
     let currentEffectiveBPM = 170 * session.appliedPlaybackRate
     let hasTrackAction = session.pendingNextTrackID != nil || session.preparedNextTrackID != nil
 
-    #expect(requestedSpan >= 40)
-    #expect(
-        abs(currentEffectiveBPM - requested) <= 3
-            || hasTrackAction
-            || appliedSpan >= 0.08,
-        "A wide accepted BPM command must move verified playback or start a compatible-track action"
-    )
+    #expect(requestedSpan == 15)
+    #expect(requested == 153)
+    #expect(abs(currentEffectiveBPM - requested) < 0.001)
+    #expect(appliedSpan >= 0.09)
+    #expect(hasTrackAction == false)
 }
 
 private func fixtureTrack(id: String, bpm: Double) -> MusicTrack {

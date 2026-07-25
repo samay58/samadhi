@@ -17,7 +17,11 @@ public enum MusicPlaybackEvent: Sendable, Equatable {
         latencySeconds: Double?
     )
     case progress(operationID: Int, PlaybackProgress)
-    case trackChanged(operationID: Int, trackID: MusicTrackID)
+    case trackChanged(
+        operationID: Int,
+        trackID: MusicTrackID,
+        reason: TrackChangeReason
+    )
     case interruptionBegan(operationID: Int)
     case interruptionEnded(operationID: Int)
     case routeLost(operationID: Int)
@@ -109,7 +113,11 @@ public final class SimulatedMusicPlayer: MusicPlaybackProviding {
         guard isCurrent(operationID), let collection else { return }
         trackIndex = (trackIndex - 1 + collection.tracks.count) % collection.tracks.count
         continuation?.yield(
-            .trackChanged(operationID: operationID, trackID: collection.tracks[trackIndex].id)
+            .trackChanged(
+                operationID: operationID,
+                trackID: collection.tracks[trackIndex].id,
+                reason: .explicitPrevious
+            )
         )
     }
 
@@ -118,7 +126,11 @@ public final class SimulatedMusicPlayer: MusicPlaybackProviding {
         trackIndex = preparedNextTrackIndex ?? (trackIndex + 1) % collection.tracks.count
         preparedNextTrackIndex = nil
         continuation?.yield(
-            .trackChanged(operationID: operationID, trackID: collection.tracks[trackIndex].id)
+            .trackChanged(
+                operationID: operationID,
+                trackID: collection.tracks[trackIndex].id,
+                reason: .explicitSkip
+            )
         )
     }
 
@@ -155,7 +167,7 @@ public final class SimulatedMusicPlayer: MusicPlaybackProviding {
                 operationID: operationID,
                 requestID: requestID,
                 trackID: trackID,
-                rate: min(max(rate, 0.90), 1.10),
+                rate: TempoEnvelope.clampRate(rate),
                 latencySeconds: 0
             )
         )

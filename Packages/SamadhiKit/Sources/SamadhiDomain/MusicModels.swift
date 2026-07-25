@@ -14,6 +14,48 @@ public struct MusicCollectionID: Sendable, Hashable, Codable {
     }
 }
 
+public enum StepBeatRelationship: String, Sendable, Equatable, Codable, CaseIterable {
+    case oneStepPerBeat
+    case twoStepsPerBeat
+
+    public var stepMultiplier: Double {
+        switch self {
+        case .oneStepPerBeat:
+            1
+        case .twoStepsPerBeat:
+            2
+        }
+    }
+
+    public var selectionCost: Double {
+        switch self {
+        case .oneStepPerBeat:
+            0
+        case .twoStepsPerBeat:
+            0.015
+        }
+    }
+}
+
+public struct CadenceProjection: Sendable, Equatable {
+    public let relationship: StepBeatRelationship
+    public let musicalPulseBPM: Double
+    public let sourcePulseBPM: Double
+    public let cadencePulseBPM: Double
+
+    public init(
+        relationship: StepBeatRelationship,
+        musicalPulseBPM: Double,
+        sourcePulseBPM: Double? = nil,
+        cadencePulseBPM: Double
+    ) {
+        self.relationship = relationship
+        self.musicalPulseBPM = musicalPulseBPM
+        self.sourcePulseBPM = sourcePulseBPM ?? musicalPulseBPM
+        self.cadencePulseBPM = cadencePulseBPM
+    }
+}
+
 public struct TempoAnalysis: Sendable, Equatable, Codable {
     public static let readyConfidence = 0.72
 
@@ -38,15 +80,52 @@ public struct TempoAnalysis: Sendable, Equatable, Codable {
     }
 
     public var isAdaptiveReady: Bool {
-        confidence >= Self.readyConfidence && (120...210).contains(runningPulseBPM)
+        confidence >= Self.readyConfidence && !cadenceProjections.isEmpty
     }
 
     public var runningPulseBPM: Double {
-        if (120...210).contains(baseBPM) { return baseBPM }
-        if let alternatePulseBPM, (120...210).contains(alternatePulseBPM) {
+        if TempoEnvelope.runningCadenceBPM.contains(baseBPM) { return baseBPM }
+        if let alternatePulseBPM, TempoEnvelope.runningCadenceBPM.contains(alternatePulseBPM) {
             return alternatePulseBPM
         }
         return baseBPM
+    }
+
+    public var cadenceProjections: [CadenceProjection] {
+        guard confidence >= Self.readyConfidence else { return [] }
+
+        let sourcePulses = [baseBPM, alternatePulseBPM].compactMap { $0 }
+        var projections: [CadenceProjection] = []
+        for sourcePulse in sourcePulses where sourcePulse > 0 {
+            for relationship in StepBeatRelationship.allCases {
+                let derivedCadencePulse = sourcePulse * relationship.stepMultiplier
+                let cadencePulse: Double
+                if sourcePulse == baseBPM,
+                    relationship == .twoStepsPerBeat,
+                    let alternatePulseBPM,
+                    abs(alternatePulseBPM - derivedCadencePulse) / alternatePulseBPM <= 0.02
+                {
+                    cadencePulse = alternatePulseBPM
+                } else {
+                    cadencePulse = derivedCadencePulse
+                }
+                guard TempoEnvelope.runningCadenceBPM.contains(cadencePulse) else { continue }
+                let projection = CadenceProjection(
+                    relationship: relationship,
+                    musicalPulseBPM: baseBPM,
+                    sourcePulseBPM: sourcePulse,
+                    cadencePulseBPM: cadencePulse
+                )
+                guard
+                    !projections.contains(where: {
+                        abs($0.cadencePulseBPM - cadencePulse) / cadencePulse <= 0.01
+                    })
+                else { continue }
+                projections.append(projection)
+            }
+        }
+
+        return projections
     }
 }
 
@@ -178,14 +257,17 @@ public struct CadenceObservation: Sendable, Equatable {
     public let stepsPerMinute: Double?
     public let elapsedSeconds: Double
     public let sampleAgeSeconds: Double
+    public let sampleEndDateSeconds: Double?
 
     public init(
         stepsPerMinute: Double?,
         elapsedSeconds: Double,
-        sampleAgeSeconds: Double = 0
+        sampleAgeSeconds: Double = 0,
+        sampleEndDateSeconds: Double? = nil
     ) {
         self.stepsPerMinute = stepsPerMinute
         self.elapsedSeconds = max(elapsedSeconds, 0)
         self.sampleAgeSeconds = max(sampleAgeSeconds, 0)
+        self.sampleEndDateSeconds = sampleEndDateSeconds
     }
 }

@@ -28,9 +28,11 @@ import Testing
     let tracker = RotaryDetentTracker()
     tracker.begin(at: 0)
 
-    #expect(tracker.update(to: RotaryDetentTracker.radiansPerDetent * 0.45) == 0)
+    #expect(tracker.update(to: RotaryDetentTracker.radiansPerDetent * 0.44) == 0)
     #expect(tracker.update(to: RotaryDetentTracker.radiansPerDetent * 0.9) == 0)
     #expect(tracker.update(to: RotaryDetentTracker.radiansPerDetent * 1.1) == 1)
+    #expect(tracker.update(to: RotaryDetentTracker.radiansPerDetent * 0.72) == 1)
+    #expect(tracker.update(to: RotaryDetentTracker.radiansPerDetent * 0.44) == 0)
 }
 
 @Test func crossingAngleWrapDoesNotReverseTheWheel() {
@@ -49,7 +51,8 @@ import Testing
     tracker.begin(at: 0)
     #expect(tracker.update(to: RotaryDetentTracker.radiansPerDetent * 3.2) == 3)
 
-    #expect(tracker.update(to: RotaryDetentTracker.radiansPerDetent * 0.8) == 0)
+    #expect(tracker.update(to: RotaryDetentTracker.radiansPerDetent * 0.8) == 1)
+    #expect(tracker.update(to: RotaryDetentTracker.radiansPerDetent * 0.4) == 0)
 }
 
 @Test func resetClearsRotationHistory() {
@@ -64,12 +67,41 @@ import Testing
     #expect(tracker.update(to: .pi) == 0)
 }
 
-@Test func oneRevolutionSpansFortyBPM() {
+@Test func oneRevolutionSpansThirtyBPM() {
     let tracker = RotaryDetentTracker()
     tracker.begin(at: -.pi / 2)
 
-    #expect(tracker.update(to: 0) == 10)
-    #expect(tracker.update(to: .pi / 2) == 20)
-    #expect(tracker.update(to: .pi) == 30)
-    #expect(tracker.update(to: -.pi / 2) == 40)
+    #expect(tracker.update(to: 0) == 7)
+    #expect(tracker.update(to: .pi / 2) == 15)
+    #expect(tracker.update(to: .pi) == 22)
+    #expect(tracker.update(to: -.pi / 2) == 30)
+}
+
+@Test func severalRevolutionsAccumulateWithoutLosingDirection() {
+    let tracker = RotaryDetentTracker()
+    tracker.begin(at: -.pi / 2)
+
+    _ = tracker.update(to: 0)
+    _ = tracker.update(to: .pi / 2)
+    _ = tracker.update(to: .pi)
+    #expect(tracker.update(to: -.pi / 2) == 30)
+    _ = tracker.update(to: 0)
+    _ = tracker.update(to: .pi / 2)
+    _ = tracker.update(to: .pi)
+    #expect(tracker.update(to: -.pi / 2) == 60)
+}
+
+@Test func aBoundedWheelDoesNotStoreOvershootAndReversesImmediately() {
+    let tracker = RotaryDetentTracker()
+    tracker.begin(at: 0, detentRange: -2...2)
+
+    #expect(tracker.update(to: .pi / 2) == 2)
+    #expect(tracker.boundaryDirection == .increase)
+    let boundaryAngle = tracker.indicatorAngle
+
+    #expect(tracker.update(to: .pi) == 2)
+    #expect(tracker.indicatorAngle == boundaryAngle)
+    #expect(tracker.update(to: .pi - 0.2) == 1)
+    #expect(tracker.boundaryDirection == nil)
+    #expect(tracker.indicatorAngle != boundaryAngle)
 }

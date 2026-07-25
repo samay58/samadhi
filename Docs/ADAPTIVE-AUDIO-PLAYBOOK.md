@@ -49,17 +49,17 @@ Cadence-retraining studies commonly test changes of 5 to 10 percent from the run
 Samadhi therefore separates availability from prescription:
 
 - Auto defaults to zero correction and follows the runner's measured cadence.
-- The runner can explore minus 20 through plus 20 BPM around that cadence. The 40-BPM window is clipped to the app's accepted 120 through 210 running range.
-- Manual supports the full 120 through 210 range for run-walk transitions, unusual stride patterns, and direct testing.
+- Auto follows fresh cadence across the accepted 120 through 210 running range and reports honestly when the current song reaches its boundary.
+- Manual exposes only the integer cadence BPM values the current song can produce inside the proven rate envelope.
 - The broader dial does not broaden one song's time-stretch envelope. Compatible-track selection creates coarse range; the physically proven playback-rate range creates fine correction.
 
-The 40-BPM span is a product control envelope, not a claim that changing a runner's natural cadence by 20 BPM is universally beneficial.
+The playlist may cover a wider range than the current wheel. Explicit Skip and natural boundaries are the only ways to move to a differently compatible song.
 
 ## Tactile grammar
 
 Apple recommends selection haptics while a control's value changes and warns against feedback that lacks a direct causal relationship or becomes tiring through repetition. Low-sharpness Core Haptics events feel round and organic, while high-sharpness events feel crisp. Sources: [Apple haptics guidance](https://developer.apple.com/design/human-interface-guidelines/playing-haptics), [Core Haptics sharpness](https://developer.apple.com/documentation/corehaptics/chhapticevent/parameterid/hapticsharpness).
 
-Samadhi uses one low-sharpness transient per BPM, a slightly fuller low-sharpness notch every five BPM, and a soft landing when Auto returns to neutral. One revolution maps to 40 BPM, matching the visible 40-detent ring. The engine starts only when the control opens, queues rapid detents 28 milliseconds apart so crossed values do not collapse into one buzz, and falls back to the system selection haptic when custom haptics are unavailable. Simulator proves event order and visual agreement; only a physical iPhone can judge warmth, fatigue, and grip.
+Samadhi uses one low-sharpness transient per BPM, a slightly fuller low-sharpness notch every five BPM, one terminal haptic at a song boundary, and a soft landing when Auto returns to neutral. One revolution maps to 30 BPM, with reverse hysteresis around each detent so finger tremor does not chatter. At a boundary, the marker and detents stop with the number and repeated outward motion stays silent. The engine starts only when the control opens, queues rapid detents 28 milliseconds apart so crossed values do not collapse into one buzz, and falls back to the system selection haptic when custom haptics are unavailable. Deterministic tests prove event order and geometry. Only a physical iPhone can judge warmth, fatigue, and grip.
 
 ## djay Pro as the manipulation benchmark
 
@@ -87,10 +87,12 @@ Any wider MusicKit rate remains an empirical device capability. Test it. Do not 
 
 ## Current Samadhi gap
 
-The source-neutral planner selects the best ready fit at run start and prepares a better fit after five seconds of stable incompatibility. Tempo estimator version 4 keeps the measured musical pulse separate from an independently supported stride pulse. The planner and summary use the running-range pulse; the visible Music BPM uses the musical pulse. The wheel commits one absolute target at finger-up, and the production rate envelope is the already audible 0.90 through 1.10 range. Three physical truths remain open:
+The source-neutral planner preserves the first ready track at run start and prepares a better fit after five seconds of stable incompatibility. Tempo estimator version 4 keeps measured musical pulse separate from an explicit one-step-per-beat or supported two-steps-per-beat cadence projection. The planner and summary use the cadence projection; visible Music BPM uses the musical pulse. The wheel commits one absolute target at finger-up, and the production rate envelope is the already audible 0.90 through 1.10 range.
+
+The current private compatibility matrix is sobering. Across 14 ready tracks at 145, 160, 175, and 190 SPM, exact fitting covers 13 of 56 cells. Explicit relationships plus a three-SPM truthful boundary cover 16. The model improves honesty and a few edge cases, but it does not produce the broad range Samay asked for. Three physical truths remain open:
 
 - One imported run must cross a natural prepared transition without a gap, stale feedback, or a false summary.
-- The wider dial must agree with the requested BPM, selected pulse, MusicKit rate read-back, and audible result on the physical phone.
+- The bounded dial must stop cleanly at both current-song limits and agree with the requested BPM, selected pulse, MusicKit rate read-back, and audible result on the physical phone.
 - The current metric compares effective tempo with cadence. It does not observe footfall phase. Source: [AdaptationPolicy.swift](../Packages/SamadhiKit/Sources/SamadhiDomain/AdaptationPolicy.swift).
 
 Do not mistake the completed control surface for a completed body-to-music loop.
@@ -99,10 +101,10 @@ Do not mistake the completed control surface for a completed body-to-music loop.
 
 Use a two-layer match:
 
-1. **Coarse match by song.** Rank tracks by the absolute logarithmic distance between requested BPM and the analyzed running pulse. Reject ambiguous or out-of-range pulse estimates instead of silently doubling them. Prefer strong-beat tracks and keep the current track when it remains inside a hysteresis band. D-Jogger used the same broad pattern of bounded stretching plus closer-tempo selection. Source: [D-Jogger implementation](https://backoffice.biblio.ugent.be/download/8551818/8551819).
+1. **Preserve the current song.** Start with the first ready song in source order. While it plays, evaluate explicit cadence relationships and hold the nearest truthful boundary when needed. A compatibility improvement may reorder only the next entry. D-Jogger used the broad pattern of bounded stretching plus closer-tempo selection, but Samadhi does not use cadence as hidden transport authority. Source: [D-Jogger implementation](https://backoffice.biblio.ugent.be/download/8551818/8551819).
 2. **Fine match by rate.** Apply pitch-stable playback rate from 0.90 through 1.10. Those endpoints were clearly distinguishable in the physical Bluetooth check. D-Jogger also found roughly ±10 percent acceptable for its own phase-vocoder implementation, but full-song MusicKit quality still needs its own final listening gate. Source: [D-Jogger implementation](https://backoffice.biblio.ugent.be/download/8551818/8551819).
 3. **Transition musically.** Reorder or select the next compatible song at a natural boundary. Do not jump tracks for every cadence fluctuation. djay applies tempo alignment around selected transition regions and holds a common BPM when songs are already close. Source: [djay Automix](https://help.algoriddim.com/user-manual/djay-pro-mac/mixing-basics/using-automix).
-4. **Preserve truthful control.** If the current track cannot reach the target, keep the request visible and hold the nearest proven boundary while preparing one latest compatible candidate. Preparation is not transport permission. Only Skip or a player-confirmed natural boundary changes the song.
+4. **Preserve truthful control.** Manual stops at the current song's reachable boundary. Auto may keep an outside cadence visible while holding the nearest proven rate and preparing one latest compatible candidate. Preparation is not transport permission. Only Skip or a player-confirmed natural boundary changes the song.
 
 Auto and Manual remain distinct:
 
@@ -125,7 +127,8 @@ The 5 to 8 percent comparison is grounded in published tempo-discrimination rang
 
 ### Track-fit proof
 
-- Given one stable cadence, show that the planner selects the closest ready running pulse.
+- Given startup without current cadence, show that the first ready source-order track remains current.
+- Given one stable cadence, show that the planner evaluates only explicit cadence relationships and preserves musical BPM truth.
 - Given a cadence change that makes the current song incompatible for at least five seconds, prepare a compatible next song without oscillating between candidates. D-Jogger used a five-second outside-range trigger before selecting a closer song. Source: [D-Jogger implementation](https://backoffice.biblio.ugent.be/download/8551818/8551819).
 - Verify requested BPM, selected pulse family, derived rate, MusicKit read-back, and effective BPM agree.
 - Keep playlist order only as a tie-breaker. Product usefulness outranks strict source order.

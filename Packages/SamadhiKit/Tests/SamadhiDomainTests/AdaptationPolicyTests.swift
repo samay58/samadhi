@@ -232,6 +232,16 @@ private let policy = AdaptationPolicy()
     #expect(control.automaticCorrectionBPM == 0)
 }
 
+@Test func manualTempoEnvelopeUsesOnlyIntegerValuesThePlayerCanReach() throws {
+    let slowPulse = try #require(ManualTempoEnvelope(cadencePulseBPM: 121.25))
+    let fastPulse = try #require(ManualTempoEnvelope(cadencePulseBPM: 179.5))
+
+    #expect(slowPulse.bpmRange == 120...133)
+    #expect(slowPulse.clamped(175) == 133)
+    #expect(fastPulse.bpmRange == 162...197)
+    #expect(fastPulse.clamped(145) == 162)
+}
+
 @Test func automaticTargetKeepsItsFortyBPMWindowInsideRunningBounds() {
     let faster = RhythmControlState(automaticCorrectionBPM: 20)
     let slower = RhythmControlState(automaticCorrectionBPM: -20)

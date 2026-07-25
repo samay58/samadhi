@@ -4,18 +4,30 @@ public struct TrackTempoMatch: Sendable, Equatable {
     public let trackID: MusicTrackID
     public let collectionIndex: Int
     public let pulseBPM: Double
+    public let sourcePulseBPM: Double
+    public let relationship: StepBeatRelationship
     public let requiredRate: Double
+    public let achievableCadenceBPM: Double
+    public let cadenceErrorBPM: Double
 
     public init(
         trackID: MusicTrackID,
         collectionIndex: Int,
         pulseBPM: Double,
-        requiredRate: Double
+        sourcePulseBPM: Double,
+        relationship: StepBeatRelationship,
+        requiredRate: Double,
+        achievableCadenceBPM: Double,
+        cadenceErrorBPM: Double
     ) {
         self.trackID = trackID
         self.collectionIndex = collectionIndex
         self.pulseBPM = pulseBPM
+        self.sourcePulseBPM = sourcePulseBPM
+        self.relationship = relationship
         self.requiredRate = requiredRate
+        self.achievableCadenceBPM = achievableCadenceBPM
+        self.cadenceErrorBPM = cadenceErrorBPM
     }
 
     public var stretchDistance: Double {
@@ -27,15 +39,18 @@ public struct TrackMatchPlanner: Sendable {
     public let minimumRate: Double
     public let maximumRate: Double
     public let currentTrackRetention: Double
+    public let cadenceToleranceBPM: Double
 
     public init(
-        minimumRate: Double = 0.90,
-        maximumRate: Double = 1.10,
-        currentTrackRetention: Double = 0.01
+        minimumRate: Double = TempoEnvelope.rateRange.lowerBound,
+        maximumRate: Double = TempoEnvelope.rateRange.upperBound,
+        currentTrackRetention: Double = 0.01,
+        cadenceToleranceBPM: Double = 3
     ) {
         self.minimumRate = minimumRate
         self.maximumRate = maximumRate
         self.currentTrackRetention = max(currentTrackRetention, 0)
+        self.cadenceToleranceBPM = max(cadenceToleranceBPM, 0)
     }
 
     public func select(
@@ -55,7 +70,15 @@ public struct TrackMatchPlanner: Sendable {
         else { return best }
 
         // A small advantage is not worth interrupting the song that is already playing.
-        return current.stretchDistance <= best.stretchDistance + currentTrackRetention ? current : best
+        return cost(current) <= cost(best) + currentTrackRetention ? current : best
+    }
+
+    // Cadence error is scored against the tolerance that admitted the match, so widening the
+    // tolerance cannot leave the ranking normalized against a stale constant.
+    private func cost(_ match: TrackTempoMatch) -> Double {
+        let cadencePenalty =
+            cadenceToleranceBPM > 0 ? match.cadenceErrorBPM / cadenceToleranceBPM : 0
+        return cadencePenalty + match.stretchDistance + match.relationship.selectionCost
     }
 
     private func match(
@@ -63,24 +86,31 @@ public struct TrackMatchPlanner: Sendable {
         at index: Int,
         requestedBPM: Double
     ) -> TrackTempoMatch? {
-        guard let tempo = track.tempo, tempo.isAdaptiveReady, tempo.runningPulseBPM > 0 else {
-            return nil
-        }
+        // An empty projection set is exactly what makes a track not adaptive-ready, so the
+        // compactMap below is the readiness test. Asking twice would recompute the projections.
+        guard let tempo = track.tempo else { return nil }
 
-        let pulse = tempo.runningPulseBPM
-        guard (120...210).contains(pulse) else { return nil }
-        let rate = requestedBPM / pulse
-        guard (minimumRate...maximumRate).contains(rate) else { return nil }
-        return TrackTempoMatch(
-            trackID: track.id,
-            collectionIndex: index,
-            pulseBPM: pulse,
-            requiredRate: rate
-        )
+        return tempo.cadenceProjections.compactMap { projection in
+            let derivedRate = requestedBPM / projection.cadencePulseBPM
+            let rate = min(max(derivedRate, minimumRate), maximumRate)
+            let achievableCadenceBPM = projection.cadencePulseBPM * rate
+            let cadenceErrorBPM = abs(achievableCadenceBPM - requestedBPM)
+            guard cadenceErrorBPM <= cadenceToleranceBPM else { return nil }
+            return TrackTempoMatch(
+                trackID: track.id,
+                collectionIndex: index,
+                pulseBPM: projection.cadencePulseBPM,
+                sourcePulseBPM: projection.sourcePulseBPM,
+                relationship: projection.relationship,
+                requiredRate: rate,
+                achievableCadenceBPM: achievableCadenceBPM,
+                cadenceErrorBPM: cadenceErrorBPM
+            )
+        }.min(by: isBetter)
     }
 
     private func isBetter(_ lhs: TrackTempoMatch, than rhs: TrackTempoMatch) -> Bool {
-        let difference = lhs.stretchDistance - rhs.stretchDistance
+        let difference = cost(lhs) - cost(rhs)
         if abs(difference) > 0.000_001 {
             return difference < 0
         }
