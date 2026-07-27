@@ -25,7 +25,7 @@
 	<key>NSAppleMusicUsageDescription</key>
 	<string>Samadhi uses your selected Apple Music playlist to match music tempo to your running cadence.</string>
 	<key>NSMotionUsageDescription</key>
-	<string>Samadhi uses step cadence to settle music into your running rhythm.</string>
+	<string>Samadhi uses step cadence to align music with your running rhythm.</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>
