@@ -45,6 +45,15 @@ enum AppMusicCollection {
         ]
     )
 
+    static let simulatorLongName = MusicCollection(
+        id: MusicCollectionID("simulator-long-name"),
+        name: "Saturday Miles Through the Hills After the Rain",
+        tracks: [
+            demoTrack(id: "long-name-158", title: "Quiet Ascent", artist: "Field Note", bpm: 158),
+            demoTrack(id: "long-name-172", title: "Rain Line", artist: "North Window", bpm: 172),
+        ]
+    )
+
     static let simulatorCollections = [simulatorDemo, simulatorCruise]
 
     static let simulatorExpandedCollections = (1...40).map { index in
@@ -171,12 +180,24 @@ enum AppMusicCollection {
 @MainActor
 final class SimulatorMusicImportService: MusicLibraryImporting {
     private let collections: [MusicCollection]
+    private let trackDelay: Duration
 
-    init(expandedLibrary: Bool = false) {
-        collections =
-            expandedLibrary
-            ? AppMusicCollection.simulatorExpandedCollections
-            : AppMusicCollection.simulatorCollections
+    init(
+        fixture: MusicSelectionFixture = .standard,
+        reviewMode: Bool = false
+    ) {
+        trackDelay = reviewMode ? .milliseconds(650) : .milliseconds(120)
+        switch fixture {
+        case .emptyLibrary:
+            collections = []
+        case .largeLibrary:
+            collections = AppMusicCollection.simulatorExpandedCollections
+        case .longPlaylistName:
+            collections = [AppMusicCollection.simulatorLongName]
+        case .standard, .none, .loading, .loadingSelected, .analyzing, .partial,
+            .authorizationFailure, .importFailure, .twoPlaylistLibrary:
+            collections = AppMusicCollection.simulatorCollections
+        }
     }
 
     func loadPlaylists() async throws -> [LibraryPlaylistChoice] {
@@ -200,7 +221,7 @@ final class SimulatorMusicImportService: MusicLibraryImporting {
         var imported: [MusicTrack] = []
         progress(MusicImportProgress(completedCount: 0, totalCount: collection.tracks.count, tracks: []))
         for track in collection.tracks {
-            try await Task.sleep(for: .milliseconds(120))
+            try await Task.sleep(for: trackDelay)
             imported.append(track)
             progress(
                 MusicImportProgress(

@@ -35,7 +35,8 @@ final class MusicSelectionModel {
             self.importer = importer
         } else if configuration.useSimulatorDemoMusic {
             self.importer = SimulatorMusicImportService(
-                expandedLibrary: configuration.musicSelectionFixture == .largeLibrary
+                fixture: configuration.musicSelectionFixture,
+                reviewMode: configuration.setupReviewMode
             )
         } else {
             self.importer = AppleMusicImportService(store: store)
@@ -173,6 +174,11 @@ final class MusicSelectionModel {
             presentation = .none
         case .loading:
             presentation = .loadingPlaylists(current: nil)
+        case .loadingSelected:
+            selectedCollection = AppMusicCollection.simulatorDemo
+            presentation = .loadingPlaylists(
+                current: Self.readyPresentationValue(AppMusicCollection.simulatorDemo)
+            )
         case .analyzing:
             let collection = AppMusicCollection.partialImportFixture
             presentation = .analyzing(
@@ -193,8 +199,10 @@ final class MusicSelectionModel {
                 name: AppMusicCollection.simulatorCruise.name
             )
             presentation = .failed(.importFailed(name: AppMusicCollection.simulatorCruise.name))
-        case .largeLibrary:
+        case .emptyLibrary, .twoPlaylistLibrary, .largeLibrary:
             presentation = .none
+        case .longPlaylistName:
+            apply(AppMusicCollection.simulatorLongName)
         }
     }
 

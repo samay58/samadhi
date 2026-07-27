@@ -426,6 +426,18 @@ This checkpoint recorded a passing local candidate before its exact-profile buil
 - Confirmed the selected-collection checksum remained byte-for-byte identical
 - Launched Samadhi and confirmed its process was running on the physical iPhone
 
+## 2026-07-27. Setup craft refinement
+
+- Distilled Bump's continuity and causal response, Flighty's obviousness, Things' object transformation, Crouton's reduction, and Apple's accessibility guidance into one quiet playlist instrument
+- Kept playlist identity mounted while status and actions hand off in stable regions
+- Added immediate picker-row response, semantic current selection, compact native picker sizing, and deterministic empty, selected-loading, long-name, and large-library fixtures
+- Replaced generic progress with an exact model-derived rail and split ready truth from skipped-result disclosure
+- Reordered result details around recovery, with failed reasons first, temporary retry beside its section, and ready tracks last
+- Added one causal selection confirmation and one first-valid-readiness confirmation without replay on restoration
+- Reflowed accessibility sizes into a top-led document layout and replaced positional transitions with immediate state truth under Reduce Motion
+- Corrected two first-pass defects after video review: skipped-disclosure contrast and old/new content overlap during readiness
+- Passed formatter lint, 118 package tests, 25 app-model tests, 21 serial UI tests, and two visual iteration passes across 17 final Simulator frames
+
 ## Current checkpoint
 
 Milestones 0 and 1 remain complete. Milestone 2 is open. The setup redesign is gated, pushed, installed, and running on the physical iPhone. The shortest remaining check is one song: source-order startup, both Manual boundaries, immediate reverse, return to Auto with a cadence change, and a quick audible and tactile judgment. Pull rolling diagnostics even if the run is not finished.

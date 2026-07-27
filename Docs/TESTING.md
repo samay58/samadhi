@@ -9,7 +9,7 @@
 
 Scripts/test.sh runs Swift package tests, app-model tests, and UI tests serially on iPhone 17 Pro Simulator.
 
-The 2026-07-27 setup-chain gate passed 116 package tests, 20 app-model tests, and 15 UI tests serially.
+The 2026-07-27 setup-craft gate passed 118 package tests, 25 app-model tests, and 21 UI tests serially.
 
 Formatter gate:
 
@@ -66,7 +66,7 @@ Domain tests cover:
 - Tempo-matched coverage preventing unmeasured Manual time from producing a misleading percentage
 - Clockwise and counterclockwise haptic direction through the reducer event
 
-Design tests cover clockwise and counterclockwise one-BPM detents, partial-turn accumulation, reverse hysteresis, direction reversal, angle wraparound, multiple revolutions, reset between gestures, and exactly 30 BPM per revolution.
+Design tests cover clockwise and counterclockwise one-BPM detents, partial-turn accumulation, reverse hysteresis, direction reversal, angle wraparound, multiple revolutions, reset between gestures, exactly 30 BPM per revolution, and readiness feedback only for a genuine transition to a newly runnable import.
 
 Motion tests cover:
 
@@ -95,19 +95,24 @@ UI tests cover:
 - Audio route recovery
 - Missing artwork
 - No selected collection
-- Playlist sheet opening, 40-playlist scrolling, selection, and current-playlist state
-- Playlist-library loading with one truthful busy action
-- Honest analysis progress
-- Partial import with a compact ready and skipped disclosure, an enabled ready-track start, and every typed reason available in the result sheet
-- Same-playlist retry, choose-another recovery, and authorization-specific recovery
+- Playlist sheet opening, dismissal, compact two-playlist sizing, empty-library recovery, 40-playlist scrolling, selection, and current-playlist state
+- Playlist-library loading with one truthful busy action and selected-playlist identity preserved during replacement
+- Exact analysis progress with Start unavailable until a runnable import exists
+- Partial import with separate ready truth and Review skipped action, an enabled ready-track Start, and every typed reason available in the result sheet
+- Skipped reasons first, temporary retry beside its relevant section, ready tracks last, same-playlist retry, choose-another recovery, and authorization-specific recovery
+- Long playlist names at standard and accessibility XXXL sizes
 - In-run aperture click-wheel reveal, clockwise and counterclockwise angular adjustment, fixed Auto bounds, protected center, Manual ownership, and return to Auto
 - Normal no-argument Simulator launch through local demo music and cadence lock
 
-App-model tests cover ready mapping, start transition, atomic store round trips, corrupt persistence, restored selection, cancellation of stale replacement work, complete typed import presentation, ordered three-track import batches, retry of the same playlist, retry after relaunch, distinct authorization and import failures, playlist context for missing or empty imports, current selection during replacement, schema-version-5 rolling run diagnostics, unfinished-run survival, a reducer-driven diagnostic timeline through finish, immediate Simulator demo readiness, and replacement with a second local playlist.
+App-model tests cover ready mapping, start transition, atomic store round trips, corrupt persistence, restored selection, cancellation of stale replacement work, complete typed import presentation, ordered three-track import batches, retry of the same playlist, retry after relaunch, distinct authorization and import failures, playlist context for missing or empty imports, current selection during replacement, deterministic empty, compact, 40-playlist, long-name, and selected-loading fixtures, schema-version-5 rolling run diagnostics, unfinished-run survival, a reducer-driven diagnostic timeline through finish, immediate Simulator demo readiness, and replacement with a second local playlist.
 
 ## Visual proof
 
-Fresh iPhone 17 Pro frames under Evidence/Simulator/ cover the complete setup chain: `2026-07-27-setup-empty.png`, `2026-07-27-setup-playlist-picker.png`, `2026-07-27-setup-loading.png`, `2026-07-27-setup-analyzing.png`, `2026-07-27-setup-partial-ready.png`, `2026-07-27-setup-ready.png`, `2026-07-27-setup-track-results.png`, `2026-07-27-setup-import-failure.png`, `2026-07-27-setup-accessibility-xxxl.png`, and `2026-07-27-setup-reduce-motion.png`. The accessibility frame keeps the playlist, readiness disclosure, Start, and Change playlist reachable at accessibility XXXL. The Reduce Motion frame was captured after enabling the Simulator accessibility setting, cold-booting the device, and confirming `ReduceMotionEnabled = 1`.
+The final setup-craft contact sheet is `Evidence/Simulator/2026-07-27-setup-craft-contact-sheet.jpg`. Its 17 fresh iPhone 17 Pro frames cover empty setup; normal, compact, empty, current-selection, and scrolled 40-playlist picker states; loading with and without an existing selection; exact `2 / 8` analysis; partial and complete readiness; full skipped-results disclosure; temporary retry placement; import and authorization failures; a long name; accessibility XXXL; and Reduce Motion.
+
+Two captured visual passes were inspected at original resolution. Pass one exposed low skipped-disclosure contrast and overlapping status/action content during the readiness handoff. Pass two raised disclosure contrast and changed the handoff to a 100-millisecond exit, 10-millisecond seam, and 100-millisecond entry. The normal and Reduce Motion review videos remain under `Evidence/Temp/setup-pass3/`. The normal sequence has no simultaneous old and new labels; the reduced sequence replaces the stage immediately with no positional travel.
+
+The accessibility UI test uses the system `UICTContentSizeCategoryAccessibilityXXXL` launch value and proves the primary control is wider than 75 percent of the window. The final frame keeps the wrapped playlist identity above readiness, full-width Start, and Change playlist.
 
 Earlier released frames cover locked run, controls, summary, Home Screen icon, BPM Auto fine-tune, the Manual safety limit, accessibility-size BPM controls, the resting `Turn` affordance, the prior rotary BPM click wheel, and normal local-demo readiness. Evidence/Previews/ covers other accessibility and state-specific visual checks.
 
@@ -177,7 +182,7 @@ Use five analyzed songs with prominent, stable beats. Compare 0.92, 1.00, and 1.
 
 The complete sequence, pivot rules, phase questions, and final evidence packet live in [FELT-SYNCHRONIZATION-EXECUTION-SPEC.md](FELT-SYNCHRONIZATION-EXECUTION-SPEC.md).
 
-The current field-repair and setup candidate passes formatter lint, 116 package tests, a resource-inclusive Simulator build, 20 app-model tests, and 15 serial UI tests. It deterministically covers the complete setup chain, first-ready startup, the LITE SPOTS to Gorilla regression values, explicit transition authority, bounded rolling diagnostics, stale-prior rejection, irregular callback timing, sustained 150 to 175 SPM tracking, isolated-spike rejection, 30 BPM per revolution, current-song Manual bounds, one terminal boundary signal, frozen indicator travel, immediate reverse response, angle wraparound, multiple revolutions, and one Manual commit at finger-up.
+The current field-repair and setup candidate passes formatter lint, 118 package tests, a resource-inclusive Simulator build, 25 app-model tests, and 21 serial UI tests. It deterministically covers the complete setup chain, first-ready startup, the LITE SPOTS to Gorilla regression values, explicit transition authority, bounded rolling diagnostics, stale-prior rejection, irregular callback timing, sustained 150 to 175 SPM tracking, isolated-spike rejection, 30 BPM per revolution, current-song Manual bounds, one terminal boundary signal, frozen indicator travel, immediate reverse response, angle wraparound, multiple revolutions, and one Manual commit at finger-up.
 
 The focused Simulator UI flow reaches the actual current-song boundary, ignores two further outward turns, reverses below the boundary, retains the same track, and never presents `Changing song`. Setup commit `cd07fd4` passes exact-profile signing, embedded application-identifier inspection, physical installation, selected-collection checksum preservation, foreground launch, and process confirmation. The current device latency trace, audible response, and haptic feel remain release blockers. Run one short physical check, then pull the rolling diagnostics immediately. Before Milestone 2 completion, prove one natural transition, five screen-locked minutes, controlled interruption, and route loss.
 

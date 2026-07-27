@@ -162,6 +162,8 @@ The ready surface shows only the honest ready count, Start, and a subordinate pl
 
 Import runs at most three ordered tracks at once. Progress begins with the complete pending source list, stays deterministic, and preserves playlist order. Debug timing records catalog, download, analysis, total track time, and total wall time without song metadata. Concurrency may change only from physical timing evidence.
 
+The composition is divided into playlist identity, a truthful status rail, and an action dock. A derived `SetupVisualStage` enum controls only presentation transitions; import truth remains owned by the existing model state. At standard sizes, subordinate content hands off in one interruptible 210-millisecond sequence so outgoing and incoming labels never occupy the same space. Reduce Motion replaces the stage immediately. Selection feedback is tied to an accepted playlist choice, and readiness feedback fires only when a new import first becomes runnable. Restoration and redraw do not replay either event.
+
 ## Direction is part of the wheel haptic
 
 Clockwise and counterclockwise detents remain distinct through the domain event and Core Haptics pattern. Ordinary detents are stronger than the first field build, every fifth BPM keeps a fuller landmark, and unsupported devices receive direction-specific system impact fallbacks. Physical comfort and direction recognition remain required before this decision is considered tuned.

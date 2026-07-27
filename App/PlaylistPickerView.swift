@@ -3,9 +3,14 @@ import SwiftUI
 
 struct PlaylistPickerView: View {
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
     let presentation: PlaylistSheetPresentation
     let select: @MainActor (LibraryPlaylistChoice) -> Void
+    let reload: @MainActor () -> Void
+
+    @State private var selectionFeedback = 0
 
     var body: some View {
         NavigationStack {
@@ -45,7 +50,18 @@ struct PlaylistPickerView: View {
         }
         .presentationBackground(.clear)
         .presentationDragIndicator(.visible)
+        .presentationDetents(presentationDetents)
+        .presentationContentInteraction(.scrolls)
+        .sensoryFeedback(.selection, trigger: selectionFeedback)
         .accessibilityIdentifier("playlist-picker")
+    }
+
+    private var presentationDetents: Set<PresentationDetent> {
+        guard !dynamicTypeSize.isAccessibilitySize, presentation.playlists.count <= 4 else {
+            return [.large]
+        }
+        let contentHeight = min(max(CGFloat(presentation.playlists.count) * 66 + 250, 350), 520)
+        return [.height(contentHeight), .large]
     }
 
     private var playlistList: some View {
@@ -59,16 +75,21 @@ struct PlaylistPickerView: View {
         .environment(\.defaultMinListRowHeight, 58)
         .overlay {
             if presentation.playlists.isEmpty {
-                VStack(spacing: Space.x3) {
-                    Text("No playlists")
+                VStack(alignment: .leading, spacing: Space.x3) {
+                    Text("No playlists yet")
                         .font(.title3.weight(.semibold))
-                    Text("Create one in Apple Music, then return here.")
+                    Text("Create one in Apple Music, then try again.")
                         .font(.body)
-                        .multilineTextAlignment(.center)
                         .foregroundStyle(SamadhiColor.ink.opacity(0.72))
+
+                    Button("Try again", action: retryPlaylistLibrary)
+                        .font(.body.weight(.semibold))
+                        .foregroundStyle(SamadhiColor.ink.opacity(0.82))
+                        .frame(minHeight: 44)
+                        .accessibilityIdentifier("reload-playlist-library")
                 }
-                .padding(.horizontal, Space.x8)
-                .accessibilityElement(children: .combine)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.horizontal, Space.x6)
             }
         }
     }
@@ -77,10 +98,17 @@ struct PlaylistPickerView: View {
         let isSelected = presentation.selectedPlaylistID == playlist.id
 
         return Button {
+            selectionFeedback += 1
             select(playlist)
             dismiss()
         } label: {
-            HStack(alignment: .firstTextBaseline, spacing: Space.x4) {
+            HStack(alignment: .firstTextBaseline, spacing: Space.x3) {
+                Circle()
+                    .fill(SamadhiColor.clay)
+                    .frame(width: 6, height: 6)
+                    .opacity(isSelected ? 1 : 0)
+                    .accessibilityHidden(true)
+
                 Text(playlist.name)
                     .font(.system(.title3, design: .serif).weight(isSelected ? .semibold : .regular))
                     .foregroundStyle(SamadhiColor.ink)
@@ -91,13 +119,13 @@ struct PlaylistPickerView: View {
                 if isSelected {
                     Text("Current")
                         .font(.caption.weight(.semibold))
-                        .foregroundStyle(SamadhiColor.clay)
+                        .foregroundStyle(SamadhiColor.ink.opacity(0.72))
                 }
             }
             .frame(maxWidth: .infinity, minHeight: 58, alignment: .leading)
             .contentShape(Rectangle())
         }
-        .buttonStyle(.plain)
+        .buttonStyle(PlaylistRowButtonStyle(reduceMotion: reduceMotion))
         .listRowInsets(
             EdgeInsets(
                 top: Space.x1,
@@ -116,6 +144,25 @@ struct PlaylistPickerView: View {
         .accessibilityHint("Selects and analyzes this playlist")
         .accessibilityIdentifier("playlist-choice-\(playlist.id)")
     }
+
+    private func retryPlaylistLibrary() {
+        dismiss()
+        reload()
+    }
+}
+
+private struct PlaylistRowButtonStyle: ButtonStyle {
+    let reduceMotion: Bool
+
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .scaleEffect(reduceMotion ? 1 : (configuration.isPressed ? 0.985 : 1))
+            .opacity(configuration.isPressed ? 0.72 : 1)
+            .animation(
+                reduceMotion ? nil : .easeOut(duration: 0.1),
+                value: configuration.isPressed
+            )
+    }
 }
 
 #Preview("Playlist picker") {
@@ -129,6 +176,7 @@ struct PlaylistPickerView: View {
             ],
             selectedPlaylistID: "city-pocket"
         ),
-        select: { _ in }
+        select: { _ in },
+        reload: {}
     )
 }

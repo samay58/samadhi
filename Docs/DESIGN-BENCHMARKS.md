@@ -32,6 +32,16 @@ Rauno Freiberg’s public standard combines speed, beauty, consistency, care, ti
 
 Source: https://raunofreiberg.me/
 
+## Setup craft cross-check
+
+Bump keeps one live world on screen, attaches actions to the focused object, and makes touch feedback part of the interaction. Its useful lesson is behavioral, not visual: preserve context, react immediately, and let real product state supply the interest. Samadhi should not import Bump's saturated color, collage, outlined type, or feature density.
+
+Flighty makes the important fact continuously available and explores broadly before converging on an obvious interface. Things lets one object become its detail surface while keeping optional fields tucked away. Crouton removes everything that does not help with the task at hand. Apple recommends immediate loading feedback, determinate progress in a consistent place, causal motion and haptics, Dynamic Type reflow, VoiceOver clarity, and a complete Reduce Motion path. Denim shows that music-adjacent SwiftUI can feel playful through transitions and haptics while keeping one simple job.
+
+For music setup, those references resolve into one playlist instrument with three stable regions: identity, truthful status, and actions. The playlist stays mounted. Status changes only when the model changes. Selection and first readiness are the only haptic boundaries. Detailed track reasons stay behind disclosure. Accessibility sizes become a top-led document flow instead of enlarging a centered poster.
+
+Sources: https://help.bumpmaps.com/en/articles/11420926-how-bump-works, https://apps.apple.com/us/app/bump-real-life-is-happening/id6471519217, https://developer.apple.com/news/?id=970ncww4, https://culturedcode.com/things/features/, https://developer.apple.com/news/?id=9x75y43e, https://developer.apple.com/design/human-interface-guidelines/onboarding, https://developer.apple.com/design/human-interface-guidelines/loading, https://developer.apple.com/design/human-interface-guidelines/progress-indicators, https://developer.apple.com/design/human-interface-guidelines/motion, https://developer.apple.com/design/human-interface-guidelines/playing-haptics, and https://developer.apple.com/design/awards/2025/
+
 ## Samadhi rules derived from the review
 
 - One centerpiece per state. During a run it is the tempo orb; on ready it is the collection and Start action.
@@ -42,3 +52,4 @@ Source: https://raunofreiberg.me/
 - Secondary copy remains readable. Reduced prominence comes from scale and spacing, not weak contrast.
 - Controls remain at least 44 points, reachable, semantically labeled, and stable when VoiceOver focus enters.
 - A state transition should feel like the same object changing jobs, not a new card replacing the last one.
+- Fun comes from immediate response, spatial continuity, and truthful confirmation. It does not justify more color, copy, containers, or decorative motion.
