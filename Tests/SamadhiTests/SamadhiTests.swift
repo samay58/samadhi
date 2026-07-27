@@ -56,6 +56,68 @@ import Testing
     #expect(model.playlistSheet?.selectedPlaylistID == AppMusicCollection.simulatorDemo.id.rawValue)
 }
 
+@Test @MainActor func emptyLibraryFixturePresentsAnEmptyPickerWithoutInventedChoices() async {
+    let model = MusicSelectionModel(configuration: .simulatorFastFixture(.emptyLibrary))
+
+    #expect(model.presentation == .none)
+    model.beginChoosing()
+    await waitUntil { model.playlistSheet != nil }
+
+    #expect(model.playlistSheet?.playlists.isEmpty == true)
+    #expect(model.playlistSheet?.selectedPlaylistID == nil)
+}
+
+@Test @MainActor func twoPlaylistFixtureKeepsStableChoiceIdentity() async {
+    let model = MusicSelectionModel(configuration: .simulatorFastFixture(.twoPlaylistLibrary))
+
+    model.beginChoosing()
+    await waitUntil { model.playlistSheet != nil }
+
+    let choices = model.playlistSheet?.playlists ?? []
+    #expect(choices.map(\.id) == ["simulator-demo", "simulator-cruise"])
+    #expect(choices.map(\.name) == ["Samadhi demo", "Soft Miles"])
+    #expect(Set(choices.map(\.id)).count == choices.count)
+}
+
+@Test @MainActor func selectedPlaylistIdentitySurvivesLibraryLoading() {
+    let model = MusicSelectionModel(configuration: .simulatorFastFixture(.loadingSelected))
+
+    #expect(model.selectedCollection == AppMusicCollection.simulatorDemo)
+    guard case let .loadingPlaylists(current) = model.presentation else {
+        Issue.record("Expected loading presentation with the existing playlist")
+        return
+    }
+    #expect(current?.name == AppMusicCollection.simulatorDemo.name)
+    #expect(current?.readyTrackCount == AppMusicCollection.simulatorDemo.readyTrackCount)
+}
+
+@Test @MainActor func longPlaylistFixturePreservesTheCompleteNameAndReadyTruth() {
+    let model = MusicSelectionModel(configuration: .simulatorFastFixture(.longPlaylistName))
+
+    guard case let .ready(presentation) = model.presentation else {
+        Issue.record("Expected long-name fixture to be ready")
+        return
+    }
+    #expect(presentation.name == "Saturday Miles Through the Hills After the Rain")
+    #expect(presentation.readyTrackCount == 2)
+    #expect(presentation.skippedTrackCount == 0)
+}
+
+@Test @MainActor func partialFixtureKeepsReadyTruthSeparateFromEverySkippedReason() {
+    let model = MusicSelectionModel(configuration: .simulatorFastFixture(.partial))
+
+    guard case let .ready(presentation) = model.presentation else {
+        Issue.record("Expected partial fixture to be ready")
+        return
+    }
+    #expect(presentation.readyTrackCount == 1)
+    #expect(presentation.skippedTrackCount == 5)
+    #expect(presentation.tracks.count == 6)
+    #expect(presentation.tracks.filter { $0.status == .ready }.count == 1)
+    #expect(presentation.tracks.filter { $0.status != .ready }.count == 5)
+    #expect(presentation.hasTemporaryFailures)
+}
+
 @Test func importBatchesPreserveOrderAndBoundConcurrency() {
     let batches = musicImportBatches(count: 18, width: 3)
 
@@ -661,6 +723,22 @@ private func importedCollection(
 }
 
 private extension SimulationConfiguration {
+    static func simulatorFastFixture(
+        _ musicSelectionFixture: MusicSelectionFixture
+    ) -> SimulationConfiguration {
+        SimulationConfiguration(
+            fastMode: true,
+            permissionDenied: false,
+            simulateRouteLoss: false,
+            missingArtwork: false,
+            extendedAcquisitionWindow: false,
+            useAppleMusicCoreLoop: false,
+            useSimulatorDemoMusic: true,
+            setupReviewMode: false,
+            musicSelectionFixture: musicSelectionFixture
+        )
+    }
+
     static let productionFixture = SimulationConfiguration(
         fastMode: false,
         permissionDenied: false,
@@ -669,6 +747,7 @@ private extension SimulationConfiguration {
         extendedAcquisitionWindow: false,
         useAppleMusicCoreLoop: false,
         useSimulatorDemoMusic: false,
+        setupReviewMode: false,
         musicSelectionFixture: .standard
     )
 
@@ -680,6 +759,7 @@ private extension SimulationConfiguration {
         extendedAcquisitionWindow: false,
         useAppleMusicCoreLoop: false,
         useSimulatorDemoMusic: true,
+        setupReviewMode: false,
         musicSelectionFixture: .standard
     )
 }

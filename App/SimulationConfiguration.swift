@@ -4,11 +4,15 @@ enum MusicSelectionFixture: Equatable {
     case standard
     case none
     case loading
+    case loadingSelected
     case analyzing
     case partial
     case authorizationFailure
     case importFailure
+    case emptyLibrary
+    case twoPlaylistLibrary
     case largeLibrary
+    case longPlaylistName
 }
 
 struct SimulationConfiguration {
@@ -20,6 +24,7 @@ struct SimulationConfiguration {
     let extendedAcquisitionWindow: Bool
     let useAppleMusicCoreLoop: Bool
     let useSimulatorDemoMusic: Bool
+    let setupReviewMode: Bool
     let musicSelectionFixture: MusicSelectionFixture
 
     static var current: SimulationConfiguration {
@@ -41,9 +46,19 @@ struct SimulationConfiguration {
             extendedAcquisitionWindow: arguments.contains("-SAMADHI_TEST_ACQUISITION_WINDOW"),
             useAppleMusicCoreLoop: arguments.contains("--apple-music-core-loop"),
             useSimulatorDemoMusic: useSimulatorDemoMusic,
+            setupReviewMode: {
+                #if DEBUG && targetEnvironment(simulator)
+                    arguments.contains("-SAMADHI_SETUP_REVIEW_MODE")
+                #else
+                    false
+                #endif
+            }(),
             musicSelectionFixture: {
                 if arguments.contains("-SAMADHI_MUSIC_NONE") { return .none }
                 if arguments.contains("-SAMADHI_MUSIC_LOADING") { return .loading }
+                if arguments.contains("-SAMADHI_MUSIC_LOADING_SELECTED") {
+                    return .loadingSelected
+                }
                 if arguments.contains("-SAMADHI_MUSIC_ANALYZING") { return .analyzing }
                 if arguments.contains("-SAMADHI_MUSIC_PARTIAL") { return .partial }
                 if arguments.contains("-SAMADHI_MUSIC_AUTHORIZATION_FAILURE") {
@@ -52,8 +67,17 @@ struct SimulationConfiguration {
                 if arguments.contains("-SAMADHI_MUSIC_IMPORT_FAILURE") {
                     return .importFailure
                 }
+                if arguments.contains("-SAMADHI_MUSIC_LIBRARY_EMPTY") {
+                    return .emptyLibrary
+                }
+                if arguments.contains("-SAMADHI_MUSIC_LIBRARY_TWO") {
+                    return .twoPlaylistLibrary
+                }
                 if arguments.contains("-SAMADHI_MUSIC_LIBRARY_LARGE") {
                     return .largeLibrary
+                }
+                if arguments.contains("-SAMADHI_MUSIC_LONG_NAME") {
+                    return .longPlaylistName
                 }
                 return .standard
             }()

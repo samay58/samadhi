@@ -14,7 +14,8 @@ struct RootView: View {
             .sheet(item: $musicModel.playlistSheet) { sheet in
                 PlaylistPickerView(
                     presentation: sheet,
-                    select: self.musicModel.selectPlaylist
+                    select: self.musicModel.selectPlaylist,
+                    reload: self.musicModel.beginChoosing
                 )
             }
             .task {

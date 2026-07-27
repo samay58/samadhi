@@ -5,8 +5,8 @@
 | Area | State | Evidence |
 | --- | --- | --- |
 | Product interaction | Complete prototype | Golden UI flow |
-| Visual system | Complete prototype | Continuous setup-chain and active-run Simulator frames |
-| Accessibility | Covered in prototype | Accessibility XXXL, Reduce Motion, contrast, VoiceOver labels and selected state |
+| Visual system | Complete prototype | Playlist-instrument setup chain and active-run Simulator frames |
+| Accessibility | Covered in prototype | Authored accessibility XXXL reflow, Reduce Motion, contrast, VoiceOver labels and selected state |
 | State architecture | Complete for prototype | Pure reducer tests |
 | Cadence | Core Motion connected; acquisition, tracking, confidence loss, and reacquisition are explicit | Deterministic freshness and response traces plus prior iPhone evidence |
 | Audio timing | Real for imported ready tracks; deterministic in fixtures | Production player contract and beat-clock tests |
@@ -45,7 +45,8 @@
 - Passive white cards removed
 - Open type hierarchy and native raised controls established
 - Music setup keeps the selected playlist as one stable visual owner from analysis through recovery
-- The native playlist sheet uses open type, quiet separators, and an accessible current-selection state without decorative metadata
+- The setup composition uses stable identity, truthful status, and action regions without cards, explanatory copy, or decorative progress
+- The native playlist sheet uses open type, compact native sizing, tactile rows, quiet separators, and an accessible current-selection state without decorative metadata
 - Samadhi name, icon, tagline, project, scheme, package, tests, and repository aligned
 - GitHub cover and app icon installed
 
@@ -147,18 +148,21 @@
 - Kept the rhythm control pinned for the full wheel gesture so its timeout cannot hide the surface mid-turn
 - Rebuilt empty, loading, analysis, partial readiness, full readiness, and failure as one playlist-anchored setup chain
 - Added same-playlist retry, choose-another recovery, authorization guidance, 40-playlist scrolling proof, and an accessible current-selection state
+- Split setup into focused identity, status, action, and results views while keeping model ownership unchanged
+- Added causal selection and first-readiness feedback, an interruptible 210-millisecond handoff, and an immediate Reduce Motion path
+- Reflowed accessibility sizes into a top-led document hierarchy with wrapped titles and full-width primary actions
 
 ## Proof
 
 The current software gate passed on 2026-07-27:
 
-- 116 Swift package tests
-- 20 app-model tests
-- 15 UI tests
+- 118 Swift package tests
+- 25 app-model tests
+- 21 UI tests
 - Swift formatter lint
 - Resource-inclusive Simulator build
 - Focused setup and rotary-control UI proof
-- Runtime review of ten setup frames on iPhone 17 Pro Simulator, including accessibility XXXL and Reduce Motion
+- Two runtime iteration passes and 17 final setup frames on iPhone 17 Pro Simulator, including accessibility XXXL and Reduce Motion
 
 The paired iPhone is available. Automatic signing selected a valid wildcard profile, so that build was rejected before installation because MusicKit requires the explicit Samadhi application identifier. The renewed exact profile expires on 2026-07-30 UTC. Commit `66e0616` was rebuilt from a clean detached worktree, signed with the exact application identifier, and installed without changing the selected-collection checksum. Foreground launch was blocked only because the phone was locked.
 
@@ -176,7 +180,7 @@ The current 18-track selection contains 14 ready tracks, two unclear rhythms, an
 
 Explicit one-step-per-beat and two-steps-per-beat relationships improve representative cadence compatibility from 13 to 16 of 56 private matrix cells without changing the 0.90 through 1.10 playback envelope. This is truthful but not broad enough to close the product range problem. A wider MusicKit rate needs physical quality proof. If the outdoor run still feels constrained, reopen the source and mechanics decision.
 
-The current candidate passes formatter lint, 116 package tests, a resource-inclusive Simulator build, 20 app-model tests, and 15 serial UI tests. Setup coverage proves an empty library path, 40-playlist scrolling and selection, exact progress, partial and complete readiness, complete typed disclosure, current selection, same-playlist retry, choose-another recovery, and authorization recovery. The focused wheel flow reaches the current song's actual upper boundary, rejects further outward travel, reverses immediately, keeps the same song, and never shows `Changing song`. Commit `cd07fd4` was built with the exact Samadhi profile, installed over the existing app without changing the selected-collection checksum, launched, and confirmed in the physical process inventory. Current physical timing, audible response, and haptic feel remain open.
+The current candidate passes formatter lint, 118 package tests, a resource-inclusive Simulator build, 25 app-model tests, and 21 serial UI tests. Setup coverage proves compact and empty pickers, 40-playlist scrolling and selection, selected loading, exact progress, long names, partial and complete readiness, complete typed disclosure, current selection, same-playlist retry, choose-another recovery, authorization recovery, accessibility XXXL reflow, and Reduce Motion. The focused wheel flow reaches the current song's actual upper boundary, rejects further outward travel, reverses immediately, keeps the same song, and never shows `Changing song`. Current physical timing, audible response, and haptic feel remain open.
 
 ## WHERE WE LEFT OFF
 
