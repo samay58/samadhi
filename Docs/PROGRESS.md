@@ -334,7 +334,7 @@
 - Passed formatter lint, 97 package tests, 15 app-model tests, and 10 UI tests
 - Rebuilt with the exact `Samadhi Development` profile, verified the embedded application identifier, and installed the final repair on Samay's connected iPhone
 
-## Current checkpoint
+## Checkpoint after the 2026-07-22 repair
 
 Milestones 0 and 1 are complete. Milestone 2 is still open. The next checkpoint is one short physical proof on the new build: let the playlist reanalyze once, confirm the ready count, make several large wheel changes without an unexpected song change, then use Skip and one natural boundary to prove the only allowed transition paths. Pull diagnostics immediately afterward. No visual expansion outranks that result.
 
@@ -383,9 +383,9 @@ Milestones 0 and 1 are complete. Milestone 2 is still open. The next checkpoint 
 - Passed formatter lint, 112 package tests, iPhone and Simulator package compilation, and iPhone and Simulator app-model typechecking
 - Left the implementation uncommitted because CoreSimulator service access is refused from the current tool process; the resource app build, serial UI suite, exact-profile build, installation, and current physical timing trace remain required
 
-## Current checkpoint
+## Checkpoint after the 2026-07-23 candidate
 
-Milestones 0 and 1 remain complete. Milestone 2 is open. The local software gate now passes. Build the same candidate with the exact profile, push it, and install that exact commit. The shortest physical check is one song: source-order startup, both Manual boundaries, immediate reverse, return to Auto with a cadence change, and a quick audible and tactile judgment. Pull rolling diagnostics even if the run is not finished.
+This checkpoint recorded a passing local candidate before its exact-profile build and installation. The next intended check was one song covering source-order startup, both Manual boundaries, immediate reverse, return to Auto with a cadence change, and a quick audible and tactile judgment.
 
 ## 2026-07-24. Honest Manual wheel boundary
 
@@ -417,3 +417,15 @@ Milestones 0 and 1 remain complete. Milestone 2 is open. The local software gate
 - Preserved import cancellation, stale-operation protection, atomic persistence, ready-only start truth, and partial-collection start
 - Reviewed fresh iPhone 17 Pro Simulator frames for empty, picker, loading, analysis, partial and complete readiness, results, failure, accessibility XXXL, and Reduce Motion
 - Expanded the gate to 116 package tests, 20 app-model tests, and 15 UI tests
+
+## 2026-07-27. Setup redesign installation
+
+- Pushed setup commit `cd07fd4` to `main`
+- Rebuilt the exact commit with the `Samadhi Development` profile and verified the embedded application identifier and code signature
+- Installed over the existing iPhone app without uninstalling or replacing its data container
+- Confirmed the selected-collection checksum remained byte-for-byte identical
+- Launched Samadhi and confirmed its process was running on the physical iPhone
+
+## Current checkpoint
+
+Milestones 0 and 1 remain complete. Milestone 2 is open. The setup redesign is gated, pushed, installed, and running on the physical iPhone. The shortest remaining check is one song: source-order startup, both Manual boundaries, immediate reverse, return to Auto with a cadence change, and a quick audible and tactile judgment. Pull rolling diagnostics even if the run is not finished.
