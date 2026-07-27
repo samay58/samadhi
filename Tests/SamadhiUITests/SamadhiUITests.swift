@@ -77,6 +77,46 @@ final class SamadhiUITests: XCTestCase {
 
         XCTAssertTrue(app.buttons["choose-music"].waitForExistence(timeout: 2))
         XCTAssertFalse(app.buttons["start-run"].exists)
+        XCTAssertFalse(app.buttons["change-music"].exists)
+    }
+
+    func testPlaylistPickerOpensScrollsAndSelects() {
+        prepareApp("-SAMADHI_MUSIC_LIBRARY_LARGE")
+        app.launch()
+
+        app.buttons["choose-music"].tap()
+        XCTAssertTrue(element("playlist-picker").waitForExistence(timeout: 2))
+        XCTAssertTrue(app.buttons["playlist-choice-simulator-library-1"].exists)
+
+        let lastPlaylist = app.buttons["playlist-choice-simulator-library-40"]
+        for _ in 0..<10 where !lastPlaylist.exists {
+            app.swipeUp()
+        }
+        XCTAssertTrue(lastPlaylist.waitForExistence(timeout: 2))
+        lastPlaylist.tap()
+
+        XCTAssertTrue(element("music-ready").waitForExistence(timeout: 3))
+        XCTAssertTrue(app.staticTexts["Long Run 40"].exists)
+    }
+
+    func testChangingMusicMarksTheCurrentPlaylist() {
+        prepareApp()
+        app.launch()
+
+        app.buttons["change-music"].tap()
+        XCTAssertTrue(element("playlist-picker").waitForExistence(timeout: 2))
+        let current = app.buttons["playlist-choice-simulator-demo"]
+        XCTAssertTrue(current.exists)
+        XCTAssertTrue(current.label.contains("Current playlist"))
+    }
+
+    func testPlaylistLoadingKeepsOneTruthfulBusyAction() {
+        prepareApp("-SAMADHI_MUSIC_LOADING")
+        app.launch()
+
+        XCTAssertTrue(element("music-loading").waitForExistence(timeout: 2))
+        XCTAssertFalse(app.buttons["start-run"].exists)
+        XCTAssertFalse(app.buttons["choose-music"].exists)
     }
 
     func testAnalysisProgressIsHonest() {
@@ -84,7 +124,7 @@ final class SamadhiUITests: XCTestCase {
         app.launch()
 
         XCTAssertTrue(element("music-analyzing").waitForExistence(timeout: 2))
-        XCTAssertTrue(app.staticTexts["2 of 8 tracks"].exists)
+        XCTAssertTrue(app.staticTexts["2 / 8"].exists)
         XCTAssertFalse(app.buttons["start-run"].exists)
     }
 
@@ -93,10 +133,14 @@ final class SamadhiUITests: XCTestCase {
         app.launch()
 
         XCTAssertTrue(element("music-ready").waitForExistence(timeout: 2))
-        XCTAssertTrue(app.staticTexts["Rhythm unclear"].exists)
-        XCTAssertTrue(app.staticTexts["Preview unavailable"].exists)
+        let results = element("all-imported-tracks")
+        XCTAssertTrue(results.waitForExistence(timeout: 2))
+        XCTAssertTrue(results.label.contains("1 ready"))
+        XCTAssertTrue(results.label.contains("5 skipped"))
         XCTAssertTrue(app.buttons["start-run"].exists)
-        app.buttons["all-imported-tracks"].tap()
+        results.tap()
+        XCTAssertTrue(app.staticTexts["Rhythm unclear"].waitForExistence(timeout: 2))
+        XCTAssertTrue(app.staticTexts["Preview unavailable"].exists)
         XCTAssertTrue(app.staticTexts["Distant Signal"].waitForExistence(timeout: 2))
         XCTAssertTrue(app.staticTexts["Warm Static"].exists)
         XCTAssertTrue(app.staticTexts["Side Street"].exists)
@@ -107,8 +151,35 @@ final class SamadhiUITests: XCTestCase {
         app.launch()
 
         XCTAssertTrue(element("music-import-failed").waitForExistence(timeout: 2))
-        XCTAssertTrue(app.buttons["choose-music"].exists)
+        XCTAssertTrue(app.buttons["retry-music-import"].exists)
+        XCTAssertTrue(app.buttons["choose-another-music"].exists)
         XCTAssertFalse(app.buttons["start-run"].exists)
+
+        app.buttons["retry-music-import"].tap()
+        XCTAssertTrue(element("music-ready").waitForExistence(timeout: 3))
+        XCTAssertTrue(app.staticTexts["Soft Miles"].exists)
+    }
+
+    func testImportFailureCanChooseAnotherPlaylist() {
+        prepareApp("-SAMADHI_MUSIC_IMPORT_FAILURE")
+        app.launch()
+
+        XCTAssertTrue(element("music-import-failed").waitForExistence(timeout: 2))
+        app.buttons["choose-another-music"].tap()
+        XCTAssertTrue(element("playlist-picker").waitForExistence(timeout: 2))
+    }
+
+    func testAuthorizationFailureUsesSettingsAndLibraryRetry() {
+        prepareApp("-SAMADHI_MUSIC_AUTHORIZATION_FAILURE")
+        app.launch()
+
+        XCTAssertTrue(element("music-import-failed").waitForExistence(timeout: 2))
+        XCTAssertTrue(app.staticTexts["Apple Music access is off"].exists)
+        XCTAssertTrue(app.buttons["open-settings"].exists)
+        XCTAssertTrue(app.buttons["retry-playlist-library"].exists)
+
+        app.buttons["retry-playlist-library"].tap()
+        XCTAssertTrue(element("playlist-picker").waitForExistence(timeout: 2))
     }
 
     func testTempoControlRevealsAndSwitchesOwnership() {

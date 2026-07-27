@@ -7,6 +7,7 @@ import SamadhiDomain
 struct PlaylistSheetPresentation: Identifiable, Equatable {
     let id: Int
     let playlists: [LibraryPlaylistChoice]
+    let selectedPlaylistID: String?
 }
 
 @MainActor
@@ -33,7 +34,9 @@ final class MusicSelectionModel {
         if let importer {
             self.importer = importer
         } else if configuration.useSimulatorDemoMusic {
-            self.importer = SimulatorMusicImportService()
+            self.importer = SimulatorMusicImportService(
+                expandedLibrary: configuration.musicSelectionFixture == .largeLibrary
+            )
         } else {
             self.importer = AppleMusicImportService(store: store)
         }
@@ -75,13 +78,13 @@ final class MusicSelectionModel {
             }
             apply(collection)
         } catch {
-            presentation = .failed("Your saved music could not be opened.")
+            presentation = .failed(.savedCollectionUnavailable)
         }
     }
 
     func beginChoosing() {
         let operationID = beginOperation()
-        presentation = .loadingPlaylists
+        presentation = .loadingPlaylists(current: selectedCollection.map(Self.readyPresentationValue))
         operationTask = Task { [weak self, importer] in
             do {
                 let playlists = try await importer.loadPlaylists()
@@ -90,14 +93,15 @@ final class MusicSelectionModel {
                 }
                 playlistSheet = PlaylistSheetPresentation(
                     id: operationID,
-                    playlists: playlists
+                    playlists: playlists,
+                    selectedPlaylistID: selectedCollection?.id.rawValue
                 )
                 presentation = selectedCollection.map(Self.readyPresentation) ?? .none
             } catch is CancellationError {
                 return
             } catch {
                 guard let self, currentOperationID == operationID else { return }
-                presentation = .failed(Self.message(for: error))
+                presentation = .failed(Self.libraryFailure(for: error))
             }
         }
     }
@@ -138,7 +142,7 @@ final class MusicSelectionModel {
                 return
             } catch {
                 guard let self, currentOperationID == operationID else { return }
-                presentation = .failed(Self.message(for: error))
+                presentation = .failed(Self.importFailure(for: error, playlistName: choice.name))
             }
         }
     }
@@ -164,11 +168,11 @@ final class MusicSelectionModel {
     private func applyFixture(_ fixture: MusicSelectionFixture) {
         switch fixture {
         case .standard:
-            apply(AppMusicCollection.simulated)
+            apply(AppMusicCollection.simulatorDemo)
         case .none:
             presentation = .none
         case .loading:
-            presentation = .loadingPlaylists
+            presentation = .loadingPlaylists(current: nil)
         case .analyzing:
             let collection = AppMusicCollection.partialImportFixture
             presentation = .analyzing(
@@ -182,22 +186,32 @@ final class MusicSelectionModel {
         case .partial:
             apply(AppMusicCollection.partialImportFixture)
         case .authorizationFailure:
-            presentation = .failed("Apple Music access is needed to choose a playlist.")
+            presentation = .failed(.authorizationDenied)
         case .importFailure:
-            presentation = .failed("Your Apple Music playlist could not be analyzed.")
+            lastSelectedChoice = LibraryPlaylistChoice(
+                id: AppMusicCollection.simulatorCruise.id.rawValue,
+                name: AppMusicCollection.simulatorCruise.name
+            )
+            presentation = .failed(.importFailed(name: AppMusicCollection.simulatorCruise.name))
+        case .largeLibrary:
+            presentation = .none
         }
     }
 
     private static func readyPresentation(
         _ collection: MusicCollection
     ) -> MusicSelectionPresentation {
-        .ready(
-            presentation(
-                name: collection.name,
-                tracks: collection.tracks,
-                totalCount: collection.tracks.count,
-                completedCount: collection.tracks.count
-            )
+        .ready(readyPresentationValue(collection))
+    }
+
+    private static func readyPresentationValue(
+        _ collection: MusicCollection
+    ) -> ImportedCollectionPresentation {
+        presentation(
+            name: collection.name,
+            tracks: collection.tracks,
+            totalCount: collection.tracks.count,
+            completedCount: collection.tracks.count
         )
     }
 
@@ -242,14 +256,30 @@ final class MusicSelectionModel {
         }
     }
 
-    private static func message(for error: Error) -> String {
+    private static func libraryFailure(
+        for error: Error
+    ) -> MusicSelectionFailurePresentation {
         switch error {
         case AppleMusicImportError.authorizationDenied:
-            "Apple Music access is needed to choose a playlist."
-        case AppleMusicImportError.emptyPlaylist:
-            "This playlist has no tracks."
+            .authorizationDenied
         default:
-            "Your Apple Music playlists could not be opened."
+            .playlistLibraryUnavailable
+        }
+    }
+
+    private static func importFailure(
+        for error: Error,
+        playlistName: String
+    ) -> MusicSelectionFailurePresentation {
+        switch error {
+        case AppleMusicImportError.authorizationDenied:
+            .authorizationDenied
+        case AppleMusicImportError.emptyPlaylist:
+            .emptyPlaylist(name: playlistName)
+        case AppleMusicImportError.playlistUnavailable:
+            .playlistUnavailable(name: playlistName)
+        default:
+            .importFailed(name: playlistName)
         }
     }
 }

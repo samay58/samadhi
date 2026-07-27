@@ -41,6 +41,21 @@ import Testing
     #expect(model.selectedCollection?.readyTrackCount == 4)
 }
 
+@Test @MainActor func choosingMusicKeepsTheCurrentPlaylistStableAndMarksItInThePicker() async {
+    let model = MusicSelectionModel(configuration: .simulatorFixture)
+
+    model.beginChoosing()
+
+    guard case let .loadingPlaylists(current) = model.presentation else {
+        Issue.record("Expected playlist loading presentation")
+        return
+    }
+    #expect(current?.name == AppMusicCollection.simulatorDemo.name)
+
+    await waitUntil { model.playlistSheet != nil }
+    #expect(model.playlistSheet?.selectedPlaylistID == AppMusicCollection.simulatorDemo.id.rawValue)
+}
+
 @Test func importBatchesPreserveOrderAndBoundConcurrency() {
     let batches = musicImportBatches(count: 18, width: 3)
 
@@ -470,6 +485,69 @@ import Testing
     #expect(importer.importedIDs == ["retry", "retry"])
 }
 
+@Test @MainActor func importFailuresKeepTypedPlaylistRecoveryContext() async throws {
+    let directory = FileManager.default.temporaryDirectory
+        .appending(path: UUID().uuidString, directoryHint: .isDirectory)
+    defer { try? FileManager.default.removeItem(at: directory) }
+    let importer = FixtureMusicImporter(
+        collections: [:],
+        importErrors: ["missing": .playlistUnavailable]
+    )
+    let model = MusicSelectionModel(
+        store: MusicCollectionStore(directoryURL: directory),
+        importer: importer,
+        configuration: .productionFixture
+    )
+
+    model.selectPlaylist(LibraryPlaylistChoice(id: "missing", name: "Evening Miles"))
+    await waitUntil {
+        model.presentation == .failed(.playlistUnavailable(name: "Evening Miles"))
+    }
+
+    #expect(model.presentation == .failed(.playlistUnavailable(name: "Evening Miles")))
+}
+
+@Test @MainActor func emptyPlaylistFailureKeepsTypedPlaylistRecoveryContext() async throws {
+    let directory = FileManager.default.temporaryDirectory
+        .appending(path: UUID().uuidString, directoryHint: .isDirectory)
+    defer { try? FileManager.default.removeItem(at: directory) }
+    let importer = FixtureMusicImporter(
+        collections: [:],
+        importErrors: ["empty": .emptyPlaylist]
+    )
+    let model = MusicSelectionModel(
+        store: MusicCollectionStore(directoryURL: directory),
+        importer: importer,
+        configuration: .productionFixture
+    )
+
+    model.selectPlaylist(LibraryPlaylistChoice(id: "empty", name: "Quiet Miles"))
+    await waitUntil {
+        model.presentation == .failed(.emptyPlaylist(name: "Quiet Miles"))
+    }
+
+    #expect(model.presentation == .failed(.emptyPlaylist(name: "Quiet Miles")))
+}
+
+@Test @MainActor func authorizationFailureIsDistinctFromLibraryFailure() async throws {
+    let directory = FileManager.default.temporaryDirectory
+        .appending(path: UUID().uuidString, directoryHint: .isDirectory)
+    defer { try? FileManager.default.removeItem(at: directory) }
+    let model = MusicSelectionModel(
+        store: MusicCollectionStore(directoryURL: directory),
+        importer: FixtureMusicImporter(
+            collections: [:],
+            loadError: .authorizationDenied
+        ),
+        configuration: .productionFixture
+    )
+
+    model.beginChoosing()
+    await waitUntil { model.presentation == .failed(.authorizationDenied) }
+
+    #expect(model.presentation == .failed(.authorizationDenied))
+}
+
 @Test @MainActor func replacementCancelsOlderImportAndPersistsNewestCollection() async throws {
     let directory = FileManager.default.temporaryDirectory
         .appending(path: UUID().uuidString, directoryHint: .isDirectory)
@@ -500,15 +578,25 @@ import Testing
 private final class FixtureMusicImporter: MusicLibraryImporting {
     let collections: [String: MusicCollection]
     let delayedID: String?
+    let loadError: AppleMusicImportError?
+    let importErrors: [String: AppleMusicImportError]
     private(set) var importedIDs: [String] = []
 
-    init(collections: [String: MusicCollection], delayedID: String? = nil) {
+    init(
+        collections: [String: MusicCollection],
+        delayedID: String? = nil,
+        loadError: AppleMusicImportError? = nil,
+        importErrors: [String: AppleMusicImportError] = [:]
+    ) {
         self.collections = collections
         self.delayedID = delayedID
+        self.loadError = loadError
+        self.importErrors = importErrors
     }
 
     func loadPlaylists() async throws -> [LibraryPlaylistChoice] {
-        collections.map { LibraryPlaylistChoice(id: $0.key, name: $0.value.name) }
+        if let loadError { throw loadError }
+        return collections.map { LibraryPlaylistChoice(id: $0.key, name: $0.value.name) }
     }
 
     func importPlaylist(
@@ -516,6 +604,7 @@ private final class FixtureMusicImporter: MusicLibraryImporting {
         progress: @escaping @MainActor (MusicImportProgress) -> Void
     ) async throws -> MusicCollection {
         importedIDs.append(id)
+        if let error = importErrors[id] { throw error }
         if id == delayedID {
             try await Task.sleep(for: .seconds(1))
         }

@@ -405,3 +405,15 @@ Milestones 0 and 1 remain complete. Milestone 2 is open. The local software gate
 - Installed over the existing app without uninstalling or replacing its container
 - Confirmed the selected-collection checksum remained byte-for-byte identical
 - Attempted foreground launch but left it open because the phone was locked
+
+## 2026-07-27. Continuous music setup
+
+- Rebuilt first-run music setup around one stable playlist identity from selection through analysis, readiness, and failure
+- Reduced the empty state to `Music in stride` and one direct action
+- Replaced the generic playlist card with a native warm sheet, open typography, quiet separators, 40-playlist scrolling, and an accessible current-selection state
+- Kept exact analysis progress on the primary surface while moving complete typed track results into one optional sheet
+- Made partial readiness immediately legible and removed the extra ready-state marketing sentence and technical rows
+- Added typed same-playlist retry, choose-another, empty-playlist, unavailable-playlist, library, and authorization recovery
+- Preserved import cancellation, stale-operation protection, atomic persistence, ready-only start truth, and partial-collection start
+- Reviewed fresh iPhone 17 Pro Simulator frames for empty, picker, loading, analysis, partial and complete readiness, results, failure, accessibility XXXL, and Reduce Motion
+- Expanded the gate to 116 package tests, 20 app-model tests, and 15 UI tests

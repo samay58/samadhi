@@ -47,6 +47,21 @@ enum AppMusicCollection {
 
     static let simulatorCollections = [simulatorDemo, simulatorCruise]
 
+    static let simulatorExpandedCollections = (1...40).map { index in
+        MusicCollection(
+            id: MusicCollectionID("simulator-library-\(index)"),
+            name: index == 40 ? "Long Run 40" : "Playlist \(index)",
+            tracks: [
+                demoTrack(
+                    id: "simulator-library-\(index)-track",
+                    title: "Open Road \(index)",
+                    artist: "Samadhi fixture",
+                    bpm: Double(148 + index % 36)
+                )
+            ]
+        )
+    }
+
     // This catalog track is a temporary core-loop fixture, not a user-facing default.
     static let appleMusicCoreLoop = MusicCollection(
         id: MusicCollectionID("apple-music-core-loop"),
@@ -155,8 +170,17 @@ enum AppMusicCollection {
 
 @MainActor
 final class SimulatorMusicImportService: MusicLibraryImporting {
+    private let collections: [MusicCollection]
+
+    init(expandedLibrary: Bool = false) {
+        collections =
+            expandedLibrary
+            ? AppMusicCollection.simulatorExpandedCollections
+            : AppMusicCollection.simulatorCollections
+    }
+
     func loadPlaylists() async throws -> [LibraryPlaylistChoice] {
-        AppMusicCollection.simulatorCollections.map {
+        collections.map {
             LibraryPlaylistChoice(id: $0.id.rawValue, name: $0.name)
         }
     }
@@ -166,7 +190,7 @@ final class SimulatorMusicImportService: MusicLibraryImporting {
         progress: @escaping @MainActor (MusicImportProgress) -> Void
     ) async throws -> MusicCollection {
         guard
-            let collection = AppMusicCollection.simulatorCollections.first(where: {
+            let collection = collections.first(where: {
                 $0.id.rawValue == id
             })
         else {

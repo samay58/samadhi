@@ -65,6 +65,10 @@ public struct ImportedCollectionPresentation: Sendable, Equatable {
         tracks.contains { $0.status == .temporaryFailure }
     }
 
+    public var skippedTrackCount: Int {
+        max(totalTrackCount - readyTrackCount, 0)
+    }
+
     public init(
         name: String,
         totalTrackCount: Int,
@@ -80,12 +84,21 @@ public struct ImportedCollectionPresentation: Sendable, Equatable {
     }
 }
 
+public enum MusicSelectionFailurePresentation: Sendable, Equatable {
+    case authorizationDenied
+    case savedCollectionUnavailable
+    case playlistLibraryUnavailable
+    case emptyPlaylist(name: String)
+    case playlistUnavailable(name: String)
+    case importFailed(name: String)
+}
+
 public enum MusicSelectionPresentation: Sendable, Equatable {
     case none
-    case loadingPlaylists
+    case loadingPlaylists(current: ImportedCollectionPresentation?)
     case analyzing(ImportedCollectionPresentation)
     case ready(ImportedCollectionPresentation)
-    case failed(String)
+    case failed(MusicSelectionFailurePresentation)
 }
 
 public struct RhythmControlPresentation: Sendable, Equatable {
