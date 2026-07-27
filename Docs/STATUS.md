@@ -5,12 +5,12 @@
 | Area | State | Evidence |
 | --- | --- | --- |
 | Product interaction | Complete prototype | Golden UI flow |
-| Visual system | Complete prototype | Final Simulator frames |
-| Accessibility | Covered in prototype | Dynamic Type, Reduce Motion, contrast, VoiceOver behavior |
+| Visual system | Complete prototype | Continuous setup-chain and active-run Simulator frames |
+| Accessibility | Covered in prototype | Accessibility XXXL, Reduce Motion, contrast, VoiceOver labels and selected state |
 | State architecture | Complete for prototype | Pure reducer tests |
 | Cadence | Core Motion connected; acquisition, tracking, confidence loss, and reacquisition are explicit | Deterministic freshness and response traces plus prior iPhone evidence |
 | Audio timing | Real for imported ready tracks; deterministic in fixtures | Production player contract and beat-clock tests |
-| Playlist import | Complete results, typed failures, retry, and bounded analysis implemented | Full-list Simulator proof, import timing diagnostics, model tests, and prior physical collection evidence |
+| Playlist import | Continuous setup, complete results, typed recovery, retry, and bounded analysis implemented | Empty through failure Simulator proof, import timing diagnostics, model tests, and prior physical collection evidence |
 | Tempo analysis | Version 4 keeps measured musical pulse separate from an independently supported stride pulse; the public corpus passes 12 of 12 | Generated regressions, private playlist replay, and opt-in Apple preview validation |
 | Adaptation policy | Manual commits apply directly; Auto tracks fresh cadence through a time-based filter; an unreachable request uses the nearest honest rate | Identified effects, boundary behavior, and deterministic replay tests; current physical latency remains open |
 | Track fit | Source order is preserved at startup; next-song preparation cannot change current transport | Deterministic relationship, envelope, coalescing, identity, order, and retention tests |
@@ -44,6 +44,8 @@
 - Full-screen fluid field replaced square cover treatment
 - Passive white cards removed
 - Open type hierarchy and native raised controls established
+- Music setup keeps the selected playlist as one stable visual owner from analysis through recovery
+- The native playlist sheet uses open type, quiet separators, and an accessible current-selection state without decorative metadata
 - Samadhi name, icon, tagline, project, scheme, package, tests, and repository aligned
 - GitHub cover and app icon installed
 
@@ -138,23 +140,25 @@
 - Made compatible large BPM changes prepare only the latest better-fitting track; only Skip or a player-confirmed natural boundary may commit it
 - Required at least 80 percent verified measurement coverage before showing a tempo-matched percentage
 - Preserved Automatic and Manual seconds in the completed-run diagnostic summary
-- Replaced the truncated import result with three calm preview rows plus a complete grouped track sheet
+- Removed the technical result table from the primary setup composition and kept complete typed results in a native disclosure sheet
 - Preserved distinct rhythm, preview, catalog, download, and decode outcomes and added retry after relaunch
 - Limited concurrent import work to three ordered tracks and added private stage timing diagnostics
 - Preserved clockwise and counterclockwise direction through stronger ordinary and five-BPM haptic events
 - Kept the rhythm control pinned for the full wheel gesture so its timeout cannot hide the surface mid-turn
+- Rebuilt empty, loading, analysis, partial readiness, full readiness, and failure as one playlist-anchored setup chain
+- Added same-playlist retry, choose-another recovery, authorization guidance, 40-playlist scrolling proof, and an accessible current-selection state
 
 ## Proof
 
-The current software gate passed on 2026-07-23:
+The current software gate passed on 2026-07-27:
 
-- 103 Swift package tests
-- 15 app-model tests
-- 10 UI tests
+- 116 Swift package tests
+- 20 app-model tests
+- 15 UI tests
 - Swift formatter lint
 - Resource-inclusive Simulator build
-- Focused rotary-control UI proof
-- Runtime review of the ready and active-run screens on iPhone 17 Simulator
+- Focused setup and rotary-control UI proof
+- Runtime review of ten setup frames on iPhone 17 Pro Simulator, including accessibility XXXL and Reduce Motion
 
 The paired iPhone is available. Automatic signing selected a valid wildcard profile, so that build was rejected before installation because MusicKit requires the explicit Samadhi application identifier. The renewed exact profile expires on 2026-07-30 UTC. Commit `66e0616` was rebuilt from a clean detached worktree, signed with the exact application identifier, and installed without changing the selected-collection checksum. Foreground launch was blocked only because the phone was locked.
 
@@ -172,8 +176,8 @@ The current 18-track selection contains 14 ready tracks, two unclear rhythms, an
 
 Explicit one-step-per-beat and two-steps-per-beat relationships improve representative cadence compatibility from 13 to 16 of 56 private matrix cells without changing the 0.90 through 1.10 playback envelope. This is truthful but not broad enough to close the product range problem. A wider MusicKit rate needs physical quality proof. If the outdoor run still feels constrained, reopen the source and mechanics decision.
 
-The current candidate passes formatter lint, 116 package tests, a resource-inclusive Simulator build, 16 app-model tests, and 10 serial UI tests. The focused wheel flow reaches the current song's actual upper boundary, rejects further outward travel, reverses immediately, keeps the same song, and never shows `Changing song`. Commit `42f4dd5` was built from a clean detached worktree with the exact Samadhi profile and installed without changing the selected-collection checksum. Foreground launch was blocked only because the phone was locked. Current physical timing, audible response, and haptic feel remain open.
+The current local candidate passes formatter lint, 116 package tests, a resource-inclusive Simulator build, 20 app-model tests, and 15 serial UI tests. Setup coverage proves an empty library path, 40-playlist scrolling and selection, exact progress, partial and complete readiness, complete typed disclosure, current selection, same-playlist retry, choose-another recovery, and authorization recovery. The focused wheel flow reaches the current song's actual upper boundary, rejects further outward travel, reverses immediately, keeps the same song, and never shows `Changing song`. The latest physical proof remains commit `42f4dd5`, which was built from a clean detached worktree with the exact Samadhi profile and installed without changing the selected-collection checksum. The setup redesign has not been installed on the physical iPhone. Current physical timing, audible response, and haptic feel remain open.
 
 ## WHERE WE LEFT OFF
 
-The field repair is pushed and installed. It preserves source order, records every transition reason, separates musical BPM from explicit cadence relationships, replaces stale cadence anchoring with a responsive stateful filter, persists bounded diagnostics during unfinished runs, and makes the 30-BPM wheel stop at each current-song boundary. The shortest user check is one song: confirm startup stays on the first ready track, reach and leave both Manual boundaries, return to Auto while changing cadence, and judge audible response and wheel feel. Pull rolling diagnostics immediately afterward.
+The setup-chain redesign is complete and locally gated. The installed field repair remains the next physical checkpoint. It preserves source order, records every transition reason, separates musical BPM from explicit cadence relationships, replaces stale cadence anchoring with a responsive stateful filter, persists bounded diagnostics during unfinished runs, and makes the 30-BPM wheel stop at each current-song boundary. The shortest user check is one song: confirm startup stays on the first ready track, reach and leave both Manual boundaries, return to Auto while changing cadence, and judge audible response and wheel feel. Pull rolling diagnostics immediately afterward.

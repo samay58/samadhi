@@ -154,9 +154,11 @@ The current playlist proves that explicit step-to-beat relationships alone do no
 
 Tempo-matched time is eligible only while playback is active, a valid Automatic cadence or Manual reference exists, and MusicKit has verified the current rate command. A run must reach 80 percent eligible coverage before showing a percentage. Lower coverage reports Not measured. Debug diagnostics also preserve coverage plus Automatic and Manual seconds so a high percentage cannot hide a long unmeasured segment.
 
-## Complete import results with bounded work
+## Playlist identity anchors music setup
 
-The setup screen keeps three result rows in the primary composition and exposes every track in a native grouped sheet. Failures remain distinct: unclear rhythm, unavailable preview, catalog mismatch, temporary catalog or download failure, and decode failure. Temporary failures can be retried after relaunch. Legacy collapsed values remain decodable only for persisted compatibility.
+Music setup uses one composition from selection through analysis, readiness, and recovery. Once selected, the playlist name remains the visual owner while exact progress and actions change around it. The empty state keeps only the public tagline and one music action. Playlist loading stays in that composition instead of replacing it with a generic spinner screen.
+
+The ready surface shows only the honest ready count, Start, and a subordinate playlist-change action. A partial import uses one compact ready and skipped disclosure; every typed track result remains available in a native sheet. Import failures preserve playlist context and offer action-specific recovery. A valid retry targets the same playlist, while authorization and selection failures route to settings or another playlist as appropriate.
 
 Import runs at most three ordered tracks at once. Progress begins with the complete pending source list, stays deterministic, and preserves playlist order. Debug timing records catalog, download, analysis, total track time, and total wall time without song metadata. Concurrency may change only from physical timing evidence.
 

@@ -10,6 +10,10 @@ Project generates, builds, tests, and stores evidence without production depende
 
 Every meaningful state renders deterministically. Golden flow and recovery paths pass. Visual hierarchy, accessibility, progress, controls, finish safety, and summary are resolved at prototype level.
 
+### Music setup chain
+
+Empty selection, playlist loading and selection, exact analysis progress, partial and complete readiness, typed result disclosure, and action-specific recovery now share one continuous setup composition. Fresh iPhone 17 Pro Simulator evidence covers the normal states, accessibility XXXL, and Reduce Motion.
+
 ### Milestone 2 specification
 
 Playlist import, real cadence, adaptive playback, honest measurement, source selection, testing, and physical completion are specified in [MILESTONE-2-SPEC.md](MILESTONE-2-SPEC.md).
@@ -48,7 +52,7 @@ Continue in this order:
 - Physical imported-collection gate: real playlist selection, local analysis, reinstall and relaunch restoration, and basic progress passed at 13 of 25 ready tracks; a natural transition remains open
 - Device evidence: the candidate persists one bounded latest diagnostic during the run and after completion; commit `42f4dd5` is installed with the selected collection preserved
 - Rhythm control: the candidate uses 30 BPM per revolution, reverse hysteresis, a current-song integer BPM envelope, one terminal boundary haptic, frozen visual travel at the boundary, one Manual command at finger-up, and explicit return to Auto; physical audible and tactile proof remains open
-- Candidate verification: formatter lint, 116 package tests, a resource-inclusive Simulator build, 16 app-model tests, 10 UI tests, exact-profile signing, installation, and selected-collection preservation pass; current physical behavior remains required before release
+- Candidate software verification: formatter lint, 116 package tests, a resource-inclusive Simulator build, 20 app-model tests, and 15 UI tests pass. Exact-profile signing, installation, and selected-collection preservation remain proven on commit `42f4dd5`; the setup redesign has not been installed on the physical iPhone.
 - Felt-synchronization research: complete enough to set direction; Weav used adaptive arrangements, djay separates BPM from beat sync, and published running work supports compatible-track selection plus phase-aware control
 - Device harness: exact-profile catalog search, strict identity resolution, temporary preview download, local PCM decoding, playback, rate controls, route observation, and trace export remain available on the physical iPhone 17 Pro
 - Perceptibility result: 0.90 versus 1.10 was clearly audible on `LITE SPOTS` through Beoplay Eleven; Apple Music stays authoritative while broader blinded and full-song quality evidence remains open

@@ -21,6 +21,7 @@ public enum Space {
 }
 
 public enum MotionToken {
+    public static let feedback = 0.22
     public static let control = 0.18
     public static let transition = 0.42
 }

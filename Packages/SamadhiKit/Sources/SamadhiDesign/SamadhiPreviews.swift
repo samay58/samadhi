@@ -14,6 +14,16 @@ private let previewSend: @MainActor (RunAction) -> Void = { _ in }
     )
 }
 
+#Preview("Ready, loading playlists") {
+    SamadhiScreen(
+        state: RunViewState(
+            phase: .ready,
+            musicSelection: .loadingPlaylists(current: nil)
+        ),
+        send: previewSend
+    )
+}
+
 #Preview("Ready, analyzing music") {
     SamadhiScreen(
         state: RunViewState(
@@ -81,10 +91,42 @@ private let previewSend: @MainActor (RunAction) -> Void = { _ in }
     SamadhiScreen(
         state: RunViewState(
             phase: .ready,
-            musicSelection: .failed("Your Apple Music playlist could not be analyzed.")
+            musicSelection: .failed(.importFailed(name: "City Pocket"))
         ),
         send: previewSend
     )
+}
+
+#Preview("Ready, authorization failure") {
+    SamadhiScreen(
+        state: RunViewState(
+            phase: .ready,
+            musicSelection: .failed(.authorizationDenied)
+        ),
+        send: previewSend
+    )
+}
+
+#Preview("Ready, accessibility text") {
+    SamadhiScreen(
+        state: RunViewState(
+            phase: .ready,
+            musicSelection: .ready(
+                ImportedCollectionPresentation(
+                    name: "The Streetlights Kept Time All the Way Home",
+                    totalTrackCount: 6,
+                    readyTrackCount: 1,
+                    completedTrackCount: 6,
+                    tracks: [
+                        ImportedTrackPresentation(id: "one", title: "Soft Current", status: .ready),
+                        ImportedTrackPresentation(id: "two", title: "Afterimage", status: .rhythmUnclear),
+                    ]
+                )
+            )
+        ),
+        send: previewSend
+    )
+    .environment(\.dynamicTypeSize, .accessibility5)
 }
 
 #Preview("Start transformation") {

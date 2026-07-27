@@ -1,6 +1,6 @@
 import Foundation
 
-enum MusicSelectionFixture {
+enum MusicSelectionFixture: Equatable {
     case standard
     case none
     case loading
@@ -8,6 +8,7 @@ enum MusicSelectionFixture {
     case partial
     case authorizationFailure
     case importFailure
+    case largeLibrary
 }
 
 struct SimulationConfiguration {
@@ -50,6 +51,9 @@ struct SimulationConfiguration {
                 }
                 if arguments.contains("-SAMADHI_MUSIC_IMPORT_FAILURE") {
                     return .importFailure
+                }
+                if arguments.contains("-SAMADHI_MUSIC_LIBRARY_LARGE") {
+                    return .largeLibrary
                 }
                 return .standard
             }()
