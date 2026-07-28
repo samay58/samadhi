@@ -438,6 +438,14 @@ This checkpoint recorded a passing local candidate before its exact-profile buil
 - Corrected two first-pass defects after video review: skipped-disclosure contrast and old/new content overlap during readiness
 - Passed formatter lint, 118 package tests, 25 app-model tests, 21 serial UI tests, and two visual iteration passes across 17 final Simulator frames
 
+## 2026-07-27. Setup craft installation
+
+- Pushed setup-craft commit `0a59b64` to `main`
+- Rebuilt the exact commit with the `Samadhi Development` profile and verified its embedded application identifier and strict code signature
+- Installed over the existing iPhone app without uninstalling or replacing its data container
+- Confirmed the selected-collection checksum remained byte-for-byte identical
+- Attempted foreground launch repeatedly but left it open because the phone was locked
+
 ## Current checkpoint
 
-Milestones 0 and 1 remain complete. Milestone 2 is open. The setup redesign is gated, pushed, installed, and running on the physical iPhone. The shortest remaining check is one song: source-order startup, both Manual boundaries, immediate reverse, return to Auto with a cadence change, and a quick audible and tactile judgment. Pull rolling diagnostics even if the run is not finished.
+Milestones 0 and 1 remain complete. Milestone 2 is open. The setup-craft redesign is gated, pushed, and installed on the physical iPhone with the selected collection preserved. Foreground launch remains open because the phone was locked. Once unlocked, check selection response, readiness confirmation, and Start, then run one song for source-order startup, both Manual boundaries, immediate reverse, return to Auto with a cadence change, and a quick audible and tactile judgment. Pull rolling diagnostics even if the run is not finished.

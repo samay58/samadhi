@@ -175,6 +175,7 @@ The `Samadhi MusicKit Gate` scheme verifies that the harness and framework calls
 - Physical remediation check: open for audible direction, command latency, compatible track change, clockwise versus counterclockwise haptics, and real import wall time
 - Current release profile: renewed; `Samadhi Development` UUID `982e709d-7aa8-4d79-aca3-7759c8f70fc5` expires on 2026-07-30 UTC and embeds `ZL5U59XBJ6.com.samaydhawan.Samadhi`
 - Current response-latency build: clean commit `66e0616`, exact-profile build, signature inspection, physical installation, and selected-collection checksum preservation passed; foreground launch was blocked by the locked phone
+- Current setup-craft build: clean commit `0a59b64`, exact-profile build, embedded identity and signature inspection, in-place physical installation, and selected-collection checksum preservation passed; foreground launch was blocked by the locked phone
 
 ## Felt-synchronization gate
 
@@ -184,7 +185,7 @@ The complete sequence, pivot rules, phase questions, and final evidence packet l
 
 The current field-repair and setup candidate passes formatter lint, 118 package tests, a resource-inclusive Simulator build, 25 app-model tests, and 21 serial UI tests. It deterministically covers the complete setup chain, first-ready startup, the LITE SPOTS to Gorilla regression values, explicit transition authority, bounded rolling diagnostics, stale-prior rejection, irregular callback timing, sustained 150 to 175 SPM tracking, isolated-spike rejection, 30 BPM per revolution, current-song Manual bounds, one terminal boundary signal, frozen indicator travel, immediate reverse response, angle wraparound, multiple revolutions, and one Manual commit at finger-up.
 
-The focused Simulator UI flow reaches the actual current-song boundary, ignores two further outward turns, reverses below the boundary, retains the same track, and never presents `Changing song`. Setup commit `cd07fd4` passes exact-profile signing, embedded application-identifier inspection, physical installation, selected-collection checksum preservation, foreground launch, and process confirmation. The current device latency trace, audible response, and haptic feel remain release blockers. Run one short physical check, then pull the rolling diagnostics immediately. Before Milestone 2 completion, prove one natural transition, five screen-locked minutes, controlled interruption, and route loss.
+The focused Simulator UI flow reaches the actual current-song boundary, ignores two further outward turns, reverses below the boundary, retains the same track, and never presents `Changing song`. Setup-craft commit `0a59b64` passes exact-profile signing, embedded application-identifier inspection, physical installation, and selected-collection checksum preservation. Foreground launch is not claimed because the phone remained locked. The current device latency trace, audible response, and haptic feel remain release blockers. Run one short physical check, then pull the rolling diagnostics immediately. Before Milestone 2 completion, prove one natural transition, five screen-locked minutes, controlled interruption, and route loss.
 
 ## Known environment behavior
 
