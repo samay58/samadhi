@@ -83,9 +83,9 @@ public struct TempoAnalysis: Sendable, Equatable, Codable {
         confidence >= Self.readyConfidence && !cadenceProjections.isEmpty
     }
 
-    public var runningPulseBPM: Double {
-        if TempoEnvelope.runningCadenceBPM.contains(baseBPM) { return baseBPM }
-        if let alternatePulseBPM, TempoEnvelope.runningCadenceBPM.contains(alternatePulseBPM) {
+    public var stepPulseSPM: Double {
+        if TempoEnvelope.locomotionCadenceSPM.contains(baseBPM) { return baseBPM }
+        if let alternatePulseBPM, TempoEnvelope.locomotionCadenceSPM.contains(alternatePulseBPM) {
             return alternatePulseBPM
         }
         return baseBPM
@@ -109,7 +109,7 @@ public struct TempoAnalysis: Sendable, Equatable, Codable {
                 } else {
                     cadencePulse = derivedCadencePulse
                 }
-                guard TempoEnvelope.runningCadenceBPM.contains(cadencePulse) else { continue }
+                guard TempoEnvelope.locomotionCadenceSPM.contains(cadencePulse) else { continue }
                 let projection = CadenceProjection(
                     relationship: relationship,
                     musicalPulseBPM: baseBPM,

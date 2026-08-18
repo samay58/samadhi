@@ -13,6 +13,9 @@ final class RunPresentationModel {
     // This is the boundary between the pure run state machine and iOS. Follow send -> dispatch -> execute.
     private(set) var state: RunState = .ready
     private(set) var showLockBrief = false
+    #if DEBUG
+        private(set) var latestCadenceDiagnosticSample: CadenceDiagnosticSample?
+    #endif
 
     @ObservationIgnored private let reducer: RunReducer
     @ObservationIgnored private let configuration: SimulationConfiguration
@@ -166,6 +169,16 @@ final class RunPresentationModel {
         )
     }
 
+    #if DEBUG
+        var coreLoopDiagnostics: CoreLoopDiagnosticPresentation {
+            CoreLoopDiagnosticPresentation(
+                state: state,
+                collection: musicCollection,
+                cadenceSample: latestCadenceDiagnosticSample
+            )
+        }
+    #endif
+
     func send(_ action: RunAction) {
         switch action {
         case .start:
@@ -175,6 +188,8 @@ final class RunPresentationModel {
         case .revealRhythmControl:
             hapticFeedback.prepareRhythmStep()
             dispatch(.rhythmControlRevealed(timeoutID: token()))
+        case .dismissRhythmControl:
+            dispatch(.rhythmControlDismissed(timeoutID: token()))
         case let .adjustRhythmControl(steps):
             dispatch(
                 .rhythmControlAdjusted(
@@ -291,20 +306,24 @@ final class RunPresentationModel {
         _ observation: CadenceObservation,
         estimate: CadenceEstimate,
         filterState: CadenceTrackingState,
+        disposition: CadenceSampleDisposition,
         callbackIntervalSeconds: Double
     ) {
         #if DEBUG
+            let sample = CadenceDiagnosticSample(
+                rawStepsPerMinute: observation.stepsPerMinute,
+                sampleAgeSeconds: observation.sampleAgeSeconds,
+                sampleEndDateSeconds: observation.sampleEndDateSeconds
+                    ?? (Date().timeIntervalSince1970 - observation.sampleAgeSeconds),
+                callbackIntervalSeconds: callbackIntervalSeconds,
+                filterState: filterState,
+                disposition: disposition,
+                filteredStepsPerMinute: estimate.lockedStepsPerMinute
+            )
+            latestCadenceDiagnosticSample = sample
             persist(
                 diagnosticsRecorder.record(
-                    cadenceSample: CadenceDiagnosticSample(
-                        rawStepsPerMinute: observation.stepsPerMinute,
-                        sampleAgeSeconds: observation.sampleAgeSeconds,
-                        sampleEndDateSeconds: observation.sampleEndDateSeconds
-                            ?? (Date().timeIntervalSince1970 - observation.sampleAgeSeconds),
-                        callbackIntervalSeconds: callbackIntervalSeconds,
-                        filterState: filterState,
-                        filteredStepsPerMinute: estimate.lockedStepsPerMinute
-                    ),
+                    cadenceSample: sample,
                     state: state,
                     collection: musicCollection
                 )
@@ -403,7 +422,7 @@ final class RunPresentationModel {
                             } ?? 1
                         let deltaSeconds =
                             rawDelta > 0
-                            ? min(rawDelta, 2)
+                            ? min(rawDelta, 5)
                             : 1
                         lastElapsedSeconds = observation.elapsedSeconds
 
@@ -412,6 +431,7 @@ final class RunPresentationModel {
                             observation,
                             estimate: estimate,
                             filterState: filter.state,
+                            disposition: filter.lastSampleDisposition,
                             callbackIntervalSeconds: rawDelta > 0 ? rawDelta : 1
                         )
 
@@ -687,7 +707,7 @@ final class RunPresentationModel {
             referenceBPM: referenceBPM,
             referenceReliable: referenceReliable,
             baseTempoBPM: active.session.adaptationState.baseTempoBPM
-                ?? tempo.runningPulseBPM,
+                ?? tempo.stepPulseSPM,
             appliedRate: active.session.appliedPlaybackRate,
             playbackActive: true,
             commandVerified: active.session.adaptationState.commandStatus == .applied

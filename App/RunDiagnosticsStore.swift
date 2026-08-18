@@ -1,7 +1,10 @@
 import Foundation
 import SamadhiDomain
+import SamadhiMotion
 
 struct RunDiagnosticSnapshot: Codable, Equatable, Sendable {
+    static let currentSchemaVersion = 9
+
     enum CompletionState: String, Codable, Sendable {
         case inProgress
         case completed
@@ -49,6 +52,7 @@ struct RunDiagnosticSnapshot: Codable, Equatable, Sendable {
         let sampleEndDateSeconds: Double?
         let callbackIntervalSeconds: Double?
         let cadenceFilterState: String?
+        let cadenceSampleDisposition: String?
         let filteredCadenceSPM: Double?
         let targetRate: Double?
         let controlMode: String?
@@ -57,10 +61,16 @@ struct RunDiagnosticSnapshot: Codable, Equatable, Sendable {
         let requestedBPM: Double?
         let musicalPulseBPM: Double?
         let alternatePulseBPM: Double?
-        let runningPulseBPM: Double?
+        let analysisConfidence: Double?
+        let analyzedDurationSeconds: Double?
+        let analyzerVersion: Int?
+        let originalStepRhythmSPM: Double?
         let stepBeatRelationship: String?
+        let settledAutoTargetSPM: Double?
+        let settledAutoTargetStatus: String?
         let appliedMusicalBPM: Double?
-        let appliedRunningPulseBPM: Double?
+        let appliedStepRhythmSPM: Double?
+        let residualTargetErrorSPM: Double?
         let derivedTargetRate: Double?
         let atLimit: Bool?
         let commandStatus: String?
@@ -87,6 +97,7 @@ struct RunDiagnosticSnapshot: Codable, Equatable, Sendable {
             sampleEndDateSeconds: Double? = nil,
             callbackIntervalSeconds: Double? = nil,
             cadenceFilterState: String? = nil,
+            cadenceSampleDisposition: String? = nil,
             filteredCadenceSPM: Double? = nil,
             targetRate: Double?,
             controlMode: String? = nil,
@@ -95,10 +106,16 @@ struct RunDiagnosticSnapshot: Codable, Equatable, Sendable {
             requestedBPM: Double? = nil,
             musicalPulseBPM: Double? = nil,
             alternatePulseBPM: Double? = nil,
-            runningPulseBPM: Double? = nil,
+            analysisConfidence: Double? = nil,
+            analyzedDurationSeconds: Double? = nil,
+            analyzerVersion: Int? = nil,
+            originalStepRhythmSPM: Double? = nil,
             stepBeatRelationship: String? = nil,
+            settledAutoTargetSPM: Double? = nil,
+            settledAutoTargetStatus: String? = nil,
             appliedMusicalBPM: Double? = nil,
-            appliedRunningPulseBPM: Double? = nil,
+            appliedStepRhythmSPM: Double? = nil,
+            residualTargetErrorSPM: Double? = nil,
             derivedTargetRate: Double? = nil,
             atLimit: Bool = false,
             commandStatus: String? = nil,
@@ -124,6 +141,7 @@ struct RunDiagnosticSnapshot: Codable, Equatable, Sendable {
             self.sampleEndDateSeconds = sampleEndDateSeconds
             self.callbackIntervalSeconds = callbackIntervalSeconds
             self.cadenceFilterState = cadenceFilterState
+            self.cadenceSampleDisposition = cadenceSampleDisposition
             self.filteredCadenceSPM = filteredCadenceSPM
             self.targetRate = targetRate
             self.controlMode = controlMode
@@ -132,10 +150,16 @@ struct RunDiagnosticSnapshot: Codable, Equatable, Sendable {
             self.requestedBPM = requestedBPM
             self.musicalPulseBPM = musicalPulseBPM
             self.alternatePulseBPM = alternatePulseBPM
-            self.runningPulseBPM = runningPulseBPM
+            self.analysisConfidence = analysisConfidence
+            self.analyzedDurationSeconds = analyzedDurationSeconds
+            self.analyzerVersion = analyzerVersion
+            self.originalStepRhythmSPM = originalStepRhythmSPM
             self.stepBeatRelationship = stepBeatRelationship
+            self.settledAutoTargetSPM = settledAutoTargetSPM
+            self.settledAutoTargetStatus = settledAutoTargetStatus
             self.appliedMusicalBPM = appliedMusicalBPM
-            self.appliedRunningPulseBPM = appliedRunningPulseBPM
+            self.appliedStepRhythmSPM = appliedStepRhythmSPM
+            self.residualTargetErrorSPM = residualTargetErrorSPM
             self.derivedTargetRate = derivedTargetRate
             self.atLimit = atLimit
             self.commandStatus = commandStatus
@@ -156,6 +180,8 @@ struct RunDiagnosticSnapshot: Codable, Equatable, Sendable {
 
     let schemaVersion: Int
     let capturedAt: Date
+    let build: BuildIdentity
+    let environment: DiagnosticEnvironment
     let completionState: CompletionState?
     let collectionID: String
     let collectionName: String
@@ -166,6 +192,8 @@ struct RunDiagnosticSnapshot: Codable, Equatable, Sendable {
     init(
         schemaVersion: Int,
         capturedAt: Date,
+        build: BuildIdentity = .current,
+        environment: DiagnosticEnvironment = .current,
         completionState: CompletionState? = .completed,
         collectionID: String,
         collectionName: String,
@@ -175,6 +203,8 @@ struct RunDiagnosticSnapshot: Codable, Equatable, Sendable {
     ) {
         self.schemaVersion = schemaVersion
         self.capturedAt = capturedAt
+        self.build = build
+        self.environment = environment
         self.completionState = completionState
         self.collectionID = collectionID
         self.collectionName = collectionName
@@ -237,6 +267,7 @@ struct CadenceDiagnosticSample {
     let sampleEndDateSeconds: Double
     let callbackIntervalSeconds: Double
     let filterState: CadenceTrackingState
+    let disposition: CadenceSampleDisposition
     let filteredStepsPerMinute: Double?
 }
 
@@ -328,6 +359,13 @@ struct RunDiagnosticsRecorder {
                 ? collection.tracks[session.trackIndex]
                 : nil
         }
+        let appliedStepRhythmSPM = track?.tempo.map {
+            (session?.adaptationState.baseTempoBPM ?? $0.stepPulseSPM)
+                * (session?.adaptationState.appliedRateReadback ?? session?.appliedPlaybackRate ?? 1)
+        }
+        let residualTargetErrorSPM = session?.adaptationState.requestedBPM.flatMap { target in
+            appliedStepRhythmSPM.map { $0 - target }
+        }
 
         timeline.append(
             RunDiagnosticSnapshot.Entry(
@@ -340,6 +378,7 @@ struct RunDiagnosticsRecorder {
                 sampleEndDateSeconds: cadenceObservation?.sampleEndDateSeconds,
                 callbackIntervalSeconds: cadenceObservation?.callbackIntervalSeconds,
                 cadenceFilterState: cadenceObservation?.filterState.rawValue,
+                cadenceSampleDisposition: cadenceObservation?.disposition.rawValue,
                 filteredCadenceSPM: cadenceObservation?.filteredStepsPerMinute,
                 targetRate: session?.adaptationState.targetRate,
                 controlMode: session?.rhythmControl.mode.rawValue,
@@ -349,16 +388,21 @@ struct RunDiagnosticsRecorder {
                 musicalPulseBPM: session?.adaptationState.musicalTempoBPM
                     ?? track?.tempo?.baseBPM,
                 alternatePulseBPM: track?.tempo?.alternatePulseBPM,
-                runningPulseBPM: session?.adaptationState.baseTempoBPM
-                    ?? track?.tempo?.runningPulseBPM,
+                analysisConfidence: track?.tempo?.confidence,
+                analyzedDurationSeconds: track?.tempo?.analyzedDurationSeconds,
+                analyzerVersion: track?.tempo?.version,
+                originalStepRhythmSPM: session?.adaptationState.baseTempoBPM
+                    ?? track?.tempo?.stepPulseSPM,
                 stepBeatRelationship: session?.adaptationState.stepBeatRelationship?.rawValue,
+                settledAutoTargetSPM: session?.autoTargetState.settledTargetSPM,
+                settledAutoTargetStatus: session?.autoTargetState.status.rawValue,
                 appliedMusicalBPM: track?.tempo.map {
-                    $0.baseBPM * (session?.appliedPlaybackRate ?? 1)
+                    $0.baseBPM
+                        * (session?.adaptationState.appliedRateReadback
+                            ?? session?.appliedPlaybackRate ?? 1)
                 },
-                appliedRunningPulseBPM: track?.tempo.map {
-                    (session?.adaptationState.baseTempoBPM ?? $0.runningPulseBPM)
-                        * (session?.appliedPlaybackRate ?? 1)
-                },
+                appliedStepRhythmSPM: appliedStepRhythmSPM,
+                residualTargetErrorSPM: residualTargetErrorSPM,
                 derivedTargetRate: session?.adaptationState.derivedTargetRate,
                 atLimit: session?.adaptationState.isAtLimit ?? false,
                 commandStatus: session?.adaptationState.commandStatus.rawValue,
@@ -402,7 +446,7 @@ struct RunDiagnosticsRecorder {
         guard let summary = completedSummary ?? session?.summary else { return nil }
         lastCheckpointAt = now()
         let snapshot = RunDiagnosticSnapshot(
-            schemaVersion: 5,
+            schemaVersion: RunDiagnosticSnapshot.currentSchemaVersion,
             capturedAt: now(),
             completionState: completedSummary == nil ? .inProgress : .completed,
             collectionID: collection.id.rawValue,

@@ -4,12 +4,14 @@ public struct RunReducer: Sendable {
     private let requiresAdaptiveReadyTrack: Bool
     let tracks: [MusicTrack]
     let adaptationPolicy: AdaptationPolicy
+    let autoTargetPolicy: AutoTargetPolicy
 
     public init(trackCount: Int = 3) {
         self.trackCount = max(trackCount, 1)
         requiresAdaptiveReadyTrack = false
         tracks = []
         adaptationPolicy = AdaptationPolicy()
+        autoTargetPolicy = AutoTargetPolicy()
     }
 
     public init(tracks: [MusicTrack]) {
@@ -17,6 +19,7 @@ public struct RunReducer: Sendable {
         trackCount = max(tracks.count, 1)
         requiresAdaptiveReadyTrack = true
         adaptationPolicy = AdaptationPolicy()
+        autoTargetPolicy = AutoTargetPolicy()
     }
 
     public func reduce(state: RunState, event: RunEvent) -> (RunState, [RunEffect]) {
@@ -184,6 +187,20 @@ public struct RunReducer: Sendable {
             next.activity = .playing(
                 rhythm: rhythm,
                 controls: .timed(surface: .rhythm, timeoutID: timeoutID)
+            )
+            return (
+                .active(next),
+                [.scheduleControlsTimeout(sessionID: active.session.id, timeoutID: timeoutID)]
+            )
+
+        case let (.active(active), .rhythmControlDismissed(timeoutID)):
+            guard case let .playing(rhythm, controls) = active.activity,
+                controls.surface == .rhythm
+            else { return (state, []) }
+            var next = active
+            next.activity = .playing(
+                rhythm: rhythm,
+                controls: .timed(surface: .transport, timeoutID: timeoutID)
             )
             return (
                 .active(next),
@@ -531,6 +548,7 @@ public struct RunReducer: Sendable {
                 (0..<trackCount).contains(trackIndex),
                 tracks.isEmpty || tracks[trackIndex].id == trackID
             else { return (state, []) }
+            guard active.session.currentTrackID != trackID else { return (state, []) }
             var next = active
             if next.session.trackIndex != trackIndex {
                 next.session.songCount += 1
@@ -545,6 +563,7 @@ public struct RunReducer: Sendable {
             next.session.pendingTrackSelectionID = nil
             next.session.pendingNextTrackID = nil
             next.session.preparedNextTrackID = nil
+            next.session.rhythmControl = .initial
             return adaptControlAfterTrackChange(
                 active: next,
                 rateRequestID: rateRequestID

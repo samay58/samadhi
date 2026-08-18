@@ -1,0 +1,56 @@
+{
+  "capturedAt": "2026-08-17T19:32:12Z",
+  "privacy": "No collection name, song title, or song identifier is stored in this summary.",
+  "build": {
+    "gitCommit": "4f5394f3158dde9ad891b8b772b197c4c26090b2",
+    "sourceFingerprint": "4e454d2859a521367bf83f26ba1287b14d617d0700c630f90ff13ce8f3b5b498",
+    "trackedFilesDirty": true,
+    "appVersion": "1.0",
+    "buildNumber": "1",
+    "diagnosticFileVersion": 8
+  },
+  "environment": {
+    "device": "iPhone18,1",
+    "operatingSystem": "Version 27.0 (Build 24A5408d)",
+    "motionService": "real phone motion",
+    "musicService": "real Apple Music"
+  },
+  "appSummary": {
+    "completionState": "completed",
+    "countedDurationSeconds": 328,
+    "automaticSeconds": 313,
+    "manualSeconds": 15,
+    "songCount": 6,
+    "averageAcceptedCadenceSPM": 137,
+    "tempoMatchedCoveragePercent": 96,
+    "tempoMatchedPercent": 6
+  },
+  "retainedTimeline": {
+    "eventCount": 512,
+    "firstOffsetSeconds": 1300.935359954834,
+    "lastOffsetSeconds": 8769.885143995285,
+    "numericCadenceReadingCount": 61,
+    "belowRunningRangeCount": 57,
+    "belowRunningRangeMinimumSPM": 82.31926918029785,
+    "belowRunningRangeMaximumSPM": 115.56498527526855,
+    "belowRunningRangeAverageSPM": 99.32060166409141,
+    "acceptedRunningValuesSPM": [
+      130.6342077255249,
+      133.27049732208252,
+      133.27049732208252,
+      133.27049732208252
+    ],
+    "settledAutoTargetSPM": 133,
+    "verifiedCommandedRate": 1.0390625,
+    "verifiedReportedRate": 1.0390625,
+    "verifiedReplySeconds": 0.06569858331931755,
+    "routeLostOffsetSeconds": 1612.1357989311218,
+    "routeRestoredOffsetSeconds": 8765.208347916603
+  },
+  "proofLimits": [
+    "The bounded timeline begins more than 21 minutes after launch, so it does not retain the start of the workout.",
+    "The workout mixed walking, light jogging, and lifting, so the trace cannot assign every cadence reading or elapsed minute to one activity.",
+    "The trace records one confirmed song change but not whether it was natural or followed a user command.",
+    "The trace does not measure haptic perception, listening quality, or why a person chose to stop or resume."
+  ]
+}

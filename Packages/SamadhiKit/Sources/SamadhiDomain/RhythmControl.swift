@@ -17,7 +17,7 @@ public struct ManualTempoEnvelope: Sendable, Equatable {
         cadencePulseBPM: Double,
         minimumRate: Double = TempoEnvelope.rateRange.lowerBound,
         maximumRate: Double = TempoEnvelope.rateRange.upperBound,
-        targetRange: ClosedRange<Int> = TempoEnvelope.runningCadenceRange
+        targetRange: ClosedRange<Int> = TempoEnvelope.locomotionCadenceRange
     ) {
         guard cadencePulseBPM > 0, minimumRate > 0, minimumRate <= maximumRate else {
             return nil
@@ -55,7 +55,7 @@ public struct RhythmControlState: Sendable, Equatable, Codable {
     ) {
         self.mode = mode
         self.automaticCorrectionBPM = Self.automaticCorrectionRange.clamped(automaticCorrectionBPM)
-        self.manualTargetBPM = TempoEnvelope.runningCadenceRange.clamped(manualTargetBPM)
+        self.manualTargetBPM = TempoEnvelope.locomotionCadenceRange.clamped(manualTargetBPM)
     }
 
     public static let initial = RhythmControlState()
@@ -66,8 +66,8 @@ public struct RhythmControlState: Sendable, Equatable, Codable {
             cadenceSPM.map {
                 let requested = $0 + Double(automaticCorrectionBPM)
                 return min(
-                    max(requested, TempoEnvelope.runningCadenceBPM.lowerBound),
-                    TempoEnvelope.runningCadenceBPM.upperBound
+                    max(requested, TempoEnvelope.locomotionCadenceSPM.lowerBound),
+                    TempoEnvelope.locomotionCadenceSPM.upperBound
                 )
             }
         case .manual:
@@ -117,12 +117,12 @@ public struct RhythmControlState: Sendable, Equatable, Codable {
         automaticCorrectionBPM = 0
     }
 
-    // Without a current track there is no per-song envelope, so the broad running range applies.
+    // Without a current track there is no per-song envelope, so the supported movement range applies.
     private static func clampManualTarget(
         _ bpm: Int,
         within envelope: ManualTempoEnvelope?
     ) -> Int {
-        envelope?.clamped(bpm) ?? TempoEnvelope.runningCadenceRange.clamped(bpm)
+        envelope?.clamped(bpm) ?? TempoEnvelope.locomotionCadenceRange.clamped(bpm)
     }
 }
 

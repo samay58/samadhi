@@ -27,7 +27,7 @@ private struct FixtureResult: Codable {
     let referenceBPM: Double
     let estimatedBPM: Double?
     let alternatePulseBPM: Double?
-    let runningPulseBPM: Double?
+    let stepPulseSPM: Double?
     let confidence: Double?
     let analysisVersion: Int?
     let pulseError: Double?
@@ -162,7 +162,7 @@ private enum TempoCorpusValidator {
             referenceBPM: fixture.referenceBPM,
             estimatedBPM: analysis?.baseBPM,
             alternatePulseBPM: analysis?.alternatePulseBPM,
-            runningPulseBPM: analysis?.runningPulseBPM,
+            stepPulseSPM: analysis?.stepPulseSPM,
             confidence: analysis?.confidence,
             analysisVersion: analysis?.version,
             pulseError: pulseError,

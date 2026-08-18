@@ -62,6 +62,7 @@ public struct RunSession: Sendable, Equatable {
     public var currentTrackID: MusicTrackID?
     public var cadenceAcquisitionID: Int?
     public var adaptationState: AdaptationState
+    public var autoTargetState: AutoTargetState
     public var rhythmControl: RhythmControlState
     public var appliedPlaybackRate: Double
     public var pendingRateRequestID: Int?
@@ -89,6 +90,7 @@ public struct RunSession: Sendable, Equatable {
         currentTrackID = nil
         cadenceAcquisitionID = nil
         adaptationState = .initial
+        autoTargetState = .initial
         rhythmControl = .initial
         appliedPlaybackRate = 1
         pendingRateRequestID = nil
@@ -328,6 +330,7 @@ public enum RunEvent: Sendable, Equatable {
     case cadenceAcquisitionFailed(sessionID: Int, acquisitionID: Int)
     case surfaceTapped(timeoutID: Int)
     case rhythmControlRevealed(timeoutID: Int)
+    case rhythmControlDismissed(timeoutID: Int)
     case rhythmControlAdjusted(steps: Int, rateRequestID: Int, timeoutID: Int)
     case rhythmControlTargetCommitted(bpm: Int, rateRequestID: Int, timeoutID: Int)
     case rhythmControlSetManual(rateRequestID: Int, timeoutID: Int)

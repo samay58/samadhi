@@ -151,7 +151,7 @@ The controlled test placement is an iPhone secured in the runner's right-front s
 
 Cadence rules:
 
-- Accept values from 120 through 210 SPM as running cadence.
+- Accept steady movement from 90 through 210 SPM. Treat 120 through 210 as running cadence. Walking needs five seconds of steady evidence before it can control music.
 - Keep the latest six observations.
 - Initial lock requires at least five valid observations and median absolute deviation no greater than 3 SPM.
 - Target lock time is 8 seconds or less. The hard timeout is 12 seconds.
@@ -170,7 +170,7 @@ For a measured musical pulse `B`, optional independently supported stride pulse 
 
 Safety and stability rules:
 
-- Keep 0.90 through 1.10 as the current physically audible range. Full-song artifact listening remains a completion gate.
+- Use 0.85 through 1.15 for the current software candidate. Only 0.90 through 1.10 has passed a short physical listening check. Apple Music read-back and full-song listening at the new endpoints remain completion gates.
 - A track is cadence-compatible only when its unclamped target falls inside that range.
 - Apply an initial lock ramp no faster than 2 percentage points of rate per second.
 - After lock, change rate no faster than 0.5 percentage points per second.
@@ -324,9 +324,9 @@ The implemented rhythm control helps both the runner and the physical test. It e
 
 Behavior:
 
-- Auto follows stable Core Motion cadence through the existing deadband, ramp, confidence, compatibility, and 0.90 through 1.10 rate limits.
-- Fine-tune applies a signed BPM correction to Auto. The range is minus 20 through plus 20 BPM in one-BPM steps, clipped to the accepted 120 through 210 running range.
-- Manual lets the runner choose a target BPM directly from 120 through 210 BPM in one-BPM steps.
+- Auto follows stable Core Motion cadence through the existing deadband, ramp, confidence, compatibility, and 0.85 through 1.15 candidate rate limits.
+- Fine-tune applies a signed BPM correction to Auto. The range is minus 20 through plus 20 BPM in one-BPM steps, clipped to the supported 90 through 210 SPM movement range.
+- Manual lets the runner choose a target directly from 90 through 210 SPM in one-step increments, further limited by the current song's reachable range.
 - Reset returns to Auto with zero correction.
 - Each run starts in Auto. Manual state does not silently carry into a later run.
 - The control keeps requested BPM and achievable Music BPM distinct. At the safe-rate boundary it keeps the request, applies the nearest honest rate, and never changes the song without Skip or a natural boundary.
@@ -369,11 +369,11 @@ Acceptance:
 
 ### Where we are now
 
-Milestones 0 and 1 are complete. Apple Music is the selected Milestone 2 source. A validated 149.75 BPM fixture, Core Motion cadence, bounded reducer adaptation, identified MusicKit read-back, and honest measurement pass together in the focused core-loop scheme. The corrected 59-second physical run averaged 155 SPM and measured 98 percent tempo matched. Analyzer version 4 uses Accelerate spectral flux and fractional-lag autocorrelation across 60 through 210 BPM. It preserves the measured musical pulse, records only independently supported stride relationships, and passes 12 of 12 public preview references. One physical 25-track playlist restores after reinstall and relaunch with 13 ready tracks, and basic production-player progress passes. Playlist persistence, ready-track filtering, the normal production composition, and the source-neutral BPM control are implemented. The repaired build prevents Manual or Auto changes from committing transport. Its physical reimport, natural imported-track transition, and listening behavior remain open.
+Milestones 0 and 1 are complete. Apple Music is the selected Milestone 2 source. A validated 149.75 BPM fixture, Core Motion cadence, bounded reducer adaptation, identified MusicKit read-back, and honest measurement pass together in the focused core-loop scheme. The corrected 59-second physical run averaged 155 SPM and measured 98 percent tempo matched. Analyzer version 4 uses Accelerate spectral flux and fractional-lag autocorrelation across 60 through 210 BPM. It preserves the measured musical pulse, records only independently supported stride relationships, and passes 12 of 12 public preview references. One physical 25-track playlist restores after reinstall and relaunch with 13 ready tracks, and basic production-player progress passes. Playlist persistence, ready-track filtering, the normal production composition, and the source-neutral BPM control are implemented. The repaired build prevents Manual or Auto changes from committing transport. The current 0.85 through 1.15 candidate still needs exact-profile endpoint read-back, full-song listening, a known natural imported-track transition, and outdoor proof.
 
 ### Build order
 
-1. Prove requested BPM, safe target rate, MusicKit read-back, and limit feedback on the physical phone.
+1. Prove 0.85 and 1.15 MusicKit read-back, full-song sound quality, requested BPM, and limit feedback on the physical phone.
 2. Continue the restored imported production flow through a natural transition and verify the saved diagnostics.
 3. Expand analyzer coverage only when new real tracks expose a specific failure.
 4. Run cadence calibration, listening, background, recovery, and the outdoor completion gate.

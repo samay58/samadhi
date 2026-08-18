@@ -44,6 +44,6 @@ Result: automatic cadence-driven rate response passes on the physical iPhone.
 
 The live target and applied values were released when the session moved to the summary, so the completed-run panel shows placeholders. Its post-run `feedback settled` label is also a default with no active request and is not used as evidence. Future focused observations should be captured programmatically during the run or written to a focused trace file.
 
-User-supplied iPhone frame: [objective rate-response summary](2026-07-16-objective-rate-response-summary.png)
+The user-supplied iPhone summary frame was reviewed during the check but was not retained in the repository.
 
 SHA-256: `2c89e833e1accdf795515403d6b735a42a8a808597790d1a55dc67b4ea69aca7`

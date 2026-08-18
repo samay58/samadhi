@@ -86,7 +86,7 @@ func generatedTempoCorpusStaysInsideTwoPercent(_ referenceBPM: Double) async thr
     #expect(result != nil)
     #expect(tempoError(result?.baseBPM ?? 0, referenceBPM: 90) <= 0.02)
     #expect(result?.alternatePulseBPM == nil)
-    #expect(tempoError(result?.runningPulseBPM ?? 0, referenceBPM: 90) <= 0.02)
+    #expect(tempoError(result?.stepPulseSPM ?? 0, referenceBPM: 90) <= 0.02)
     #expect(result?.isAdaptiveReady == true)
 }
 
@@ -103,7 +103,7 @@ func generatedTempoCorpusStaysInsideTwoPercent(_ referenceBPM: Double) async thr
 
     #expect(result != nil)
     #expect(tempoError(result?.baseBPM ?? 0, referenceBPM: 180) <= 0.02)
-    #expect(tempoError(result?.runningPulseBPM ?? 0, referenceBPM: 180) <= 0.02)
+    #expect(tempoError(result?.stepPulseSPM ?? 0, referenceBPM: 180) <= 0.02)
 }
 
 private func analyze(

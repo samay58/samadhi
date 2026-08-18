@@ -27,7 +27,7 @@ final class SamadhiUITests: XCTestCase {
 
         XCTAssertTrue(app.buttons["skip-track"].waitForExistence(timeout: 2))
         app.buttons["skip-track"].tap()
-        XCTAssertTrue(app.staticTexts["Afterimage"].waitForExistence(timeout: 2))
+        XCTAssertTrue(app.staticTexts["Afterimage"].waitForExistence(timeout: 4))
 
         element("track-identity").tap()
         XCTAssertTrue(app.buttons["finish-run"].waitForExistence(timeout: 2))
@@ -304,13 +304,21 @@ final class SamadhiUITests: XCTestCase {
         app.launch()
         XCTAssertTrue(app.buttons["start-run"].waitForExistence(timeout: 2))
         app.buttons["start-run"].tap()
-        XCTAssertTrue(element("cadence-lock").waitForExistence(timeout: 3))
+        XCTAssertTrue(element("cadence-lock").waitForExistence(timeout: 6))
         XCTAssertFalse(app.staticTexts["Turn the ring to tune"].exists)
 
         element("tempo-control").tap()
         XCTAssertTrue(element("rhythm-dial").waitForExistence(timeout: 2))
         XCTAssertTrue(app.buttons["rhythm-auto"].exists)
         XCTAssertTrue(app.buttons["rhythm-manual"].exists)
+
+        app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.15)).tap()
+        XCTAssertTrue(element("rhythm-dial").exists)
+        XCTAssertFalse(app.buttons["pause-run"].exists)
+
+        app.buttons["close-rhythm-control"].tap()
+        element("tempo-control").tap()
+        XCTAssertTrue(element("rhythm-dial").waitForExistence(timeout: 2))
 
         let trackIdentity = element("track-identity")
         XCTAssertTrue(trackIdentity.exists)
@@ -352,6 +360,84 @@ final class SamadhiUITests: XCTestCase {
         app.buttons["rhythm-auto"].tap()
         XCTAssertTrue(app.buttons["rhythm-auto"].isSelected)
         XCTAssertTrue(app.staticTexts["168"].exists)
+
+        let close = app.buttons["close-rhythm-control"]
+        XCTAssertTrue(close.exists)
+        XCTAssertTrue(close.isHittable)
+        assertCloseTargetClearsDial(close: close, dial: element("rhythm-dial"))
+        attachScreenshot(named: "tempo-control-open-quiet-close")
+        close.tap()
+        XCTAssertTrue(app.buttons["pause-run"].waitForExistence(timeout: 2))
+        XCTAssertFalse(element("rhythm-dial").exists)
+        attachScreenshot(named: "tempo-control-closed-playback-controls")
+    }
+
+    func testManualReturnsToAutoOnlyAfterConfirmedSongChange() {
+        prepareApp()
+        app.launch()
+        app.buttons["start-run"].tap()
+        XCTAssertTrue(element("cadence-lock").waitForExistence(timeout: 6))
+
+        element("tempo-control").tap()
+        app.buttons["rhythm-manual"].tap()
+        XCTAssertTrue(app.buttons["rhythm-manual"].isSelected)
+        attachScreenshot(named: "manual-before-confirmed-song-change")
+
+        app.buttons["close-rhythm-control"].tap()
+        let originalTrack = element("track-identity").label
+        let skip = app.buttons["skip-track"]
+        XCTAssertTrue(skip.waitForExistence(timeout: 2))
+        skip.tap()
+
+        let track = element("track-identity")
+        let changed = NSPredicate(format: "label != %@", originalTrack)
+        expectation(for: changed, evaluatedWith: track)
+        waitForExpectations(timeout: 3)
+
+        element("tempo-control").tap()
+        XCTAssertTrue(app.buttons["rhythm-auto"].waitForExistence(timeout: 2))
+        XCTAssertTrue(app.buttons["rhythm-auto"].isSelected)
+        XCTAssertFalse(app.buttons["rhythm-manual"].isSelected)
+        attachScreenshot(named: "auto-after-confirmed-song-change")
+    }
+
+    func testTempoCloseRemainsUsableWithAccessibilityTextAndReduceMotion() {
+        prepareApp([
+            "-UIPreferredContentSizeCategoryName",
+            "UICTContentSizeCategoryAccessibilityXXXL",
+            "-UIAccessibilityReduceMotionEnabled",
+            "YES",
+        ])
+        app.launch()
+        app.buttons["start-run"].tap()
+        XCTAssertTrue(element("cadence-lock").waitForExistence(timeout: 3))
+
+        element("tempo-control").tap()
+        let close = app.buttons["close-rhythm-control"]
+        XCTAssertTrue(close.waitForExistence(timeout: 2))
+        XCTAssertGreaterThanOrEqual(close.frame.width, 44)
+        XCTAssertGreaterThanOrEqual(close.frame.height, 44)
+        assertCloseTargetClearsDial(close: close, dial: element("rhythm-dial"))
+        attachScreenshot(named: "tempo-close-accessibility-reduce-motion")
+
+        close.tap()
+        XCTAssertTrue(app.buttons["pause-run"].waitForExistence(timeout: 2))
+        XCTAssertFalse(element("rhythm-dial").exists)
+    }
+
+    func testTempoCloseRemainsClearWithIncreasedContrast() {
+        prepareApp(["-UIAccessibilityDarkerSystemColorsEnabled", "YES"])
+        app.launch()
+        app.buttons["start-run"].tap()
+        XCTAssertTrue(element("cadence-lock").waitForExistence(timeout: 3))
+
+        element("tempo-control").tap()
+        let close = app.buttons["close-rhythm-control"]
+        XCTAssertTrue(close.waitForExistence(timeout: 2))
+        XCTAssertGreaterThanOrEqual(close.frame.width, 44)
+        XCTAssertGreaterThanOrEqual(close.frame.height, 44)
+        assertCloseTargetClearsDial(close: close, dial: element("rhythm-dial"))
+        attachScreenshot(named: "tempo-close-increased-contrast")
     }
 
     func testNormalSimulatorLaunchUsesLocalDemoMusic() {
@@ -363,6 +449,88 @@ final class SamadhiUITests: XCTestCase {
         XCTAssertTrue(app.staticTexts["Samadhi demo"].exists)
         app.buttons["start-run"].tap()
         XCTAssertTrue(element("cadence-lock").waitForExistence(timeout: 6))
+    }
+
+    func testDiagnosticsKeepSongBeatsAndRunnerStepsSeparate() {
+        prepareApp("--diagnostic-scenario=verified")
+        app.launch()
+
+        XCTAssertTrue(element("core-loop-diagnostics").waitForExistence(timeout: 3))
+        XCTAssertTrue(element("build-identity-value").exists)
+        XCTAssertFalse(element("build-identity-value").label.contains("unknown"))
+        let sourceFingerprint = element("source-fingerprint-value")
+        XCTAssertTrue(sourceFingerprint.exists)
+        XCTAssertNotNil(
+            sourceFingerprint.label.range(
+                of: "[0-9a-f]{64}",
+                options: .regularExpression
+            )
+        )
+        for _ in 0..<3 where !element("measured-song-speed").exists {
+            app.swipeUp()
+        }
+        XCTAssertTrue(element("measured-song-speed").label.contains("84.0 BPM"))
+        XCTAssertTrue(element("step-relationship").label.contains("Two steps per beat"))
+        XCTAssertTrue(element("original-step-rhythm").label.contains("168.0 SPM"))
+        attachScreenshot(named: "core-diagnostics-low-tempo")
+        for _ in 0..<4 where !element("settled-auto-target").exists {
+            app.swipeUp()
+        }
+        XCTAssertTrue(element("sensor-sample-status").label.contains("Accepted, delayed but new"))
+        XCTAssertTrue(element("settled-auto-target").label.contains("175 SPM, settled"))
+        attachScreenshot(named: "core-diagnostics-sensor-and-auto-target")
+    }
+
+    func testDiagnosticsDistinguishEveryAppleMusicResult() {
+        for status in ["waiting", "verified", "limited", "rejected"] {
+            prepareApp("--diagnostic-scenario=\(status)")
+            app.launch()
+            XCTAssertTrue(element("core-loop-diagnostics").waitForExistence(timeout: 3))
+            for _ in 0..<4 where !element("tempo-command-status").exists {
+                app.swipeUp()
+            }
+            XCTAssertTrue(element("tempo-command-status").exists)
+            XCTAssertFalse(element("tempo-command-status").label.isEmpty)
+            attachScreenshot(named: "core-diagnostics-\(status)")
+            app.terminate()
+        }
+    }
+
+    func testTrackResetShowsNoOldAppleMusicReadback() {
+        prepareApp("--diagnostic-scenario=waiting")
+        app.launch()
+
+        XCTAssertTrue(element("core-loop-diagnostics").waitForExistence(timeout: 3))
+        for _ in 0..<8 where !element("tempo-command-status").exists {
+            app.swipeUp()
+        }
+        XCTAssertTrue(element("apple-music-reported-rate").exists)
+        XCTAssertTrue(element("apple-music-reported-rate").label.contains("Not available"))
+        XCTAssertTrue(element("tempo-command-status").exists)
+        XCTAssertEqual(element("tempo-command-status").label, "Waiting for Apple Music")
+        attachScreenshot(named: "core-diagnostics-track-reset")
+    }
+
+    func testDiagnosticsRemainReadableAtAccessibilitySizeWithReduceMotion() {
+        prepareApp([
+            "--diagnostic-scenario=limited",
+            "-UIPreferredContentSizeCategoryName",
+            "UICTContentSizeCategoryAccessibilityXXXL",
+            "-UIAccessibilityReduceMotionEnabled",
+            "YES",
+        ])
+        app.launch()
+
+        XCTAssertTrue(element("core-loop-diagnostics").waitForExistence(timeout: 3))
+        for _ in 0..<12 where !element("measured-song-speed").exists {
+            app.swipeUp()
+        }
+        XCTAssertTrue(element("measured-song-speed").exists)
+        for _ in 0..<12 where !element("tempo-command-status").exists {
+            app.swipeUp()
+        }
+        XCTAssertEqual(element("tempo-command-status").label, "Limited by this song")
+        attachScreenshot(named: "core-diagnostics-accessibility-reduce-motion")
     }
 
     private func element(_ identifier: String) -> XCUIElement {
@@ -382,6 +550,19 @@ final class SamadhiUITests: XCTestCase {
         add(attachment)
     }
 
+    private func assertCloseTargetClearsDial(close: XCUIElement, dial: XCUIElement) {
+        XCTAssertTrue(dial.exists)
+        let closeFrame = close.frame
+        let dialFrame = dial.frame
+        let centerDistance = hypot(
+            closeFrame.midX - dialFrame.midX,
+            closeFrame.midY - dialFrame.midY
+        )
+        let dialRadius = min(dialFrame.width, dialFrame.height) / 2
+        let closeHalfDiagonal = hypot(closeFrame.width, closeFrame.height) / 2
+        XCTAssertGreaterThanOrEqual(centerDistance, dialRadius + closeHalfDiagonal)
+    }
+
     private func waitForVisualSettle() {
         RunLoop.current.run(until: Date(timeIntervalSinceNow: 0.3))
     }
@@ -390,7 +571,7 @@ final class SamadhiUITests: XCTestCase {
         app.staticTexts.allElementsBoundByIndex
             .lazy
             .compactMap { Int($0.label) }
-            .first { 120...210 ~= $0 }
+            .first { 90...210 ~= $0 }
     }
 
     private func turn(from start: XCUICoordinate, to end: XCUICoordinate) {

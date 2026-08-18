@@ -1,6 +1,6 @@
 # Apple Music feasibility gate
 
-Historical snapshot. Superseded later on 2026-07-15 by [apple-music-gate-device-start.md](2026-07-15-apple-music-gate-device-start.md), after Apple signing and the physical iPhone became available.
+Historical snapshot. Superseded later on 2026-07-15 by [the device gate](2026-07-15-apple-music-gate-device-start.md), after Apple signing and the physical iPhone became available.
 
 Date: 2026-07-15
 

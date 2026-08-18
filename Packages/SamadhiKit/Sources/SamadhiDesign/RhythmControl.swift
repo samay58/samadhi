@@ -8,6 +8,7 @@ struct RhythmControl: View {
     let send: @MainActor (RunAction) -> Void
 
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.colorSchemeContrast) private var colorSchemeContrast
     @Environment(\.accessibilityVoiceOverEnabled) private var voiceOverEnabled
     @AppStorage("samadhi.tempoControlDiscovered") private var tempoControlDiscovered = false
     @State private var dragOriginBPM: Int?
@@ -39,34 +40,67 @@ struct RhythmControl: View {
     private var apertureSurface: some View {
         if state.rhythmControl.isVisible {
             ZStack {
-                aperture
-                    .accessibilityHidden(true)
+                ZStack {
+                    aperture
+                        .accessibilityHidden(true)
 
-                wheelDetents
+                    wheelDetents
 
-                readout
-                    .transition(.opacity)
+                    readout
+                        .transition(.opacity)
 
-                wheelIndicator
+                    wheelIndicator
+                }
+                .frame(width: size, height: size)
+                .contentShape(Circle())
+                .gesture(adjustmentGesture)
+                .accessibilityElement(children: .ignore)
+                .accessibilityLabel(accessibilityLabel)
+                .accessibilityValue(accessibilityValue)
+                .accessibilityHint("Swipe up or down to adjust by one beat per minute")
+                .accessibilityAdjustableAction { direction in
+                    switch direction {
+                    case .increment:
+                        commitAccessibleChange(1)
+                    case .decrement:
+                        commitAccessibleChange(-1)
+                    @unknown default:
+                        break
+                    }
+                }
+                .accessibilityIdentifier("rhythm-dial")
             }
             .frame(width: size, height: size)
-            .contentShape(Circle())
-            .gesture(adjustmentGesture)
-            .accessibilityElement(children: .ignore)
-            .accessibilityLabel(accessibilityLabel)
-            .accessibilityValue(accessibilityValue)
-            .accessibilityHint("Swipe up or down to adjust by one beat per minute")
-            .accessibilityAdjustableAction { direction in
-                switch direction {
-                case .increment:
-                    commitAccessibleChange(1)
-                case .decrement:
-                    commitAccessibleChange(-1)
-                @unknown default:
-                    break
+            .overlay(alignment: .topTrailing) {
+                Button(action: dismiss) {
+                    ZStack {
+                        Circle()
+                            .fill(
+                                SamadhiColor.ink.opacity(
+                                    effectiveIncreasedContrast ? 0.36 : 0.08
+                                )
+                            )
+                            .frame(width: 24, height: 24)
+
+                        Image(systemName: "xmark")
+                            .font(.system(size: 11.5, weight: .medium))
+                            .foregroundStyle(
+                                SamadhiColor.ivory.opacity(
+                                    effectiveIncreasedContrast ? 1 : 0.9
+                                )
+                            )
+                            .offset(y: -0.25)
+                    }
+                    .frame(width: 44, height: 44)
+                    .contentShape(Rectangle())
                 }
+                .buttonStyle(QuietCloseButtonStyle(reduceMotion: effectiveReduceMotion))
+                .offset(x: Space.x3, y: -Space.x3)
+                .accessibilityLabel("Close tempo control")
+                .accessibilityHint("Returns to playback controls")
+                .accessibilityIdentifier("close-rhythm-control")
+                .accessibilitySortPriority(1)
             }
-            .accessibilityIdentifier("rhythm-dial")
         } else {
             Button(action: reveal) {
                 ZStack {
@@ -324,6 +358,10 @@ struct RhythmControl: View {
         reduceMotion || state.forceReduceMotion
     }
 
+    private var effectiveIncreasedContrast: Bool {
+        colorSchemeContrast == .increased || state.forceIncreasedContrast
+    }
+
     private var shouldPresentAffordanceCue: Bool {
         mode == .locked && state.rhythmControl.isAvailable && !tempoControlDiscovered
             && !effectiveReduceMotion
@@ -359,9 +397,14 @@ struct RhythmControl: View {
         if voiceOverEnabled { send(.controlsInteractionChanged(true)) }
     }
 
+    private func dismiss() {
+        guard state.rhythmControl.isVisible else { return }
+        send(.dismissRhythmControl)
+    }
+
     // Frozen at finger-down so the reachable range cannot shift under a gesture in progress.
     private var activeBPMRange: ClosedRange<Int> {
-        dragBPMRange ?? state.rhythmControl.manualBPMRange ?? TempoEnvelope.runningCadenceRange
+        dragBPMRange ?? state.rhythmControl.manualBPMRange ?? TempoEnvelope.locomotionCadenceRange
     }
 
     private func boundedDisplayBPM(_ bpm: Int) -> Int {
@@ -394,6 +437,20 @@ struct RhythmControl: View {
     private func commitAccessibleChange(_ step: Int) {
         guard let current = displayBPM else { return }
         send(.commitRhythmTarget(boundedDisplayBPM(current + step)))
+    }
+}
+
+private struct QuietCloseButtonStyle: ButtonStyle {
+    let reduceMotion: Bool
+
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .scaleEffect(configuration.isPressed && !reduceMotion ? 0.96 : 1)
+            .opacity(configuration.isPressed ? 0.7 : 1)
+            .animation(
+                reduceMotion ? nil : .easeOut(duration: 0.12),
+                value: configuration.isPressed
+            )
     }
 }
 

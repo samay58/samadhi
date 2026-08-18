@@ -208,6 +208,7 @@ public enum RunAction: Sendable, Equatable {
     case start
     case revealControls
     case revealRhythmControl
+    case dismissRhythmControl
     case adjustRhythmControl(Int)
     case previewRhythmStep(direction: RhythmAdjustmentDirection, isMajor: Bool)
     case previewRhythmLimit

@@ -38,22 +38,32 @@ extension SimulatedCadenceProvider: CadenceProviding {
     public func events() -> AsyncStream<CadenceProviderEvent> {
         AsyncStream { continuation in
             let task = Task {
+                var elapsedSeconds = 0.0
                 for await sample in samples() {
                     switch sample {
                     case .acquiring:
                         continuation.yield(
-                            .observation(CadenceObservation(stepsPerMinute: nil, elapsedSeconds: 0))
+                            .observation(
+                                CadenceObservation(
+                                    stepsPerMinute: nil,
+                                    elapsedSeconds: elapsedSeconds,
+                                    sampleEndDateSeconds: elapsedSeconds
+                                )
+                            )
                         )
+                        elapsedSeconds += 1
                     case let .locked(spm):
                         for _ in 0..<5 {
                             continuation.yield(
                                 .observation(
                                     CadenceObservation(
                                         stepsPerMinute: Double(spm),
-                                        elapsedSeconds: 0
+                                        elapsedSeconds: elapsedSeconds,
+                                        sampleEndDateSeconds: elapsedSeconds
                                     )
                                 )
                             )
+                            elapsedSeconds += 1
                         }
                     }
                 }

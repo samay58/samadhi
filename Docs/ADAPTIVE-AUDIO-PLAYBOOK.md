@@ -14,7 +14,7 @@ The current milestone must prove a felt tempo match and establish whether public
 
 ## What Weav actually built
 
-Weav's broad range was a content system, not one aggressive time-stretch setting.
+Weav's broad range came from a content system, not one aggressive time-stretch setting:
 
 - First-party and contemporary coverage describe a 100 to 240 BPM range in the original product, with a later company announcement claiming 60 to 240 BPM. Sources: [Weav producer explainer](https://medium.com/@weavmusic/what-adaptive-music-means-for-artists-and-producers-758334126943), [TechCrunch](https://techcrunch.com/2017/08/02/google-maps-cofounder-lars-rasmussen-wants-to-make-running-fun-through-music/), [2020 announcement](https://www.businesswire.com/news/home/20200630005225/en/Weav-Music-Launches-First-Personalized-Audio-Workouts-for-Runners).
 - Artists delivered multiple stems or arrangements assigned to tempo bands. Within a band, Weav could stretch with pitch control. At a boundary, it could swap arrangements at a beat or bar and crossfade the components. Sources: [Weav producer explainer](https://medium.com/@weavmusic/what-adaptive-music-means-for-artists-and-producers-758334126943), [Weav patent](https://patents.google.com/patent/US11373630B2/en).
@@ -26,7 +26,7 @@ The conclusion is firm: arbitrary Apple Music masters cannot reproduce Weav's 10
 
 ## What makes a change perceptible
 
-Perceptibility and entrainment are different goals.
+Perceptibility and entrainment require different tests:
 
 - Tempo-discrimination estimates vary with stimulus and method, from roughly 2 to 3 percent for simple sequences to approximately 6 to 9 percent in forced-choice comparisons. A deliberate faster-versus-slower proof should therefore use at least a 5 to 8 percent separation. Sources: [tempo discrimination review](https://pmc.ncbi.nlm.nih.gov/articles/PMC8525396/), [tempo discrimination study archive](https://web-archive.southampton.ac.uk/cogprints.org/644/1/tempo.htm).
 - Small 1 to 3 percent changes can steer cadence without announcing themselves. That is useful for settled Auto behavior, but it is a poor demonstration of whether the player works. Source: [running entrainment study](https://pmc.ncbi.nlm.nih.gov/articles/PMC4526248/).
@@ -49,8 +49,8 @@ Cadence-retraining studies commonly test changes of 5 to 10 percent from the run
 Samadhi therefore separates availability from prescription:
 
 - Auto defaults to zero correction and follows the runner's measured cadence.
-- Auto follows fresh cadence across the accepted 120 through 210 running range and reports honestly when the current song reaches its boundary.
-- Manual exposes only the integer cadence BPM values the current song can produce inside the proven rate envelope.
+- Auto follows steady movement from 90 through 210 SPM. Walking needs five seconds of steady evidence. Running can settle after the sensor filter locks. The app reports honestly when the current song reaches its boundary.
+- Manual exposes only the integer cadence BPM values the current song can produce inside the current rate envelope.
 - The broader dial does not broaden one song's time-stretch envelope. Compatible-track selection creates coarse range; the physically proven playback-rate range creates fine correction.
 
 The playlist may cover a wider range than the current wheel. Explicit Skip and natural boundaries are the only ways to move to a differently compatible song.
@@ -87,7 +87,7 @@ Any wider MusicKit rate remains an empirical device capability. Test it. Do not 
 
 ## Current Samadhi gap
 
-The source-neutral planner preserves the first ready track at run start and prepares a better fit after five seconds of stable incompatibility. Tempo estimator version 4 keeps measured musical pulse separate from an explicit one-step-per-beat or supported two-steps-per-beat cadence projection. The planner and summary use the cadence projection; visible Music BPM uses the musical pulse. The wheel commits one absolute target at finger-up, and the production rate envelope is the already audible 0.90 through 1.10 range.
+The source-neutral planner preserves the first ready track at run start and prepares a better fit after five seconds of stable incompatibility. Tempo estimator version 4 keeps measured musical pulse separate from an explicit one-step-per-beat or supported two-steps-per-beat cadence projection. The planner and summary use the cadence projection; visible Music BPM uses the musical pulse. The wheel commits one absolute target at finger-up. The current software candidate spans 0.85 through 1.15. Only the inner 0.90 through 1.10 pair has been heard physically.
 
 The current private compatibility matrix is sobering. Across 14 ready tracks at 145, 160, 175, and 190 SPM, exact fitting covers 13 of 56 cells. Explicit relationships plus a three-SPM truthful boundary cover 16. The model improves honesty and a few edge cases, but it does not produce the broad range Samay asked for. Three physical truths remain open:
 
@@ -102,7 +102,7 @@ Do not mistake the completed control surface for a completed body-to-music loop.
 Use a two-layer match:
 
 1. **Preserve the current song.** Start with the first ready song in source order. While it plays, evaluate explicit cadence relationships and hold the nearest truthful boundary when needed. A compatibility improvement may reorder only the next entry. D-Jogger used the broad pattern of bounded stretching plus closer-tempo selection, but Samadhi does not use cadence as hidden transport authority. Source: [D-Jogger implementation](https://backoffice.biblio.ugent.be/download/8551818/8551819).
-2. **Fine match by rate.** Apply pitch-stable playback rate from 0.90 through 1.10. Those endpoints were clearly distinguishable in the physical Bluetooth check. D-Jogger also found roughly ±10 percent acceptable for its own phase-vocoder implementation, but full-song MusicKit quality still needs its own final listening gate. Source: [D-Jogger implementation](https://backoffice.biblio.ugent.be/download/8551818/8551819).
+2. **Fine match by rate.** The current candidate applies playback rate from 0.85 through 1.15. The 0.90 and 1.10 pair was clearly distinguishable in the physical Bluetooth check. The new endpoints need their own Apple Music read-back and full-song listening result. D-Jogger found roughly ±10 percent acceptable for its own phase-vocoder implementation, which does not prove MusicKit quality at ±15 percent. Source: [D-Jogger implementation](https://backoffice.biblio.ugent.be/download/8551818/8551819).
 3. **Transition musically.** Reorder or select the next compatible song at a natural boundary. Do not jump tracks for every cadence fluctuation. djay applies tempo alignment around selected transition regions and holds a common BPM when songs are already close. Source: [djay Automix](https://help.algoriddim.com/user-manual/djay-pro-mac/mixing-basics/using-automix).
 4. **Preserve truthful control.** Manual stops at the current song's reachable boundary. Auto may keep an outside cadence visible while holding the nearest proven rate and preparing one latest compatible candidate. Preparation is not transport permission. Only Skip or a player-confirmed natural boundary changes the song.
 
@@ -141,7 +141,7 @@ The 5 to 8 percent comparison is grounded in published tempo-discrimination rang
 
 ## Pivot path if MusicKit fails
 
-App-owned audio unlocks the missing controls.
+App-owned audio provides the missing timing and rate controls.
 
 - `AVAudioUnitTimePitch` changes rate independently of pitch over a documented 1/32 to 32 range, with overlap available to trade more processing for fewer artifacts. Practical music quality still needs a narrow device bake-off. Sources: [TimePitch rate](https://developer.apple.com/documentation/avfaudio/avaudiounittimepitch/rate), [TimePitch overlap](https://developer.apple.com/documentation/avfaudio/avaudiounittimepitch/overlap).
 - `AVAudioPlayerNode` can schedule buffers and segments at sample or host times. Two nodes feeding a mixer provide the basis for preroll, beat-aligned starts, crossfades, and gapless transitions. Source: [AVAudioPlayerNode](https://developer.apple.com/documentation/avfaudio/avaudioplayernode).

@@ -32,6 +32,12 @@ extension RunReducer {
         }
 
         var next = active
+        next.session.autoTargetState = autoTargetPolicy.update(
+            state: next.session.autoTargetState,
+            cadenceSPM: stepsPerMinute,
+            cadenceReliable: true,
+            deltaSeconds: deltaSeconds
+        )
         next.activity = .playing(
             rhythm: .locked(spm: Int(stepsPerMinute.rounded())),
             controls: controls
@@ -70,6 +76,12 @@ extension RunReducer {
         else { return (.active(active), []) }
 
         var next = active
+        next.session.autoTargetState = autoTargetPolicy.update(
+            state: next.session.autoTargetState,
+            cadenceSPM: nil,
+            cadenceReliable: false,
+            deltaSeconds: deltaSeconds
+        )
         let adaptation = adapt(
             session: next.session,
             cadenceSPM: nil,
@@ -260,13 +272,15 @@ extension RunReducer {
         }
 
         var next = active
+        next.session.adaptationState = .initial
         let adaptation = adapt(
             session: next.session,
             cadenceSPM: cadenceSPM,
             cadenceReliable: cadenceReliable,
             deltaSeconds: 1,
             rateRequestID: rateRequestID,
-            forceTargetUpdate: true
+            forceTargetUpdate: true,
+            requireReadback: true
         )
         next.session = adaptation.session
         return (.active(next), adaptation.effects)
@@ -278,7 +292,8 @@ extension RunReducer {
         cadenceReliable: Bool,
         deltaSeconds: Double,
         rateRequestID: Int,
-        forceTargetUpdate: Bool = false
+        forceTargetUpdate: Bool = false,
+        requireReadback: Bool = false
     ) -> (session: RunSession, effects: [RunEffect]) {
         guard session.mode == .adaptive,
             let trackID = session.currentTrackID,
@@ -286,7 +301,11 @@ extension RunReducer {
             let tempo = track.tempo,
             let projection = cadenceProjection(
                 for: tempo,
-                requestedBPM: session.rhythmControl.requestedBPM(cadenceSPM: cadenceSPM),
+                requestedBPM: session.rhythmControl.requestedBPM(
+                    cadenceSPM: session.rhythmControl.mode == .automatic
+                        ? session.autoTargetState.settledTargetSPM
+                        : cadenceSPM
+                ),
                 retaining: session.adaptationState
             )
         else { return (session, []) }
@@ -297,6 +316,7 @@ extension RunReducer {
             state: session.adaptationState,
             input: AdaptationInput(
                 cadenceSPM: cadenceSPM,
+                automaticTargetSPM: session.autoTargetState.settledTargetSPM,
                 cadenceReliable: cadenceReliable,
                 baseTempoBPM: projection.cadencePulseBPM,
                 musicalTempoBPM: projection.musicalPulseBPM,
@@ -311,7 +331,7 @@ extension RunReducer {
         )
         next.adaptationState = decision.nextState
 
-        guard abs(decision.commandedRate - rampOriginRate) > 0.000_1 else {
+        guard requireReadback || abs(decision.commandedRate - rampOriginRate) > 0.000_1 else {
             if decision.isTrackCompatible, session.pendingRateRequestID == nil {
                 next.adaptationState.commandStatus = .applied
                 next.adaptationState.appliedRateReadback = session.appliedPlaybackRate
@@ -320,6 +340,9 @@ extension RunReducer {
             return (next, [])
         }
 
+        next.adaptationState.commandStatus = .applying
+        next.adaptationState.appliedRateReadback = nil
+        next.adaptationState.commandLatencySeconds = nil
         next.pendingRateRequestID = rateRequestID
         next.pendingCommandedRate = decision.commandedRate
         return (
@@ -440,7 +463,7 @@ extension RunReducer {
 
         let currentRate = adaptationPolicy.clampRate(requestedBPM / current.cadencePulseBPM)
         let currentError = abs((current.cadencePulseBPM * currentRate) - requestedBPM)
-        guard currentError <= 3,
+        guard currentError <= TempoEnvelope.approximateMatchToleranceSPM,
             projectionCost(current, requestedBPM: requestedBPM)
                 <= projectionCost(best, requestedBPM: requestedBPM) + 0.04
         else { return best }

@@ -1,0 +1,7 @@
+Before we move any further, can you take some time to ensure that we have this feedback parsed and interpreted properly, and your diagnosis and assessment of the situation, as well as (most importantly) your solution is the strongest. E.g. I don't want "text on screen" because (a) I'm sure we'll produce AI slop, (b) it will be hard to make it look good, and (c) the user is almost certainly not looking at their phone when this is happening. 
+
+I would rather have top tier interaction design, combined with unique haptic signatures for increasing vs. decreasing tempo (with varying degrees of intensity for the degree of the change, but most important is having unique signatures for up vs. down to train the user in that way). Study the haptics library to ensure we understand how it works to a top tier level before we move forward with this. 
+
+Again, these are just thoughts. tHe most important thing is we have crystal clear understanding of what will work well, we take the time to ensure it will work well with users from our perspective, and then lets save down and fold the feedback into the app please.
+
+Most importantly, I don't want to make this the top priority yet - I do want you to priortiize appropriately but I do want to tackle the other changes we suggested first (or at least the few of them that are the most consequential). wE will discuss this once you're done.
