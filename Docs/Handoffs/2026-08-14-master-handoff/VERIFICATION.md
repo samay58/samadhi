@@ -18,9 +18,9 @@
 
 | Check | Result |
 | --- | --- |
-| Fresh `origin/main` | `4f5394f3158dde9ad891b8b772b197c4c26090b2` |
+| Fresh `origin/main` | `0f51c63c7f37164dc9895ffbdd5133576cf7f805` |
 | Local `main` | Same SHA |
-| User-owned dirty files preserved | Yes |
+| User-owned dirty files preserved | Yes, then consolidated in the reviewed commit |
 | Xcode | 27.0, build `27A5209h` |
 | XcodeGen | 2.45.4 |
 | Swift | 6.4 |

@@ -47,7 +47,7 @@ Current updates on August 16, 2026:
 
 Current updates on August 17, 2026:
 
-- Freshly fetched `origin/main` and local `main` still point to `4f5394f3158dde9ad891b8b772b197c4c26090b2`. The user-owned dirty tree was preserved through the reset and consolidated into one reviewed release commit.
+- Freshly fetched `origin/main` and local `main` point to consolidation commit `0f51c63c7f37164dc9895ffbdd5133576cf7f805`. The user-owned dirty tree was preserved through the reset, reviewed, and committed without a second worktree.
 - Every new build carries a stable fingerprint for the exact behavior-changing source, resources, configuration, and build scripts used. Modified and untracked inputs are covered. Documentation, evidence, app data, diagnostics, credentials, and signing files are excluded.
 - The saved delayed phone pattern now acquires in deterministic replay. Old first samples, repeats, backward timestamps, out-of-order callbacks, unexplained gaps, missing values, and values outside 90 through 210 SPM still fail.
 - Auto now keeps the responsive sensor estimate separate from a settled musical target. Ordinary noise and one spike do not move the target. Sustained faster or slower evidence does.

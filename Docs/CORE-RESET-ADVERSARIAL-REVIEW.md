@@ -31,9 +31,9 @@ These labels follow the handoff's validation boundary. Source: `Docs/Handoffs/20
 | --- | --- | --- |
 | Repository | `/Users/samaydhawan/Projects/active/samadhi` | Direct path read-back |
 | Branch | `main` | Git read-back |
-| Local HEAD | `4f5394f3158dde9ad891b8b772b197c4c26090b2` | Git read-back |
+| Local HEAD | `0f51c63c7f37164dc9895ffbdd5133576cf7f805` | Git read-back |
 | Fresh `origin/main` | Same SHA | `git fetch` and Git read-back |
-| Working tree | Pre-existing user documentation edits plus new handoff files | `git status --short` |
+| Working tree | Clean after the reviewed core-reset consolidation | `git status --short` |
 | Xcode | 27.0, build `27A5209h` | Tool read-back |
 | XcodeGen | 2.45.4 | Tool read-back |
 | Swift | 6.4 | Tool read-back |
@@ -48,24 +48,22 @@ These labels follow the handoff's validation boundary. Source: `Docs/Handoffs/20
 | Fresh signed entitlement | Exact application identifier requested by the built app | Code-signature inspection |
 | MusicKit signing readiness | Passed | Embedded profile and signature use `ZL5U59XBJ6.com.samaydhawan.Samadhi` |
 
-The phone is reachable and exact signing is available. The baseline build was opened and recorded. The fingerprinted Auto candidate was inspected and installed in place with the selected collection preserved. Its built app contains fingerprint `4e454d2859a521367bf83f26ba1287b14d617d0700c630f90ff13ce8f3b5b498`. Samay later ran that build, and the pulled diagnostic matched the fingerprint.
+Exact signing is available. The fingerprinted Auto candidate with fingerprint `4e454d2859a521367bf83f26ba1287b14d617d0700c630f90ff13ce8f3b5b498` produced the saved workout evidence. The later expanded-rate candidate with fingerprint `fd8120ad2ac14e1090a687438e6564beb65bde0a61d58fab04d4ec7295535684` was inspected and installed in place with the selected collection preserved. It has not yet been opened and read back inside the app.
 
 The selected collection stayed byte-for-byte unchanged across installation.
 
 ## Current software gate
 
-Rerun on August 17, 2026 against current `main` and the existing working tree:
+Rerun on August 17, 2026 against the source consolidated into current `main`:
 
 - XcodeGen project generation: passed.
 - Swift formatter lint: passed.
-- Swift package tests: 136 passed.
+- Swift package tests: 153 passed.
 - App-model tests: 27 passed.
 - UI tests: 28 passed.
 - Exact-profile physical build and in-place installation: passed.
 - Resource-inclusive Release Simulator build: passed.
 - Hidden Debug screen absent from Release: passed.
-
-The current UI result bundle is at `/tmp/samadhi-ui-final3-20260817.xcresult`.
 
 Software health is not the product gate. It proves a stable baseline for Phase 0 work.
 
