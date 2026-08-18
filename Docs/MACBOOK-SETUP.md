@@ -1,14 +1,14 @@
 # MacBook continuation setup
 
-This is the local continuation guide for Samadhi on Samay's MacBook. The repository is the source of code and durable evidence. The Mac Mini is no longer needed for ordinary development or Simulator validation. The remaining MacBook gap is physical iPhone availability and pairing.
+This is the local continuation guide for Samadhi on Samay's MacBook. The repository is the source of code and durable evidence. The Mac Mini is no longer needed for ordinary development, Simulator validation, signing, or installation. Physical product claims still require the paired iPhone.
 
 ## Current MacBook audit
 
-Checked 2026-08-14.
+Checked 2026-08-17.
 
 | Surface | State | What it means |
 | --- | --- | --- |
-| Checkout | `/Users/samaydhawan/Projects/active/samadhi` on `main` at `4f5394f` | Canonical local working copy |
+| Checkout | `/Users/samaydhawan/Projects/active/samadhi` on `main` at `0f51c63` | Canonical local working copy |
 | Convenience path | `/Users/samaydhawan/samadhi` | Symlink to the canonical checkout |
 | Machine | M4 MacBook Air, 24 GB memory | Enough for this app's compile, test, and one-Simulator workflow |
 | Free storage | 36 GiB | Enough for the active project and one current runtime; avoid adding more platforms or runtimes |
@@ -16,8 +16,8 @@ Checked 2026-08-14.
 | XcodeGen | 2.45.4 | Installed |
 | Active developer directory | Command Line Tools | Raw Xcode commands need the local `DEVELOPER_DIR` command below |
 | iOS Simulator runtime | One iOS 27 runtime with one iPhone 17 Pro simulator | Full Simulator gate passed on this device |
-| Physical iPhone | Known to CoreDevice but currently unavailable | Reconnect and pair from this MacBook before device work |
-| Signing | Apple Development identity present | Physical signing is ready once an available paired iPhone returns |
+| Physical iPhone | Paired; live availability depends on connection and lock state | Check it before device work |
+| Signing | Exact Samadhi development profile and Apple Development identity available | Exact-profile physical builds pass |
 
 The historical device records in `Evidence/Device/` prove prior behavior on the iPhone. They do not transfer signing authority, pairing, local app data, or current device availability to this MacBook. In particular, the profile named in the July records expired on 2026-07-30.
 
@@ -65,7 +65,7 @@ Keep the machine lean:
 | Device installation | `Docs/DEVICE_RUNBOOK.md` | Exact-app-ID signing, installation, and launch on the paired iPhone |
 | Product quality | One short physical run, then the remaining Milestone 2 reliability checks | Cadence, audible rate change, wheel feel, natural transition, background playback, interruption, and route recovery |
 
-The first useful session on this MacBook is now a physical-device session: reconnect and pair the iPhone, verify exact-app-ID signing, then take one focused product check from `PLAN.md`. The local software gate passed on 2026-08-13 with 118 Swift package tests and 46 iPhone 17 Pro Simulator tests.
+The next physical session should confirm that the iPhone is connected and unlocked, verify exact-app-ID signing, then take one focused product check from `PLAN.md`. The current software gate passes 153 package tests, 27 app-model tests, and 28 serial interface tests.
 
 ## Boundaries
 
