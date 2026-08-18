@@ -4,9 +4,9 @@ Status: Apple Music selected; long-form reliability checks deferred
 
 ## Problem Statement
 
-Samadhi needs one production music source that can import a runner's collection, expose or support local tempo analysis, play in the background, and change playback rate from 0.94 through 1.06 without audible damage.
+Samadhi needs one production music source that can import a runner's collection, support local tempo analysis, play in the background, and change playback rate cleanly. At the source-decision gate, the tested range was 0.94 through 1.06.
 
-The physical MusicKit harness has proved authorization, library playlist loading, automatic token generation, strict catalog resolution, 10 of 10 local preview decodes, real playback, live rate writes, pause, and resume. It also reached a Beoplay Eleven Bluetooth A2DP route and applied 0.94, 1.00, and 1.06 during playback. The exact Samadhi development profile fixed the earlier `developerTokenRequestFailed` blocker. A separate opt-in validator now passes 12 of 12 tempo-declared Apple previews through analyzer version 2.
+The physical MusicKit harness proved authorization, library playlist loading, automatic token generation, strict catalog resolution, 10 of 10 local preview decodes, real playback, live rate writes, pause, and resume. It also reached a Beoplay Eleven Bluetooth A2DP route and applied 0.94, 1.00, and 1.06 during playback. The exact Samadhi development profile fixed the earlier `developerTokenRequestFailed` blocker. The later analyzer version 4 passes 12 of 12 public tempo references. The current 0.85 through 1.15 playback candidate is a separate product decision and still needs endpoint listening.
 
 Spotify was considered as another streaming source. It is not a viable adaptive-audio player for this milestone. Spotify's iOS SDK remotely controls the Spotify app rather than giving Samadhi an app-owned audio signal. Its documented player APIs do not offer music playback-rate control, and Spotify's Developer Policy prohibits altering or analyzing Spotify content. A Spotify playlist could provide metadata, but it would not close the adaptive playback loop and would add OAuth, account, and provider complexity.
 

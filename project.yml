@@ -37,6 +37,19 @@ targets:
         INFOPLIST_FILE: Config/Samadhi-Info.plist
         TARGETED_DEVICE_FAMILY: "1"
         CODE_SIGN_STYLE: Automatic
+    preBuildScripts:
+      - name: Capture source fingerprint
+        script: |
+          "$SRCROOT/Scripts/capture-source-fingerprint.sh"
+        basedOnDependencyAnalysis: false
+    postBuildScripts:
+      - name: Embed build identity
+        script: |
+          "$SRCROOT/Scripts/embed-build-identity.sh"
+        inputFiles:
+          - "$(TARGET_BUILD_DIR)/$(INFOPLIST_PATH)"
+          - "$(DERIVED_FILE_DIR)/SamadhiSourceFingerprint.txt"
+        basedOnDependencyAnalysis: false
   SamadhiTests:
     type: bundle.unit-test
     platform: iOS

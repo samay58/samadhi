@@ -126,6 +126,24 @@ import Testing
     #expect(musicImportBatches(count: 0, width: 3).isEmpty)
 }
 
+@Test func diagnosticLaunchArgumentsHidePrivateValues() {
+    let arguments = DiagnosticEnvironment.sanitizedLaunchArguments([
+        "--diagnostic-scenario=verified",
+        "--api-key=private-value",
+        "--token",
+        "another-private-value",
+    ])
+
+    #expect(
+        arguments == [
+            "--diagnostic-scenario=verified",
+            "--api-key=<redacted>",
+            "--token",
+            "<redacted>",
+        ]
+    )
+}
+
 @Test func runDiagnosticsRoundTripPreservesPhysicalEvidence() async throws {
     let directory = FileManager.default.temporaryDirectory
         .appending(path: UUID().uuidString, directoryHint: .isDirectory)
@@ -158,6 +176,8 @@ import Testing
                 automaticCorrectionBPM: 2,
                 manualTargetBPM: 168,
                 requestedBPM: 157,
+                originalStepRhythmSPM: 152,
+                appliedStepRhythmSPM: 157,
                 derivedTargetRate: 1.035,
                 atLimit: false,
                 commandStatus: TempoCommandStatus.applied.rawValue,
@@ -179,6 +199,14 @@ import Testing
     try await store.save(snapshot)
 
     #expect(try await store.latest() == snapshot)
+    let encoded = try String(
+        contentsOf: directory.appending(path: "latest-run-diagnostics.json"),
+        encoding: .utf8
+    )
+    #expect(encoded.contains("originalStepRhythmSPM"))
+    #expect(encoded.contains("appliedStepRhythmSPM"))
+    #expect(!encoded.contains("runningPulseBPM"))
+    #expect(!encoded.contains("appliedRunningPulseBPM"))
 }
 
 @Test func runDiagnosticsCapturePlayerTruthThroughFinish() throws {
@@ -269,7 +297,7 @@ import Testing
     )
     #expect(snapshot.timeline[2].appliedRate == 0.98)
     #expect(snapshot.timeline[3].trackElapsedSeconds == 12)
-    #expect(snapshot.schemaVersion == 5)
+    #expect(snapshot.schemaVersion == RunDiagnosticSnapshot.currentSchemaVersion)
     #expect(snapshot.completionState == .completed)
     #expect(snapshot.timeline[1].controlMode == RhythmControlMode.automatic.rawValue)
     #expect(snapshot.timeline[1].automaticCorrectionBPM == 0)
@@ -309,6 +337,7 @@ import Testing
             sampleEndDateSeconds: 1_721_000_003,
             callbackIntervalSeconds: 1.4,
             filterState: .tracking,
+            disposition: .acceptedFresh,
             filteredStepsPerMinute: 159
         ),
         state: state,
@@ -317,12 +346,99 @@ import Testing
     let rolling = try #require(cadenceSnapshot)
 
     #expect(rolling.completionState == .inProgress)
-    #expect(rolling.schemaVersion == 5)
+    #expect(rolling.schemaVersion == RunDiagnosticSnapshot.currentSchemaVersion)
     #expect(rolling.timeline.last?.kind == .cadenceObserved)
     #expect(rolling.timeline.last?.rawCadenceSPM == 161)
     #expect(rolling.timeline.last?.callbackIntervalSeconds == 1.4)
     #expect(rolling.timeline.last?.cadenceFilterState == "tracking")
+    #expect(rolling.timeline.last?.cadenceSampleDisposition == "acceptedFresh")
     #expect(rolling.timeline.last?.filteredCadenceSPM == 159)
+}
+
+@Test func diagnosticViewKeepsSongBeatsAndRunnerStepsSeparate() throws {
+    let track = MusicTrack(
+        id: MusicTrackID("low-tempo"),
+        title: "Low tempo fixture",
+        durationSeconds: 180,
+        tempo: TempoAnalysis(
+            baseBPM: 84,
+            alternatePulseBPM: 168,
+            confidence: 0.94,
+            analyzedDurationSeconds: 30,
+            version: 4
+        )
+    )
+    let collection = MusicCollection(
+        id: MusicCollectionID("diagnostic-fixture"),
+        name: "Diagnostic fixture",
+        tracks: [track]
+    )
+    let reducer = RunReducer(tracks: [track])
+    var state: RunState = .ready
+    state = reducer.reduce(state: state, event: .startTapped(sessionID: 31)).0
+    state =
+        reducer.reduce(
+            state: state,
+            event: .authorizationResolved(sessionID: 31, .authorized)
+        ).0
+    state =
+        reducer.reduce(
+            state: state,
+            event: .playbackPrepared(sessionID: 31, trackID: track.id)
+        ).0
+    state =
+        reducer.reduce(
+            state: state,
+            event: .cadenceUpdated(
+                sessionID: 31,
+                acquisitionID: 1,
+                stepsPerMinute: 175,
+                deltaSeconds: 1,
+                rateRequestID: 33
+            )
+        ).0
+    let commandedRate = try #require(state.session?.pendingCommandedRate)
+    state =
+        reducer.reduce(
+            state: state,
+            event: .playbackRateApplied(
+                sessionID: 31,
+                operationID: 31,
+                requestID: 33,
+                trackID: track.id,
+                rate: commandedRate,
+                latencySeconds: 0.08
+            )
+        ).0
+    let presentation = CoreLoopDiagnosticPresentation(
+        state: state,
+        collection: collection,
+        cadenceSample: CadenceDiagnosticSample(
+            rawStepsPerMinute: 176,
+            sampleAgeSeconds: 0.1,
+            sampleEndDateSeconds: 1_721_000_000,
+            callbackIntervalSeconds: 1,
+            filterState: .tracking,
+            disposition: .acceptedFresh,
+            filteredStepsPerMinute: 175
+        )
+    )
+
+    #expect(presentation.measuredSongBPM == 84)
+    #expect(presentation.alternatePulseBPM == 168)
+    #expect(presentation.relationship == .twoStepsPerBeat)
+    #expect(presentation.originalStepRhythmSPM == 168)
+    #expect(presentation.rawStepSPM == 176)
+    #expect(presentation.smoothedStepSPM == 175)
+    #expect(presentation.resultingMusicalBPM == 84 * commandedRate)
+    #expect(presentation.resultingStepRhythmSPM == 168 * commandedRate)
+    #expect(
+        abs(try #require(presentation.remainingDifferenceSPM) - ((168 * commandedRate) - 175))
+            < 0.001
+    )
+    #expect(presentation.status == TempoDiagnosticStatus.verified)
+    #expect(presentation.settledAutoTargetSPM == 175)
+    #expect(presentation.autoTargetStatus == .settled)
 }
 
 @Test func collectionStoreRoundTripsSelectionAndCache() async throws {

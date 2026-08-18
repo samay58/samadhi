@@ -116,6 +116,10 @@ The reducer owns adaptation state and rate decisions. Each rate effect carries s
 
 Debug builds overwrite one local `latest-run-diagnostics.json` file during a run and at completion. The bounded rolling trace records raw and filtered cadence, sample freshness, requested and applied rates, track identity, transition authority, recovery events, and the final summary when one exists. An abandoned or interrupted check therefore leaves useful evidence without adding analytics, a dashboard, or a run-history product. Release behavior and the visible run interface remain unchanged.
 
+Each built app writes its own Git commit, branch, tracked-file state, build date, app version, and build number into the built Info.plist before signing. Debug diagnostics add the analyzer version, diagnostic-file version, device and system, real or simulated services, and sanitized launch arguments. A hidden Debug screen reads the same run state and diagnostic values. It is not a second state system and it is absent from the normal Release interface.
+
+A player-confirmed song change clears the prior song's rate read-back, delay, and result before requesting a fresh Apple Music reply. A late reply for the old song remains invalid because request and track identity must both match.
+
 ## Manual rhythm control belongs in the core loop
 
 Automatic cadence matching remains the default, but it is not the only control. The runner has one in-run BPM control to correct the feel and to prove that requested musical changes reach the real player. It supports a small Auto correction, a direct Manual target, and one-step reset to Auto. It remains bounded by the existing rate, ramp, confidence, and track-compatibility rules.
@@ -128,13 +132,15 @@ Weav achieved broad adaptation through licensed multi-arrangement material, not 
 
 The production mechanic is coarse track fit followed by fine rate correction. `TrackMatchPlanner` evaluates explicit one-step-per-beat and supported two-steps-per-beat relationships while preserving the measured musical BPM. It does not silently multiply a slow beat or relabel the music. Startup preserves the first ready track in playlist order. During playback, current-track retention and source order beat a marginal compatibility improvement.
 
-The production envelope is 0.90 through 1.10. Samay heard those endpoints clearly on Bluetooth, reported no unpleasant artifacts in earlier rate listening, and later reported approximately 95 percent confidence that the mechanism worked. Full-song listening and the final outdoor run remain required quality gates, but the older 0.94 through 1.06 limit no longer blocks a useful response.
+The prior production envelope was 0.90 through 1.10. Samay heard those endpoints clearly on Bluetooth, reported no unpleasant artifacts in earlier rate listening, and later reported approximately 95 percent confidence that the mechanism worked. Full-song listening and the final outdoor run remained open.
 
 On 2026-07-21, one Beoplay Eleven check made the 0.90 versus 1.10 difference unmistakable on `LITE SPOTS`, with matching MusicKit read-back. Samay reported approximately 95 percent confidence that the mechanism worked and asked implementation to continue. Apple Music remains authoritative. This does not expand the production quality envelope because the wider endpoints have not passed full-song artifact listening.
 
+On 2026-08-17, Samay chose a wider 0.85 through 1.15 software candidate. The same shared limit now controls Auto, Manual, track fit, diagnostics, and the final Apple Music command. Automatic playback still changes by no more than 0.02 rate units per second, so normal speed reaches either endpoint in at most eight seconds. Deterministic tests prove the limit, ramp, song boundaries, and read-back identity. They do not prove that 0.85 and 1.15 sound clean. The candidate must compare those endpoints with the known 0.90 and 1.10 pair on real Apple Music before release.
+
 The tempo aperture is the BPM control. Turning its perimeter clockwise raises BPM and turning counterclockwise lowers it in one-BPM detents. The center remains protected for reading, a small perimeter marker appears only during manipulation, and VoiceOver exposes the same adjustment. Separate plus and minus furniture was removed because it made the control feel like a generic settings panel rather than one musical instrument.
 
-Manual wheel travel is limited to the integer BPM values the current song can produce through its selected cadence relationship inside the proven 0.90 through 1.10 rate envelope. One revolution equals 30 BPM, minor haptics are low-sharpness and rounded, every fifth detent is fuller, and returning to neutral has one soft landing. At either song boundary, the number, marker, detents, and haptics stop together. One terminal haptic marks the limit, outward motion stores no hidden overshoot, and ordinary reverse motion releases the control immediately. Broader playlist coverage comes from an explicit Skip or natural boundary, not unreachable wheel travel.
+Manual wheel travel is limited to the integer BPM values the current song can produce through its selected cadence relationship inside the current 0.85 through 1.15 candidate. One revolution equals 30 BPM, minor haptics are low-sharpness and rounded, every fifth detent is fuller, and returning to neutral has one soft landing. At either song boundary, the number, marker, detents, and haptics stop together. One terminal haptic marks the limit, outward motion stores no hidden overshoot, and ordinary reverse motion releases the control immediately. Broader playlist coverage comes from an explicit Skip or natural boundary, not unreachable wheel travel.
 
 The closed aperture teaches its interaction without tutorial copy. Three grip notches appear in the same rim used by the full wheel and make one restrained clockwise-and-back movement after cadence locks. `Turn` is etched into the lower aperture as the only visible word because it names the physical gesture directly. Opening the control removes that label, expands the marks into 30 detents, and permanently retires the teaching movement. Reduce Motion keeps the static cues and skips the movement.
 
@@ -142,13 +148,49 @@ Adaptive run start preserves the first ready track in imported playlist order. I
 
 ## Requested BPM is intent; player read-back is truth
 
-The wheel previews one-BPM detents and haptics locally, stays pinned for the full gesture, then sends one absolute target when the finger lifts. Turning the wheel takes Manual ownership. That final target is durable when cadence changes and jumps directly to its compatible playback rate. Auto remains filtered by cadence confidence and the 2 SPM deadband, retargets after one second, and moves at 0.02 rate units per second so the full production range settles within five seconds of a fresh reliable change. The interface may call a value applied only after `ApplicationMusicPlayer` reports the commanded rate for the current session, operation, request, and track.
+The wheel previews one-BPM detents and haptics locally, stays pinned for the full gesture, then sends one absolute target when the finger lifts. Turning the wheel takes Manual ownership. That final target is durable when cadence changes and jumps directly to its compatible playback rate. Auto first commits a separate settled target under the policy recorded below. Once that target changes, the existing playback policy keeps its 2 SPM rate deadband, one-second update interval, and 0.02 rate-units-per-second ramp. Moving from normal speed to either candidate endpoint takes at most eight seconds. The interface may call a value applied only after `ApplicationMusicPlayer` reports the commanded rate for the current session, operation, request, and track.
 
-Core Motion cadence is current only when `CMPedometerData.endDate` is no more than two seconds old and the value lies inside the running range. Three agreeing current samples acquire or reacquire cadence. An old prior cannot override them. During tracking, one large change waits for a corroborating sample, then a time-based response follows the sustained change. Three consecutive invalid samples return Auto to reacquisition.
+The first Core Motion sample must be no more than two seconds old because no earlier timestamp can prove that it is new. A delayed later sample may be accepted only when its callback and Core Motion end time advance coherently within the bounded delivery interval. Repeated, backward, out-of-order, unexplained-gap, missing, and outside-supported-range samples still fail. Three agreeing accepted samples acquire or reacquire cadence. During tracking, one large change waits for a corroborating sample, then a time-based response follows the sustained change. Three consecutive invalid samples return Auto to reacquisition.
 
-Manual cannot display or commit an unreachable target. Its preview and final command share the current song's derived integer BPM envelope, so the requested value always has a truthful rate inside 0.90 through 1.10. Auto may still encounter cadence outside that envelope. In that case the current song holds the nearest reachable rate, while requested cadence and achievable Music BPM remain separate truths. Stable Auto mismatch may prepare one latest candidate after five seconds, but preparation never changes transport. Only explicit Skip or a player-confirmed natural boundary may commit the prepared song.
+The August 15 phone trace established this rule. Fourteen of 16 numeric readings arrived about 2.57 seconds after their Core Motion end time, so the old fixed two-second rule never locked. The saved trace failed before the change and passes after it. The August 17 workout then physically confirmed the repair: four supported readings arrived at the same delayed cadence, Auto settled at 133 SPM, and Apple Music reported the exact 1.0390625 command after 0.066 seconds.
 
-The current playlist proves that explicit step-to-beat relationships alone do not create Weav-scale range. Across 14 ready tracks and four representative cadences, compatibility improves from 13 to 16 of 56 cells when a three-SPM truthful boundary tolerance is allowed. This is not enough to close the product range requirement. Broader MusicKit rate requires physical quality evidence. If that evidence fails, reopen the source and mechanics decision rather than adding hidden ratios or wider clamps.
+## Manual belongs to the confirmed song
+
+Manual remains active while the player is on the same confirmed song, including pause, resume, route loss, and explicit recovery. Previous or Skip requests do not reset it because the player may reject or delay the change. Manual returns to Auto only when the player confirms a different song, or when the runner explicitly chooses Auto.
+
+A confirmed different song starts with fresh adaptation state. It cannot inherit the prior song's requested result, delay, Apple Music reply, or verification. A late reply identified for the prior song is rejected.
+
+## The tempo wheel closes without changing the run
+
+The open tempo wheel has one native close action. Closing restores playback controls immediately. It does not pause, skip, change the requested rhythm, reset Manual, or alter the current song. The action has a 44-point hit target, a clear accessibility label, and the same immediate Reduce Motion behavior as the existing control surface.
+
+The visible close mark is smaller than its touch target and sits clear of the rotary ring. It uses a flat, low-contrast surface at normal settings and a stronger surface only for Increased Contrast. The earlier 44-point glass circle was removed because it covered detents and competed with the instrument.
+
+## Dirty builds carry a stable source fingerprint
+
+The build captures the fingerprint before compilation. It hashes relative paths and file contents for `App`, `Resources`, package source, `Config`, `project.yml`, the generated Xcode project, the package manifest and lock file when present, and the scripts that capture and embed build identity. Modified and untracked files in those locations are included.
+
+Tests, documentation, evidence, build products, local diagnostics, app data, credentials, certificates, provisioning profiles, and signing material are excluded. The fingerprint contains only a hash. It exposes no source text, playlist data, account details, or secrets.
+
+## Auto keeps sensing and music commitment separate
+
+The cadence filter remains the responsive sensor estimate. A separate domain policy owns the settled Auto target. Raw cadence cannot reach the playback policy while that target is empty. Running can settle after the sensor filter locks. Cadence from 90 through 119 SPM needs five seconds of steady evidence because walking overlaps more with ordinary gym movement. Later target changes also need five seconds of agreement. The target ignores changes inside four steps per minute, requires a change of at least six steps per minute, and keeps commits at least eight seconds apart. Missing input holds the target for up to twelve seconds before reacquisition.
+
+These constants are software defaults based on the saved 2.56-second phone delivery pattern and the existing product tests. They are not physically tuned. A real phone check must decide whether the music feels calm and responsive.
+
+## Expand rhythmic walking, not lifting
+
+The August 17 workout mixed brisk walking, light jogging, and substantial lifting. That prevents a precise comparison between wall time and counted rhythmic time. It does not weaken the case for a lower walking range.
+
+The software candidate extends Auto into steady movement from 90 through 210 SPM. Values below 90 remain outside Auto. Walking needs five seconds of steady evidence, while three disagreeing values or missing readings cannot accumulate a target. A clean walking-only phone check must still tune the floor and delay.
+
+Samadhi has no lifting mode. It accepts only the step cadence that Core Motion reports and does not classify the exercise type. Missing or irregular readings make Auto hold briefly, ease the song toward normal speed, then reacquire. A clean phone check must still show whether pocket movement during lifting can fool the step signal.
+
+Manual cannot display or commit an unreachable target. Its preview and final command share the current song's derived integer BPM envelope, so the requested value always has a truthful rate inside 0.85 through 1.15. Auto may still encounter cadence outside that envelope. In that case the current song holds the nearest reachable rate, while requested cadence and achievable Music BPM remain separate truths. Stable Auto mismatch may prepare one latest candidate after five seconds, but preparation never changes transport. Only explicit Skip or a player-confirmed natural boundary may commit the prepared song.
+
+Approximate alignment accepts up to five SPM of remaining error. The playback candidate now spans 0.85 through 1.15. This should reduce unnecessary song changes while keeping small residual differences acceptable. Six SPM still fails.
+
+The saved 15-track ready collection report shows the effect of the prior 0.90 through 1.10 envelope without exposing private music data. It found four compatible tracks around 90 and 100 SPM, seven around 110, and six around 120. Those counts must not be relabeled as evidence for the wider candidate. The aggregate report lives under `Evidence/Device/2026-08-17-walking-auto/`.
 
 ## Tempo-matched summaries require verified coverage
 
@@ -167,3 +209,13 @@ The composition is divided into playlist identity, a truthful status rail, and a
 ## Direction is part of the wheel haptic
 
 Clockwise and counterclockwise detents remain distinct through the domain event and Core Haptics pattern. Ordinary detents are stronger than the first field build, every fifth BPM keeps a fuller landmark, and unsupported devices receive direction-specific system impact fallbacks. Physical comfort and direction recognition remain required before this decision is considered tuned.
+
+## Auto changes use touch and sound, not screen copy
+
+The August 17 workout made the gap concrete. Samay felt Auto working, but the changes felt jarring and unexplained. The runner is unlikely to be looking at the phone, so temporary text on the run screen is rejected.
+
+The accepted later direction is one identified Auto transition with two sparse moments. The first matching Apple Music reply produces a short faster or slower haptic. A final matching reply produces one quiet authored sound with a soft terminal haptic. Direction comes from the pattern's timing and shape. No more than three coarse strength levels express reachable change size.
+
+This does not authorize implementation yet. The exact AHAP patterns, sound family, Core Haptics audio path, fallback, and intensity bands require physical comparison with the phone in a pocket, the screen locked, and real music playing. The full contract lives in [AUTO-CHANGE-INTERACTION-SPEC.md](AUTO-CHANGE-INTERACTION-SPEC.md).
+
+The current haptic shell is sufficient for wheel detents but not this feature. It starts the custom engine only when the wheel opens, ignores audio events, and lacks complete stop and resource-recovery handling. A later app-shell service must own engine life cycle. The reducer must own the one-time verified trigger and stale-reply protection.

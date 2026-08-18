@@ -21,13 +21,55 @@ import Testing
 
     #expect(
         events == [
-            .observation(CadenceObservation(stepsPerMinute: nil, elapsedSeconds: 0)),
-            .observation(CadenceObservation(stepsPerMinute: nil, elapsedSeconds: 0)),
-            .observation(CadenceObservation(stepsPerMinute: 172, elapsedSeconds: 0)),
-            .observation(CadenceObservation(stepsPerMinute: 172, elapsedSeconds: 0)),
-            .observation(CadenceObservation(stepsPerMinute: 172, elapsedSeconds: 0)),
-            .observation(CadenceObservation(stepsPerMinute: 172, elapsedSeconds: 0)),
-            .observation(CadenceObservation(stepsPerMinute: 172, elapsedSeconds: 0)),
+            .observation(
+                CadenceObservation(
+                    stepsPerMinute: nil,
+                    elapsedSeconds: 0,
+                    sampleEndDateSeconds: 0
+                )
+            ),
+            .observation(
+                CadenceObservation(
+                    stepsPerMinute: nil,
+                    elapsedSeconds: 1,
+                    sampleEndDateSeconds: 1
+                )
+            ),
+            .observation(
+                CadenceObservation(
+                    stepsPerMinute: 172,
+                    elapsedSeconds: 2,
+                    sampleEndDateSeconds: 2
+                )
+            ),
+            .observation(
+                CadenceObservation(
+                    stepsPerMinute: 172,
+                    elapsedSeconds: 3,
+                    sampleEndDateSeconds: 3
+                )
+            ),
+            .observation(
+                CadenceObservation(
+                    stepsPerMinute: 172,
+                    elapsedSeconds: 4,
+                    sampleEndDateSeconds: 4
+                )
+            ),
+            .observation(
+                CadenceObservation(
+                    stepsPerMinute: 172,
+                    elapsedSeconds: 5,
+                    sampleEndDateSeconds: 5
+                )
+            ),
+            .observation(
+                CadenceObservation(
+                    stepsPerMinute: 172,
+                    elapsedSeconds: 6,
+                    sampleEndDateSeconds: 6
+                )
+            ),
         ]
     )
 }

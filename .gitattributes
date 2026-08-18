@@ -1,0 +1,2 @@
+# Preserve the user's original handoff text byte-for-byte, including its existing line endings and spaces.
+Docs/Handoffs/2026-08-14-master-handoff/original/*.txt -whitespace

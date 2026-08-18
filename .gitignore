@@ -5,3 +5,6 @@ DerivedData/
 xcuserdata/
 Evidence/Temp/
 
+# Keep raw phone records and lock-screen captures local. They can contain personal music or device data.
+Evidence/Device/**/*diagnostics.json
+Evidence/Device/2026-08-17-auto-target/source-fingerprint-screen.png

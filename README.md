@@ -4,13 +4,15 @@
 
 *music in stride*
 
-Samadhi is a native iPhone music experience that lets a runner's cadence and music settle into one rhythm. The current build imports an Apple Music playlist, analyzes available previews locally, remembers the selection, and sends ready tracks through the real cadence-driven run. The active mechanics work now separates compatible-track selection, fine tempo correction, and any future beat-phase claim.
+Samadhi is a native iPhone music experience that helps movement and music settle into one rhythm. It imports an Apple Music playlist, analyzes available previews on the phone, remembers the selection, and plays ready tracks through a cadence-aware run.
 
 ## Current state
 
-Milestones 0 and 1 are complete. Milestone 2 is in progress. Apple Music is the selected production source. Exact-App-ID signing fixed catalog access, analyzer version 2 passes a narrow 12-preview corpus, and a 59-second physical run averaged 155 SPM with 98 percent tempo matched from player read-back. A real 25-track playlist restores with 13 ready tracks. The production run now starts with the compatible pulse requiring the least stretch, plans a better-fitting next song after a stable mismatch, and uses the pulsing aperture itself as a rotary BPM control. One Bluetooth track made the wider 0.90 versus 1.10 rate difference obvious. A natural imported-song transition, broader listening quality, long-form background playback, recovery, and the outdoor run remain open.
+Milestone 2 is in progress. Apple Music is the production player. Tempo analyzer version 4 passes 12 of 12 public preview references. A physical run confirmed that delayed iPhone cadence readings can settle Auto and that Apple Music reports the requested playback speed. Manual belongs to the current song, and the tempo wheel closes without changing playback. The current candidate supports steady movement from 90 through 210 steps per minute and can adjust one song from 85 to 115 percent of normal speed.
 
-Start with [product ethos](Docs/PRODUCT.md), then read [current status](Docs/STATUS.md), [next plan](Docs/PLAN.md), the [Milestone 2 specification](Docs/MILESTONE-2-SPEC.md), and the active [music-source resolution specification](Docs/MUSIC-SOURCE-RESOLUTION-SPEC.md).
+The 85 and 115 percent endpoints pass software checks and are installed with exact Samadhi signing. They still need Apple Music read-back and listening approval on the phone. Transport and Finish craft, a known natural song transition, background recovery, and the outdoor run also remain open.
+
+Start with [product ethos](Docs/PRODUCT.md), [current status](Docs/STATUS.md), and [next plan](Docs/PLAN.md). Use the [Milestone 2 specification](Docs/MILESTONE-2-SPEC.md) for the complete release contract. The [music-source decision record](Docs/MUSIC-SOURCE-RESOLUTION-SPEC.md) explains why Apple Music was selected.
 
 ## Build
 
@@ -44,8 +46,9 @@ A normal Debug launch on iPhone Simulator uses two local placeholder playlists, 
 | What exactly are we building next? | [Docs/MILESTONE-2-SPEC.md](Docs/MILESTONE-2-SPEC.md) |
 | What makes the music feel synchronized? | [Docs/ADAPTIVE-AUDIO-PLAYBOOK.md](Docs/ADAPTIVE-AUDIO-PLAYBOOK.md) |
 | What is the prioritized execution sequence? | [Docs/FELT-SYNCHRONIZATION-EXECUTION-SPEC.md](Docs/FELT-SYNCHRONIZATION-EXECUTION-SPEC.md) |
+| How is this MacBook prepared to continue the work? | [Docs/MACBOOK-SETUP.md](Docs/MACBOOK-SETUP.md) |
 | What do product terms mean? | [Docs/CONTEXT.md](Docs/CONTEXT.md) |
-| How will the production music source be decided? | [Docs/MUSIC-SOURCE-RESOLUTION-SPEC.md](Docs/MUSIC-SOURCE-RESOLUTION-SPEC.md) |
+| Why was Apple Music selected? | [Docs/MUSIC-SOURCE-RESOLUTION-SPEC.md](Docs/MUSIC-SOURCE-RESOLUTION-SPEC.md) |
 | How is code shaped? | [Docs/ARCHITECTURE.md](Docs/ARCHITECTURE.md) |
 | Why were key choices made? | [Docs/DECISIONS.md](Docs/DECISIONS.md) |
 | What proves current behavior? | [Docs/TESTING.md](Docs/TESTING.md) |

@@ -1,0 +1,23 @@
+I will give you my qualitative feedback. Its unstructured and I'm writing it freehand, so take special attention to parsing it, understanding it, writing it thoughtfully and clearly in your words etc.
+
+---
+
+I definitely felt the auto working, although the transitions between tempos just felt jarring because there wasn't a clear indication that a switch was happening
+
+This is why I gave you the initail feedback in that master feedback doc of including a really, really high quality, soft yet "ear pleasing" sound or set of sounds + maybe (maybe?) haptic feedback when a change is happening.
+
+And also why I told you that we can't be changing it every time we notice a change in the motion, but rather when we notice a drastic change (I.e. we should prioritize approximate alignment of tempo and the users motion activity and ergonomic UX over fine tuned alignment of tempo and a jarring UX.)
+
+Yes, I ended the samadhi part of the workout after about 30 minutes. I was stretching and doing other stuff before that!
+
+Yes I completely agree with the poor overall marching, that's a good read. We need to fine tune and make that more aligned.
+
+And yes I mostly walked vs. very light jog, I did very light jog for a little bit of time as well (at like 4.5 treadmill speed literally, on like 5 incline). Otherwise it was brisk walk. This is the warmup of my workout (gym logs in ~/phoenix)
+
+---
+
+Either we find high quality sounds (I'm thinking like the sound Cursor uses to indicate an agent session is done, I don't want some basic audio AI slop) or we use a high quality service like Elevenlabs to generate a selection of high quality sounds and then choose one or a few. IDK. These are all just off the cuff thoughts, I'm so 100% open to better more creative plans from you appeared as well. Also open to paying for really high quality sound effect.
+
+---
+
+More importantly, and this is the biggest hole - there's still a missing clarity to the user, besides that abrupt break in the song followed by a slower (or faster) song - it just happens and then yes I can hear a slower or faster song so I know its "working", but its very jarring and isn't clear to me, the user, what's happening or why its happening or when it chooses to happen you know. The third isn't as important (when is defined by being aligned with the user), but without a clear UX, the experience loses its charm and potential.

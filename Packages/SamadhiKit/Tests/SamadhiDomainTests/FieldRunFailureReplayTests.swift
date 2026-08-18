@@ -50,9 +50,10 @@ import Testing
     let appliedSpan = (appliedRates.max() ?? 1) - (appliedRates.min() ?? 1)
     let currentEffectiveBPM = 170 * session.appliedPlaybackRate
     let hasTrackAction = session.pendingNextTrackID != nil || session.preparedNextTrackID != nil
+    let expectedLowerBound = ManualTempoEnvelope(cadencePulseBPM: 170)?.bpmRange.lowerBound
 
-    #expect(requestedSpan == 15)
-    #expect(requested == 153)
+    #expect(requestedSpan == 23)
+    #expect(requested == Double(expectedLowerBound ?? 0))
     #expect(abs(currentEffectiveBPM - requested) < 0.001)
     #expect(appliedSpan >= 0.09)
     #expect(hasTrackAction == false)

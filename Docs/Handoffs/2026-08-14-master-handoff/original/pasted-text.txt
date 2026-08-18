@@ -1,0 +1,1842 @@
+**Prepared for:** the next Samadhi agent session  
+**Prepared on:** August 14, 2026  
+**Repository:** `samay58/samadhi`  
+**Verified repository baseline:** `main` at `4f5394f3158dde9ad891b8b772b197c4c26090b2`, “Record setup craft installation”  
+**Purpose:** turn Samay’s unstructured product feedback into a rigorous, evidence-led program that an engineering agent can inspect, challenge, refine, and execute without losing the intended experience.  
+**Revision note:** incorporates Samay’s explicit preference for a short, original, Cursor-like-in-role completion sound after a verified meaningful Auto adjustment.
+
+---
+
+## 0. Read this before doing anything
+
+This document is authoritative about **Samay’s experience, dissatisfaction, priorities, and desired product outcome**. It is not automatically authoritative about the correct technical solution.
+
+Treat every proposed implementation, threshold, label, and sequencing choice below as a hypothesis until it survives an adversarial review of:
+
+1. the current source code,
+2. the current installed build,
+3. the repository’s existing evidence,
+4. official platform capability,
+5. automated tests,
+6. physical-device traces,
+7. listening and body-feel tests,
+8. Samay’s taste judgment.
+
+Do not begin by “implementing the spec.” Begin by determining which parts are already fixed on `main`, which feedback came from an older installed build, which proposed remedies are wrong, and which problems are real but caused by a different layer than assumed.
+
+The agent’s first substantive deliverable must be an **Adversarial Review Memo**, not a code diff.
+
+### Operating rule
+
+Before changing product behavior:
+
+1. identify the exact build and commit being tested;
+2. reproduce the reported behavior on current `main`;
+3. capture diagnostics and screen evidence;
+4. trace the behavior through state, event, effect, platform callback, and presentation;
+5. independently verify or refute the proposed explanation;
+6. state the smallest coherent product decision;
+7. only then implement.
+
+Instrumentation, build provenance, test fixtures, and environment repair may be changed during the review if necessary to make truth observable.
+
+---
+
+# 1. Executive synthesis
+
+Samadhi does not primarily need more features. It needs a coherent center.
+
+The current app has serious engineering underneath it: local playlist analysis, Core Motion cadence, a pure reducer, bounded MusicKit rate control, read-back verification, typed import failures, diagnostics, accessibility, and device evidence. The problem is that the user-facing mental model does not reliably convert that sophistication into a simple, trustworthy experience.
+
+Samay’s central complaint is not merely that Auto is inaccurate, Manual is awkward, imports fail, or the UI needs polish. It is that he cannot form a stable answer to these basic questions:
+
+- What rhythm does Samadhi think I am moving at?
+- What rhythm does it think this song contains?
+- Why are two different tempo numbers visible?
+- What exactly does Auto control?
+- What exactly does Manual control?
+- Why does the wheel stop where it stops?
+- Did the app actually change the song, or only change a number?
+- Why did my Manual value follow me into another song?
+- Why are many tracks unavailable?
+- Is the selected music coherent enough for adaptation to work?
+- Is the change mathematically correct, audibly correct, and physically useful?
+- Which build am I even evaluating?
+
+Until these questions are answered, visual polish can make the app more attractive without making it more legible.
+
+The reset therefore has five priorities, in this order:
+
+1. **Establish truth:** build identity, original analyzed tempo, cadence projection, requested target, commanded rate, MusicKit read-back, effective result, and target error must be inspectable.
+2. **Repair the mental model:** Auto, Manual, the primary tempo value, per-song limits, and track transitions must each have one clear meaning.
+3. **Make Auto calm and useful:** the app should estimate motion responsively but change the musical target only when a new rhythm is genuinely sustained.
+4. **Improve the music supply:** understand import failures, create a reliable local inventory, and later generate a coherent run set around the settled cadence.
+5. **Add craft around proven behavior:** explicit exit from the tempo editor, causal haptics, a brief authored completion sound for verified Auto changes, better setup readability, richer finish and summary interactions, and an authored icon.
+
+The north star remains the repository’s original promise:
+
+> The runner starts moving, the music finds a credible relationship to the runner’s rhythm, the interface confirms what happened, and then it gets out of the way.
+
+---
+
+# 2. Current repository truth
+
+The agent must read these files before planning changes:
+
+1. `AGENTS.md`
+2. `README.md`
+3. `Docs/PRODUCT.md`
+4. `Docs/STATUS.md`
+5. `Docs/PLAN.md`
+6. `Docs/ARCHITECTURE.md`
+7. `Docs/DECISIONS.md`
+8. `Docs/TESTING.md`
+9. `Docs/ADAPTIVE-AUDIO-PLAYBOOK.md`
+10. `Docs/FELT-SYNCHRONIZATION-EXECUTION-SPEC.md`
+11. `Evidence/Device/2026-07-22-field-run-failure-analysis.md`
+12. `Evidence/Device/2026-07-23-field-repair-analysis.md`
+13. the implementation files named throughout this handoff.
+
+### Current architectural contract
+
+Samadhi uses a functional core with a main-actor shell:
+
+```text
+SwiftUI
+  -> RunAction
+RunPresentationModel
+  -> RunEvent
+RunReducer
+  -> RunEffect
+platform services
+  -> identified callbacks
+RunPresentationModel
+  -> RunViewState
+SwiftUI
+```
+
+Preserve this architecture unless the adversarial review proves that it is the source of a concrete failure. It currently provides valuable boundaries:
+
+- domain logic stays independent of SwiftUI, MusicKit, Core Motion, UIKit, and wall-clock access;
+- async callbacks carry session, operation, request, track, selection, acquisition, and timeout identity;
+- stale work is rejected;
+- simulator fixtures remain deterministic;
+- physical claims remain separate from simulator claims.
+
+### Current verified state
+
+At the latest repository checkpoint:
+
+- the project uses Swift 6, XcodeGen, and a local Swift package;
+- the test script runs package, app-model, and UI tests serially;
+- the most recent recorded gate passed 118 package tests, 25 app-model tests, and 21 UI tests;
+- real Apple Music authorization, library loading, catalog access, preview decoding, playback, and rate writes have been demonstrated;
+- one corrected 59-second physical run averaged 155 SPM and reported 98 percent tempo matched from MusicKit read-back;
+- a real 25-track playlist previously produced 13 ready tracks;
+- natural imported-song transition, full endpoint listening, screen-lock duration, interruption, route-loss recovery, and the latest tactile feel remain open;
+- the last recorded signing profile expired on July 30, 2026, so current physical work requires renewed signing;
+- the latest `main` commit has not changed since July 28, 2026.
+
+### Critical caution
+
+Samay’s recent feedback may describe an older installed binary rather than the latest `main`. The latest setup-craft commit was installed while the phone was locked, and foreground launch of that exact candidate was not confirmed. Do not assume that every complaint reproduces on current source. Do not dismiss a complaint merely because the current code appears to address it.
+
+Add build provenance to diagnostics before drawing conclusions.
+
+---
+
+# 3. Product intent distilled from Samay’s feedback
+
+The following feedback ledger preserves the complete ask. Each implementation task must cite the relevant feedback IDs.
+
+## F-001: This is a core-experience reset
+
+Samadhi is not close to prime time. The last thing it needs is feature accumulation. It needs one cohesive experience that makes sense.
+
+**Required interpretation:** no decorative expansion may become the lead workstream. Behavior, truth, and trust come first.
+
+## F-002: Auto and Manual are conceptually tangled
+
+A low-tempo song can display a cadence-like value near double its musical BPM. A smaller number may show the musical BPM while the larger dial shows a cadence projection or requested target. The numbers are both defensible internally, but their meanings are not legible.
+
+Switching between Auto and Manual does not make ownership or state clear.
+
+**Required interpretation:** the interface is exposing several domain quantities without a runner-facing hierarchy.
+
+## F-003: Per-song limits feel unexplained
+
+The wheel stops, but the person does not understand whether the limit comes from the song, MusicKit, sound quality, cadence range, or a software choice.
+
+**Required interpretation:** do not remove real quality boundaries blindly. First prove the boundary and make its cause intelligible.
+
+## F-004: Manual state carries across songs in a way that feels wrong
+
+A Manual target selected for one song can remain visible when another song starts, even though the new recording has a different source tempo and reachable range.
+
+**Desired behavior:** Manual is a temporary intervention on the current song. The next song should return to Auto unless deliberate user testing proves a better model.
+
+## F-005: Auto should find a rhythm, not chase noise
+
+The desired Auto experience is not literal callback-by-callback mirroring. The app should develop a general sense of the person’s motion, settle around it, and change only when the new motion is sustained enough to matter.
+
+**Required interpretation:** separate motion estimation from product target selection.
+
+## F-006: Manual adjustment is fun and essential
+
+The wheel is worth keeping. Hearing a familiar song move faster or slower can feel playful and instrument-like.
+
+**Required interpretation:** simplify Manual, do not remove it. Make the causal chain obvious and keep the control reversible.
+
+## F-007: The music source is too eclectic for the mechanic
+
+One arbitrary playlist can contain incompatible tempos, weak beats, live material, alternate versions, and abrupt stylistic transitions. This makes adaptive playback harder and can make the entire experience feel random.
+
+**Desired direction:** build a coherent music inventory and, once the core loop works, create an internal run set around a settled cadence.
+
+## F-008: A “warehouse” of the user’s music may be more useful than one playlist
+
+Potential sources include multiple selected playlists, the user’s library, recently played tracks, or Apple Music recommendations.
+
+**Required interpretation:** start with a bounded, incremental, local inventory. Do not synchronously analyze an entire library by default.
+
+## F-009: A generated playlist or run set should be possible
+
+Samay suggested Apple Music playlist creation, or an LLM workaround if Apple does not support it.
+
+**Research result:** MusicKit already supports creating a playlist from music items. An LLM workaround is not needed for the basic write path. Internal queue generation should precede export.
+
+## F-010: Too many tracks appear to fail import
+
+The failures feel random and implausibly frequent.
+
+**Required interpretation:** measure the complete failure distribution before relaxing resolver rules. Distinguish wrong identity, no preview, temporary network failure, decode failure, ambiguous rhythm, low confidence, and no useful cadence projection.
+
+## F-011: Auto does not visibly prove that it works
+
+A slow walk should be useful as a development test, even if walking is not ultimately a production mode. The person needs to see that sensing, target selection, and playback adaptation are alive.
+
+**Required interpretation:** separate product range from calibration range. The current 120 to 210 SPM boundary is an app policy, not a limitation of `CMPedometer`.
+
+## F-012: Meaningful Auto changes should have an authored completion cue
+
+The person needs to know when Samadhi has found a rhythm, committed a new Auto target, applied a Manual target, reached a boundary, or rejected a command.
+
+Samay specifically wants a very short, high-quality sound when Auto has completed a meaningful adjustment, analogous in interaction role to the soft completion cue heard when an agent session finishes in Cursor. The product should borrow that sense of quiet completion, not copy Cursor’s proprietary sound asset.
+
+**Required interpretation:** this Auto completion sound is now an explicit product requirement, not merely an optional hypothesis. It should play only after a meaningful Auto target change has been committed and the corresponding MusicKit rate has been verified by read-back. It must not play for raw cadence callbacks, a merely considered target, every ramp increment, or an unverified command. Pair it with a restrained haptic. Create an original one-shot through a sound-design process such as ElevenLabs Sound Effects, or source a properly licensed high-quality asset, then trim, mix, and master it locally for Samadhi.
+
+## F-013: The tempo editor traps transport
+
+After opening or manipulating the wheel, pause and next may remain inaccessible until the control times out.
+
+**Desired behavior:** add an explicit close or back action. Closing the editor must immediately restore transport without discarding the current Manual target.
+
+## F-014: Setup readability and motion need refinement
+
+The playlist page can feel dark, mechanical, and insufficiently inviting. Analysis progress could feel more crafted.
+
+**Required interpretation:** fix contrast and hierarchy before adding expressive motion. Avoid decorative smoke or running graphics until they prove a clear role.
+
+## F-015: Transport and hold-to-finish need more tactile joy
+
+Pause, previous, next, and finish should feel responsive and native. The existing hold safety mechanic is liked and should remain.
+
+**Required interpretation:** improve touch response, haptics, and morphing without weakening finish safety.
+
+## F-016: The summary needs clearer closure
+
+The summary is directionally sound but basic, hard to read in places, and not emotionally satisfying enough.
+
+**Required interpretation:** improve hierarchy and completion, not metric breadth.
+
+## F-017: The icon should be more personal and authored
+
+The current icon can be more distinctive, colorful, and related to the product’s rhythm-and-stillness idea.
+
+The dictated tool name was unclear. Recraft is a plausible interpretation but not confirmed.
+
+**Required interpretation:** use generative tools only for exploration. Final artwork should be deliberately selected, redrawn or refined as layered vector art, and completed in Apple Icon Composer.
+
+## F-018: The development environment is not reliably portable
+
+Much of the work occurred on the Mac mini. The Mac mini and the primary Mac must both be able to reproduce, test, sign, install, and inspect the project.
+
+**Required interpretation:** environment reproducibility is part of the product program, not housekeeping.
+
+## F-019: “Original BPM” and the complete tempo transformation are hidden
+
+Samay can hear that tempo changes, but cannot independently determine whether the song’s source tempo is correct, whether the half-time or double-time interpretation is correct, whether the required rate was calculated correctly, or whether MusicKit applied it.
+
+**Required interpretation:** build a Tempo Truth mode before redesigning the core semantics.
+
+## F-020: The app must distinguish mathematical, platform, perceptual, and embodied success
+
+A changing number is not enough. A successful loop requires:
+
+1. correct source analysis,
+2. correct cadence relationship,
+3. correct rate command,
+4. correct MusicKit read-back,
+5. audible and acceptable playback,
+6. a useful bodily relationship to motion.
+
+---
+
+# 4. Independent research findings and their implications
+
+The agent must independently recheck these findings against the SDK installed on the working machine. They are the current research baseline, not a substitute for local interface inspection.
+
+## 4.1 Apple Music can create playlists
+
+MusicKit exposes `MusicLibrary.createPlaylist(name:description:authorDisplayName:items:)`. It also supports editing playlists created by the app. It does not allow an app to rebuild arbitrary playlists created by another app.
+
+**Implication:** build an internal Run Set first. Add explicit “Save to Apple Music” later. Store the identifier of any Samadhi-created playlist if repeated edits are desired.
+
+**Verdict on the prior LLM workaround:** rejected as unnecessary for playlist creation. An LLM may later support taste curation, but it is not required for the mechanical write path.
+
+## 4.2 The user’s library can be queried and paginated
+
+`MusicLibraryRequest` supports limits and offsets, and Music item collections expose subsequent batches. Songs, tracks, playlists, and playlist entries conform to library request protocols.
+
+**Implication:** a music warehouse is technically possible. The current app’s one-page playlist request is not sufficient for a complete library index. A production warehouse must paginate, deduplicate, persist incremental progress, and remain useful while partially analyzed.
+
+## 4.3 Apple Music does not expose an authoritative BPM field for catalog songs
+
+The documented Apple Music song attributes include title, artist, album, artwork, duration, ISRC, previews, and other catalog data, but not tempo.
+
+**Implication:** “Original BPM” must be labeled **Analyzed source tempo** unless corroborated. Do not present an estimator result as Apple-provided truth.
+
+## 4.4 Preview audio is available, full-stream PCM is not
+
+MusicKit exposes preview assets and preview URLs. It exposes streamed playback through `ApplicationMusicPlayer`, but not a documented PCM callback, DSP graph, beat grid, downbeat map, or full-track file URL for subscription playback.
+
+**Implication:** the current preview analysis is a reasonable scalar-tempo input, but it cannot establish full-track beat phase. The preview and full stream must not be assumed to have identical edit boundaries or phase.
+
+## 4.5 `playbackRate` is writable, but its quality envelope is undocumented
+
+`MusicPlayer.State` exposes a writable `playbackRate`. Apple does not document a supported musical range, pitch-quality guarantee, or artifact threshold for streamed Apple Music playback.
+
+**Implication:** 0.90 through 1.10 is an empirical Samadhi envelope, not a platform guarantee. Keep or change it only through blinded, route-specific listening evidence.
+
+## 4.6 Tempo match is not beat lock
+
+Research using D-Jogger found that continuous tempo matching alone produced limited phase synchronization, while strategies that established and maintained beat-to-footfall phase alignment produced much stronger synchronization. Running studies also show that small tempo changes can influence cadence without being consciously obvious.
+
+**Implication:** Samadhi currently supports tempo relationship, not footfall-phase lock. Do not claim “beat sync,” “in phase,” or a true per-step match. The product can still be valuable, but the claim boundary must remain explicit.
+
+## 4.7 Step-based pacing is more stable than stride-based pacing when synchronization occurs
+
+Research comparing step-based and stride-based auditory pacing found more stable auditory-motor coordination with step-based pacing.
+
+**Implication:** retaining explicit one-step-per-beat and two-steps-per-beat relationships is defensible, but the app must not silently relabel musical tempo. The runner-facing cadence target and the source musical tempo must remain separate truths.
+
+## 4.8 Walking cadence is available from Core Motion
+
+`CMPedometerData.currentCadence` reports steps per second and is described as live pedestrian data. The current app rejects values below 120 SPM because of its own running envelope.
+
+**Implication:** walking can be supported in a development calibration harness immediately. Production walking support remains a product decision and needs musical-quality testing.
+
+## 4.9 Haptic clicks fit a dial, but overuse weakens them
+
+Apple’s guidance explicitly identifies click feedback as useful for dial increments and warns that overuse or overlapping clicks can make it confusing. Custom haptics can vary sharpness and intensity, with lower sharpness conveying a softer, more organic feel.
+
+**Implication:** keep causal detents, major intervals, one boundary stop, and one ownership transition. Do not add haptics to every internal Auto callback.
+
+## 4.10 Liquid Glass belongs primarily to controls and navigation
+
+Apple’s guidance says Liquid Glass should define a control or navigation layer above content, not become the content layer itself. Native glass is appropriate for interactive buttons, transient controls, and morphing control groups. It is not a reason to turn a progress rail or passive status block into glass.
+
+**Implication:** improve the analysis progress through typography, motion, shape, and truthful state. Reserve glass for Start, transport, tempo controls, close, and finish.
+
+## 4.11 The final icon workflow should use Icon Composer
+
+Apple’s current icon workflow uses layered source artwork, vector or transparent raster layers, and Icon Composer for Default, Dark, Clear, and Tinted appearances.
+
+**Implication:** Recraft or another generator may help produce concept families. It should not be the final craft process. Final concepts must survive small-size, monochrome, wallpaper, and multi-appearance tests.
+
+## 4.12 Independent tempo tools require license discipline
+
+Librosa is available under the permissive ISC license and can serve as a development-only independent cross-check. Essentia is AGPL, aubio is GPL, and madmom’s pretrained model/data files carry noncommercial restrictions even though much of its code is BSD.
+
+**Implication:** do not add an external analyzer to the shipping app during this reset. A development-only Python validation script using Librosa is the lowest-friction independent comparator. Preserve Samadhi’s zero third-party production dependency unless a later decision explicitly changes it.
+
+## 4.13 Original short sound effects can be generated offline and bundled locally
+
+ElevenLabs Sound Effects supports text-described sound-effect generation, explicit duration control, and non-looping WAV output. Apple’s Core Haptics APIs can also register a bundled audio file as a custom audio resource and schedule it with a haptic event. These capabilities make it practical to create and prototype an original Auto completion cue without adding a runtime generation service.
+
+**Implication:** use ElevenLabs, bespoke sound design, or a properly licensed library only as an offline asset-creation path. Verify current rights before shipping, preserve provenance, bundle the selected final asset locally, and physically test the playback mechanism alongside `ApplicationMusicPlayer`. Do not assume that a technically playable cue will mix correctly with Apple Music, preserve the route, avoid ducking, or feel good under real songs.
+
+---
+
+# 5. Adversarial hypothesis matrix
+
+The agent must fill and commit a completed version of this matrix before major behavior changes.
+
+| ID    | Hypothesis                                                   | Initial status                                               | Required evidence                                            |
+| ----- | ------------------------------------------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ |
+| H-001 | Samay’s feedback reproduces on current `main`                | Unknown                                                      | current build identity, device reproduction, diagnostic trace |
+| H-002 | The primary runner-facing number should be SPM               | Strong hypothesis                                            | copy prototypes, usability readout, low-tempo case           |
+| H-003 | Manual should reset to Auto on every confirmed track change  | Strong user requirement                                      | reducer trace, transition prototype, Samay confirmation      |
+| H-004 | Auto correction should disappear from the user-facing model  | Strong hypothesis                                            | current call-site audit, control prototype, no lost use case |
+| H-005 | Cadence sensing and Auto target selection need separate filters | Strong hypothesis                                            | recorded traces showing current target chatter or lag        |
+| H-006 | 0.90 through 1.10 is clean enough for production             | Unproven                                                     | five-track blinded listening on required routes              |
+| H-007 | Walking should be a production mode                          | Unknown                                                      | sensing trace, musical-quality test, product judgment        |
+| H-008 | Current tempo estimates are accurate on Samay’s music        | Unknown                                                      | Tempo Truth corpus, independent analyzer, tap verification   |
+| H-009 | Resolver strictness is the main source of import failure     | Unknown                                                      | failure census and manual identity audit                     |
+| H-010 | `Playlist.Entry` or entry items expose better identity than current hydrated tracks | Testable                                                     | metadata coverage comparison on same playlists               |
+| H-011 | A multi-playlist warehouse is needed before the core loop can succeed | Probably false                                               | one-playlist core proof first                                |
+| H-012 | A coherent Run Set materially improves the experience after the core loop works | Strong hypothesis                                            | three generated sets and listening review                    |
+| H-013 | Random selection from the warehouse is good enough           | Rejected                                                     | use deterministic weighted planning                          |
+| H-014 | A short authored completion cue should mark a verified meaningful Auto change | Accepted user direction; exact sound and playback mechanism unproven | original candidate generation, haptic-plus-sound A/B, MusicKit coexistence and route tests |
+| H-015 | Liquid Glass will improve the progress rail                  | Rejected as default                                          | Apple guidance and visual comparison                         |
+| H-016 | Recraft was the intended icon tool                           | Unknown                                                      | ask only at the brand gate                                   |
+| H-017 | The tempo aperture should pulse at musical BPM               | Unknown                                                      | low-tempo visual and listening tests                         |
+| H-018 | The tempo aperture should pulse at cadence projection        | Unknown                                                      | compare honesty and felt utility; avoid fake beat-phase claim |
+| H-019 | Preview tempo is representative of the full streamed song    | Unknown per track                                            | section comparison and variable-tempo classification         |
+| H-020 | Current queue preparation and prepared-next reordering are reliable at natural boundaries | Unproven                                                     | five physical natural transitions                            |
+
+Each row must end as one of:
+
+- **Accepted**
+- **Accepted with modification**
+- **Refuted**
+- **Deferred because evidence is unavailable**
+
+No row may end as “seems fine.”
+
+---
+
+# 6. Provisional product model
+
+This model is the best synthesis of Samay’s intent and the evidence. The agent must challenge it, then either adopt it or record a better alternative.
+
+## 6.1 Separate the system into seven layers
+
+### Layer 1: Source rhythm evidence
+
+What the recording appears to contain:
+
+- analyzed musical BPM,
+- alternate supported pulse,
+- confidence,
+- analyzed preview duration,
+- analyzer version,
+- evidence provenance,
+- variable or ambiguous tempo status.
+
+### Layer 2: Motion observation
+
+What the phone currently observes:
+
+- raw Core Motion cadence,
+- sample age,
+- callback interval,
+- filtered cadence,
+- acquisition or tracking state.
+
+This layer should be responsive and honest. It should not be artificially sluggish merely to keep the product calm.
+
+### Layer 3: Settled Auto target
+
+What Auto currently trusts enough to use as the musical target:
+
+- acquiring,
+- settled,
+- considering a new target,
+- committed change,
+- confidence lost.
+
+This layer creates calmness. It should not mirror every filtered cadence update.
+
+### Layer 4: Track fit
+
+Which explicit cadence projection of which ready track can serve the settled target with the least distortion and discontinuity.
+
+### Layer 5: Fine rate control
+
+The bounded playback-rate command, MusicKit read-back, latency, effective musical tempo, effective cadence pulse, and residual error.
+
+### Layer 6: Transport authority
+
+Previous, Skip, and player-confirmed natural boundary change the current song. Planning can prepare, but cannot silently change, the current song.
+
+### Layer 7: Presentation and feedback
+
+One runner-facing target, one ownership model, one visible status, causal haptics, and optional development disclosure.
+
+These layers must not be collapsed into one `bpm` field.
+
+## 6.2 Auto
+
+Provisional meaning:
+
+> Auto follows the runner’s settled cadence and organizes the music around it.
+
+Auto should:
+
+1. observe filtered cadence;
+2. establish a settled target;
+3. ignore ordinary variation;
+4. consider a change only after a meaningful sustained shift;
+5. commit the new target once;
+6. ramp the current song within its proven envelope;
+7. prepare a better future track when the current song cannot fit;
+8. remain the default at run start and at every confirmed track change.
+
+The current user-facing Auto correction should be removed unless the audit finds a valuable real use case. Internal correction and calibration values may remain in diagnostics.
+
+Do not hardcode the earlier proposed 4 SPM, 6 SPM, 8-second, or 12-second thresholds before replaying real traces. Those are starting test values, not research-backed constants.
+
+## 6.3 Manual
+
+Provisional meaning:
+
+> Manual temporarily sets the target rhythm for the current song.
+
+Manual should:
+
+- begin when the wheel is turned or Manual is explicitly selected;
+- use an absolute target, not a hidden offset;
+- preserve the runner’s observed cadence separately;
+- remain through pause and same-song route recovery;
+- remain active after the editor closes;
+- clear on Previous, Skip, or natural boundary;
+- clear when the user explicitly returns to Auto;
+- never carry an old song’s range into the new song.
+
+The Manual override should be track-scoped in domain state.
+
+## 6.4 Primary display
+
+Preferred hypothesis:
+
+> The large number is the target rhythm in **SPM**.
+
+Examples:
+
+```text
+164 SPM
+Following your stride
+```
+
+```text
+168 SPM
+Manual for this song
+```
+
+```text
+172 SPM
+Settling
+```
+
+Do not show a second competing BPM value in the normal run surface merely because it exists in diagnostics.
+
+The tempo editor may provide a subordinate source-tempo disclosure if testing shows that it improves understanding:
+
+```text
+Song analyzed at 84 BPM
+2 steps per beat
+```
+
+This disclosure must not dominate the running experience.
+
+## 6.5 Per-song limits
+
+The current-song range is:
+
+```text
+selected cadence projection × proven playback-rate envelope
+```
+
+Keep this boundary until the listening gate changes the envelope.
+
+When the wheel reaches it:
+
+- visual travel stops;
+- the value stops;
+- detent feedback stops;
+- one terminal haptic occurs;
+- repeated outward motion is silent;
+- reversing responds immediately;
+- copy explains “This song’s limit”;
+- Auto may show that it is preparing a better next fit.
+
+A limit must never feel like a dead control or hidden error.
+
+## 6.6 Track change
+
+At every player-confirmed change:
+
+1. verify operation and track identity;
+2. clear old pending rate work;
+3. clear track-scoped Manual ownership;
+4. preserve the settled Auto target;
+5. derive the new track’s cadence projection;
+6. calculate and command the new rate;
+7. wait for MusicKit read-back;
+8. show a brief Auto confirmation;
+9. reject stale old-track callbacks.
+
+## 6.7 Tempo Truth mode
+
+The normal product should be simple. Development must be exhaustive.
+
+For the active track, Tempo Truth must expose:
+
+```text
+Build commit
+Track identity
+Analyzed source tempo
+Alternate pulse
+Confidence
+Analyzer version
+Evidence provenance
+Selected step-beat relationship
+Original cadence projection
+Raw cadence
+Filtered cadence
+Settled Auto target
+Active target
+Required rate
+Commanded rate
+MusicKit applied rate
+Command latency
+Effective musical BPM
+Effective cadence pulse
+Residual target error
+Verification status
+```
+
+Example:
+
+```text
+Analyzed source tempo       84.0 BPM
+Relationship                2 steps per beat
+Original cadence pulse      168.0 SPM
+
+Settled Auto target         175 SPM
+Required rate               1.0417×
+Commanded rate              1.042×
+MusicKit applied rate       1.040×
+
+Effective musical tempo     87.4 BPM
+Effective cadence pulse     174.7 SPM
+Target error                -0.3 SPM
+Status                      Verified
+```
+
+Use “Analyzed source tempo,” not “Original BPM,” unless the value has independent corroboration.
+
+## 6.8 Walking
+
+Do not expand the production promise merely to make debugging easier.
+
+Add a development calibration mode that can:
+
+- accept walking cadence,
+- show raw and filtered sensor data,
+- use known low-tempo material,
+- demonstrate the complete rate calculation,
+- save traces.
+
+After the test, decide whether warm-up walking belongs in the product.
+
+## 6.9 Music Warehouse and Run Set
+
+Do not use “random songs from everything.”
+
+A Music Warehouse is a local, incremental, deduplicated inventory of analyzed tracks and their source provenance.
+
+A Run Set is an internal queue selected from that warehouse around:
+
+- settled target SPM,
+- cadence fit,
+- required stretch,
+- analysis confidence,
+- adjacent pulse continuity,
+- artist repetition,
+- source diversity,
+- optional taste signals.
+
+The first Run Set planner should be deterministic. No LLM is required.
+
+Export to Apple Music is optional and comes after the internal set passes listening review.
+
+---
+
+# 7. Proposed domain seams
+
+These names are illustrative. Preserve semantics, not spelling.
+
+```swift
+enum RhythmOwnership: Sendable, Equatable {
+    case automatic
+    case manual(ManualRhythmOverride)
+}
+
+struct ManualRhythmOverride: Sendable, Equatable {
+    let trackID: MusicTrackID
+    var targetSPM: Int
+}
+
+struct AutoTargetState: Sendable, Equatable {
+    var observedCadenceSPM: Double?
+    var settledTargetSPM: Double?
+    var candidateTargetSPM: Double?
+    var candidateDurationSeconds: Double
+    var secondsSinceCommit: Double
+    var status: AutoTargetStatus
+}
+
+enum AutoTargetStatus: Sendable, Equatable {
+    case acquiring
+    case settled
+    case considering
+    case confidenceLost
+}
+
+enum TempoEvidenceSource: String, Codable, Sendable {
+    case samadhiAnalyzer
+    case independentAnalyzer
+    case humanTap
+    case publishedReference
+    case humanVerified
+}
+
+struct TempoEvidence: Codable, Sendable, Equatable {
+    let source: TempoEvidenceSource
+    let bpm: Double
+    let alternateBPM: Double?
+    let confidence: Double?
+    let analyzedDurationSeconds: Double?
+    let analyzerVersion: Int?
+}
+```
+
+### Required invariants
+
+- Manual always names the track it applies to.
+- A confirmed track change invalidates Manual.
+- Observed cadence is never overwritten by a Manual target.
+- Settled Auto target changes only through the Auto target policy.
+- Source musical BPM is never relabeled as cadence.
+- Applied means verified MusicKit read-back.
+- Planning never becomes transport authority.
+- Views never write player or motion state directly.
+- A stale callback cannot alter a replacement run or replacement track.
+- The summary never infers a match from intent alone.
+- The visual aperture never claims audible beat phase unless phase is actually measured.
+
+---
+
+# 8. Execution program
+
+## Phase 0: Truth, environment, and adversarial review
+
+No visual redesign and no playlist generation during this phase.
+
+### GOV-001: Produce the Adversarial Review Memo
+
+**Purpose:** verify, modify, or refute every central claim in this handoff.
+
+**Work:**
+
+1. fingerprint the repository and working tree;
+2. identify the latest installed build, or prove that it cannot be identified;
+3. read the source-of-truth documents;
+4. trace each feedback cluster through current code;
+5. complete the hypothesis matrix;
+6. identify conflicts between current docs and new user intent;
+7. recommend the smallest new product decision set;
+8. list instrumentation needed before behavior changes.
+
+**Deliverable:** `Docs/CORE-RESET-ADVERSARIAL-REVIEW.md`
+
+**Acceptance:**
+
+- every hypothesis has a status and evidence plan;
+- every user complaint maps to code paths or an explicit unknown;
+- current-main behavior is separated from older-build behavior;
+- the memo calls out any proposed task that should be deleted or deferred;
+- no “fix” is proposed without a falsifiable test.
+
+### ENV-001: Restore reproducible development on both Macs
+
+**Purpose:** eliminate hidden Mac mini state and renew physical-device capability.
+
+**Required checks:**
+
+```sh
+git status --short
+git rev-parse HEAD
+git remote -v
+xcodebuild -version
+xcode-select -p
+xcodegen --version
+swift --version
+./Scripts/bootstrap.sh
+./Scripts/test.sh
+```
+
+**Work:**
+
+- fresh-clone on the Mac mini and primary Mac;
+- confirm both generate the same project;
+- confirm test gates;
+- record required Xcode and simulator versions;
+- renew the exact Samadhi signing profile;
+- verify bundle and application identifiers;
+- pair and launch on the iPhone;
+- install in place without losing the selected collection;
+- update `Docs/DEVICE_RUNBOOK.md`;
+- keep certificates, tokens, and private account material out of git.
+
+**Acceptance:**
+
+- both Macs build from a clean checkout;
+- at least one can sign, install, launch, capture logs, and pull the app container;
+- project generation is deterministic;
+- the selected collection survives installation;
+- no source or configuration exists only on the Mac mini.
+
+### OBS-001: Add build provenance
+
+**Purpose:** make every screenshot and diagnostic attributable.
+
+**Record in debug diagnostics:**
+
+- git SHA;
+- branch or detached state;
+- build date;
+- app version and build;
+- analyzer version;
+- diagnostic schema version;
+- device and OS;
+- simulation versus production services;
+- active launch arguments.
+
+**Acceptance:**
+
+- every future run evidence packet identifies the exact binary;
+- the value is generated during build, not manually maintained;
+- Release UI remains uncluttered;
+- personal or signing secrets are not included.
+
+### BASE-001: Reproduce the reported core failures
+
+Use the current source and a known build.
+
+**Required scenarios:**
+
+1. low musical BPM with a two-steps-per-beat projection;
+2. Auto to Manual;
+3. Manual back to Auto;
+4. Manual then Skip;
+5. Manual then natural boundary;
+6. upper and lower current-song limits;
+7. tempo editor close and transport return;
+8. stable run cadence;
+9. one cadence spike;
+10. sustained cadence change;
+11. walking cadence;
+12. delayed or rejected MusicKit rate;
+13. route loss while Manual;
+14. pause and resume while Manual.
+
+**For each scenario capture:**
+
+- screen recording;
+- Tempo Truth panel;
+- run diagnostic;
+- relevant logs;
+- exact code path;
+- observed versus expected behavior.
+
+**Acceptance:** every complaint is classified as current defect, older-build defect, platform limit, intentional policy, presentation problem, or unverified perception problem.
+
+### TEMPO-001: Build Tempo Truth mode
+
+**Purpose:** make the body-to-music loop explain itself.
+
+**Likely code surfaces:**
+
+- `MusicModels.swift`
+- `AdaptationPolicy.swift`
+- `RunModels.swift`
+- `RunReducer+Adaptation.swift`
+- `RunPresentationModel.swift`
+- `RunDiagnosticsStore.swift`
+- debug UI or MusicKit feasibility harness.
+
+**Acceptance:**
+
+- all fields in Section 6.7 are visible or exported;
+- source tempo and cadence projection are distinct;
+- commanded and applied rates are distinct;
+- target error is computed from applied rate;
+- stale feedback cannot appear verified;
+- track change resets the panel to new-track evidence;
+- an A/B control can compare 1.00× and the current applied rate;
+- normal Release UI is unchanged.
+
+### TEMPO-002: Create a reference and disagreement corpus
+
+**Purpose:** determine whether Samadhi’s analyzer is correct on relevant music.
+
+**Corpus:**
+
+- retain the existing 12 tempo-declared preview validation;
+- add at least 20 representative tracks from Samay’s sources;
+- include low, medium, and high tempos;
+- include obvious half-time and double-time cases;
+- include ambiguous, live, drifting, and failed tracks.
+
+**Evidence per track:**
+
+- Samadhi estimate;
+- alternate pulse;
+- confidence;
+- Librosa development estimate;
+- human tap estimate over at least 16 beats;
+- published reference when trustworthy;
+- accepted interpretation;
+- disagreement classification.
+
+**License rule:** do not ship Librosa or any other comparator in the app. Do not integrate AGPL, GPL, or noncommercial model assets without an explicit dependency and legal review.
+
+**Privacy rule:** commit metadata only in privacy-safe form. Do not commit preview audio or personal playlist titles unless Samay explicitly approves.
+
+**Acceptance:**
+
+- every disagreement is classified;
+- false-ready and false-rejected rates are measurable;
+- half-time and double-time mistakes are visible;
+- variable-tempo tracks are not forced into one confident scalar;
+- analyzer changes require corpus replay and version bump.
+
+### IMPORT-001: Build the import failure census
+
+**Purpose:** stop guessing why tracks fail.
+
+Test at least three sources:
+
+- one rhythmically coherent playlist;
+- one eclectic playlist;
+- one larger personal source.
+
+**For every source item record one terminal outcome:**
+
+- resolved by ISRC;
+- resolved by exact or equivalent catalog identity;
+- resolved by strict metadata;
+- ambiguous;
+- no catalog match;
+- no preview;
+- temporary catalog failure;
+- temporary download failure;
+- decode failure;
+- tempo ambiguous;
+- confidence too low;
+- no supported cadence projection;
+- cache hit;
+- ready.
+
+Also compare:
+
+- `playlist.tracks`;
+- `playlist.entries`;
+- `Playlist.Entry.item`;
+- available ISRC, duration, album, and catalog identity coverage.
+
+**Acceptance:**
+
+- percentages total 100 percent;
+- at least 30 resolved items receive manual version audit;
+- zero wrong high-confidence matches;
+- avoidable failure classes are identified before resolver relaxation;
+- current UI is checked to ensure failed tracks are disclosed rather than silently absent.
+
+---
+
+## Phase 1: Repair the core model
+
+Begin only after Phase 0 establishes what is actually broken.
+
+### CORE-101: Replace the ownership model
+
+**Goal:** one meaning for Auto and one meaning for Manual.
+
+**Work:**
+
+- introduce track-scoped Manual override;
+- preserve settled Auto target separately;
+- remove or quarantine user-facing Auto correction;
+- create explicit ownership transition events;
+- clear Manual on confirmed track change;
+- keep Manual through pause and same-track recovery;
+- prevent views from mutating ownership.
+
+**Acceptance:**
+
+- turning the wheel enters Manual;
+- Return to Auto clears Manual;
+- Previous, Skip, and natural boundary return the new track to Auto;
+- the previous song’s Manual value never appears as the new song’s target;
+- reducer tests cover every transition and stale event;
+- diagnostics record ownership and reason.
+
+### CORE-102: Introduce a settled Auto target policy
+
+**Goal:** responsive sensing, calm musical decisions.
+
+Do not simply make `CadenceFilter` slower. Preserve a responsive sensor estimate and introduce a separate pure `AutoTargetPolicy`.
+
+**The policy must replay:**
+
+- stable cadence;
+- ordinary variation;
+- isolated spike;
+- sustained increase;
+- sustained decrease;
+- missing data;
+- irregular callback intervals;
+- pause and resume;
+- route recovery;
+- walking trace.
+
+**Initial search range for tuning, not final constants:**
+
+- target deadband: 3 to 5 SPM;
+- candidate change threshold: 5 to 8 SPM;
+- sustain window: 4 to 10 seconds;
+- minimum time between commits: 8 to 15 seconds.
+
+Use recorded traces to select values.
+
+**Acceptance:**
+
+- ordinary noise creates no target chatter;
+- one spike does not commit;
+- sustained change commits once;
+- the decision is deterministic;
+- the UI can distinguish “observing,” “considering,” and “committed” without showing raw noise;
+- rate adaptation still respects confidence and read-back.
+
+### CORE-103: Redesign the runner-facing tempo semantics
+
+Prototype at least three real-data states:
+
+1. 168 BPM song, 168 SPM target;
+2. 84 BPM song, two steps per beat, 168 SPM target;
+3. current song at a limit below the target.
+
+Test the preferred model:
+
+```text
+168 SPM
+Following your stride
+```
+
+Alternative presentations may be proposed only if they reduce confusion.
+
+**Acceptance questions:**
+
+- What is the large number?
+- Is Auto following me or am I controlling it?
+- What happened to the song?
+- Why did the wheel stop?
+- What will happen on the next song?
+
+A nontechnical tester should answer without an explanation of rate ratios.
+
+### CORE-104: Make the tempo editor escapable
+
+Add an explicit close or back control.
+
+**On close:**
+
+- preserve current ownership and target;
+- close the rhythm surface immediately;
+- restore transport immediately;
+- restart the normal transport timeout;
+- preserve playback and current track.
+
+**Acceptance:**
+
+- no timeout wait;
+- open, adjust, close, pause, resume, and reopen all work;
+- VoiceOver has a named close action;
+- close is reachable at accessibility sizes;
+- UI test covers the full sequence.
+
+### CORE-105: Prove track-transition reset and freshness
+
+Test Previous, Skip, and natural boundary.
+
+**Acceptance across five physical natural transitions:**
+
+- new track starts in Auto;
+- settled target persists;
+- new projection is calculated;
+- new rate is read back;
+- old Manual state is absent;
+- old pending request cannot alter the new track;
+- transition reason is correct;
+- no false Applied status;
+- no perceptible gap or wrong queue jump;
+- prepared better fit is actually closer when used.
+
+### AUDIO-101: Revalidate the playback-rate envelope
+
+Apple publishes no quality envelope. Test, do not assume.
+
+**Tracks:** at least five, covering vocals, acoustic drums, electronic percussion, bass-heavy production, and dense mix.
+
+**Routes:**
+
+- built-in speaker;
+- primary Bluetooth headphones.
+
+**Rates:**
+
+```text
+0.85
+0.90
+0.95
+1.00
+1.05
+1.10
+1.15
+```
+
+**Record:**
+
+- requested and applied rate;
+- command latency;
+- direction identification;
+- pitch impression;
+- vocal smearing;
+- transient softness;
+- warble;
+- click or gap;
+- full-song fatigue;
+- musical acceptability.
+
+**Acceptance:**
+
+- chosen endpoints are identified correctly in at least four of five blinded comparisons;
+- chosen endpoints remain acceptable on both required routes;
+- no range expansion enters production before full evidence;
+- one shared envelope governs planner, Manual, Auto, player, diagnostics, and tests.
+
+### MOTION-101: Decide walking support
+
+**Question:** production feature, warm-up state, or debug-only calibration?
+
+**Acceptance:**
+
+- Core Motion reliability is measured at walking cadence;
+- music quality is tested with suitable material;
+- product wording remains running-first unless Samay approves expansion;
+- the decision is recorded in `Docs/DECISIONS.md`;
+- no one changes `runningCadenceRange` as a shortcut.
+
+### VISUAL-CORE-101: Decide what the aperture represents
+
+The current aperture’s pulse is periodic but not beat-phase aligned to the streamed song.
+
+Compare:
+
+1. source musical BPM;
+2. cadence projection;
+3. settled target SPM;
+4. a slower non-literal ambient response.
+
+**Acceptance:**
+
+- the chosen behavior has an honest product meaning;
+- it does not imply measured footfall phase;
+- it remains calm under Auto;
+- it freezes or simplifies under Reduce Motion;
+- Samay approves it with low-tempo and normal-tempo songs.
+
+---
+
+## Phase 2: Improve the music supply
+
+This phase is contingent on a working one-playlist core loop. Do not use music generation to hide a broken adaptation model.
+
+### IMPORT-201: Improve identity resolution
+
+Use the Phase 0 census.
+
+Potential improvements to test:
+
+- ISRC when present;
+- exact catalog identity;
+- documented equivalent matching;
+- playlist-entry item identity;
+- normalized version tokens;
+- artist-set comparison;
+- album similarity;
+- duration delta;
+- preview availability;
+- explicit ambiguity score.
+
+**Acceptance:**
+
+- avoidable failures materially decline;
+- wrong-version rate remains zero in the audited high-confidence sample;
+- ambiguous items still fail closed;
+- every failure remains typed;
+- temporary failures can retry without reprocessing successful tracks.
+
+### WAREHOUSE-201: Build an incremental local Music Warehouse
+
+Start with multiple user-selected playlists. Add “entire library” only as an explicit later option.
+
+**Record:**
+
+- catalog identity;
+- source playlist provenance;
+- source fingerprint;
+- title and artist;
+- duration;
+- genre names when available;
+- play count and last-played date when available;
+- tempo evidence;
+- cadence projections;
+- terminal analysis state;
+- analyzer version;
+- last analyzed date.
+
+**Deduplicate by:**
+
+1. catalog identity;
+2. ISRC;
+3. strict fingerprint.
+
+**Acceptance:**
+
+- paginates all selected sources;
+- deduplicates shared tracks;
+- resumes after cancellation;
+- reuses valid cache;
+- remains useful while incomplete;
+- stale analyzer versions reprocess;
+- source removal does not remove a track still referenced elsewhere;
+- no synchronous whole-library wall blocks Start.
+
+### RUNSET-201: Build the deterministic Run Set planner
+
+**Inputs:**
+
+- settled target SPM;
+- intended duration;
+- ready warehouse;
+- current track;
+- proven rate envelope;
+- recent choices in the current set.
+
+**Initial cost dimensions:**
+
+1. residual target error;
+2. required stretch;
+3. analysis confidence;
+4. cadence relationship penalty;
+5. adjacent effective-pulse discontinuity;
+6. repeated artist;
+7. repeated track;
+8. insufficient backup coverage above and below target;
+9. optional source or genre continuity.
+
+**Rules:**
+
+- current track remains current;
+- planning changes future entries only;
+- future entries may replan after an Auto commit;
+- planning is deterministic for a seed;
+- unresolved tracks never enter;
+- low-confidence tracks never enter;
+- random choice is not the default.
+
+**Acceptance:**
+
+- three 30-minute sets can be generated from a sufficiently rich warehouse;
+- most entries require modest correction;
+- adjacent transitions avoid unnecessary pulse discontinuity;
+- the set contains backup coverage around target changes;
+- three sets pass Samay’s listening review;
+- diagnostics explain why every track was selected.
+
+### EXPORT-201: Optional Apple Music export
+
+After a Run Set is approved:
+
+```text
+Save to Apple Music
+```
+
+**Requirements:**
+
+- explicit user action;
+- no duplicate playlist on repeated action;
+- store Samadhi-created playlist identity;
+- only edit playlists created by Samadhi;
+- write failure does not damage the internal set;
+- export is never required for playback.
+
+---
+
+## Phase 3: Causal feedback and supporting craft
+
+### FEEDBACK-301: Create the Auto completion cue and the broader haptic grammar
+
+#### Product decision
+
+Ship one brief, authored sonic cue for a **verified meaningful Auto change**. Its interaction role should resemble a refined task-completion sound: Auto has found and successfully applied the new rhythm, so the system gives one quiet moment of closure.
+
+The cue is not a metronome, sensor tick, wheel detent, notification ding, or generic success chime.
+
+#### Exact trigger contract
+
+The success cue must occur only when all of the following are true:
+
+1. the settled Auto target has materially changed;
+2. the reducer has committed that new target;
+3. the player has received the resulting rate command;
+4. MusicKit has reported a matching applied-rate read-back for the current session, operation, request, and track;
+5. the effective cadence pulse is inside the accepted match tolerance, or the Auto policy has reached the verified nearest truthful boundary it intentionally selected.
+
+Do not play the cue when:
+
+- raw or filtered cadence changes;
+- Auto is merely considering a candidate target;
+- a rate ramp takes an intermediate step;
+- a command remains pending;
+- MusicKit rejects or mismatches the command;
+- stale feedback arrives;
+- the current target is reaffirmed without a meaningful change.
+
+A rejected command receives a separate restrained warning haptic, not the completion sound.
+
+#### Sound brief
+
+Generate and audition an original family of short one-shot candidates. The starting brief, subject to physical testing, is:
+
+- roughly 180 to 450 milliseconds, with no conspicuous long tail;
+- soft but decisive;
+- warm, rounded, lightly tonal or tactile-percussive;
+- audible over music at low level without masking the song;
+- emotionally closer to “settled” or “complete” than “alert” or “reward”;
+- clean in mono on the iPhone speaker and through Bluetooth headphones;
+- no hard UI click, bright notification bell, coin sound, arcade reward, stock cursor sound, or obvious sample-pack character.
+
+Borrow the emotional function of Cursor’s completion cue, not its literal waveform.
+
+#### Candidate creation and provenance
+
+Create at least 12 candidates, then narrow to three physical prototypes. Candidate sources may include:
+
+1. ElevenLabs Sound Effects, used offline to generate original one-shots with controlled duration;
+2. bespoke synthesis, Foley, or recording created for Samadhi;
+3. a high-quality sound library with a license that clearly permits app distribution and modification.
+
+For every candidate preserve:
+
+- source or generator;
+- prompt or recording notes;
+- license and usage terms as of acquisition;
+- raw file;
+- edits and processing chain;
+- final file checksum.
+
+The final sound must ship as a bundled local asset. Do not add an ElevenLabs API call, network dependency, or generated-at-runtime audio path to the product.
+
+#### Playback implementation review
+
+Independently test the smallest reliable mechanism for playing the bundled cue alongside `ApplicationMusicPlayer`, including a custom Core Haptics audio resource or a local AVFoundation player. Do not choose the mechanism from theory alone.
+
+The selected implementation must not:
+
+- change or reactivate the audio session in a way that pauses music;
+- duck Apple Music unless explicitly selected and approved;
+- create a route change;
+- interrupt background playback;
+- produce a start-up delay on the first cue;
+- desynchronize the haptic and sound;
+- fail silently when haptics are disabled or unavailable.
+
+#### Broader event grammar
+
+Continue to prototype restrained haptic treatment for:
+
+- cadence acquired;
+- Manual detent;
+- Manual target verified;
+- current-song limit;
+- rejected command;
+- Return to Auto;
+- run finish.
+
+The Auto completion sound is the one required sonic event in this phase. Other sounds require separate evidence before inclusion.
+
+#### Acceptance
+
+- Samay can identify that Auto has completed a real change without looking in at least four of five trials;
+- the cue never fires before verified read-back;
+- intermediate rate steps produce no repeated sound;
+- the cue remains pleasant and non-fatiguing across at least ten meaningful Auto changes;
+- it is audible but unobtrusive across five representative songs;
+- it causes no perceptible music duck, pause, gap, route glitch, or background failure on the iPhone speaker and primary Bluetooth route;
+- sound and haptic feel causally simultaneous;
+- functionality remains understandable with sound or haptics disabled;
+- Samay explicitly selects the final candidate on the physical phone.
+
+### UX-301: Refine setup readability and progress
+
+First repair:
+
+- contrast;
+- typography;
+- hierarchy;
+- mesh readability wash;
+- exact progress;
+- action placement;
+- long names;
+- accessibility reflow.
+
+Then explore three directions with real states:
+
+1. restrained editorial;
+2. tactile kinetic;
+3. warm native control layer.
+
+**Guardrails:**
+
+- no decorative smoke in the first implementation;
+- no running silhouette;
+- no fake waveform;
+- no glass content card;
+- no animation that delays Start;
+- no low-contrast type;
+- no motion that survives Reduce Motion incorrectly.
+
+**Acceptance:**
+
+- passes contrast and accessibility inspection;
+- exact progress remains truthful;
+- Reduced Motion is immediate;
+- old and new status do not overlap;
+- Samay selects from physical frames and short recordings.
+
+### UX-302: Refine transport and finish
+
+Use native Liquid Glass for interactive control surfaces, not passive content.
+
+**Preserve:**
+
+- deliberate two-stage finish;
+- 900 ms protection unless testing changes it;
+- cancelability;
+- accessibility finish action.
+
+**Explore:**
+
+- pressed glass response;
+- coherent grouping in `GlassEffectContainer`;
+- morphing with `glassEffectID`;
+- progressive but restrained hold feedback;
+- clean release into summary;
+- better pause, next, and previous touch response.
+
+**Acceptance:**
+
+- accidental tap cannot finish;
+- interrupted hold resets;
+- visual and reducer hold windows agree;
+- accessibility works without physical long press;
+- Reduced Transparency, Increased Contrast, and Reduce Motion remain usable;
+- Samay approves physical feel.
+
+### UX-303: Refine the summary
+
+Keep:
+
+- duration;
+- tempo matched or Not measured;
+- average cadence or settled range;
+- song count;
+- Done.
+
+Add one restrained completion gesture, not a dashboard.
+
+**Acceptance:**
+
+- all values are evidence-backed;
+- no percentage below coverage threshold;
+- high contrast;
+- accessibility sizes fit;
+- Reduce Motion remains complete;
+- the screen feels conclusive in a device recording;
+- no GPS, calorie, streak, or coaching metrics.
+
+### BRAND-301: Redesign the icon
+
+At this phase, clarify whether Samay meant Recraft.
+
+**Concept territory:**
+
+- two rhythms settling into one;
+- repeated step and pulse;
+- dynamic aperture;
+- motion becoming stillness;
+- interlocking cadence;
+- Indian visual intelligence without spiritual cliché.
+
+**Avoid:**
+
+- lotus;
+- meditation silhouette;
+- shoe;
+- heartbeat line;
+- music note;
+- generic waveform;
+- neon wellness orb;
+- obvious S monogram;
+- pseudo-mystical AI texture.
+
+**Process:**
+
+1. black-and-white silhouettes;
+2. three concept families;
+3. small-size test;
+4. manual/vector refinement;
+5. color systems;
+6. layered export;
+7. Icon Composer;
+8. Default, Dark, Clear, and Tinted review;
+9. multiple wallpapers;
+10. final physical home-screen test.
+
+**Acceptance:** the final icon is recognizable, simple, personal, and selected explicitly by Samay.
+
+---
+
+## Phase 4: Reliability and release proof
+
+### REL-401: Complete the core outdoor run gate
+
+At least 20 minutes with:
+
+- real imported or warehouse music;
+- current build provenance;
+- Auto acquisition;
+- one stable cadence period;
+- one sustained cadence change;
+- one Manual adjustment;
+- explicit editor close;
+- pause and resume;
+- one current-song limit;
+- one prepared better fit;
+- one natural transition;
+- new-song Auto reset;
+- five screen-locked minutes;
+- one controlled interruption or route loss;
+- completed summary;
+- saved diagnostics.
+
+**Pass conditions:**
+
+- Auto establishes a stable target;
+- ordinary variation does not chatter;
+- sustained change causes one understandable adjustment;
+- a verified meaningful Auto adjustment produces exactly one selected completion cue and no cue during intermediate ramp steps;
+- Manual changes the current song audibly;
+- Manual does not survive a track change;
+- transport is never trapped;
+- every Applied state has read-back;
+- limits are understandable and reversible;
+- natural transition has no stale state or perceptible failure;
+- summary matches diagnostics;
+- Samay reports that the run is meaningfully better because of Samadhi.
+
+Only after this gate should the team call the core reset complete.
+
+---
+
+# 9. Validation ownership
+
+Every acceptance criterion must name its proof owner.
+
+| Claim                                | Required proof                                 |
+| ------------------------------------ | ---------------------------------------------- |
+| Reducer state transition             | deterministic domain test                      |
+| Async cancellation or stale callback | identified event test                          |
+| Import presentation                  | app-model and UI test                          |
+| Layout and hierarchy                 | Simulator frame plus physical review           |
+| Accessibility                        | UI test and Accessibility Inspector            |
+| Motion                               | Simulator recording plus Reduce Motion variant |
+| Core Motion quality                  | physical device trace                          |
+| MusicKit rate                        | read-back with request identity                |
+| Audio quality                        | blinded listening on required route            |
+| Haptic quality                       | physical iPhone and Samay judgment             |
+| Body-to-music usefulness             | outdoor run and diagnostics                    |
+| Icon quality                         | multi-appearance physical home-screen review   |
+
+An agent may say:
+
+- code-verified;
+- Simulator-verified;
+- device-installed;
+- MusicKit-read-back verified;
+- listening-verified;
+- body-feel verified;
+- Samay-approved.
+
+An agent may not say “works,” “polished,” “smooth,” “matched,” or “seamless” without the matching proof.
+
+---
+
+# 10. Human taste and decision gates
+
+The agent should not ask Samay to approve routine engineering. Bring him in at these exact moments.
+
+## Gate A: Mental model
+
+Show real states for:
+
+- Auto acquiring;
+- Auto settled;
+- Auto considering change;
+- Manual;
+- current-song limit;
+- rejected command;
+- new song returning to Auto.
+
+**Decision:** does the model make immediate sense?
+
+## Gate B: Tempo Truth
+
+Show at least five familiar tracks, including low-tempo cases.
+
+**Decision:** do the numbers explain what he hears?
+
+## Gate C: Rate envelope
+
+Run the blinded physical listening test.
+
+**Decision:** which endpoints are musically acceptable?
+
+## Gate D: Auto behavior
+
+Replay traces and complete a short outdoor test.
+
+**Decision:** does Auto feel calm, responsive, and flow-supporting?
+
+## Gate E: Auto completion cue and feedback grammar
+
+Present three physical versions of the original Auto completion cue, each paired with its intended haptic, plus the broader haptic-only event grammar.
+
+**Decision:** which cue gives the right quiet sense of a verified Auto change being complete, while remaining authored, subtle, and non-annoying under real music?
+
+## Gate F: Run Set
+
+Listen to three generated sets at the same target.
+
+**Decision:** is the sequence coherent enough to support flow?
+
+## Gate G: Supporting visual craft
+
+Review setup, transport, finish, and summary on the phone with accessibility variants.
+
+**Decision:** which direction has the right taste and restraint?
+
+## Gate H: Icon
+
+Review concept families in actual home-screen context.
+
+**Decision:** final concept and color system.
+
+---
+
+# 11. Non-goals and stop rules
+
+Do not add during the reset:
+
+- GPS;
+- map;
+- pace dashboard;
+- calories;
+- coaching;
+- plans;
+- streaks;
+- social;
+- account system;
+- subscription;
+- analytics SDK;
+- cloud backend;
+- LLM runtime dependency;
+- Spotify;
+- a second production player;
+- beat-lock claims;
+- full run history;
+- automatic whole-library indexing without consent;
+- automatic Apple Music playlist writes;
+- decorative smoke or fake waveforms;
+- a broad visual redesign before core semantics pass;
+- wider time stretch without listening evidence.
+
+### Stop rules
+
+1. If current `main` does not reproduce a complaint, determine whether the installed build is stale before changing code.
+2. If MusicKit read-back disagrees with commands, stop UI work and fix player truth.
+3. If tempo estimates disagree on familiar music, stop planner work and fix evidence.
+4. If the selected rate envelope sounds bad, reopen source and mechanics rather than hiding the limit.
+5. If one playlist cannot prove the core loop, do not assume a warehouse will save it.
+6. If a Run Set does not improve listening quality, do not add more recommendation complexity.
+7. If a visual idea reduces readability or truth, discard it regardless of novelty.
+
+---
+
+# 12. Repository and evidence discipline
+
+For every coherent change:
+
+1. build;
+2. run relevant tests;
+3. inspect actual UI;
+4. capture evidence;
+5. update active docs only with verified claims;
+6. preserve privacy;
+7. commit intentionally.
+
+### Required doc updates at milestone boundaries
+
+- `Docs/DECISIONS.md`
+- `Docs/TESTING.md`
+- `Docs/STATUS.md`
+- `Docs/PLAN.md`
+- `Docs/PROGRESS.md`
+
+### Evidence naming
+
+Use dated, descriptive paths:
+
+```text
+Evidence/Simulator/YYYY-MM-DD-...
+Evidence/Device/YYYY-MM-DD-...
+Evidence/Logs/YYYY-MM-DD-...
+```
+
+Do not commit:
+
+- preview audio;
+- personal playlist titles or track lists without approval;
+- Apple credentials;
+- provisioning private material;
+- raw personal run traces when privacy-safe aggregates suffice.
+
+When available in Codex, use the installed iOS workflows:
+
+- simulator discovery, build, launch, UI description, screenshots, and logs through the iOS debugger workflow;
+- SwiftUI state and component guidance for screen work;
+- Liquid Glass guidance for interactive controls;
+- physical device validation for haptics, MusicKit, motion, routes, and background behavior.
+
+---
+
+# 13. First assignment for the next agent session
+
+Use this instruction verbatim:
+
+> Begin the Samadhi Core Experience Reset with Phase 0 only. Do not redesign the UI, change Auto or Manual semantics, add playlist generation, or implement the Auto completion cue yet. Preserve that cue as an explicit later requirement while Phase 0 defines the verified completion event and captures the audio-session, routing, and latency constraints needed to implement it safely.
+>
+> First identify the exact local repository, branch, working-tree state, latest `origin/main`, Xcode version, simulator, signing status, and physical device status. Confirm whether `main` is still `4f5394f3158dde9ad891b8b772b197c4c26090b2`. Run the existing bootstrap, test, formatter, and build gates.
+>
+> Read `AGENTS.md`, `Docs/PRODUCT.md`, `Docs/STATUS.md`, `Docs/PLAN.md`, `Docs/ARCHITECTURE.md`, `Docs/DECISIONS.md`, `Docs/TESTING.md`, `Docs/ADAPTIVE-AUDIO-PLAYBOOK.md`, and the two July field-failure analyses.
+>
+> Then produce `Docs/CORE-RESET-ADVERSARIAL-REVIEW.md`. Independently verify, refute, or modify every hypothesis H-001 through H-020 in the handoff. Distinguish current-main behavior from behavior observed on an older installed build. Trace each confirmed problem through domain state, reducer event, effect, platform call, callback identity, presentation mapping, and UI.
+>
+> You may add only the minimum instrumentation needed to establish truth, including build provenance and Tempo Truth mode. Create a privacy-safe baseline evidence packet covering low-tempo/two-step interpretation, Auto to Manual, Manual to Auto, Manual across Skip and natural boundary, current-song limits, tempo editor exit, stable cadence, spike, sustained cadence change, walking cadence, delayed or rejected rate feedback, route loss, and pause/resume.
+>
+> Build an import failure census across representative playlists. Compare playlist tracks, entries, and entry items before relaxing the resolver. Every source item must receive exactly one typed terminal outcome, and at least 30 resolved identities must be manually audited for version correctness.
+>
+> Do not call Phase 0 complete until every feedback item maps to reproducible current behavior or a documented non-reproduction, every tempo transformation can be explained numerically, and the adversarial memo identifies which later tasks should be accepted, modified, deferred, or deleted.
+
+---
+
+# 14. Primary source inventory for the agent
+
+## Repository
+
+- `samay58/samadhi`, `main`
+- `AGENTS.md`
+- `Docs/PRODUCT.md`
+- `Docs/STATUS.md`
+- `Docs/PLAN.md`
+- `Docs/ARCHITECTURE.md`
+- `Docs/DECISIONS.md`
+- `Docs/TESTING.md`
+- `Docs/ADAPTIVE-AUDIO-PLAYBOOK.md`
+- `Docs/FELT-SYNCHRONIZATION-EXECUTION-SPEC.md`
+- `Packages/SamadhiKit/Sources/SamadhiDomain/MusicModels.swift`
+- `Packages/SamadhiKit/Sources/SamadhiDomain/RhythmControl.swift`
+- `Packages/SamadhiKit/Sources/SamadhiDomain/AdaptationPolicy.swift`
+- `Packages/SamadhiKit/Sources/SamadhiDomain/TrackMatchPlanner.swift`
+- `Packages/SamadhiKit/Sources/SamadhiDomain/RunReducer.swift`
+- `Packages/SamadhiKit/Sources/SamadhiDomain/RunReducer+Adaptation.swift`
+- `Packages/SamadhiKit/Sources/SamadhiMotion/CadenceFilter.swift`
+- `Packages/SamadhiKit/Sources/SamadhiAudio/TempoEstimator.swift`
+- `App/AppleMusicImportService.swift`
+- `App/AppleMusicCatalogResolver.swift`
+- `App/AppleMusicPlaybackController.swift`
+- `App/RunPresentationModel.swift`
+- `App/RunDiagnosticsStore.swift`
+- `Packages/SamadhiKit/Sources/SamadhiDesign/RhythmControl.swift`
+- `Packages/SamadhiKit/Sources/SamadhiDesign/TempoAperture.swift`
+
+## Apple primary documentation
+
+- `MusicPlayer.State.playbackRate`
+- `MusicLibrary.createPlaylist(name:description:authorDisplayName:items:)`
+- `MusicLibrary.edit(_:name:description:authorDisplayName:items:)`
+- `MusicLibraryRequest`
+- `MusicItemCollection.hasNextBatch`
+- `MusicItemCollection.nextBatch(limit:)`
+- `Playlist`, `Playlist.Entry`, and `Track.previewAssets`
+- Apple Music API `Songs.Attributes`
+- `CMPedometerData.currentCadence`
+- `CMPedometer.isCadenceAvailable()`
+- Human Interface Guidelines, `Playing haptics`
+- Core Haptics, custom audio resources and audio events
+- AVAudioSession mixing, ducking, route, and interruption behavior
+- ElevenLabs Sound Effects documentation for offline one-shot candidate generation
+- Human Interface Guidelines, `Materials`
+- SwiftUI `glassEffect`, `GlassEffectContainer`, and glass button styles
+- Human Interface Guidelines, `App icons`
+- WWDC25, `Create icons with Icon Composer`
+
+## Research
+
+- Moens et al., “Encouraging Spontaneous Synchronisation with D-Jogger, an Adaptive Music Player That Aligns Movement and Music,” PLoS ONE, 2014, PMID 25489742, PMCID PMC4260851.
+- Van Dyck et al., “Spontaneous Entrainment of Running Cadence to Music Tempo,” Sports Medicine Open, 2015, PMID 26258007, PMCID PMC4526248.
+- Van Dyck et al., “Optimizing beat synchronized running to music,” 2018, PMCID PMC6283599.
+- Van Dyck et al., “Instructed versus spontaneous entrainment of running cadence to music tempo,” Annals of the New York Academy of Sciences, 2021.
+- “Cadence Modulation in Walking and Running: Pacing Steps or Strides?”, PMID 32370091.
+- Librosa documentation, `librosa.beat.beat_track`.
+- Ellis, “Beat tracking by dynamic programming,” Journal of New Music Research, 2007.
+
+---
+
+# 15. Final product test
+
+The reset succeeds when Samay can say, without seeing a debug panel:
+
+> I start moving. Samadhi finds my rhythm without twitching. When Auto completes a meaningful verified adjustment, one subtle authored cue lets me know the new rhythm has settled. The music changes in a way I can hear and feel. I can turn the wheel for the current song, understand the boundary, close it, and get back to transport. The next song returns cleanly to Auto. The music selection feels coherent. When something fails, the app tells the truth. When the run ends, the summary feels clear and earned.
+
+And when debugging, the team can answer every one of those feelings with evidence:
+
+> This was the analyzed source tempo. This was the supported cadence relationship. This was the settled target. This was the required rate. This was the command. This was MusicKit’s read-back. This was the effective result. This was the remaining error. This was the track transition authority. This is the exact build that produced it.
+
+That combination, an effortless surface supported by ruthless internal observability, is the standard for Samadhi’s next phase.

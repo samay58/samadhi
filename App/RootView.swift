@@ -6,6 +6,9 @@ struct RootView: View {
     // RootView owns the app's one presentation model. Screens receive rendered state and send intent back.
     @State private var runModel = RunPresentationModel()
     @State private var musicModel = MusicSelectionModel()
+    #if DEBUG
+        @State private var showingCoreDiagnostics = false
+    #endif
 
     var body: some View {
         @Bindable var musicModel = musicModel
@@ -18,6 +21,11 @@ struct RootView: View {
                     reload: self.musicModel.beginChoosing
                 )
             }
+            #if DEBUG
+                .sheet(isPresented: $showingCoreDiagnostics) {
+                    CoreLoopDiagnosticsView(presentation: runModel.coreLoopDiagnostics)
+                }
+            #endif
             .task {
                 await self.musicModel.restore()
                 installSelectedCollection()
@@ -32,6 +40,10 @@ struct RootView: View {
         #if DEBUG
             if ProcessInfo.processInfo.arguments.contains("--music-feasibility") {
                 MusicKitFeasibilityView()
+            } else if let status = diagnosticFixtureStatus {
+                CoreLoopDiagnosticsView(presentation: .fixture(status))
+            } else if ProcessInfo.processInfo.arguments.contains("--core-diagnostics") {
+                CoreLoopDiagnosticsView(presentation: runModel.coreLoopDiagnostics)
             } else {
                 samadhiScreen
             }
@@ -51,11 +63,9 @@ struct RootView: View {
 
             #if DEBUG
                 if ProcessInfo.processInfo.arguments.contains("--apple-music-core-loop") {
-                    CoreLoopDiagnosticsView(
-                        cadenceSPM: runModel.viewState.cadenceSPM,
-                        targetRate: runModel.state.session?.adaptationState.targetRate,
-                        appliedRate: runModel.state.session?.appliedPlaybackRate,
-                        awaitingFeedback: runModel.state.session?.pendingRateRequestID != nil
+                    CoreLoopDiagnosticsOverlay(
+                        presentation: runModel.coreLoopDiagnostics,
+                        open: { showingCoreDiagnostics = true }
                     )
                 }
             #endif
@@ -79,36 +89,40 @@ struct RootView: View {
         else { return }
         runModel = RunPresentationModel(musicCollection: collection)
     }
+
+    #if DEBUG
+        private var diagnosticFixtureStatus: TempoDiagnosticStatus? {
+            let prefix = "--diagnostic-scenario="
+            guard let argument = ProcessInfo.processInfo.arguments.first(where: { $0.hasPrefix(prefix) })
+            else { return nil }
+            return TempoDiagnosticStatus(rawValue: String(argument.dropFirst(prefix.count)))
+        }
+    #endif
 }
 
 #if DEBUG
-    private struct CoreLoopDiagnosticsView: View {
-        let cadenceSPM: Int?
-        let targetRate: Double?
-        let appliedRate: Double?
-        let awaitingFeedback: Bool
+    private struct CoreLoopDiagnosticsOverlay: View {
+        let presentation: CoreLoopDiagnosticPresentation
+        let open: () -> Void
 
         var body: some View {
-            VStack(alignment: .leading, spacing: 2) {
-                Text("Core loop")
-                    .fontWeight(.semibold)
-                Text("cadence \(cadenceSPM.map(String.init) ?? "--")")
-                Text("target \(formatted(targetRate))")
-                Text("applied \(formatted(appliedRate))")
-                Text(awaitingFeedback ? "feedback pending" : "feedback settled")
+            Button(action: open) {
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("What Samadhi saw")
+                        .fontWeight(.semibold)
+                    Text(presentation.status.label)
+                    Text("Sent \(formatted(presentation.sentRate))")
+                    Text("Apple Music \(formatted(presentation.reportedRate))")
+                }
+                .font(.system(.caption2, design: .monospaced))
+                .foregroundStyle(Color.black.opacity(0.82))
+                .padding(8)
+                .background(Color.white.opacity(0.88), in: RoundedRectangle(cornerRadius: 8))
             }
-            .font(.system(.caption2, design: .monospaced))
-            .foregroundStyle(Color.black.opacity(0.82))
-            .padding(8)
-            .background(Color.white.opacity(0.88), in: RoundedRectangle(cornerRadius: 8))
+            .buttonStyle(.plain)
             .padding(.leading, 12)
             .padding(.top, 54)
-            .allowsHitTesting(false)
-            .accessibilityElement(children: .combine)
-            .accessibilityLabel(
-                "Core loop diagnostics, cadence \(cadenceSPM.map(String.init) ?? "unavailable"), "
-                    + "target rate \(formatted(targetRate)), applied rate \(formatted(appliedRate))"
-            )
+            .accessibilityLabel("Open what Samadhi saw and changed")
         }
 
         private func formatted(_ value: Double?) -> String {

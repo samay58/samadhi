@@ -1,189 +1,54 @@
 # Current status
 
-## At a glance
+## Product state
 
-| Area | State | Evidence |
+| Area | Current truth | Proof |
 | --- | --- | --- |
-| Product interaction | Complete prototype | Golden UI flow |
-| Visual system | Complete prototype | Playlist-instrument setup chain and active-run Simulator frames |
-| Accessibility | Covered in prototype | Authored accessibility XXXL reflow, Reduce Motion, contrast, VoiceOver labels and selected state |
-| State architecture | Complete for prototype | Pure reducer tests |
-| Cadence | Core Motion connected; acquisition, tracking, confidence loss, and reacquisition are explicit | Deterministic freshness and response traces plus prior iPhone evidence |
-| Audio timing | Real for imported ready tracks; deterministic in fixtures | Production player contract and beat-clock tests |
-| Playlist import | Continuous setup, complete results, typed recovery, retry, and bounded analysis implemented | Empty through failure Simulator proof, import timing diagnostics, model tests, and prior physical collection evidence |
-| Tempo analysis | Version 4 keeps measured musical pulse separate from an independently supported stride pulse; the public corpus passes 12 of 12 | Generated regressions, private playlist replay, and opt-in Apple preview validation |
-| Adaptation policy | Manual commits apply directly; Auto tracks fresh cadence through a time-based filter; an unreachable request uses the nearest honest rate | Identified effects, boundary behavior, and deterministic replay tests; current physical latency remains open |
-| Track fit | Source order is preserved at startup; next-song preparation cannot change current transport | Deterministic relationship, envelope, coalescing, identity, order, and retention tests |
-| In-run BPM control | The wheel uses 30 BPM per revolution, reverse hysteresis, local detent previews, and one absolute Manual commit at finger-up | Deterministic geometry and command tests; current physical feel remains open |
-| Simulator development loop | Local placeholder playlists and silent simulated playback available in Debug | Normal no-argument launch, model tests, UI flow, screenshot, and interaction recording |
-| Apple Music feasibility | Source selected; 0.90 versus 1.10 was clearly audible on one Bluetooth track; broader quality and long-form reliability remain | Exact-profile traces and explicit product decision |
-| Spotify feasibility | Rejected for adaptive playback | Remote-control architecture, missing music rate control, and content policy conflict |
-| Production player | Apple Music selected; imported ready tracks enter the real player | Source-neutral contract, exact-profile build, and device install |
-| Physical run validation | First field run failed; remediation build installed for a short focused retest | Audible response, directional haptic feel, import timing, reliability, and final outdoor run remain open |
+| Music source | Apple Music is selected | Authorization, catalog access, preview decoding, playback, and rate writes passed on iPhone |
+| Music import | One playlist can be selected, analyzed locally, restored, retried, and filtered to ready tracks | Automated tests, Simulator frames, and prior phone import |
+| Tempo analysis | Version 4 keeps musical BPM separate from the supported step relationship | 12 of 12 public preview references and deterministic ambiguity tests |
+| Motion | Steady readings from 90 through 210 SPM are accepted; walking needs longer evidence | Saved phone replay, deterministic stale-data rejection, and one attributed workout |
+| Auto | A responsive sensor estimate feeds a separate calm musical target | Noise, spike, faster, slower, missing-input, and walking tests |
+| Manual | Manual stays with the confirmed song and returns to Auto only after a different song is confirmed | Reducer, app-model, and interface tests |
+| Playback range | The software candidate is 0.85 through 1.15 | Shared limits and endpoint tests across Auto, Manual, track fit, diagnostics, and player commands |
+| Tempo wheel | The wheel has a quiet close action with a separate 44-point touch target | Interface tests and inspected Simulator frames |
+| Debug explanation | Debug builds show the exact source fingerprint and the full motion-to-music calculation | Build inspection, diagnostic tests, and Simulator frames |
+| Release isolation | The hidden Debug screen does not ship in Release | Release binary inspection |
 
-## Completed
+## What the phone has proved
 
-### Foundation
+The August 17 workout came from an exact-profile build with a matching source fingerprint. Four delayed but forward-moving cadence readings acquired 133 SPM. Apple Music received 1.0390625 and reported 1.0390625 after 0.066 seconds. This proves the repaired timing rule for that observed phone pattern.
 
-- Reproducible XcodeGen project targeting iOS 26
-- Local Swift package separating domain, motion, audio timing, and design
-- Pure run reducer with explicit events, effects, cancellation, and recovery
-- Serial Xcode test gate for current beta Simulator behavior
+Samay also felt Auto changing the music. The changes felt jarring and unexplained. The workout mixed walking, light jogging, and lifting, so it does not prove the best walking threshold or how much time belonged to each activity.
 
-### Interaction
+The expanded 0.85 through 1.15 candidate is installed over Samadhi 1.0 build 1 with exact signing. The selected collection stayed byte-for-byte unchanged at SHA-256 `81a9b31fbc115d607bc766dd25374ecff6874b079276b68c3719cb122cea3f52`. The phone locked before launch, so the new endpoints have not produced an in-app fingerprint read-back, Apple Music reply, or listening result.
 
-- Ready, preparing, acquiring, locked, controls, paused, resumed, finish hold, summary, permission recovery, and audio-route recovery
-- Song progress linked to outer ring
-- Tempo aperture linked to simulated cadence
-- Controls hidden until requested
-- Explicit resume after route loss
-- Fixed-rhythm fallback after denied motion access
+## Current software gate
 
-### Design and brand
+- Project generation passed.
+- Formatter lint passed.
+- 153 Swift package tests passed.
+- 27 app-model tests passed.
+- 28 serial interface tests passed.
+- Source-fingerprint tests passed.
+- Resource-inclusive Debug and Release Simulator builds passed.
+- The hidden Debug screen was absent from Release.
+- The physical build used exact profile `Samadhi Development 2026-08-15`, which expires August 15, 2027.
+- The embedded profile and app signature both use `ZL5U59XBJ6.com.samaydhawan.Samadhi`.
 
-- Full-screen fluid field replaced square cover treatment
-- Passive white cards removed
-- Open type hierarchy and native raised controls established
-- Music setup keeps the selected playlist as one stable visual owner from analysis through recovery
-- The setup composition uses stable identity, truthful status, and action regions without cards, explanatory copy, or decorative progress
-- The native playlist sheet uses open type, compact native sizing, tactile rows, quiet separators, and an accessible current-selection state without decorative metadata
-- Samadhi name, icon, tagline, project, scheme, package, tests, and repository aligned
-- GitHub cover and app icon installed
+## Still open
 
-### Cleanup
+- Launch the installed expanded-rate build and confirm its in-app source fingerprint.
+- Get Apple Music read-back at 0.85 and 1.15, then judge both endpoints through headphones for a full musical section.
+- Run a clean walking-only check. The 90 SPM floor and five-second walking delay are software choices, not physically tuned constants.
+- Check whether steady lifting motion can falsely look like walking. Samadhi does not need a lifting mode.
+- Rebuild Play, Pause, Previous, Next, and Finish as one coherent control system. Fix the Finish border overflow.
+- Prove one known natural song boundary, screen lock, interruption, and route recovery.
+- Prototype the faster and slower haptic and sound cues only after the core behavior gate.
+- Complete one 20-minute outdoor run.
 
-- Removed empty diagnostics module
-- Split 633-line screen into focused screen and control types
-- Split domain models from reducer
-- Moved task cancellation bookkeeping into dedicated task store
-- Replaced hard-coded three-track navigation with configured collection size
-- Added formatter config and clean lint gate
-- Added newcomer guidance at load-bearing architectural and interaction seams
-- Removed stale pre-final evidence, rejected cover exports, completed-generation prompts, and superseded build handoff
+## Where we left off
 
-### Milestone 2 groundwork
+The core reset is consolidated in the current candidate. The next physical gate is short: launch, confirm the fingerprint, compare 0.85 and 1.15 with the known 0.90 and 1.10 pair, and record Apple Music's replies. If the endpoints sound clean, the next Main Thing is the transport and Finish craft pass.
 
-- Inspected Xcode 27, iOS 27 SDK interfaces, signing, connected devices, and current project capabilities
-- Configured Apple team `ZL5U59XBJ6`, registered the explicit App ID, and received user confirmation that the MusicKit App Service is enabled
-- Built, signed, installed, and launched the gate harness on a physical iPhone 17 Pro with Developer Mode enabled
-- Added source-neutral collection, track, tempo, cadence, progress, adaptation, and tempo-measurement models
-- Added bounded adaptation with ramp limits, deadband, update interval, confidence hold, and calm return to normal speed
-- Added cadence-provider events, deterministic cadence filtering, and a Core Motion provider that compiles for iPhone
-- Renamed the summary measurement to tempo matched and made fixed rhythm report Not measured
-- Added a debug-only MusicKit gate scheme with playlist loading, decoded PCM preview coverage, playback, rate controls, route and interruption observation, and JSON trace export
-- Added music and motion permission text plus verified background audio mode
-- Saved five early physical-device traces proving authorization, 40-playlist loading, real playback, live 0.94, 1.00, and 1.06 rate writes, pause, and resume
-- Used the early traces to isolate two blockers: library tracks had no direct previews or ISRC, and the wildcard profile could not obtain Apple's automatic developer token
-- Evaluated Spotify and rejected it as a production source because it does not provide an app-owned audio signal or documented music rate control, and its policy prohibits altering or analyzing Spotify content
-- Added a source-resolution spec with explicit token, tempo-source, listening, background, and fallback gates
-- Installed exact profile `Samadhi Development` and verified the signed application identifier `ZL5U59XBJ6.com.samaydhawan.Samadhi`
-- Passed automatic developer-token generation with repeated direct catalog responses
-- Added strict title, artist, album, and duration catalog resolution that fails closed on ambiguity and persists the returned numeric catalog ID
-- Downloaded remote preview assets into temporary app storage and decoded 10 of 10 City Pocket previews to PCM
-- Recorded a clean built-in-speaker listening pass across the safe-rate endpoints; Bluetooth listening remains required
-- Reached Beoplay Eleven over Bluetooth A2DP and applied 0.94, 1.00, and 1.06 during real playback
-- Selected Apple Music as the one production source after Samay explicitly deferred further repetitive manual drills
-- Added a source-neutral production player contract, deterministic player, Apple Music adapter, and identified progress and recovery events
-- Added a dedicated `Samadhi Apple Music Core Loop` scheme, then replaced its provisional track with a validated tempo fixture
-- Added one local audio analysis interface, off-main PCM decoding, a versioned tempo estimator, and generated tempo and rejection fixtures
-- Connected the MusicKit harness to report estimated tempo and confidence for resolved previews
-- Replaced frame-energy onset detection with Accelerate spectral flux and fractional-lag autocorrelation after real previews exposed a confident triple-meter error
-- Added an opt-in 12-track Apple preview corpus with published tempo references; version 2 passed 12 of 12 within the accepted tempo family
-- Selected catalog track `1066177773` as the initial verified 170 BPM core-loop fixture
-- Connected the focused core-loop scheme to `CoreMotionCadenceProvider` while preserving simulation for normal runs and repeatable tests
-- Kept cadence sensing alive after first lock so stable updates, confidence loss, and reacquisition continue through the run
-- Made the reducer own adaptation state and emit bounded, identified playback-rate effects
-- Required session, operation, request, and track identity before applied-rate feedback can change run state
-- Connected honest tempo-matched measurement to the player-reported applied rate instead of assuming every locked second matched
-- Launched the focused configuration on the physical iPhone and observed changing Core Motion cadence during a 29-second walk
-- Recorded an honest 142 SPM average and 0 percent tempo matched because the initial 170.25 BPM fixture could not safely reach that cadence
-- Switched the first follow-up to validated catalog track `1434921088`, estimated at 139.5 BPM, without changing the safe rate range or stability policy
-- Recorded no perceptible speed change during that follow-up, leaving automatic rate response unproven
-- Removed the adapter's immediate command echo so applied rate now comes from MusicKit read-back
-- Added a focused-only diagnostic panel for cadence, target rate, applied rate, and pending feedback
-- Switched the objective check to validated catalog track `1558215042`, estimated at 149.75 BPM, which produces a clearer safe ramp around the observed cadence
-- Installed and launched the corrected build after the iPhone reconnected
-- Completed a 59-second run averaging 155 SPM with 98 percent tempo matched from MusicKit read-back
-- Added contextual Apple Music playlist selection using the native library response
-- Preserved playlist order while resolving each track strictly to a numeric catalog identity
-- Added sequential, cancellation-aware preview analysis with honest ready, unreadable, and unavailable states
-- Added versioned tempo caching keyed by track identity, source fingerprint, and analyzer version
-- Added atomic selected-collection persistence under Application Support
-- Filtered the production queue to adaptive-ready tracks without hiding failed tracks from setup
-- Connected restored imported music to `AppleMusicPlaybackController` and `CoreMotionCadenceProvider` in the normal app
-- Added deterministic empty, loading, analyzing, partial, authorization-failure, and import-failure states
-- Installed and launched the import-capable test build on the physical iPhone
-- Pulled the physical app container and verified one real 25-track playlist produced 13 ready, 8 unreadable, and 4 unavailable tracks
-- Added debug-only latest-run diagnostics so progress, cadence, target and applied rates, track changes, recovery events, and summary survive finish for direct device retrieval
-- Built, signed, and installed the diagnostics-capable app while preserving the selected playlist byte-for-byte; foreground launch remains blocked by the locked phone
-- Added one in-run rhythm control with Auto fine-tune from minus 8 through plus 8 BPM, Manual targets from 120 through 200 BPM, and one-step return to neutral Auto
-- Kept safe rate bounds, ramping, deadband, confidence handling, track compatibility, identified player feedback, and honest summary measurement authoritative in the reducer
-- Kept requested BPM distinct from the nearest achievable Music BPM when one song reaches its rate boundary
-- Extended latest-run diagnostics with control mode, correction or Manual target, requested BPM, derived rate, MusicKit read-back, and limit state
-- Resolved the control as direct manipulation of the existing tempo aperture with large touch targets, restrained haptics, VoiceOver adjustment, Dynamic Type, increased contrast, and Reduce Motion support
-- Reviewed final Auto fine-tune, Manual safety-limit, and accessibility-size frames in the iPhone 17 Pro Simulator without changing the wider visual system
-- Added a debug-only blinded 0.92 versus 1.08 comparison that captures rate read-back and direction recognition with optional 0.90 and 1.10 endpoint controls
-- Preserved imported playlist order at adaptive run start instead of selecting against a cadence guess before live cadence exists
-- Kept song identity and count authoritative to real player callbacks instead of predicting the result of Previous or Skip
-- Added a five-second mismatch hold that prepares a better-fitting next song while allowing the current song to finish naturally
-- Protected next-song preparation with selection identity so late preparation cannot replace a newer choice
-- Turned the pulsing aperture into the single rotary BPM click wheel with one-BPM angular detents, soft takeover, restrained haptics, a temporary perimeter marker, and VoiceOver adjustment
-- Removed separate plus and minus controls after visual review because they weakened the single-instrument interaction
-- Added a Debug Simulator-only local music path with two placeholder playlists so the normal app flow no longer depends on unavailable Simulator MusicKit state
-- Anchored rotary movement to finger-down, kept the automatic range fixed through a gesture, protected the center, and emitted one state change plus one selection haptic per crossed BPM detent
-- Reused prepared haptic generators so the first click is not weakened by generator startup
-- Kept the broad requested BPM range separate from per-song playback limits and mapped one complete revolution to 30 BPM for calmer control
-- Added 30 restrained visual detents plus low-sharpness Core Haptics feedback, with a fuller notch every five BPM and a soft Auto landing
-- Replaced the tuning sentence with one integrated `Turn` label, three resting grip notches, and one Reduce-Motion-aware teaching movement that retires after first use
-- Replayed the first field failure without committing personal library metadata
-- Made every BPM command resolve against requested BPM, achievable BPM, commanded rate, and player read-back without treating incompatibility as a transport command
-- Made rapid wheel turns coalesce toward the latest requested target while keeping MusicKit read-back authoritative
-- Made compatible large BPM changes prepare only the latest better-fitting track; only Skip or a player-confirmed natural boundary may commit it
-- Required at least 80 percent verified measurement coverage before showing a tempo-matched percentage
-- Preserved Automatic and Manual seconds in the completed-run diagnostic summary
-- Removed the technical result table from the primary setup composition and kept complete typed results in a native disclosure sheet
-- Preserved distinct rhythm, preview, catalog, download, and decode outcomes and added retry after relaunch
-- Limited concurrent import work to three ordered tracks and added private stage timing diagnostics
-- Preserved clockwise and counterclockwise direction through stronger ordinary and five-BPM haptic events
-- Kept the rhythm control pinned for the full wheel gesture so its timeout cannot hide the surface mid-turn
-- Rebuilt empty, loading, analysis, partial readiness, full readiness, and failure as one playlist-anchored setup chain
-- Added same-playlist retry, choose-another recovery, authorization guidance, 40-playlist scrolling proof, and an accessible current-selection state
-- Split setup into focused identity, status, action, and results views while keeping model ownership unchanged
-- Added causal selection and first-readiness feedback, an interruptible 210-millisecond handoff, and an immediate Reduce Motion path
-- Reflowed accessibility sizes into a top-led document hierarchy with wrapped titles and full-width primary actions
-
-## Proof
-
-The current software gate passed on 2026-07-27:
-
-- 118 Swift package tests
-- 25 app-model tests
-- 21 UI tests
-- Swift formatter lint
-- Resource-inclusive Simulator build
-- Focused setup and rotary-control UI proof
-- Two runtime iteration passes and 17 final setup frames on iPhone 17 Pro Simulator, including accessibility XXXL and Reduce Motion
-
-The paired iPhone is available. Automatic signing selected a valid wildcard profile, so that build was rejected before installation because MusicKit requires the explicit Samadhi application identifier. The renewed exact profile expires on 2026-07-30 UTC. Commit `66e0616` was rebuilt from a clean detached worktree, signed with the exact application identifier, and installed without changing the selected-collection checksum. Foreground launch was blocked only because the phone was locked.
-
-Setup-craft commit `0a59b64` was rebuilt from a clean detached worktree, signed with the exact `Samadhi Development` profile, and installed in place. Its selected-collection checksum stayed byte-for-byte identical. Foreground launch was attempted but not claimed because the phone remained locked.
-
-Durable logs and final visual frames live under Evidence/.
-
-The diagnostics slice passes formatter lint, a Simulator build, the full serial gate, an exact-profile physical build, physical installation, and foreground launch.
-
-The production track-fit and rotary-control slice passes formatter lint, 83 package tests, 11 app-model tests, 10 UI tests, and an exact-profile signed iPhone build. Commit `c8e195e` was installed and launched over the local network on the restored iPhone on 2026-07-22. A direct device capture confirmed the normal setup screen rendered cleanly.
-
-The MusicKit harness and normal app launch in Simulator and on the physical iPhone. Signing uses the Apple Development certificate for team `ZL5U59XBJ6`. The import-capable normal build is installed. Its build and installation record is under `Evidence/Device/`.
-
-## Known limits
-
-The current 18-track selection contains 14 ready tracks, two unclear rhythms, and two catalog-unavailable tracks. LITE SPOTS was ready, but the former hardcoded 168 SPM startup prior selected the later Gorilla because it fit that guess. Startup now preserves the first ready track in source order. Manual and Auto may prepare one latest next candidate but cannot change current transport. Only Previous, Skip, or a player-confirmed natural boundary may do that.
-
-Explicit one-step-per-beat and two-steps-per-beat relationships improve representative cadence compatibility from 13 to 16 of 56 private matrix cells without changing the 0.90 through 1.10 playback envelope. This is truthful but not broad enough to close the product range problem. A wider MusicKit rate needs physical quality proof. If the outdoor run still feels constrained, reopen the source and mechanics decision.
-
-The current candidate passes formatter lint, 118 package tests, a resource-inclusive Simulator build, 25 app-model tests, and 21 serial UI tests. Setup coverage proves compact and empty pickers, 40-playlist scrolling and selection, selected loading, exact progress, long names, partial and complete readiness, complete typed disclosure, current selection, same-playlist retry, choose-another recovery, authorization recovery, accessibility XXXL reflow, and Reduce Motion. Commit `0a59b64` is installed on the physical iPhone with the selected collection preserved. Foreground launch confirmation, current physical timing, audible response, and haptic feel remain open.
-
-## WHERE WE LEFT OFF
-
-The setup-craft redesign is complete, pushed, and installed on Samay's iPhone with the selected collection preserved. The phone remained locked, so foreground launch of this exact candidate is not yet confirmed. Once unlocked, open Samadhi and judge selection response, readiness confirmation, and Start. The shortest run check remains one song: confirm startup stays on the first ready track, reach and leave both Manual boundaries, return to Auto while changing cadence, and judge audible response and wheel feel. Pull rolling diagnostics immediately afterward.
+Historical implementation detail lives in [PROGRESS.md](PROGRESS.md). Product choices live in [DECISIONS.md](DECISIONS.md). Exact checks and proof limits live in [TESTING.md](TESTING.md).

@@ -85,12 +85,17 @@
                             rateButton(1)
                             rateButton(1.08)
                         }
-                        Text("Try 0.90 and 1.10 only if these endpoints remain clean.")
+                        Text("Compare the known 0.90 and 1.10 pair before the 0.85 and 1.15 candidate.")
                             .foregroundStyle(.secondary)
                         HStack {
                             rateButton(0.90)
                             rateButton(1)
                             rateButton(1.10)
+                        }
+                        HStack {
+                            rateButton(0.85)
+                            rateButton(1)
+                            rateButton(1.15)
                         }
                     }
 

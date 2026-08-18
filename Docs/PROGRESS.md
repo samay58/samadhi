@@ -446,6 +446,112 @@ This checkpoint recorded a passing local candidate before its exact-profile buil
 - Confirmed the selected-collection checksum remained byte-for-byte identical
 - Attempted foreground launch repeatedly but left it open because the phone was locked
 
+## 2026-08-14. MacBook continuation gate
+
+- Cloned `main` into `Projects/active/samadhi` and added the `/Users/samaydhawan/samadhi` convenience link
+- Installed one iOS 27 runtime and retained one iPhone 17 Pro Simulator only
+- Passed the local `Scripts/test.sh` gate with 118 Swift package tests and 46 serial Simulator tests
+- Confirmed an Apple Development identity is available locally
+- Kept physical-device work open because the iPhone is unavailable to this MacBook
+- Added the MacBook continuation, storage, signing, and pairing guide, then aligned the active status, plan, testing, and device-runbook surfaces with historical profile evidence
+
+## 2026-08-14. Core reset software baseline
+
+- Added build-generated commit, branch state, build date, app version, and build number to Debug evidence
+- Extended the existing run diagnostic file to version 6 with analyzer details, song pulse, step relationship, current Auto-target truth, resulting speeds, and remaining difference
+- Added one hidden Debug screen that separates musical BPM from step rhythm in SPM and shows the complete Apple Music request and reply
+- Cleared prior-song read-back and result values on every confirmed song change, then required a fresh identified reply for the new song
+- Added deterministic coverage for the current behavior matrix, including low-tempo two-step music, both direction changes, a false spike, song limits, the tempo-wheel return trap, delayed and rejected replies, route loss, pause, and song changes during Manual
+- Inspected seven fresh iPhone 17 Pro Simulator frames covering low-tempo math, waiting, verified, limited, rejected, song reset, accessibility XXXL, and Reduce Motion
+- Passed formatter lint, 121 package tests, 27 app-model tests, 25 serial UI tests, and a resource-inclusive Release Simulator build
+- Built successfully for the paired iPhone, found only a wildcard profile, and did not install it or change app data
+
+## 2026-08-15. Exact phone baseline and track-scoped Manual
+
+- Created and downloaded `Samadhi Development 2026-08-15` for the exact Samadhi application identifier
+- Inspected the embedded profile and app signature, then installed over the existing phone app without uninstalling
+- Confirmed the selected collection checksum stayed byte-for-byte unchanged
+- Launched the baseline build and saved its base commit, dirty state, build time, and phone environment
+- Captured one short real-phone run with raw Core Motion cadence and identified Apple Music replies
+- Recorded 16 numeric cadence readings from 151.56 to 158.10 SPM; 14 exceeded the 2.0-second freshness limit at about 2.57 seconds old, so only two were accepted and Auto could not lock
+- Recorded Apple Music replies in about 0.04 to 0.07 seconds for Manual and Auto commands
+- Made Manual persist through same-song pause, resume, route loss, recovery, and unconfirmed transport requests
+- Made Manual return to Auto only after the player confirms a different song, with no inherited result or late old-song verification
+- Added one accessible tempo-wheel close action that restores playback controls without changing rhythm or playback
+- Inspected fresh Simulator frames for Manual before and Auto after a confirmed song change, close restoration, accessibility XXXL, and Reduce Motion
+- Passed bootstrap, formatter lint, 124 package tests, 27 app-model tests, 27 serial UI tests, and a resource-inclusive Release Simulator build
+- Rebuilt and installed the final Manual/close candidate in place; the phone locked before an in-app read-back
+
+## 2026-08-17. Continuation audit
+
+- Rechecked local and fetched remote `main` at `4f5394f3158dde9ad891b8b772b197c4c26090b2`
+- Confirmed the phone is paired and still reports Samadhi 1.0 build 1
+- Re-read the saved phone trace and found the Auto acquisition blocker: 14 of 16 numeric cadence readings were about 2.57 seconds old and failed the 2.0-second freshness limit
+- Corrected build claims: the screen records base commit, dirty state, and build time, but not the exact dirty source changes
+- Reran bootstrap, formatter lint, 124 package tests, 27 app-model tests, 27 serial UI tests, and a resource-inclusive Release Simulator build
+
+## 2026-08-17. Trustworthy Auto software slice
+
+- Added a pre-compilation source fingerprint covering behavior-changing app inputs, including modified and untracked files
+- Replayed the saved phone cadence shape and accepted delayed readings only when Core Motion time moves forward coherently
+- Preserved rejection of old, repeated, backward, out-of-order, unexplained-gap, missing, and out-of-range readings
+- Added a separate time-based Auto target that holds through ordinary noise and one spike, then moves after sustained evidence
+- Replaced the glass close bubble with a small flat mark outside the dial while retaining a 44-point touch target
+- Inspected normal, accessibility XXXL with Reduce Motion, and Increased Contrast Simulator frames
+- Passed bootstrap, formatter lint, 136 package tests, 27 app-model tests, 28 serial UI tests, and resource-inclusive Debug and Release Simulator builds
+- Built with the exact Samadhi profile, verified fingerprint `4e454d2859a521367bf83f26ba1287b14d617d0700c630f90ff13ce8f3b5b498`, and installed in place
+- Confirmed the selected collection stayed byte-for-byte unchanged; the phone locked before the in-app fingerprint read-back
+
+## 2026-08-17. Fingerprinted workout and Auto interaction decision
+
+- Pulled the completed workout diagnostic from the physical phone and matched its source fingerprint to the exact-profile candidate
+- Confirmed the timing repair on real motion: four supported delayed readings acquired 133 SPM
+- Confirmed one exact Apple Music response: 1.0390625 requested and reported after 0.066 seconds
+- Recorded that 57 of 61 retained numeric readings were below the current 120 SPM contract without assigning each reading to walking, jogging, or lifting
+- Preserved Samay's raw workout and interaction feedback as two immutable handoff addenda with checksums
+- Recorded Samay's judgment that Auto was perceptible but its transitions felt jarring and unexplained
+- Rejected temporary screen copy as the solution because the phone is normally not visible
+- Defined a later two-part nonvisual interaction: a distinct faster or slower haptic at first verified movement, then one authored sound and settling haptic at verified arrival
+- Kept that interaction behind the walking, approximate-match, and transport and Finish work
+- Corrected the workout interpretation after Samay clarified that substantial lifting occurred during the 30-minute period
+- Removed the unsupported claim that the summary undercounted a known amount; kept walking-range expansion open and lifting-specific adaptation out
+
+## 2026-08-17. Walking and approximate alignment
+
+- Measured the mixed workout without claiming which exact readings came from walking or lifting
+- Chose a conservative 90 SPM floor; values from 80 through 89 remain outside Auto
+- Required five seconds of steady evidence for walking while keeping the faster running acquisition path
+- Prevented missing or disagreeing rep-like movement from accumulating a walking target
+- Found and fixed a deeper separation bug: raw cadence could command playback before the settled Auto target existed
+- Kept the Apple Music playback range at 0.90 through 1.10
+- Expanded approximate alignment from three to five SPM; six SPM still fails
+- Measured privacy-safe coverage across 15 ready private tracks without storing titles or identifiers
+- Renamed Debug output from running pulse to step rhythm and advanced the diagnostic file to version 9
+
+## 2026-08-17. Expanded playback candidate
+
+- Widened the shared Apple Music playback candidate from 0.90 through 1.10 to 0.85 through 1.15 at Samay's direction
+- Kept Auto changes limited to 0.02 rate units per second, which reaches either endpoint from normal speed in at most eight seconds
+- Applied the same bounds to Auto, Manual, track selection, diagnostics, and the final Apple Music command
+- Added Debug controls that compare the known 0.90 and 1.10 pair with the new 0.85 and 1.15 endpoints
+- Added deterministic endpoint, ramp, Manual-boundary, track-fit, command-clamp, and five-SPM tolerance checks
+- Fixed floating-point rounding that could reject a result exactly five SPM from target
+- Passed bootstrap, formatter lint, 153 package tests, 27 app-model tests, 28 serial interface tests, source-fingerprint tests, and resource-inclusive Debug and Release Simulator builds
+- Confirmed the hidden Debug screen remains absent from Release
+- Built with the exact Samadhi profile and verified source fingerprint `fd8120ad2ac14e1090a687438e6564beb65bde0a61d58fab04d4ec7295535684`
+- Installed over the existing phone app without uninstalling and preserved the selected collection byte-for-byte
+- Kept endpoint Apple Music read-back, sound quality, and long-form reliability open because the phone locked before launch
+
 ## Current checkpoint
 
-Milestones 0 and 1 remain complete. Milestone 2 is open. The setup-craft redesign is gated, pushed, and installed on the physical iPhone with the selected collection preserved. Foreground launch remains open because the phone was locked. Once unlocked, check selection response, readiness confirmation, and Start, then run one song for source-order startup, both Manual boundaries, immediate reverse, return to Auto with a cadence change, and a quick audible and tactile judgment. Pull rolling diagnostics even if the run is not finished.
+The expanded-rate candidate passes the full software gate and is installed with exact signing. Its in-app fingerprint read-back, 0.85 and 1.15 Apple Music replies, and listening approval remain open because the phone locked before launch. After that short physical gate, the next Main Thing remains the transport and Finish craft pass. Directional Auto feedback remains specified for later physical prototyping.
+
+## 2026-08-17. Core reset consolidation
+
+- Rewrote the public README and current status around the code and evidence that exist today
+- Removed one redundant handoff rewrite and one completed continuation prompt while preserving every original handoff file and checksum
+- Kept the raw phone diagnostic and personal lock-screen capture local and ignored in this public repository
+- Corrected stale evidence links and marked old playback limits as historical measurements
+- Confirmed that this repository has one worktree, with no stale worktrees to merge or remove
+- Passed bootstrap, formatter lint, 153 package tests, 27 app-model tests, 28 serial interface tests, and resource-inclusive Debug and Release Simulator builds
+- Confirmed that the hidden developer screen is absent from the Release app

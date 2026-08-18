@@ -1,0 +1,54 @@
+{
+  "date": "2026-08-17",
+  "privacy": "This file contains counts and ranges only. It contains no collection name, song title, song identifier, or raw phone timeline.",
+  "workoutSource": {
+    "sourceFingerprint": "4e454d2859a521367bf83f26ba1287b14d617d0700c630f90ff13ce8f3b5b498",
+    "numericCadenceReadingCount": 61,
+    "cadenceHistogramSPM": {
+      "below80": 0,
+      "80Through89": 8,
+      "90Through99": 21,
+      "100Through109": 20,
+      "110Through119": 8,
+      "120AndAbove": 4
+    },
+    "medianSPM": 101.28,
+    "tenthPercentileSPM": 83.75,
+    "ninetiethPercentileSPM": 115.56
+  },
+  "policyComparison": {
+    "before": {
+      "supportedCadenceSPM": [120, 210],
+      "approximateMatchToleranceSPM": 3
+    },
+    "candidate": {
+      "supportedCadenceSPM": [90, 210],
+      "runningCadenceSPM": [120, 210],
+      "approximateMatchToleranceSPM": 5,
+      "walkingAcquisitionSeconds": 5,
+      "runningAcquisitionSeconds": 1,
+      "playbackRate": [0.9, 1.1]
+    }
+  },
+  "privateCollectionCoverage": {
+    "readyTrackCount": 15,
+    "targets": [
+      {"targetSPM": 80, "beforeCompatibleTracks": 0, "candidateCompatibleTracks": 0},
+      {"targetSPM": 90, "beforeCompatibleTracks": 0, "candidateCompatibleTracks": 4},
+      {"targetSPM": 100, "beforeCompatibleTracks": 0, "candidateCompatibleTracks": 4},
+      {"targetSPM": 110, "beforeCompatibleTracks": 0, "candidateCompatibleTracks": 7},
+      {"targetSPM": 120, "beforeCompatibleTracks": 5, "candidateCompatibleTracks": 6},
+      {"targetSPM": 130, "beforeCompatibleTracks": 8, "candidateCompatibleTracks": 8},
+      {"targetSPM": 140, "beforeCompatibleTracks": 7, "candidateCompatibleTracks": 7},
+      {"targetSPM": 160, "beforeCompatibleTracks": 4, "candidateCompatibleTracks": 5},
+      {"targetSPM": 180, "beforeCompatibleTracks": 5, "candidateCompatibleTracks": 5},
+      {"targetSPM": 200, "beforeCompatibleTracks": 4, "candidateCompatibleTracks": 4}
+    ]
+  },
+  "proofLimits": [
+    "The workout mixed walking, light jogging, and lifting. The trace does not label each reading by activity.",
+    "The collection coverage uses saved local tempo analysis and contains no listening judgment.",
+    "The five-second walking rule is a conservative software choice. It is not physically tuned yet.",
+    "Lifting remains outside the product contract. Irregular movement must not acquire a musical target."
+  ]
+}

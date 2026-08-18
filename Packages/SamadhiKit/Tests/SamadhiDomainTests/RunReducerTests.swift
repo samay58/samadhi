@@ -15,6 +15,18 @@ private let coreLoopTrack = MusicTrack(
     )
 )
 private let coreLoopReducer = RunReducer(tracks: [coreLoopTrack])
+private let walkingTrack = MusicTrack(
+    id: MusicTrackID("walking-track"),
+    title: "Walking",
+    durationSeconds: 180,
+    tempo: TempoAnalysis(
+        baseBPM: 90,
+        confidence: 1,
+        analyzedDurationSeconds: 30,
+        version: 4
+    )
+)
+private let walkingReducer = RunReducer(tracks: [walkingTrack])
 private let transitionTrack = MusicTrack(
     id: MusicTrackID("transition-track"),
     title: "Transition",
@@ -157,14 +169,14 @@ private let slowTrack = MusicTrack(
 
 @Test func incompatibleTrackMustStayOutsideTheEnvelopeForFiveSeconds() {
     let planningReducer = RunReducer(tracks: [slowTrack, coreLoopTrack])
-    var state = incompatibleRun()
+    var state = incompatibleRun(cadence: 180)
 
     var result = planningReducer.reduce(
         state: state,
         event: .cadenceUpdated(
             sessionID: 202,
             acquisitionID: 1,
-            stepsPerMinute: 168,
+            stepsPerMinute: 180,
             deltaSeconds: 4,
             rateRequestID: 300
         )
@@ -187,7 +199,7 @@ private let slowTrack = MusicTrack(
         event: .cadenceUpdated(
             sessionID: 202,
             acquisitionID: 1,
-            stepsPerMinute: 168,
+            stepsPerMinute: 180,
             deltaSeconds: 1,
             rateRequestID: 301
         )
@@ -226,7 +238,7 @@ private let slowTrack = MusicTrack(
         event: .cadenceUpdated(
             sessionID: 202,
             acquisitionID: 1,
-            stepsPerMinute: 168,
+            stepsPerMinute: 180,
             deltaSeconds: 5,
             rateRequestID: 302
         )
@@ -240,14 +252,14 @@ private let slowTrack = MusicTrack(
 
 @Test func stalePreparedSelectionCannotReplaceANewerPlan() {
     let planningReducer = RunReducer(tracks: [slowTrack, coreLoopTrack])
-    var state = incompatibleRun()
+    var state = incompatibleRun(cadence: 180)
     state =
         planningReducer.reduce(
             state: state,
             event: .cadenceUpdated(
                 sessionID: 202,
                 acquisitionID: 1,
-                stepsPerMinute: 168,
+                stepsPerMinute: 180,
                 deltaSeconds: 5,
                 rateRequestID: 301
             )
@@ -279,29 +291,44 @@ private let slowTrack = MusicTrack(
 
 @Test func compatibilityRecoveryInvalidatesAnOutstandingSelection() {
     let planningReducer = RunReducer(tracks: [slowTrack, coreLoopTrack])
-    var state = incompatibleRun()
+    var state = incompatibleRun(cadence: 180)
     state =
         planningReducer.reduce(
             state: state,
             event: .cadenceUpdated(
                 sessionID: 202,
                 acquisitionID: 1,
-                stepsPerMinute: 168,
+                stepsPerMinute: 180,
                 deltaSeconds: 5,
                 rateRequestID: 301
             )
         ).0
 
-    let result = planningReducer.reduce(
-        state: state,
-        event: .cadenceUpdated(
-            sessionID: 202,
-            acquisitionID: 1,
-            stepsPerMinute: 148,
-            deltaSeconds: 1,
-            rateRequestID: 302
+    state =
+        planningReducer.reduce(
+            state: state,
+            event: .cadenceUpdated(
+                sessionID: 202,
+                acquisitionID: 1,
+                stepsPerMinute: 180,
+                deltaSeconds: 8,
+                rateRequestID: 302
+            )
+        ).0
+
+    var result: (RunState, [RunEffect]) = (state, [])
+    for index in 0..<6 {
+        result = planningReducer.reduce(
+            state: result.0,
+            event: .cadenceUpdated(
+                sessionID: 202,
+                acquisitionID: 1,
+                stepsPerMinute: 148,
+                deltaSeconds: 1,
+                rateRequestID: 303 + index
+            )
         )
-    )
+    }
     state = result.0
 
     #expect(state.session?.pendingTrackSelectionID == nil)
@@ -311,7 +338,7 @@ private let slowTrack = MusicTrack(
             .clearPreparedNextTrack(
                 sessionID: 202,
                 operationID: 202,
-                selectionID: 302
+                selectionID: 308
             )
         )
     )
@@ -383,6 +410,37 @@ private let slowTrack = MusicTrack(
     state = reducer.reduce(state: state, event: .surfaceTapped(timeoutID: 5)).0
 
     #expect(state == rhythmVisible)
+}
+
+@Test func closingRhythmControlRestoresTransportWithoutChangingPlayback() {
+    var state = reducer.reduce(
+        state: lockedRun(),
+        event: .rhythmControlRevealed(timeoutID: 4)
+    ).0
+    state =
+        reducer.reduce(
+            state: state,
+            event: .rhythmControlSetManual(rateRequestID: 5, timeoutID: 6)
+        ).0
+    let sessionBeforeClose = state.session
+
+    let result = reducer.reduce(
+        state: state,
+        event: .rhythmControlDismissed(timeoutID: 7)
+    )
+
+    guard case let .active(active) = result.0,
+        case let .playing(rhythm, .timed(surface, timeoutID)) = active.activity
+    else {
+        Issue.record("Expected visible transport controls")
+        return
+    }
+    #expect(rhythm == .locked(spm: 168))
+    #expect(surface == .transport)
+    #expect(timeoutID == 7)
+    #expect(result.0.session == sessionBeforeClose)
+    #expect(result.0.session?.rhythmControl.mode == .manual)
+    #expect(result.1 == [.scheduleControlsTimeout(sessionID: 1, timeoutID: 7)])
 }
 
 @Test func pauseExcludesTimeAndResumeReacquiresWithPrior() {
@@ -623,7 +681,7 @@ private let slowTrack = MusicTrack(
     #expect(result.1.contains(.emitHaptic(.rhythmAuto)))
 }
 
-@Test func manualOwnershipSurvivesPauseResumeAndRecomputesForTheNextTrack() {
+@Test func manualSurvivesSameSongPauseResumeThenReturnsToAutoForConfirmedNewSong() {
     let transitionReducer = RunReducer(tracks: [coreLoopTrack, transitionTrack])
     var state: RunState = .ready
     state = transitionReducer.reduce(state: state, event: .startTapped(sessionID: 79)).0
@@ -648,6 +706,7 @@ private let slowTrack = MusicTrack(
             state: state,
             event: .resumeTapped(acquisitionID: 82, timeoutID: 83)
         ).0
+    #expect(state.session?.rhythmControl.mode == .manual)
 
     let result = transitionReducer.reduce(
         state: state,
@@ -661,8 +720,9 @@ private let slowTrack = MusicTrack(
         )
     )
 
-    #expect(result.0.session?.rhythmControl.mode == .manual)
-    #expect(result.0.session?.adaptationState.derivedTargetRate == 1.05)
+    #expect(result.0.session?.rhythmControl == .initial)
+    #expect(result.0.session?.adaptationState.appliedRateReadback == nil)
+    #expect(result.0.session?.adaptationState.commandLatencySeconds == nil)
     #expect(
         result.1 == [
             .setPlaybackRate(
@@ -670,10 +730,27 @@ private let slowTrack = MusicTrack(
                 operationID: 79,
                 requestID: 84,
                 trackID: transitionTrack.id,
-                rate: 1.05
+                rate: 1
             )
         ]
     )
+}
+
+@Test func skipAndPreviousWaitForPlayerConfirmationBeforeResettingManual() {
+    var state = acquiringCoreLoopRun(sessionID: 85)
+    state =
+        coreLoopReducer.reduce(
+            state: state,
+            event: .rhythmControlSetManual(rateRequestID: 86, timeoutID: 87)
+        ).0
+
+    let skipped = coreLoopReducer.reduce(state: state, event: .skipTapped)
+    let previous = coreLoopReducer.reduce(state: state, event: .previousTapped)
+
+    #expect(skipped.0.session?.rhythmControl.mode == .manual)
+    #expect(skipped.1 == [.skipTrack(sessionID: 85)])
+    #expect(previous.0.session?.rhythmControl.mode == .manual)
+    #expect(previous.1 == [.previousTrack(sessionID: 85)])
 }
 
 @Test func finishRequiresVisibleControlsAndMatchingHold() {
@@ -863,6 +940,50 @@ private let slowTrack = MusicTrack(
         ])
 }
 
+@Test func steadyWalkingCanDriveTheExistingBoundedRatePath() {
+    var state = acquiringWalkingRun(sessionID: 701)
+    var effects: [RunEffect] = []
+    var prematureRateCommands: [RunEffect] = []
+
+    for step in 0..<5 {
+        let result = walkingReducer.reduce(
+            state: state,
+            event: .cadenceUpdated(
+                sessionID: 701,
+                acquisitionID: 1,
+                stepsPerMinute: 100,
+                deltaSeconds: 1,
+                rateRequestID: 710 + step
+            )
+        )
+        state = result.0
+        effects = result.1
+        if step < 4 {
+            prematureRateCommands += effects.filter {
+                if case .setPlaybackRate = $0 { return true }
+                return false
+            }
+        }
+    }
+
+    #expect(prematureRateCommands.isEmpty)
+    #expect(state.session?.autoTargetState.settledTargetSPM == 100)
+    #expect(state.session?.adaptationState.requestedBPM == 100)
+    #expect(abs((state.session?.adaptationState.achievableBPM ?? 0) - 100) < 0.000_1)
+    #expect(state.session?.adaptationState.isAtLimit == false)
+    #expect(
+        effects.contains(
+            .setPlaybackRate(
+                sessionID: 701,
+                operationID: 701,
+                requestID: 714,
+                trackID: walkingTrack.id,
+                rate: 1.02
+            )
+        )
+    )
+}
+
 @Test func appliedRateFeedbackRequiresCurrentSessionRequestAndTrack() {
     var state = coreLoopReducer.reduce(
         state: acquiringCoreLoopRun(sessionID: 72),
@@ -913,11 +1034,12 @@ private let slowTrack = MusicTrack(
                 requestID: 81,
                 trackID: coreLoopTrack.id,
                 rate: 0.98,
-                latencySeconds: 0
+                latencySeconds: 1.75
             )
         ).0
     #expect(state.session?.appliedPlaybackRate == 0.98)
     #expect(state.session?.pendingRateRequestID == nil)
+    #expect(state.session?.adaptationState.commandLatencySeconds == 1.75)
 }
 
 @Test func sustainedConfidenceLossHoldsThenReturnsTowardNormal() {
@@ -1061,12 +1183,12 @@ private let slowTrack = MusicTrack(
     let planningReducer = RunReducer(tracks: [slowTrack, coreLoopTrack])
     let adjusted = planningReducer.reduce(
         state: incompatibleRun(),
-        event: .rhythmControlTargetCommitted(bpm: 170, rateRequestID: 410, timeoutID: 411)
+        event: .rhythmControlTargetCommitted(bpm: 180, rateRequestID: 410, timeoutID: 411)
     )
 
     #expect(adjusted.0.session?.adaptationState.commandStatus == .applying)
-    #expect(adjusted.0.session?.adaptationState.requestedBPM == 162)
-    #expect(adjusted.0.session?.adaptationState.achievableBPM == 162)
+    #expect(adjusted.0.session?.adaptationState.requestedBPM == 170)
+    #expect(adjusted.0.session?.adaptationState.achievableBPM == 170)
     #expect(adjusted.0.session?.pendingTrackSelectionID == nil)
     #expect(
         adjusted.1.contains(
@@ -1075,7 +1197,7 @@ private let slowTrack = MusicTrack(
                 operationID: 202,
                 requestID: 410,
                 trackID: slowTrack.id,
-                rate: 162.0 / 148.0
+                rate: 170.0 / 148.0
             )
         )
     )
@@ -1101,13 +1223,13 @@ private let slowTrack = MusicTrack(
             operationID: 202,
             requestID: 410,
             trackID: slowTrack.id,
-            rate: 162.0 / 148.0,
+            rate: 170.0 / 148.0,
             latencySeconds: 0.08
         )
     )
     #expect(applied.0.session?.adaptationState.commandStatus == .applied)
-    #expect(applied.0.session?.adaptationState.requestedBPM == 162)
-    #expect(applied.0.session?.adaptationState.achievableBPM == 162)
+    #expect(applied.0.session?.adaptationState.requestedBPM == 170)
+    #expect(applied.0.session?.adaptationState.achievableBPM == 170)
     #expect(applied.0.session?.currentTrackID == slowTrack.id)
 }
 
@@ -1173,7 +1295,7 @@ private let slowTrack = MusicTrack(
     #expect(second.1.contains { if case .skipTrack = $0 { true } else { false } } == false)
     #expect(third.1.contains { if case .skipTrack = $0 { true } else { false } } == false)
     #expect(third.0.session?.currentTrackID == slowTrack.id)
-    #expect(third.0.session?.rhythmControl.manualTargetBPM == 162)
+    #expect(third.0.session?.rhythmControl.manualTargetBPM == 170)
     #expect(third.0.session?.pendingTrackSelectionID == nil)
     #expect(third.0.session?.pendingNextTrackID == nil)
     #expect(stale.0 == third.0)
@@ -1277,9 +1399,9 @@ private let slowTrack = MusicTrack(
         event: .rhythmControlTargetCommitted(bpm: 120, rateRequestID: 470, timeoutID: 471)
     )
 
-    #expect(adjusted.0.session?.rhythmControl.manualTargetBPM == 154)
-    #expect(adjusted.0.session?.adaptationState.requestedBPM == 154)
-    #expect(adjusted.0.session?.adaptationState.achievableBPM == 154)
+    #expect(adjusted.0.session?.rhythmControl.manualTargetBPM == 145)
+    #expect(adjusted.0.session?.adaptationState.requestedBPM == 145)
+    #expect(adjusted.0.session?.adaptationState.achievableBPM == 145)
     #expect(adjusted.0.session?.adaptationState.isAtLimit == false)
     #expect(adjusted.0.session?.pendingTrackSelectionID == nil)
     #expect(
@@ -1289,11 +1411,11 @@ private let slowTrack = MusicTrack(
                 operationID: 430,
                 requestID: 470,
                 trackID: coreLoopTrack.id,
-                rate: 154.0 / 170.25
+                rate: 145.0 / 170.25
             )
         )
     )
-    #expect(adjusted.1.contains(.emitHaptic(.rhythmStep(direction: .decrease, isMajor: false))))
+    #expect(adjusted.1.contains(.emitHaptic(.rhythmStep(direction: .decrease, isMajor: true))))
 }
 
 @Test func mismatchedRateReadbackRejectsTheCommandAndRecordsLatency() {
@@ -1400,6 +1522,135 @@ private let slowTrack = MusicTrack(
     #expect(session.summary.manualSeconds == 99)
 }
 
+@Test func confirmedTrackChangeRequiresFreshReadbackForTheNewSong() throws {
+    let transitionReducer = RunReducer(tracks: [coreLoopTrack, transitionTrack])
+    var state = acquiringCoreLoopRun(sessionID: 901)
+    state =
+        transitionReducer.reduce(
+            state: state,
+            event: .rhythmControlSetManual(rateRequestID: 902, timeoutID: 903)
+        ).0
+    let firstRate = try #require(state.session?.pendingCommandedRate)
+    state =
+        transitionReducer.reduce(
+            state: state,
+            event: .playbackRateApplied(
+                sessionID: 901,
+                operationID: 901,
+                requestID: 902,
+                trackID: coreLoopTrack.id,
+                rate: firstRate,
+                latencySeconds: 0.12
+            )
+        ).0
+    #expect(state.session?.adaptationState.commandStatus == .applied)
+
+    let changed = transitionReducer.reduce(
+        state: state,
+        event: .playbackTrackChanged(
+            sessionID: 901,
+            operationID: 901,
+            trackID: transitionTrack.id,
+            trackIndex: 1,
+            reason: .naturalBoundary,
+            rateRequestID: 904
+        )
+    )
+    state = changed.0
+
+    #expect(state.session?.rhythmControl == .initial)
+    #expect(state.session?.pendingRateRequestID == 904)
+    #expect(state.session?.adaptationState.commandStatus == .applying)
+    #expect(state.session?.adaptationState.requestedBPM == nil)
+    #expect(state.session?.adaptationState.derivedTargetRate == nil)
+    #expect(state.session?.adaptationState.appliedRateReadback == nil)
+    #expect(state.session?.adaptationState.commandLatencySeconds == nil)
+    let newSongRate = try #require(state.session?.pendingCommandedRate)
+    #expect(
+        changed.1.contains(
+            .setPlaybackRate(
+                sessionID: 901,
+                operationID: 901,
+                requestID: 904,
+                trackID: transitionTrack.id,
+                rate: newSongRate
+            )
+        )
+    )
+
+    let stale = transitionReducer.reduce(
+        state: state,
+        event: .playbackRateApplied(
+            sessionID: 901,
+            operationID: 901,
+            requestID: 902,
+            trackID: coreLoopTrack.id,
+            rate: firstRate,
+            latencySeconds: 1.5
+        )
+    )
+    #expect(stale.0 == state)
+    #expect(stale.1.isEmpty)
+}
+
+@Test func sameSongConfirmationDoesNotResetManualOrClearItsReadback() throws {
+    var state = acquiringCoreLoopRun(sessionID: 905)
+    state =
+        coreLoopReducer.reduce(
+            state: state,
+            event: .rhythmControlSetManual(rateRequestID: 906, timeoutID: 907)
+        ).0
+    let rate = try #require(state.session?.pendingCommandedRate)
+    state =
+        coreLoopReducer.reduce(
+            state: state,
+            event: .playbackRateApplied(
+                sessionID: 905,
+                operationID: 905,
+                requestID: 906,
+                trackID: coreLoopTrack.id,
+                rate: rate,
+                latencySeconds: 0.08
+            )
+        ).0
+
+    let confirmed = coreLoopReducer.reduce(
+        state: state,
+        event: .playbackTrackChanged(
+            sessionID: 905,
+            operationID: 905,
+            trackID: coreLoopTrack.id,
+            trackIndex: 0,
+            reason: .recovery,
+            rateRequestID: 908
+        )
+    )
+
+    #expect(confirmed.0 == state)
+    #expect(confirmed.0.session?.rhythmControl.mode == .manual)
+    #expect(confirmed.0.session?.adaptationState.appliedRateReadback == rate)
+    #expect(confirmed.1.isEmpty)
+}
+
+@Test func manualSurvivesRouteLossAndExplicitRecovery() {
+    var state = acquiringCoreLoopRun(sessionID: 911)
+    state =
+        coreLoopReducer.reduce(
+            state: state,
+            event: .rhythmControlSetManual(rateRequestID: 912, timeoutID: 913)
+        ).0
+
+    state = coreLoopReducer.reduce(state: state, event: .audioRouteLost).0
+    #expect(state.session?.rhythmControl.mode == .manual)
+    state = coreLoopReducer.reduce(state: state, event: .audioRouteRestored).0
+    let resumed = coreLoopReducer.reduce(
+        state: state,
+        event: .routeResumeTapped(acquisitionID: 914, timeoutID: 915)
+    ).0
+
+    #expect(resumed.session?.rhythmControl.mode == .manual)
+}
+
 private func lockedRun() -> RunState {
     let session = RunSession(id: 1)
     return .active(ActiveRun(session: session, activity: .playing(rhythm: .locked(spm: 168), controls: .hidden)))
@@ -1420,14 +1671,34 @@ private func acquiringCoreLoopRun(sessionID: Int) -> RunState {
         ).0
 }
 
-private func incompatibleRun() -> RunState {
+private func acquiringWalkingRun(sessionID: Int) -> RunState {
+    var state: RunState = .ready
+    state = walkingReducer.reduce(state: state, event: .startTapped(sessionID: sessionID)).0
+    state =
+        walkingReducer.reduce(
+            state: state,
+            event: .authorizationResolved(sessionID: sessionID, .authorized)
+        ).0
+    return
+        walkingReducer.reduce(
+            state: state,
+            event: .playbackPrepared(sessionID: sessionID, trackID: walkingTrack.id)
+        ).0
+}
+
+private func incompatibleRun(cadence: Int = 168) -> RunState {
     var session = RunSession(id: 202)
     session.currentTrackID = slowTrack.id
     session.cadenceAcquisitionID = 1
+    session.autoTargetState = AutoTargetState(
+        observedCadenceSPM: Double(cadence),
+        settledTargetSPM: Double(cadence),
+        status: .settled
+    )
     return .active(
         ActiveRun(
             session: session,
-            activity: .playing(rhythm: .locked(spm: 168), controls: .hidden)
+            activity: .playing(rhythm: .locked(spm: cadence), controls: .hidden)
         )
     )
 }

@@ -19,7 +19,7 @@ Done means:
 - Start a run in one or two clear actions
 - Sense cadence from one declared phone placement
 - Choose a track whose native pulse fits the requested rhythm
-- Apply fine playback-rate correction inside a physically proven quality envelope
+- Apply fine playback-rate correction inside a declared envelope that passes physical listening
 - Let the runner fine-tune the automatic match or choose a manual BPM without leaving the run
 - Make a deliberate rhythm change audible enough to verify without watching a number
 - Keep audio stable, pitch-stable, and continuous through lock, pause, resume, and route recovery
@@ -56,6 +56,10 @@ Cadence is input, not content. Song, atmosphere, and rhythm outrank telemetry.
 ### Confirm, then withdraw
 
 UI becomes visible during preparation, uncertainty, and direct manipulation. Stable playback should feel quiet.
+
+### Understandable without looking
+
+An automatic music change must make sense when the phone is locked or in a pocket. Do not depend on temporary screen text. Use sparse touch and sound only for meaningful, verified changes, then return attention to the music.
 
 ### Control without clutter
 
@@ -96,10 +100,12 @@ Design benchmark research lives in [DESIGN-BENCHMARKS.md](DESIGN-BENCHMARKS.md).
 
 ## Current product test
 
-Current build answers one question: can complete run interaction feel calm, legible, and coherent before real sensing and audio exist?
+The interaction is calm and the mechanical loop works, but the core feeling is not yet proven. A fingerprinted workout confirmed that fresh delayed phone readings can settle Auto and that Apple Music can return the requested speed. It also exposed a practical gap: most retained movement readings sat in the brisk-walking range below the old 120 SPM floor, and Samay found audible changes jarring and unexplained.
 
-Answer: the interaction is calm and the mechanical loop works, but the core feeling is not yet proven. A corrected 59-second run averaged 155 SPM and measured 98 percent tempo matched from MusicKit read-back. The runner did not hear enough change in an earlier narrow-rate check. One real 25-track playlist restores with 13 ready tracks. Samadhi must now prove an obvious clean tempo change, select tracks by fit instead of source order alone, and establish whether public MusicKit can support measured beat-phase work.
+The current software candidate accepts steady movement from 90 through 210 SPM. Walking needs five seconds of steady evidence. Running can settle after the motion filter locks. Broken gym movement does not build a target, and raw cadence cannot change the music before the separate Auto target settles. The next physical check must prove that this feels useful during clean walking and does not react to lifting.
+
+The current candidate can change one song from 85 to 115 percent of normal speed. This gives Auto and Manual more useful reach without changing songs as often. The app ramps an automatic change by at most two percentage points per second, so moving from normal speed to either endpoint takes at most eight seconds. Correct commands and Apple Music read-back are software and device checks. Clean sound at the new endpoints still requires Samay's listening approval.
 
 ## Current exclusions
 
-Core Motion and the Apple Music adapter now enter the normal run flow when an imported collection has ready tracks. Spotify, GPS, maps, pace, distance, coaching, plans, social features, accounts, analytics, subscriptions, and backend remain outside the useful product build.
+Core Motion and the Apple Music adapter now enter the normal run flow when an imported collection has ready tracks. Spotify, GPS, maps, pace, distance, lifting adaptation, coaching, plans, social features, accounts, analytics, subscriptions, and backend remain outside the useful product build.

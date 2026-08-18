@@ -4,6 +4,13 @@ import Testing
 
 private let policy = AdaptationPolicy()
 
+@Test func sharedRateEnvelopeClampsBothCandidateEndpoints() {
+    #expect(TempoEnvelope.clampRate(0.80) == 0.85)
+    #expect(TempoEnvelope.clampRate(0.85) == 0.85)
+    #expect(TempoEnvelope.clampRate(1.15) == 1.15)
+    #expect(TempoEnvelope.clampRate(1.20) == 1.15)
+}
+
 @Test func halfAndDoubleTempoAliasesCannotClaimRunningCadence() {
     let halfTime = policy.update(
         state: .initial,
@@ -23,13 +30,13 @@ private let policy = AdaptationPolicy()
 @Test func unsafeAutomaticRateMovesTowardTheNearestTruthfulBoundary() {
     let decision = policy.update(
         state: .initial,
-        input: input(cadence: 180, tempo: 160)
+        input: input(cadence: 190, tempo: 160)
     )
 
     #expect(!decision.isTrackCompatible)
     #expect(decision.commandedRate == 1.02)
-    #expect(decision.targetRate == 1.10)
-    #expect(decision.nextState.achievableBPM == 176)
+    #expect(decision.targetRate == 1.15)
+    #expect(decision.nextState.achievableBPM == 184)
     #expect(decision.status == .musicSteady)
     #expect(decision.isAtLimit)
 }
@@ -99,7 +106,7 @@ private let policy = AdaptationPolicy()
     #expect(atInterval.targetRate == 174.0 / 165.0)
 }
 
-@Test func automaticFullEnvelopeChangeSettlesWithinFiveSecondsOfFreshCadence() {
+@Test func automaticFullEnvelopeChangeSettlesWithinEightSecondsOfFreshCadence() {
     var state = AdaptationState(
         targetRate: 1,
         baseTempoBPM: 160,
@@ -108,17 +115,17 @@ private let policy = AdaptationPolicy()
     )
     var rate = 1.0
 
-    for _ in 0..<5 {
+    for _ in 0..<8 {
         let decision = policy.update(
             state: state,
-            input: input(cadence: 176, tempo: 160, appliedRate: rate, deltaSeconds: 1)
+            input: input(cadence: 184, tempo: 160, appliedRate: rate, deltaSeconds: 1)
         )
         state = decision.nextState
         rate = decision.commandedRate
     }
 
-    #expect(state.targetRate == 1.10)
-    #expect(abs(rate - 1.10) < 0.000_1)
+    #expect(state.targetRate == 1.15)
+    #expect(abs(rate - 1.15) < 0.000_1)
 }
 
 @Test func aNewTrackRecomputesTargetEvenWhenCadenceIsSteady() {
@@ -206,11 +213,11 @@ private let policy = AdaptationPolicy()
         )
     )
 
-    #expect(decision.targetRate == 1.10)
+    #expect(decision.targetRate == 1.15)
     #expect(decision.derivedTargetRate == 200.0 / 170.0)
     #expect(decision.isAtLimit)
-    #expect(decision.commandedRate == 1.10)
-    #expect(abs((decision.nextState.achievableBPM ?? 0) - 187) < 0.000_1)
+    #expect(decision.commandedRate == 1.15)
+    #expect(abs((decision.nextState.achievableBPM ?? 0) - 195.5) < 0.000_1)
 }
 
 @Test func rhythmControlClampsBothModesAndResetReturnsToNeutralAuto() {
@@ -224,8 +231,8 @@ private let policy = AdaptationPolicy()
     control.useManual(seedBPM: 250)
     #expect(control.mode == .manual)
     #expect(control.manualTargetBPM == 210)
-    _ = control.adjust(by: -99)
-    #expect(control.manualTargetBPM == 120)
+    _ = control.adjust(by: -999)
+    #expect(control.manualTargetBPM == 90)
 
     control.resetToAutomatic()
     #expect(control.mode == .automatic)
@@ -236,18 +243,38 @@ private let policy = AdaptationPolicy()
     let slowPulse = try #require(ManualTempoEnvelope(cadencePulseBPM: 121.25))
     let fastPulse = try #require(ManualTempoEnvelope(cadencePulseBPM: 179.5))
 
-    #expect(slowPulse.bpmRange == 120...133)
-    #expect(slowPulse.clamped(175) == 133)
-    #expect(fastPulse.bpmRange == 162...197)
-    #expect(fastPulse.clamped(145) == 162)
+    #expect(slowPulse.bpmRange == 104...139)
+    #expect(slowPulse.clamped(175) == 139)
+    #expect(fastPulse.bpmRange == 153...206)
+    #expect(fastPulse.clamped(145) == 153)
 }
 
-@Test func automaticTargetKeepsItsFortyBPMWindowInsideRunningBounds() {
+@Test func automaticTargetKeepsItsFortyBPMWindowInsideLocomotionBounds() {
     let faster = RhythmControlState(automaticCorrectionBPM: 20)
     let slower = RhythmControlState(automaticCorrectionBPM: -20)
 
     #expect(faster.requestedBPM(cadenceSPM: 205) == 210)
-    #expect(slower.requestedBPM(cadenceSPM: 125) == 120)
+    #expect(slower.requestedBPM(cadenceSPM: 100) == 90)
+}
+
+@Test func approximateTempoMatchAllowsFiveSPMButNotSix() {
+    let withinTolerance = TempoMatchEvaluator.measure(
+        referenceBPM: 120,
+        referenceReliable: true,
+        baseTempoBPM: 100,
+        appliedRate: 1.15,
+        playbackActive: true
+    )
+    let outsideTolerance = TempoMatchEvaluator.measure(
+        referenceBPM: 121,
+        referenceReliable: true,
+        baseTempoBPM: 100,
+        appliedRate: 1.15,
+        playbackActive: true
+    )
+
+    #expect(withinTolerance == true)
+    #expect(outsideTolerance == false)
 }
 
 @Test func matchRequiresOneSecondInsideAppliedRateTolerance() {
@@ -306,6 +333,26 @@ private let policy = AdaptationPolicy()
     #expect(pending == nil)
 }
 
+@Test func rawCadenceCannotChangeMusicBeforeAutoSettles() {
+    let decision = policy.update(
+        state: .initial,
+        input: AdaptationInput(
+            cadenceSPM: 100,
+            automaticTargetSPM: nil,
+            cadenceReliable: true,
+            baseTempoBPM: 90,
+            analysisConfidence: 0.9,
+            appliedRate: 1,
+            deltaSeconds: 1
+        )
+    )
+
+    #expect(decision.status == .acquiring)
+    #expect(decision.requestedBPM == nil)
+    #expect(decision.commandedRate == 1)
+    #expect(decision.nextState.targetRate == nil)
+}
+
 private func input(
     cadence: Double?,
     tempo: Double,
@@ -317,6 +364,7 @@ private func input(
 ) -> AdaptationInput {
     AdaptationInput(
         cadenceSPM: cadence,
+        automaticTargetSPM: cadence,
         cadenceReliable: reliable,
         baseTempoBPM: tempo,
         analysisConfidence: 0.9,

@@ -45,7 +45,7 @@ public struct TrackMatchPlanner: Sendable {
         minimumRate: Double = TempoEnvelope.rateRange.lowerBound,
         maximumRate: Double = TempoEnvelope.rateRange.upperBound,
         currentTrackRetention: Double = 0.01,
-        cadenceToleranceBPM: Double = 3
+        cadenceToleranceBPM: Double = TempoEnvelope.approximateMatchToleranceSPM
     ) {
         self.minimumRate = minimumRate
         self.maximumRate = maximumRate
@@ -58,7 +58,10 @@ public struct TrackMatchPlanner: Sendable {
         from tracks: [MusicTrack],
         currentTrackID: MusicTrackID? = nil
     ) -> TrackTempoMatch? {
-        guard requestedBPM > 0, minimumRate > 0, minimumRate <= maximumRate else { return nil }
+        guard TempoEnvelope.locomotionCadenceSPM.contains(requestedBPM),
+            minimumRate > 0,
+            minimumRate <= maximumRate
+        else { return nil }
 
         let candidates = tracks.enumerated().compactMap { index, track in
             match(for: track, at: index, requestedBPM: requestedBPM)

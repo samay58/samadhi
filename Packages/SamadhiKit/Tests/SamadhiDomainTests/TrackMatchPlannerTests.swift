@@ -28,9 +28,51 @@ import Testing
         ))
 
     #expect(music.tempo?.baseBPM == 90)
-    #expect(music.tempo?.runningPulseBPM == 90)
+    #expect(music.tempo?.stepPulseSPM == 90)
     #expect(match.relationship == .twoStepsPerBeat)
     #expect(match.pulseBPM == 180)
+}
+
+@Test func walkingTempoAndRunningDoublePulseRemainSeparateChoices() {
+    let analysis = TempoAnalysis(
+        baseBPM: 90,
+        confidence: 0.9,
+        analyzedDurationSeconds: 30,
+        version: 4
+    )
+
+    #expect(
+        analysis.cadenceProjections.contains {
+            $0.relationship == .oneStepPerBeat && $0.cadencePulseBPM == 90
+        }
+    )
+    #expect(
+        analysis.cadenceProjections.contains {
+            $0.relationship == .twoStepsPerBeat && $0.cadencePulseBPM == 180
+        }
+    )
+}
+
+@Test func approximateWalkingMatchUsesTheWiderRateEnvelope() throws {
+    let match = try #require(
+        TrackMatchPlanner().select(
+            requestedBPM: 104,
+            from: [track("walking", tempo: 90)]
+        )
+    )
+
+    #expect(match.requiredRate == 1.15)
+    #expect(abs(match.achievableCadenceBPM - 103.5) < 0.000_1)
+    #expect(abs(match.cadenceErrorBPM - 0.5) < 0.000_1)
+}
+
+@Test func targetBelowPurposefulWalkingRangeFailsClosed() {
+    let match = TrackMatchPlanner().select(
+        requestedBPM: 89,
+        from: [track("walking", tempo: 90)]
+    )
+
+    #expect(match == nil)
 }
 
 @Test func anExplicitAlternatePulseCanRelateSlowMusicToRunningCadence() throws {
@@ -117,14 +159,14 @@ import Testing
 @Test func aTruthfulBoundaryWithinMatchToleranceClosesSmallPlaylistGaps() throws {
     let match = try #require(
         TrackMatchPlanner().select(
-            requestedBPM: 160,
+            requestedBPM: 167,
             from: [track("upper-boundary", tempo: 145)]
         )
     )
 
-    #expect(match.requiredRate == 1.1)
-    #expect(abs(match.achievableCadenceBPM - 159.5) < 0.000_1)
-    #expect(abs(match.cadenceErrorBPM - 0.5) < 0.000_1)
+    #expect(match.requiredRate == 1.15)
+    #expect(abs(match.achievableCadenceBPM - 166.75) < 0.000_1)
+    #expect(abs(match.cadenceErrorBPM - 0.25) < 0.000_1)
 }
 
 @Test func aBoundaryOutsideTempoMatchToleranceStillFailsClosed() {
@@ -136,16 +178,16 @@ import Testing
     #expect(match == nil)
 }
 
-@Test func defaultEnvelopeIncludesThePhysicallyProvenTenPercentEndpoints() throws {
+@Test func defaultEnvelopeIncludesTheFifteenPercentCandidateEndpoints() throws {
     let slower = try #require(
-        TrackMatchPlanner().select(requestedBPM: 153, from: [track("slower", tempo: 170)])
+        TrackMatchPlanner().select(requestedBPM: 144.5, from: [track("slower", tempo: 170)])
     )
     let faster = try #require(
-        TrackMatchPlanner().select(requestedBPM: 187, from: [track("faster", tempo: 170)])
+        TrackMatchPlanner().select(requestedBPM: 195.5, from: [track("faster", tempo: 170)])
     )
 
-    #expect(abs(slower.requiredRate - 0.9) < 0.000_1)
-    #expect(abs(faster.requiredRate - 1.1) < 0.000_1)
+    #expect(abs(slower.requiredRate - 0.85) < 0.000_1)
+    #expect(abs(faster.requiredRate - 1.15) < 0.000_1)
 }
 
 @Test func unavailableAndIncompatibleTracksAreExcluded() throws {
@@ -202,11 +244,11 @@ import Testing
 
 @Test func plannerUsesItsConfiguredRateEnvelope() {
     let standard = TrackMatchPlanner().select(
-        requestedBPM: 189,
+        requestedBPM: 201,
         from: [track("candidate", tempo: 168)]
     )
-    let wider = TrackMatchPlanner(minimumRate: 0.88, maximumRate: 1.12).select(
-        requestedBPM: 189,
+    let wider = TrackMatchPlanner(minimumRate: 0.80, maximumRate: 1.20).select(
+        requestedBPM: 201,
         from: [track("candidate", tempo: 168)]
     )
 

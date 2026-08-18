@@ -83,6 +83,7 @@ public struct AdaptationState: Sendable, Equatable {
 
 public struct AdaptationInput: Sendable, Equatable {
     public let cadenceSPM: Double?
+    public let automaticTargetSPM: Double?
     public let cadenceReliable: Bool
     public let baseTempoBPM: Double
     public let musicalTempoBPM: Double
@@ -96,6 +97,7 @@ public struct AdaptationInput: Sendable, Equatable {
 
     public init(
         cadenceSPM: Double?,
+        automaticTargetSPM: Double? = nil,
         cadenceReliable: Bool,
         baseTempoBPM: Double,
         musicalTempoBPM: Double? = nil,
@@ -108,6 +110,7 @@ public struct AdaptationInput: Sendable, Equatable {
         forceTargetUpdate: Bool = false
     ) {
         self.cadenceSPM = cadenceSPM
+        self.automaticTargetSPM = automaticTargetSPM
         self.cadenceReliable = cadenceReliable
         self.baseTempoBPM = baseTempoBPM
         self.musicalTempoBPM = musicalTempoBPM ?? baseTempoBPM
@@ -159,9 +162,9 @@ public struct AdaptationPolicy: Sendable {
         switch input.rhythmControl.mode {
         case .automatic:
             guard input.cadenceReliable,
-                let cadence = input.cadenceSPM,
-                TempoEnvelope.runningCadenceBPM.contains(cadence),
-                let requested = input.rhythmControl.requestedBPM(cadenceSPM: cadence)
+                let automaticTarget = input.automaticTargetSPM,
+                TempoEnvelope.locomotionCadenceSPM.contains(automaticTarget),
+                let requested = input.rhythmControl.requestedBPM(cadenceSPM: automaticTarget)
             else {
                 return confidenceLost(state: state, input: input)
             }
@@ -276,7 +279,7 @@ public struct AdaptationPolicy: Sendable {
     }
 
     private func targetRate(requestedBPM: Double, baseTempo: Double) -> Double? {
-        guard TempoEnvelope.runningCadenceBPM.contains(baseTempo) else { return nil }
+        guard TempoEnvelope.locomotionCadenceSPM.contains(baseTempo) else { return nil }
         return requestedBPM / baseTempo
     }
 
@@ -389,7 +392,9 @@ public enum TempoMatchEvaluator {
             let appliedRate
         else { return nil }
 
-        guard TempoEnvelope.runningCadenceBPM.contains(baseTempoBPM) else { return nil }
-        return abs((baseTempoBPM * appliedRate) - referenceBPM) <= 3
+        guard TempoEnvelope.locomotionCadenceSPM.contains(baseTempoBPM) else { return nil }
+        return
+            abs((baseTempoBPM * appliedRate) - referenceBPM)
+            <= TempoEnvelope.approximateMatchToleranceSPM + 0.000_1
     }
 }
