@@ -5,7 +5,7 @@
 | Area | Current truth | Proof |
 | --- | --- | --- |
 | Music source | Apple Music is selected | Authorization, catalog access, preview decoding, playback, and rate writes passed on iPhone |
-| Music import | One playlist can be selected, analyzed locally, restored, retried, and filtered to ready tracks | Automated tests, Simulator frames, and prior phone import |
+| Music import | One playlist can be selected, analyzed locally, restored, retried, and filtered to ready tracks. Library songs resolve through their own catalog identifier first, and an explicit versus clean tie picks the edit in the playlist instead of dropping the song | Automated tests, Simulator frames, and prior phone import. The tie fix is not yet proved on the phone |
 | Tempo analysis | Version 4 keeps musical BPM separate from the supported step relationship | 12 of 12 public preview references and deterministic ambiguity tests |
 | Motion | Steady readings from 90 through 210 SPM are accepted; walking needs longer evidence | Saved phone replay, deterministic stale-data rejection, and one attributed workout |
 | Auto | A responsive sensor estimate feeds a separate calm musical target | Noise, spike, faster, slower, missing-input, and walking tests |
@@ -31,7 +31,7 @@ The current candidate from `main` at `67adf80` is installed over Samadhi 1.0 bui
 - Project generation passed.
 - Formatter lint passed.
 - 179 Swift package tests passed.
-- 39 app-model tests passed.
+- 44 app-model tests passed.
 - 32 serial interface tests passed.
 - Source-fingerprint tests passed.
 - Resource-inclusive Debug and Release Simulator builds passed.

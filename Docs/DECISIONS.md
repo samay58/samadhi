@@ -259,3 +259,12 @@ None of this is a product asset. The preferred final path is still a small paid 
 `AutoFeedbackService` owns the engine, not the views and not the reducer. It starts one Core Haptics engine lazily with audio allowed, keeps stopped and reset handlers, drops cached players and re-registers audio resources on a reset, and stays silent on hardware without haptics while the sound still plays through a local player. The app configures no `AVAudioSession` category, mode, or active state anywhere, so Samadhi asks for no ducking; the only session use is reading route and interruption notifications.
 
 The audition screen is Debug only. It reaches the app through the `--feedback-audition` launch argument and the `Samadhi Feedback Audition` scheme, and it plays patterns by hand so a person can compare them. Release contains none of its strings or symbols. The prototype files themselves are still packaged in Release, which is the honest state of a prototype set that has not been chosen from yet.
+
+## Catalog ties are broken, not rejected
+
+The strict catalog resolver used to give up when two catalog songs matched a library track on title, artist, album, and duration within half a second. On the phone that threw out five of seventeen songs in one playlist and most of a rap playlist, because Apple Music lists the explicit and clean edits of a song with identical metadata and identical length. A tie like that is the normal shape of the catalog, not an ambiguity that protects the runner from a wrong song.
+
+The resolver now tries the library item's own catalog identifier first, read from the encoded play parameters, and falls back to the metadata search only when that is missing. When the search still ties, a pure selection rule picks the candidate whose content rating matches the library track, prefers the explicit edit when the library rating is unknown, and otherwise picks deterministically by duration and identifier. Tempo analysis is identical across the edits, so the preview is the same evidence either way; the rating rule exists so playback stays on the edit the runner put in the playlist. Nothing within three seconds still means no match.
+
+This does not touch the other cause of an unready song. A preview whose thirty seconds carry no steady pulse is still reported as rhythm unclear, because the product promises not to adapt a song it cannot time.
+
