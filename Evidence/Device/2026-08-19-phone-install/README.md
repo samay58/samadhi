@@ -56,3 +56,17 @@ The glass transport circles and the catalog tie fix were built and installed in 
 
 The selected collection on the phone had changed again between the two installs because the app was used in between; at this install it held 25 songs with 13 not ready, 11 of them `catalogMatchUnavailable` and 2 `rhythmUnclear`. That is the population the tie fix targets. The playlist must be chosen again in the app for the 11 to resolve; nothing on the phone was changed to force that.
 
+## Third install the same day, commit 294981e
+
+Tempo analyzer version 5 was built and installed in place with the same profile and procedure.
+
+| Item | Value |
+| --- | --- |
+| Commit | `294981e6c278901f278838c4c47ac38af43a0faa`, `main`, clean |
+| Profile and identifier | `Samadhi Development 2026-08-15`, `ZL5U59XBJ6.com.samaydhawan.Samadhi`; strict verification passed |
+| Built Info.plist source fingerprint | `55438218da031307a32d9e1fdb190ecf4a880571e17533d5436f19a81317f24b`, equal to `Scripts/source-fingerprint.sh` |
+| Install | In place, nothing uninstalled, no app data touched; selected collection byte-identical before and after (`4866a2e5...`) |
+| Phone state | Locked at install, so no in-app read-back for this build yet |
+
+Because the analysis version moved from 4 to 5, the app will measure every song again the next time the playlist is chosen or restored. That is intended.
+
