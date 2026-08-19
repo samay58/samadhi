@@ -74,6 +74,12 @@ public struct RunSession: Sendable, Equatable {
     public var autoFeedback: AutoFeedbackState
     // Why the current song became current. Diagnostics read it; no product rule branches on it.
     public var lastTrackChangeReason: TrackChangeReason?
+    // The collection index the player's queue continues after. A prepared song is slotted in
+    // after the song that was playing, so the queue resumes from that song, not from the prepared one.
+    public var queueAnchorIndex: Int
+    // What the reducer expects at the next natural boundary. Diagnostics and tests read it.
+    public var nextSongOutlook: NextSongOutlook
+    public var collectionReach: CollectionReachState
 
     public init(id: Int, mode: RunMode = .adaptive, playbackOperationID: Int? = nil) {
         self.id = id
@@ -104,6 +110,9 @@ public struct RunSession: Sendable, Equatable {
         preparedNextTrackID = nil
         autoFeedback = .initial
         lastTrackChangeReason = nil
+        queueAnchorIndex = 0
+        nextSongOutlook = .notYetKnown
+        collectionReach = .initial
     }
 
     public mutating func recordSecond(cadence: Int?, tempoMatched: Bool?) {
@@ -214,6 +223,38 @@ public struct FinishConfirmation: Sendable, Equatable {
 public enum RouteAvailability: Sendable, Equatable {
     case missing
     case restored
+}
+
+// The reducer looks at the queued next song before the current one ends, so a natural boundary
+// lands on a song the body can follow. Skip and Previous stay the runner's and carry no plan.
+public enum NextSongOutlook: String, Sendable, Equatable, Codable {
+    // Outside the look-ahead window, or no settled Auto target to judge against yet.
+    case notYetKnown
+    case queuedSongFits
+    case betterFitPrepared
+    // Nothing in the ready collection reaches the settled target, so the queue proceeds as it is.
+    case nothingFits
+}
+
+// Most of the ready collection cannot reach the settled Auto target inside the rate window, and
+// which way it misses. Said once per run per direction, in human words, never per second.
+public enum CollectionReach: String, Sendable, Equatable, Codable {
+    case mostlyFaster
+    case mostlySlower
+}
+
+public struct CollectionReachState: Sendable, Equatable {
+    public var condition: CollectionReach?
+    public var heldSeconds: Double
+    public var noticed: [CollectionReach]
+
+    public init(condition: CollectionReach? = nil, heldSeconds: Double = 0, noticed: [CollectionReach] = []) {
+        self.condition = condition
+        self.heldSeconds = heldSeconds
+        self.noticed = noticed
+    }
+
+    public static let initial = CollectionReachState()
 }
 
 public enum TrackChangeReason: String, Sendable, Equatable, Codable {
@@ -384,6 +425,7 @@ public enum RunTaskKind: Sendable, Equatable, Hashable {
     case ticker
     case finishing
     case lockBrief
+    case reachNotice
     case simulatedRoute
 }
 
@@ -425,6 +467,8 @@ public enum RunEffect: Sendable, Equatable {
     case emitHaptic(HapticEvent)
     case emitAutoFeedback(AutoFeedbackCue)
     case cancelAutoFeedback(transactionID: Int)
+    // One quiet line on the run screen. The reducer allows it once per run per direction.
+    case showReachNotice(CollectionReach)
     case cancelTask(sessionID: Int, RunTaskKind)
     case cancelAllTasks(sessionID: Int)
 }
@@ -481,12 +525,15 @@ public enum RunEvent: Sendable, Equatable {
     case audioRouteLost
     case audioRouteRestored
     case routeResumeTapped(acquisitionID: Int, timeoutID: Int)
+    // Progress carries a selection identifier because the boundary look-ahead may prepare a next
+    // song from it; the player orders prepare and clear commands by that identifier.
     case playbackProgress(
         sessionID: Int,
         operationID: Int,
         trackIndex: Int,
         elapsedSeconds: Int,
-        durationSeconds: Int
+        durationSeconds: Int,
+        selectionID: Int
     )
     case playbackRouteLost(sessionID: Int, operationID: Int)
     case playbackRouteRestored(sessionID: Int, operationID: Int)
