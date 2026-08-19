@@ -605,6 +605,16 @@ This checkpoint recorded a passing local candidate before its exact-profile buil
 - Added five app-model tests for the rule; the count is now 44
 - Not yet on the phone. The selected playlist must be chosen again in the app after the next install so the unmatched songs resolve again
 
+## 2026-08-19. Glass transport circles
+
+- Removed the glass capsule bar after it read as a milky slab with a ghost disc on the phone
+- Built a bare version first, two ivory symbols around one solid ivory disc; it rendered cleanly but gave up the material, and the ask was glass done well
+- Rebuilt transport as three separate interactive Liquid Glass circles in one container: 68 point clear circles for Previous and Next, an 88 point ivory-tinted circle with an ink glyph for Pause or Resume
+- Added a spring press, 0.88 compression with a 220 millisecond response, on top of the interactive glass, because the bar answered a press with almost nothing; Reduce Motion dims instead
+- Dimmed the row to about a third while Finish is armed instead of hiding it, so the layout keeps its shape
+- Widened the resting Finish pill slightly to sit in proportion under the row
+- Captured fresh normal, paused, accessibility XXXL, Reduce Motion, Increased Contrast, Reduced Transparency, armed, and early-release frames under `Evidence/Simulator/2026-08-19-transport-glass/`
+
 ## Current checkpoint
 
 The transport and Finish pass, deterministic song-change causes, and the first directional Auto feedback prototype are merged on `main`, pass the software gate, and are installed on the phone with the in-app fingerprint confirmed. Endpoint read-back and listening at 0.85 and 1.15 carry over from the previous candidate, and tactile feel, sound quality, locked-screen delivery, and Apple Music coexistence have no result at all. The next step is the ordered checklist in [PHONE-CHECK-2026-08-19.md](PHONE-CHECK-2026-08-19.md) from step 2 onward. After it, the next Main Thing is the 20-minute outdoor run.
