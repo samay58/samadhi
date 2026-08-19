@@ -1,4 +1,5 @@
 import Foundation
+import SamadhiAudio
 import SamadhiDomain
 import SamadhiMotion
 import Testing
@@ -374,7 +375,7 @@ import Testing
             alternatePulseBPM: 168,
             confidence: 0.94,
             analyzedDurationSeconds: 30,
-            version: 4
+            version: LocalTempoAnalyzer.analysisVersion
         )
     )
     let collection = MusicCollection(
@@ -549,7 +550,7 @@ import Testing
                         baseBPM: 168,
                         confidence: 0.6,
                         analyzedDurationSeconds: 30,
-                        version: 4
+                        version: LocalTempoAnalyzer.analysisVersion
                     )
                 )
             )
@@ -824,7 +825,7 @@ private func importedCollection(
     id: String,
     name: String,
     readyCount: Int,
-    analysisVersion: Int = 4
+    analysisVersion: Int = LocalTempoAnalyzer.analysisVersion
 ) -> MusicCollection {
     let analysis = TempoAnalysis(
         baseBPM: 168,

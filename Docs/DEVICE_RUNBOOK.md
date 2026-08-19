@@ -100,6 +100,15 @@ The Auto feedback prototypes are played by hand from a Debug-only screen. It shi
 
 Nothing in the prototype set becomes a product asset before this comparison. The acceptance bar lives in [AUTO-CHANGE-INTERACTION-SPEC.md](AUTO-CHANGE-INTERACTION-SPEC.md).
 
+## Explaining a rejected song
+
+`TempoProbe` takes Apple catalog song identifiers, fetches each 30-second preview through the public lookup service, runs the analyzer, and prints the decision, the confidence, and the strongest tempo candidates. Use it when a playlist import marks a song rhythm unclear and the reason is not obvious. It does not ship, it does not touch the phone, and it makes no product claim.
+
+~~~sh
+DEVELOPER_DIR=/Applications/Xcode-beta.app/Contents/Developer \
+  swift run --package-path Packages/SamadhiKit TempoProbe 1497226892 1561775000
+~~~
+
 ## Automated tempo corpus
 
 The real-preview accuracy check does not need device interaction. Run the opt-in `TempoCorpusValidator` from the package and provide an output path under `Evidence/Device/`. It verifies fixed Apple catalog metadata, downloads each preview into temporary storage, analyzes it, deletes it, and fails below 10 of 12 exact musical-pulse results. Supported stride relationships are reported separately. Normal automated tests do not use the network.

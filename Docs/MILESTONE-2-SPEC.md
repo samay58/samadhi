@@ -285,7 +285,7 @@ Run physical calibration at 160, 170, and 180 SPM for 60 seconds each. The locke
 
 Use generated fixtures for exact tempo, half-time ambiguity, syncopation, silence, long intro, tempo drift, and low confidence. Add legally usable music excerpts with documented reference tempo.
 
-The corpus gate is at least ten of twelve music excerpts within 2 percent of the declared musical pulse. Version 4 passes 12 of 12 tempo-declared Apple previews and keeps the earlier 89.5-versus-180 false-pulse case closed. A confident wrong answer still fails harder than a rejection, so broader music coverage remains conservative.
+The corpus gate is at least ten of twelve music excerpts within 2 percent of the declared musical pulse. Version 5 passes 12 of 12 tempo-declared Apple previews and keeps the earlier 89.5-versus-180 false-pulse case closed. A confident wrong answer still fails harder than a rejection, so broader music coverage remains conservative.
 
 ### Audio tests
 
@@ -369,7 +369,7 @@ Acceptance:
 
 ### Where we are now
 
-Milestones 0 and 1 are complete. Apple Music is the selected Milestone 2 source. A validated 149.75 BPM fixture, Core Motion cadence, bounded reducer adaptation, identified MusicKit read-back, and honest measurement pass together in the focused core-loop scheme. The corrected 59-second physical run averaged 155 SPM and measured 98 percent tempo matched. Analyzer version 4 uses Accelerate spectral flux and fractional-lag autocorrelation across 60 through 210 BPM. It preserves the measured musical pulse, records only independently supported stride relationships, and passes 12 of 12 public preview references. One physical 25-track playlist restores after reinstall and relaunch with 13 ready tracks, and basic production-player progress passes. Playlist persistence, ready-track filtering, the normal production composition, and the source-neutral BPM control are implemented. The repaired build prevents Manual or Auto changes from committing transport. The current 0.85 through 1.15 candidate still needs exact-profile endpoint read-back, full-song listening, a known natural imported-track transition, and outdoor proof.
+Milestones 0 and 1 are complete. Apple Music is the selected Milestone 2 source. A validated 149.75 BPM fixture, Core Motion cadence, bounded reducer adaptation, identified MusicKit read-back, and honest measurement pass together in the focused core-loop scheme. The corrected 59-second physical run averaged 155 SPM and measured 98 percent tempo matched. Analyzer version 5 uses Accelerate spectral flux and fractional-lag autocorrelation across 60 through 210 BPM, with support lags from 30 through 420 so each tempo is judged with its half or double. It preserves the measured musical pulse, records only independently supported stride relationships, and passes 12 of 12 public preview references. One physical 25-track playlist restores after reinstall and relaunch with 13 ready tracks, and basic production-player progress passes. Playlist persistence, ready-track filtering, the normal production composition, and the source-neutral BPM control are implemented. The repaired build prevents Manual or Auto changes from committing transport. The current 0.85 through 1.15 candidate still needs exact-profile endpoint read-back, full-song listening, a known natural imported-track transition, and outdoor proof.
 
 ### Build order
 

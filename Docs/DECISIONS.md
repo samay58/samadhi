@@ -272,3 +272,11 @@ The resolver now tries the library item's own catalog identifier first, read fro
 
 This does not touch the other cause of an unready song. A preview whose thirty seconds carry no steady pulse is still reported as rhythm unclear, because the product promises not to adapt a song it cannot time.
 
+## A tempo is judged with its family
+
+Version 4 scored each candidate tempo alone and then trusted whichever peak stood highest in the running range. On real music that failed in one specific way. A swung or shuffled groove repeats its attacks strongly at one and a half beats, and a dotted-eighth pattern repeats at three quarters of a beat, so the analyzer saw a tall peak at two thirds or four thirds of the true tempo, counted it as a rival, and either rejected the song as rhythm unclear or, worse, reported the rival as the beat. On one playlist it rejected Nightrider, Strings of Light, and Feelin, and on the phone's cache it had reported Gesaffelstein at 144 instead of 109, Dego and Kaidi at 152 instead of 114, and Kokoroko at 175 instead of 130.
+
+Version 5 changes three things and nothing else. Each candidate is scored together with its half or double, with support lags computed from 30 through 420 BPM so a 117 BPM beat can still be backed by 58.5. When the low and high candidates are not a half-double pair, the stronger family wins instead of the running-range peak winning by default. And lags at a simple ratio to the candidate, one half, two, two thirds, three halves, three quarters, four thirds, one third, and three, no longer count as rivals when measuring confidence, because they are the same groove seen through another subdivision. The deliberate rejection of a low pulse with a strong triple stays, the confidence bar stays at 0.72, and the 2 percent corpus gate stays.
+
+The analyzer version moved to 5, which invalidates every cached result on purpose. A song that was confidently wrong under version 4 must be measured again, not trusted. Songs whose 30 seconds hold no steady pulse above the bar are still rejected; that is the product keeping its promise not to adapt a song it cannot time.
+

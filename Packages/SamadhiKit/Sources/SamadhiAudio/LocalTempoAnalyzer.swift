@@ -7,7 +7,7 @@ public protocol TempoAnalyzing: Sendable {
 }
 
 public struct LocalTempoAnalyzer: TempoAnalyzing {
-    public static let analysisVersion = 4
+    public static let analysisVersion = 5
 
     private let estimator = TempoEstimator()
 
@@ -18,6 +18,13 @@ public struct LocalTempoAnalyzer: TempoAnalyzing {
             try Self.decodeMono(fileURL: fileURL)
         }.value
         return estimator.analyze(samples: decoded.samples, sampleRate: decoded.sampleRate)
+    }
+
+    package func probe(fileURL: URL) async throws -> TempoEstimator.Probe {
+        let decoded = try await Task.detached(priority: .utility) {
+            try Self.decodeMono(fileURL: fileURL)
+        }.value
+        return estimator.probe(samples: decoded.samples, sampleRate: decoded.sampleRate)
     }
 
     private static func decodeMono(fileURL: URL) throws -> (samples: [Float], sampleRate: Double) {

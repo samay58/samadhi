@@ -1,10 +1,34 @@
 import Accelerate
 import SamadhiDomain
 
-struct TempoEstimator: Sendable {
-    static let analysisVersion = 4
+package struct TempoEstimator: Sendable {
+    static let analysisVersion = 5
 
     init() {}
+
+    /// Everything the estimator saw for one preview, for the probe tool. The product never reads this.
+    package struct Probe: Sendable {
+        package let analysis: TempoAnalysis?
+        package let scores: [(tempo: Double, correlation: Double)]
+    }
+
+    package func probe(samples: [Float], sampleRate: Double) -> Probe {
+        guard sampleRate.isFinite, sampleRate > 0, samples.count >= Int(sampleRate * 8),
+            let envelope = spectralFluxEnvelope(samples: samples, sampleRate: sampleRate)
+        else { return Probe(analysis: nil, scores: []) }
+        let scores = tempoScores(envelope: envelope)
+        let estimate = estimate(from: scores, support: supportScores(envelope: envelope))
+        let analysis = estimate.map {
+            TempoAnalysis(
+                baseBPM: $0.primary.tempo,
+                alternatePulseBPM: $0.alternate?.tempo,
+                confidence: $0.confidence,
+                analyzedDurationSeconds: Double(samples.count) / sampleRate,
+                version: Self.analysisVersion
+            )
+        }
+        return Probe(analysis: analysis, scores: scores.map { ($0.tempo, $0.correlation) })
+    }
 
     func analyze(samples: [Float], sampleRate: Double) -> TempoAnalysis? {
         guard sampleRate.isFinite,
@@ -18,15 +42,9 @@ struct TempoEstimator: Sendable {
             envelope.values.max() ?? 0 > 0.000_1
         else { return nil }
 
-        let scores = stride(from: 60.0, through: 210.0, by: 0.25).map { tempo in
-            let lag = 60 * envelope.rate / tempo
-            let correlation = normalizedCorrelation(envelope.values, lag: lag)
-            return TempoScore(
-                tempo: tempo,
-                correlation: correlation
-            )
-        }
-        guard let estimate = estimate(from: scores) else { return nil }
+        let scores = tempoScores(envelope: envelope)
+        guard let estimate = estimate(from: scores, support: supportScores(envelope: envelope))
+        else { return nil }
 
         return TempoAnalysis(
             baseBPM: estimate.primary.tempo,
@@ -37,13 +55,35 @@ struct TempoEstimator: Sendable {
         )
     }
 
-    private func estimate(from scores: [TempoScore]) -> TempoEstimate? {
+    private func tempoScores(envelope: (values: [Double], rate: Double)) -> [TempoScore] {
+        stride(from: 60.0, through: 210.0, by: 0.25).map { tempo in
+            let lag = 60 * envelope.rate / tempo
+            return TempoScore(tempo: tempo, correlation: normalizedCorrelation(envelope.values, lag: lag))
+        }
+    }
+
+    // Support lags outside the candidate window, so a 117 BPM beat can still be backed by its half
+    // at 58.5 and a 64 BPM pulse by its double at 128. Coarser, because they only ever support.
+    private func supportScores(envelope: (values: [Double], rate: Double)) -> [TempoScore] {
+        let below = stride(from: 30.0, to: 60.0, by: 0.5)
+        let above = stride(from: 210.5, through: 420.0, by: 0.5)
+        return (Array(below) + Array(above)).map { tempo in
+            let lag = 60 * envelope.rate / tempo
+            return TempoScore(tempo: tempo, correlation: normalizedCorrelation(envelope.values, lag: lag))
+        }
+    }
+
+    private func estimate(from scores: [TempoScore], support: [TempoScore]) -> TempoEstimate? {
+        // A tempo is judged with its family: the candidate plus its half or double. Swung and live
+        // grooves put a strong lag at one and a half beats, which used to outrank the true beat on
+        // its own; the true beat still has its half or double behind it, and that lag does not.
+        let family = scores + support
         guard
             let lower = scores.filter({ $0.tempo < 120 }).max(
-                by: { $0.correlation < $1.correlation }
+                by: { familyScore($0, among: family) < familyScore($1, among: family) }
             ),
             let running = scores.filter({ $0.tempo >= 120 }).max(
-                by: { $0.correlation < $1.correlation }
+                by: { familyScore($0, among: family) < familyScore($1, among: family) }
             )
         else { return nil }
 
@@ -82,34 +122,41 @@ struct TempoEstimator: Sendable {
             )
         }
 
-        if running.correlation >= 0.50 {
-            let confidence = confidence(for: running, among: scores)
-            guard confidence >= TempoAnalysis.readyConfidence else { return nil }
-            return TempoEstimate(primary: running, alternate: nil, confidence: confidence)
-        }
-
-        if let triple = score(near: lower.tempo * 3, in: scores),
+        // Not a pair, so the stronger family stands alone. A low pulse with a strong triple is the
+        // deliberate rejection: that is a triple meter the step relationship cannot name honestly.
+        let best =
+            familyScore(lower, among: family) >= familyScore(running, among: family) ? lower : running
+        guard best.correlation >= 0.32 else { return nil }
+        if best.tempo < 120,
+            let triple = score(near: best.tempo * 3, in: family),
             triple.correlation >= 0.32
         {
             return nil
         }
-
-        if lower.correlation >= 0.50 {
-            let confidence = confidence(for: lower, among: scores)
-            guard confidence >= TempoAnalysis.readyConfidence else { return nil }
-            return TempoEstimate(primary: lower, alternate: nil, confidence: confidence)
-        }
-
-        guard running.correlation >= 0.32 else { return nil }
-        let confidence = confidence(for: running, among: scores)
+        let confidence = confidence(for: best, among: scores)
         guard confidence >= TempoAnalysis.readyConfidence else { return nil }
-        return TempoEstimate(primary: running, alternate: nil, confidence: confidence)
+        return TempoEstimate(primary: best, alternate: nil, confidence: confidence)
     }
+
+    private func familyScore(_ score: TempoScore, among scores: [TempoScore]) -> Double {
+        let partner = score.tempo < 120 ? score.tempo * 2 : score.tempo / 2
+        let support = self.score(near: partner, in: scores)?.correlation ?? 0
+        return score.correlation + (0.5 * support)
+    }
+
+    // Lags that sit at a simple ratio to the candidate are the same groove seen through another
+    // subdivision, not evidence for a different tempo, so they do not count against it. A lag that is
+    // unrelated to the candidate still does.
+    private static let relatedRatios: [Double] = [0.5, 2, 2 / 3, 3 / 2, 3 / 4, 4 / 3, 1 / 3, 3]
 
     private func confidence(for best: TempoScore, among scores: [TempoScore]) -> Double {
         let competingScore =
             scores
-            .filter { abs($0.tempo - best.tempo) / best.tempo > 0.04 }
+            .filter { candidate in
+                let ratio = candidate.tempo / best.tempo
+                guard abs(ratio - 1) > 0.04 else { return false }
+                return !Self.relatedRatios.contains { abs(ratio - $0) / $0 <= 0.025 }
+            }
             .map(\.correlation)
             .max() ?? 0
         let separation = max(best.correlation - competingScore, 0)
