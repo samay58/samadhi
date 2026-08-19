@@ -3,7 +3,9 @@ import SamadhiDomain
 import SamadhiMotion
 
 struct RunDiagnosticSnapshot: Codable, Equatable, Sendable {
-    static let currentSchemaVersion = 10
+    // Schema 11 adds cue delivery and engine events, the next-song outlook, the reach notice, and
+    // a buffer that evicts per-second ticks before anything that tells the story of the run.
+    static let currentSchemaVersion = 11
 
     enum CompletionState: String, Codable, Sendable {
         case inProgress
@@ -43,6 +45,23 @@ struct RunDiagnosticSnapshot: Codable, Equatable, Sendable {
             case rhythmModeChanged
             case finishRequested
             case finished
+            // What physically became of a cue the service handled, and what the haptic engine did.
+            case autoFeedbackDelivery
+            case hapticEngine
+            // The reducer planned a next song for the boundary, or said the collection is out of reach.
+            case nextSongPlanned
+            case reachNoticed
+
+            // Per-second ticks are the only entries the buffer may drop. Everything else survives
+            // a whole run.
+            var isTick: Bool {
+                switch self {
+                case .activeSecond, .cadenceObserved, .cadenceUpdated, .playerProgress:
+                    true
+                default:
+                    false
+                }
+            }
         }
 
         let offsetSeconds: Double
@@ -95,6 +114,15 @@ struct RunDiagnosticSnapshot: Codable, Equatable, Sendable {
         let autoFeedbackSize: String?
         let autoFeedbackChangeSPM: Double?
         let autoFeedbackLimited: Bool?
+        let autoFeedbackMoment: String?
+        let autoFeedbackFamily: String?
+        let autoFeedbackSoundPath: String?
+        let autoFeedbackDeliveryOutcome: String?
+        let autoFeedbackDeliveryDetail: String?
+        let hapticEngineEvent: String?
+        let nextSongOutlook: String?
+        let plannedNextTrackTitle: String?
+        let collectionReach: String?
 
         init(
             offsetSeconds: Double,
@@ -145,7 +173,16 @@ struct RunDiagnosticSnapshot: Codable, Equatable, Sendable {
             autoFeedbackDirection: String? = nil,
             autoFeedbackSize: String? = nil,
             autoFeedbackChangeSPM: Double? = nil,
-            autoFeedbackLimited: Bool? = nil
+            autoFeedbackLimited: Bool? = nil,
+            autoFeedbackMoment: String? = nil,
+            autoFeedbackFamily: String? = nil,
+            autoFeedbackSoundPath: String? = nil,
+            autoFeedbackDeliveryOutcome: String? = nil,
+            autoFeedbackDeliveryDetail: String? = nil,
+            hapticEngineEvent: String? = nil,
+            nextSongOutlook: String? = nil,
+            plannedNextTrackTitle: String? = nil,
+            collectionReach: String? = nil
         ) {
             self.offsetSeconds = offsetSeconds
             self.kind = kind
@@ -196,6 +233,15 @@ struct RunDiagnosticSnapshot: Codable, Equatable, Sendable {
             self.autoFeedbackSize = autoFeedbackSize
             self.autoFeedbackChangeSPM = autoFeedbackChangeSPM
             self.autoFeedbackLimited = autoFeedbackLimited
+            self.autoFeedbackMoment = autoFeedbackMoment
+            self.autoFeedbackFamily = autoFeedbackFamily
+            self.autoFeedbackSoundPath = autoFeedbackSoundPath
+            self.autoFeedbackDeliveryOutcome = autoFeedbackDeliveryOutcome
+            self.autoFeedbackDeliveryDetail = autoFeedbackDeliveryDetail
+            self.hapticEngineEvent = hapticEngineEvent
+            self.nextSongOutlook = nextSongOutlook
+            self.plannedNextTrackTitle = plannedNextTrackTitle
+            self.collectionReach = collectionReach
         }
     }
 
@@ -293,7 +339,10 @@ struct CadenceDiagnosticSample {
 }
 
 struct RunDiagnosticsRecorder {
-    private static let maximumEntries = 512
+    // About 1.4 KB per pretty-printed entry, so a full buffer is under 3 MB. Ticks fill whatever
+    // the story of the run leaves free and are the first to go; the August 19 walk lost its first
+    // 205 seconds and a whole song to a buffer that evicted by age alone.
+    static let maximumEntries = 2_048
     private static let checkpointInterval: TimeInterval = 5
 
     private let now: () -> Date
@@ -350,12 +399,85 @@ struct RunDiagnosticsRecorder {
                 autoFeedback: feedback
             )
         }
-        guard eventKind != nil || feedback != nil else { return nil }
+        let planned = newState.session?.pendingNextTrackID
+        let plannedChanged = planned != nil && planned != oldState.session?.pendingNextTrackID
+        if plannedChanged {
+            append(
+                kind: .nextSongPlanned,
+                state: stateForEntry,
+                collection: collection,
+                tempoMatched: nil,
+                trackChangeReason: nil,
+                cadenceSample: nil
+            )
+        }
+        let noticed = newState.session?.collectionReach.noticed ?? []
+        let reachNoticed = noticed.count > (oldState.session?.collectionReach.noticed.count ?? 0)
+        if reachNoticed {
+            append(
+                kind: .reachNoticed,
+                state: stateForEntry,
+                collection: collection,
+                tempoMatched: nil,
+                trackChangeReason: nil,
+                cadenceSample: nil
+            )
+        }
+        guard eventKind != nil || feedback != nil || plannedChanged || reachNoticed else { return nil }
         return checkpoint(
             completingWith: newState,
             session: stateForEntry.session,
             collection: collection,
-            isImmediate: feedback != nil || eventKind.map(isImmediateCheckpoint) == true
+            isImmediate: feedback != nil || plannedChanged || reachNoticed
+                || eventKind.map(isImmediateCheckpoint) == true
+        )
+    }
+
+    // The feedback service reports what became of a cue. This is shell evidence, not product
+    // state, so it arrives here directly and is written at once.
+    mutating func record(
+        autoFeedbackDelivery delivery: AutoFeedbackDeliveryRecord,
+        state: RunState,
+        collection: MusicCollection
+    ) -> RunDiagnosticSnapshot? {
+        guard startedAt != nil else { return nil }
+        append(
+            kind: .autoFeedbackDelivery,
+            state: state,
+            collection: collection,
+            tempoMatched: nil,
+            trackChangeReason: nil,
+            cadenceSample: nil,
+            delivery: delivery
+        )
+        return checkpoint(
+            completingWith: state,
+            session: state.session,
+            collection: collection,
+            isImmediate: true
+        )
+    }
+
+    mutating func record(
+        hapticEngine event: AutoFeedbackEngineEvent,
+        state: RunState,
+        collection: MusicCollection
+    ) -> RunDiagnosticSnapshot? {
+        guard startedAt != nil else { return nil }
+        append(
+            kind: .hapticEngine,
+            state: state,
+            collection: collection,
+            tempoMatched: nil,
+            trackChangeReason: nil,
+            cadenceSample: nil,
+            engineEvent: event
+        )
+        return checkpoint(
+            completingWith: state,
+            session: state.session,
+            collection: collection,
+            isImmediate: true
         )
     }
 
@@ -411,7 +533,9 @@ struct RunDiagnosticsRecorder {
         tempoMatched: Bool?,
         trackChangeReason: TrackChangeReason?,
         cadenceSample cadenceObservation: CadenceDiagnosticSample?,
-        autoFeedback: AutoFeedbackEvidence? = nil
+        autoFeedback: AutoFeedbackEvidence? = nil,
+        delivery: AutoFeedbackDeliveryRecord? = nil,
+        engineEvent: AutoFeedbackEngineEvent? = nil
     ) {
         guard let startedAt else { return }
         let session = stateForEntry.session
@@ -420,6 +544,8 @@ struct RunDiagnosticsRecorder {
                 ? collection.tracks[session.trackIndex]
                 : nil
         }
+        let plannedTrackID = session?.preparedNextTrackID ?? session?.pendingNextTrackID
+        let plannedTrack = plannedTrackID.flatMap { id in collection.tracks.first { $0.id == id } }
         let appliedStepRhythmSPM = track?.tempo.map {
             (session?.adaptationState.baseTempoBPM ?? $0.stepPulseSPM)
                 * (session?.adaptationState.appliedRateReadback ?? session?.appliedPlaybackRate ?? 1)
@@ -479,16 +605,35 @@ struct RunDiagnosticsRecorder {
                 trackDurationSeconds: session?.trackDurationSeconds,
                 tempoMatched: tempoMatched,
                 trackChangeReason: trackChangeReason?.rawValue,
-                autoFeedbackTransactionID: autoFeedback?.transactionID,
+                autoFeedbackTransactionID: autoFeedback?.transactionID ?? delivery?.transactionID,
                 autoFeedbackPhase: autoFeedback?.phase,
                 autoFeedbackDirection: autoFeedback?.direction,
                 autoFeedbackSize: autoFeedback?.size,
                 autoFeedbackChangeSPM: autoFeedback?.changeSPM,
-                autoFeedbackLimited: autoFeedback?.isLimited
+                autoFeedbackLimited: autoFeedback?.isLimited,
+                autoFeedbackMoment: delivery?.moment.rawValue,
+                autoFeedbackFamily: delivery?.family.rawValue,
+                autoFeedbackSoundPath: delivery?.soundPath.rawValue,
+                autoFeedbackDeliveryOutcome: delivery?.outcome.rawValue,
+                autoFeedbackDeliveryDetail: delivery?.detail ?? engineEvent?.detail,
+                hapticEngineEvent: engineEvent?.name,
+                nextSongOutlook: session?.nextSongOutlook.rawValue,
+                plannedNextTrackTitle: plannedTrack?.title,
+                collectionReach: session?.collectionReach.condition?.rawValue
             )
         )
-        if timeline.count > Self.maximumEntries {
-            timeline.removeFirst(timeline.count - Self.maximumEntries)
+        trimTimeline()
+    }
+
+    // Oldest tick first. Only when no tick is left does the oldest story entry go, so the cap
+    // still holds on a run that somehow produces thousands of changes.
+    private mutating func trimTimeline() {
+        while timeline.count > Self.maximumEntries {
+            if let oldestTick = timeline.firstIndex(where: { $0.kind.isTick }) {
+                timeline.remove(at: oldestTick)
+            } else {
+                timeline.removeFirst()
+            }
         }
     }
 
@@ -586,7 +731,8 @@ struct RunDiagnosticsRecorder {
         case .started, .cadenceUpdated, .cadenceLost, .rateApplied, .trackChanged,
             .paused, .resumeRequested, .routeLost, .routeRestored, .interruptionBegan,
             .interruptionEnded, .playbackFailed, .rhythmAdjusted, .rhythmModeChanged,
-            .finishRequested, .finished, .autoFeedback, .sameSongCallback:
+            .finishRequested, .finished, .autoFeedback, .sameSongCallback,
+            .autoFeedbackDelivery, .hapticEngine, .nextSongPlanned, .reachNoticed:
             true
         case .cadenceObserved, .playerProgress, .activeSecond:
             false
