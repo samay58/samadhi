@@ -72,11 +72,27 @@ Transport and Finish, song-change causes, and the first directional Auto feedbac
 | `CoreLoopDiagnostics` symbols, Debug dylib versus Release | 382 versus 0 |
 | `AutoFeedbackService` strings, Debug dylib versus Release | 4 versus 6, the control row |
 | Preserved handoff source and addendum hashes | Unchanged, all five match `MANIFEST.md` |
-| Phone build or install | None |
+| Phone build or install | Built and installed in place on 2026-08-19, see the table below |
 
 The Debug side of every isolation count reads `Samadhi.app/Samadhi.debug.dylib`. In a Debug build `Samadhi.app/Samadhi` is a launcher stub that reports zero matches for everything, including code that is certainly present, so a grep against it passes without proving anything. The `AutoFeedbackService` row is the control: that is production code, so it stays in Release, which shows the zeros above belong to the audition surface and not to a build that dropped the feature. Release still packages the 30 prototype files, 24 patterns and 6 sounds.
 
-No phone build was made and nothing was installed. This candidate has no in-app source fingerprint. Every physical result recorded elsewhere in this file still belongs to the earlier expanded-rate build.
+The software gate above was run on 2026-08-18 with no phone build. The phone install followed on 2026-08-19.
+
+| Check | Result |
+| --- | --- |
+| Commit | `67adf80f4f9c31ec7a853dd3645cc0f2feebcc4c`, `main`, clean |
+| Profile | `Samadhi Development 2026-08-15`, UUID `1b613344-c5cd-4802-a31f-9ff5088c1802`, expires 2027-08-15 |
+| Application identifier | `ZL5U59XBJ6.com.samaydhawan.Samadhi` in the embedded profile and the signature |
+| Strict signature verification | Passed |
+| Built Info.plist source fingerprint | `8df37f8dca11dfa0ad38346b2ea2339a5d76c9a10c4a539b471d8a1ea7df02e6` |
+| In-app source fingerprint, read on the device | Same value |
+| Install | In place over Samadhi 1.0 (1), nothing uninstalled, no app data touched |
+| Selected collection SHA-256 before and after | `51b4096cc3b2c29ae32d85290b5a9f72166460f23b130d818508f7507b4e8397`, unchanged |
+| Device | iPhone 17 Pro, iOS 27.0 build `24A5408d` |
+| Audition scheme | Builds for the phone from the same bundle, not installed separately |
+| Evidence | `Evidence/Device/2026-08-19-phone-install/` |
+
+Every physical judgment in `Docs/PHONE-CHECK-2026-08-19.md` is still open. Physical results recorded elsewhere in this file belong to earlier builds.
 
 ## Review artifacts
 

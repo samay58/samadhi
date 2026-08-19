@@ -205,7 +205,7 @@ The `Samadhi MusicKit Gate` scheme verifies that the harness and framework calls
 - 2026-08-17 fingerprinted workout: the pulled file matched source fingerprint `4e454d2859a521367bf83f26ba1287b14d617d0700c630f90ff13ce8f3b5b498`; four supported delayed readings acquired 133 SPM, and Apple Music reported the exact 1.0390625 command after 0.066 seconds
 - 2026-08-17 activity mix: 57 of 61 retained numeric cadence readings were below the current 120 SPM contract; substantial lifting occurred during the same period, so the low readings and elapsed time cannot all be attributed to walking
 - Walking-range tuning: use a clean walking-only check before calling the 90 SPM floor and five-second delay physically tuned
-- Transport, song-change cause, and Auto feedback candidate: no phone build and no install exist for it, so it has no in-app fingerprint and no physical result of any kind. Its ordered physical checklist is `Docs/PHONE-CHECK-2026-08-19.md`
+- Transport, song-change cause, and Auto feedback candidate: clean commit `67adf80`, exact-profile build, embedded identity and strict signature inspection, in-place install, selected-collection checksum preservation, and an on-device Debug screen read-back of source fingerprint `8df37f8dca11dfa0ad38346b2ea2339a5d76c9a10c4a539b471d8a1ea7df02e6` passed on 2026-08-19; the audition scheme builds for the phone; every physical judgment in `Docs/PHONE-CHECK-2026-08-19.md` stays open
 
 ## Felt-synchronization gate
 
