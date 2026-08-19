@@ -143,14 +143,24 @@ struct AutoFeedbackPlaybackRequest: Equatable, Sendable {
 
 @MainActor
 protocol AutoFeedbackCuePlaying: AnyObject {
-    func play()
+    // Throws when the engine refuses to start the pattern, so the delivery record can say so.
+    func play() throws
     func stop()
+}
+
+// A built cue and how it was built. No player means nothing could carry the cue; the outcome and
+// detail say why.
+struct AutoFeedbackCueBuild {
+    let player: (any AutoFeedbackCuePlaying)?
+    let outcome: AutoFeedbackDeliveryOutcome
+    let detail: String?
 }
 
 // The seam that lets tests drive the service without haptic hardware or an audio route.
 @MainActor
 protocol AutoFeedbackCuePlayerMaking: AnyObject {
-    func makePlayer(for request: AutoFeedbackPlaybackRequest) -> AutoFeedbackCuePlaying?
+    func makePlayer(for request: AutoFeedbackPlaybackRequest) -> AutoFeedbackCueBuild
+    var onEngineEvent: ((AutoFeedbackEngineEvent) -> Void)? { get set }
 }
 
 @MainActor
@@ -166,12 +176,17 @@ final class AutoFeedbackService: AutoFeedbackPlaying {
 
     let catalog: AutoFeedbackAssetCatalog
 
+    var onDelivery: ((AutoFeedbackDeliveryRecord) -> Void)?
+    var onEngineEvent: ((AutoFeedbackEngineEvent) -> Void)? {
+        didSet { playerFactory.onEngineEvent = onEngineEvent }
+    }
+
     private let playerFactory: any AutoFeedbackCuePlayerMaking
     private let now: () -> TimeInterval
     private var playedMoments: Set<PlayedMoment> = []
     private var beganTimes: [Int: TimeInterval] = [:]
     private var activePlayers: [Int: [any AutoFeedbackCuePlaying]] = [:]
-    private var pendingArrivals: [Int: Task<Void, Never>] = [:]
+    private var pendingArrivals: [Int: PendingArrival] = [:]
 
     init(
         catalog: AutoFeedbackAssetCatalog = AutoFeedbackAssetCatalog(),
@@ -200,25 +215,32 @@ final class AutoFeedbackService: AutoFeedbackPlaying {
                 perform(cue)
                 return
             }
-            pendingArrivals[cue.transactionID]?.cancel()
-            pendingArrivals[cue.transactionID] = Task { @MainActor [weak self] in
+            pendingArrivals[cue.transactionID]?.task.cancel()
+            let task = Task { @MainActor [weak self] in
                 try? await Task.sleep(for: .seconds(delay))
                 guard !Task.isCancelled, let self else { return }
                 self.pendingArrivals[cue.transactionID] = nil
                 self.perform(cue)
             }
+            pendingArrivals[cue.transactionID] = PendingArrival(cue: cue, task: task)
         }
     }
 
     func cancel(transactionID: Int) {
-        pendingArrivals.removeValue(forKey: transactionID)?.cancel()
+        if let pending = pendingArrivals.removeValue(forKey: transactionID) {
+            pending.task.cancel()
+            report(pending.cue, outcome: .cancelledBeforePlay, detail: "arrival was still held")
+        }
         activePlayers.removeValue(forKey: transactionID)?.forEach { $0.stop() }
         beganTimes.removeValue(forKey: transactionID)
         // The played record stays so a late duplicate cannot revive a cancelled transaction.
     }
 
     func cancelAll() {
-        for task in pendingArrivals.values { task.cancel() }
+        for pending in pendingArrivals.values {
+            pending.task.cancel()
+            report(pending.cue, outcome: .cancelledBeforePlay, detail: "run ended or recovered")
+        }
         pendingArrivals.removeAll()
         for players in activePlayers.values {
             for player in players { player.stop() }
@@ -262,15 +284,45 @@ final class AutoFeedbackService: AutoFeedbackPlaying {
 
     private func perform(_ cue: AutoFeedbackCue) {
         let request = playbackRequest(for: cue)
-        guard request.patternURL != nil || request.soundURL != nil else { return }
-        guard let player = playerFactory.makePlayer(for: request) else { return }
+        guard request.patternURL != nil || request.soundURL != nil else {
+            report(cue, outcome: .patternMissing, detail: "sound and haptics both disabled")
+            return
+        }
+        let build = playerFactory.makePlayer(for: request)
+        guard let player = build.player else {
+            report(cue, outcome: build.outcome, detail: build.detail)
+            return
+        }
         activePlayers[cue.transactionID, default: []].append(player)
-        player.play()
+        do {
+            try player.play()
+            report(cue, outcome: build.outcome, detail: build.detail)
+        } catch {
+            report(cue, outcome: .engineUnavailable, detail: "start failed: \(error.localizedDescription)")
+        }
+    }
+
+    private func report(_ cue: AutoFeedbackCue, outcome: AutoFeedbackDeliveryOutcome, detail: String?) {
+        onDelivery?(
+            AutoFeedbackDeliveryRecord(
+                transactionID: cue.transactionID,
+                moment: cue.moment,
+                family: family,
+                soundPath: soundPath,
+                outcome: outcome,
+                detail: detail
+            )
+        )
     }
 
     private struct PlayedMoment: Hashable {
         let transactionID: Int
         let moment: AutoFeedbackMoment
+    }
+
+    private struct PendingArrival {
+        let cue: AutoFeedbackCue
+        let task: Task<Void, Never>
     }
 }
 
@@ -281,23 +333,29 @@ final class CoreHapticsAutoFeedbackPlayerFactory: AutoFeedbackCuePlayerMaking {
     private let catalog: AutoFeedbackAssetCatalog
     private var engine: CHHapticEngine?
     private var engineIsRunning = false
+    private var lastEngineFailure: String?
     private var audioResourceIDs: [URL: CHHapticAudioResourceID] = [:]
     private var filePlayers: [URL: AVAudioPlayer] = [:]
+
+    var onEngineEvent: ((AutoFeedbackEngineEvent) -> Void)?
 
     init(catalog: AutoFeedbackAssetCatalog) {
         self.catalog = catalog
     }
 
-    func makePlayer(for request: AutoFeedbackPlaybackRequest) -> AutoFeedbackCuePlaying? {
+    func makePlayer(for request: AutoFeedbackPlaybackRequest) -> AutoFeedbackCueBuild {
         let engine = preparedEngine()
         var enginePlayers: [any CHHapticPatternPlayer] = []
         var filePlayer: AVAudioPlayer?
+        var patternProblem: String?
 
-        if let patternURL = request.patternURL, let engine,
-            let pattern = try? CHHapticPattern(contentsOf: patternURL),
-            let player = try? engine.makePlayer(with: pattern)
-        {
-            enginePlayers.append(player)
+        if let patternURL = request.patternURL, let engine {
+            do {
+                let pattern = try CHHapticPattern(contentsOf: patternURL)
+                enginePlayers.append(try engine.makePlayer(with: pattern))
+            } catch {
+                patternProblem = "\(patternURL.lastPathComponent): \(error.localizedDescription)"
+            }
         }
 
         if let soundURL = request.soundURL {
@@ -311,15 +369,54 @@ final class CoreHapticsAutoFeedbackPlayerFactory: AutoFeedbackCuePlayerMaking {
             }
         }
 
-        guard !enginePlayers.isEmpty || filePlayer != nil else { return nil }
-        return CoreHapticsCuePlayer(enginePlayers: enginePlayers, filePlayer: filePlayer)
+        if !enginePlayers.isEmpty {
+            return AutoFeedbackCueBuild(
+                player: CoreHapticsCuePlayer(enginePlayers: enginePlayers, filePlayer: filePlayer),
+                outcome: .playedThroughEngine,
+                detail: filePlayer == nil ? patternProblem : "sound through the local player"
+            )
+        }
+        if let filePlayer {
+            return AutoFeedbackCueBuild(
+                player: CoreHapticsCuePlayer(enginePlayers: [], filePlayer: filePlayer),
+                outcome: .playedLocalSoundOnly,
+                detail: engine == nil ? engineAbsenceDetail : patternProblem
+            )
+        }
+        if let patternProblem {
+            return AutoFeedbackCueBuild(player: nil, outcome: .patternMissing, detail: patternProblem)
+        }
+        return AutoFeedbackCueBuild(
+            player: nil,
+            outcome: engine == nil ? .engineUnavailable : .patternMissing,
+            detail: engine == nil ? engineAbsenceDetail : "no pattern or sound resolved"
+        )
+    }
+
+    private var engineAbsenceDetail: String {
+        if !CHHapticEngine.capabilitiesForHardware().supportsHaptics { return "no haptic hardware" }
+        return lastEngineFailure ?? "engine not running"
     }
 
     private func preparedEngine() -> CHHapticEngine? {
-        guard CHHapticEngine.capabilitiesForHardware().supportsHaptics else { return nil }
+        guard CHHapticEngine.capabilitiesForHardware().supportsHaptics else {
+            if lastEngineFailure == nil {
+                lastEngineFailure = "no haptic hardware"
+                onEngineEvent?(.unsupported)
+            }
+            return nil
+        }
         if let engine {
             if !engineIsRunning {
-                engineIsRunning = (try? engine.start()) != nil
+                do {
+                    try engine.start()
+                    engineIsRunning = true
+                    lastEngineFailure = nil
+                    onEngineEvent?(.started)
+                } catch {
+                    lastEngineFailure = "start failed: \(error.localizedDescription)"
+                    onEngineEvent?(.startFailed(error.localizedDescription))
+                }
             }
             return engineIsRunning ? engine : nil
         }
@@ -327,8 +424,14 @@ final class CoreHapticsAutoFeedbackPlayerFactory: AutoFeedbackCuePlayerMaking {
             let created = try CHHapticEngine()
             created.playsHapticsOnly = false
             created.isAutoShutdownEnabled = false
-            created.stoppedHandler = { [weak self] _ in
-                Task { @MainActor in self?.engineIsRunning = false }
+            onEngineEvent?(.created)
+            created.stoppedHandler = { [weak self] reason in
+                Task { @MainActor in
+                    self?.engineIsRunning = false
+                    let name = Self.stopReasonName(reason)
+                    self?.lastEngineFailure = "stopped: \(name)"
+                    self?.onEngineEvent?(.stopped(reason: name))
+                }
             }
             created.resetHandler = { [weak self] in
                 Task { @MainActor in self?.recoverFromReset() }
@@ -336,10 +439,14 @@ final class CoreHapticsAutoFeedbackPlayerFactory: AutoFeedbackCuePlayerMaking {
             try created.start()
             engine = created
             engineIsRunning = true
+            lastEngineFailure = nil
+            onEngineEvent?(.started)
             return created
         } catch {
             engine = nil
             engineIsRunning = false
+            lastEngineFailure = "start failed: \(error.localizedDescription)"
+            onEngineEvent?(.startFailed(error.localizedDescription))
             return nil
         }
     }
@@ -349,15 +456,33 @@ final class CoreHapticsAutoFeedbackPlayerFactory: AutoFeedbackCuePlayerMaking {
         audioResourceIDs.removeAll()
         filePlayers.removeAll()
         engineIsRunning = false
+        onEngineEvent?(.reset)
         guard let engine else { return }
         do {
             try engine.start()
             engineIsRunning = true
+            lastEngineFailure = nil
+            onEngineEvent?(.started)
         } catch {
+            lastEngineFailure = "start failed after reset: \(error.localizedDescription)"
+            onEngineEvent?(.startFailed(error.localizedDescription))
             return
         }
         for url in catalog.everyArrivalSoundURL {
             _ = audioResourceID(for: url, engine: engine)
+        }
+    }
+
+    private static func stopReasonName(_ reason: CHHapticEngine.StoppedReason) -> String {
+        switch reason {
+        case .audioSessionInterrupt: "audio session interrupt"
+        case .applicationSuspended: "application suspended"
+        case .idleTimeout: "idle timeout"
+        case .notifyWhenFinished: "finished"
+        case .engineDestroyed: "engine destroyed"
+        case .gameControllerDisconnect: "game controller disconnected"
+        case .systemError: "system error"
+        @unknown default: "unknown (\(reason.rawValue))"
         }
     }
 
@@ -400,9 +525,9 @@ private final class CoreHapticsCuePlayer: AutoFeedbackCuePlaying {
         self.filePlayer = filePlayer
     }
 
-    func play() {
+    func play() throws {
         for player in enginePlayers {
-            try? player.start(atTime: CHHapticTimeImmediate)
+            try player.start(atTime: CHHapticTimeImmediate)
         }
         filePlayer?.currentTime = 0
         filePlayer?.play()

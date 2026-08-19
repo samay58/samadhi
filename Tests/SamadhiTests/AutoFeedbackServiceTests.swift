@@ -128,16 +128,97 @@ private func cue(
     )
 }
 
+@Test @MainActor func autoFeedbackServiceRecordsWhatBecameOfEveryCue() {
+    let factory = RecordingCuePlayerFactory()
+    var clock: TimeInterval = 10
+    let service = AutoFeedbackService(playerFactory: factory, now: { clock })
+    var deliveries: [AutoFeedbackDeliveryRecord] = []
+    service.onDelivery = { deliveries.append($0) }
+
+    // Played through the engine.
+    service.play(cue(transactionID: 1, moment: .began))
+    clock += 1
+    // The engine is gone; the sound still plays locally.
+    factory.nextBuild = .localSoundOnly(detail: "engine not running")
+    service.play(cue(transactionID: 1, moment: .arrived))
+    // Nothing can carry the cue.
+    factory.nextBuild = .failure(.engineUnavailable, detail: "no haptic hardware")
+    service.play(cue(transactionID: 2, moment: .began))
+    factory.nextBuild = .failure(.patternMissing, detail: "faster-medium.ahap: unreadable")
+    service.play(cue(transactionID: 3, moment: .began))
+    // The engine accepted the build but refused to start it.
+    factory.nextBuild = .engine(detail: nil, failsToPlay: true)
+    service.play(cue(transactionID: 4, moment: .began))
+    // An arrival held behind its own start, then cancelled before it played.
+    factory.nextBuild = .engine(detail: nil, failsToPlay: false)
+    service.play(cue(transactionID: 5, moment: .began))
+    service.play(cue(transactionID: 5, moment: .arrived))
+    service.cancel(transactionID: 5)
+
+    #expect(
+        deliveries.map(\.outcome) == [
+            .playedThroughEngine,
+            .playedLocalSoundOnly,
+            .engineUnavailable,
+            .patternMissing,
+            .engineUnavailable,
+            .playedThroughEngine,
+            .cancelledBeforePlay,
+        ]
+    )
+    #expect(deliveries.map(\.transactionID) == [1, 1, 2, 3, 4, 5, 5])
+    #expect(deliveries.map(\.moment) == [.began, .arrived, .began, .began, .began, .began, .arrived])
+    #expect(deliveries[1].detail == "engine not running")
+    #expect(deliveries[2].detail == "no haptic hardware")
+    #expect(deliveries[4].detail?.hasPrefix("start failed") == true)
+    #expect(deliveries.allSatisfy { $0.family == .pulse && $0.soundPath == .coreHaptics })
+}
+
+@Test @MainActor func autoFeedbackServiceForwardsEngineEvents() {
+    let factory = RecordingCuePlayerFactory()
+    let service = AutoFeedbackService(playerFactory: factory, now: { 0 })
+    var events: [AutoFeedbackEngineEvent] = []
+    service.onEngineEvent = { events.append($0) }
+
+    factory.onEngineEvent?(.created)
+    factory.onEngineEvent?(.started)
+    factory.onEngineEvent?(.stopped(reason: "application suspended"))
+    factory.onEngineEvent?(.reset)
+
+    #expect(events == [.created, .started, .stopped(reason: "application suspended"), .reset])
+    #expect(events[2].detail == "application suspended")
+    #expect(events.map(\.name) == ["created", "started", "stopped", "reset"])
+}
+
+private struct TestPlayFailure: Error {}
+
+private enum ScriptedBuild {
+    case engine(detail: String?, failsToPlay: Bool)
+    case localSoundOnly(detail: String?)
+    case failure(AutoFeedbackDeliveryOutcome, detail: String?)
+}
+
 @MainActor
 private final class RecordingCuePlayerFactory: AutoFeedbackCuePlayerMaking {
     private(set) var requests: [AutoFeedbackPlaybackRequest] = []
     private(set) var players: [RecordingCuePlayer] = []
+    var nextBuild: ScriptedBuild = .engine(detail: nil, failsToPlay: false)
+    var onEngineEvent: ((AutoFeedbackEngineEvent) -> Void)?
 
-    func makePlayer(for request: AutoFeedbackPlaybackRequest) -> AutoFeedbackCuePlaying? {
+    func makePlayer(for request: AutoFeedbackPlaybackRequest) -> AutoFeedbackCueBuild {
         requests.append(request)
-        let player = RecordingCuePlayer()
-        players.append(player)
-        return player
+        switch nextBuild {
+        case let .engine(detail, failsToPlay):
+            let player = RecordingCuePlayer(failsToPlay: failsToPlay)
+            players.append(player)
+            return AutoFeedbackCueBuild(player: player, outcome: .playedThroughEngine, detail: detail)
+        case let .localSoundOnly(detail):
+            let player = RecordingCuePlayer(failsToPlay: false)
+            players.append(player)
+            return AutoFeedbackCueBuild(player: player, outcome: .playedLocalSoundOnly, detail: detail)
+        case let .failure(outcome, detail):
+            return AutoFeedbackCueBuild(player: nil, outcome: outcome, detail: detail)
+        }
     }
 }
 
@@ -145,8 +226,17 @@ private final class RecordingCuePlayerFactory: AutoFeedbackCuePlayerMaking {
 private final class RecordingCuePlayer: AutoFeedbackCuePlaying {
     private(set) var playCount = 0
     private(set) var stopCount = 0
+    private let failsToPlay: Bool
 
-    func play() { playCount += 1 }
+    init(failsToPlay: Bool = false) {
+        self.failsToPlay = failsToPlay
+    }
+
+    func play() throws {
+        playCount += 1
+        if failsToPlay { throw TestPlayFailure() }
+    }
+
     func stop() { stopCount += 1 }
 }
 
