@@ -1,8 +1,10 @@
 import SamadhiDomain
 import SwiftUI
 
-// One instrument. Previous, Pause or Resume, and Next share a single glass capsule, so the bar
-// reads as one object rather than three floating pills. Only the pressed region responds.
+// Transport is three separate Liquid Glass circles in one container, not a bar. Each control is its
+// own lens over the field, so the material reads as glass instead of a slab, and interactive glass
+// gives every press the system's own bounce and shimmer. The primary circle is larger and tinted so
+// the hierarchy is clear at arm's length.
 struct TransportControls: View {
     let state: RunViewState
     let send: @MainActor (RunAction) -> Void
@@ -12,11 +14,11 @@ struct TransportControls: View {
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
     var body: some View {
-        GlassEffectContainer {
-            HStack(spacing: 0) {
+        GlassEffectContainer(spacing: metrics.blendSpacing) {
+            HStack(spacing: metrics.gap) {
                 TransportRegion(
                     role: .secondary,
-                    systemImage: "backward.end.fill",
+                    systemImage: "backward.fill",
                     title: "Previous",
                     identifier: "previous-track",
                     action: .previous,
@@ -36,7 +38,7 @@ struct TransportControls: View {
 
                 TransportRegion(
                     role: .secondary,
-                    systemImage: "forward.end.fill",
+                    systemImage: "forward.fill",
                     title: "Skip",
                     identifier: "skip-track",
                     action: .skip,
@@ -44,17 +46,8 @@ struct TransportControls: View {
                     send: send
                 )
             }
-            .frame(height: metrics.barHeight)
-            .clipShape(.capsule)
-            .glassEffect(.regular, in: .capsule)
-            .overlay {
-                if metrics.increasedContrast {
-                    Capsule()
-                        .strokeBorder(SamadhiColor.ivory.opacity(0.36), lineWidth: 1)
-                }
-            }
         }
-        // Symbols carry this bar, so growth is capped to keep three regions on one line.
+        // Symbols carry this row, so growth is capped to keep three controls on one line.
         .dynamicTypeSize(...DynamicTypeSize.accessibility2)
         .accessibilityElement(children: .contain)
         .accessibilityIdentifier("transport-controls")
@@ -64,13 +57,12 @@ struct TransportControls: View {
 
     private var metrics: TransportMetrics {
         let accessibility = dynamicTypeSize.isAccessibilitySize
-        let barHeight: CGFloat = accessibility ? 84 : 60
         return TransportMetrics(
-            barHeight: barHeight,
-            primaryMinWidth: accessibility ? 140 : 132,
-            secondaryMinWidth: accessibility ? 78 : 72,
-            keyDiameter: barHeight - 16,
-            opticalNudge: accessibility ? 1.5 : 1,
+            primaryDiameter: accessibility ? 96 : 88,
+            secondaryDiameter: accessibility ? 74 : 68,
+            gap: accessibility ? 16 : 20,
+            blendSpacing: 6,
+            opticalNudge: accessibility ? 2.5 : 2,
             reduceMotion: reduceMotion || state.forceReduceMotion,
             increasedContrast: colorSchemeContrast == .increased || state.forceIncreasedContrast
         )
@@ -137,9 +129,9 @@ struct FinishControl: View {
     private var metrics: FinishMetrics {
         let accessibility = dynamicTypeSize.isAccessibilitySize
         return FinishMetrics(
-            horizontalPadding: armed ? 30 : 22,
-            verticalPadding: armed ? 12 : 8,
-            visibleHeight: armed ? (accessibility ? 58 : 46) : (accessibility ? 44 : 34)
+            horizontalPadding: armed ? 30 : 26,
+            verticalPadding: armed ? 12 : 9,
+            visibleHeight: armed ? (accessibility ? 58 : 46) : (accessibility ? 46 : 38)
         )
     }
 
@@ -175,10 +167,10 @@ struct FinishControl: View {
 }
 
 private struct TransportMetrics {
-    let barHeight: CGFloat
-    let primaryMinWidth: CGFloat
-    let secondaryMinWidth: CGFloat
-    let keyDiameter: CGFloat
+    let primaryDiameter: CGFloat
+    let secondaryDiameter: CGFloat
+    let gap: CGFloat
+    let blendSpacing: CGFloat
     let opticalNudge: CGFloat
     let reduceMotion: Bool
     let increasedContrast: Bool
@@ -206,52 +198,40 @@ private struct TransportRegion: View {
 
     var body: some View {
         Button(action: performAction) {
-            symbol
+            glyph
+                .frame(width: diameter, height: diameter)
+                .contentShape(.circle)
         }
-        .buttonStyle(
-            TransportRegionStyle(
-                minWidth: isPrimary ? metrics.primaryMinWidth : metrics.secondaryMinWidth,
-                reduceMotion: metrics.reduceMotion
-            )
-        )
+        .buttonStyle(TransportRegionStyle(reduceMotion: metrics.reduceMotion))
+        .glassEffect(glass, in: .circle)
         .accessibilityLabel(title)
         .accessibilityIdentifier(identifier)
     }
 
-    @ViewBuilder
-    private var symbol: some View {
-        switch role {
-        case let .primary(isPaused):
-            // The raised key names the primary action without a divider and carries the paused state.
-            ZStack {
-                Circle()
-                    .fill(SamadhiColor.ivory.opacity(keyFill(isPaused: isPaused)))
-                    .overlay {
-                        Circle()
-                            .strokeBorder(
-                                SamadhiColor.ivory.opacity(metrics.increasedContrast ? 0.46 : 0.24),
-                                lineWidth: 0.75
-                            )
-                    }
-                    .frame(width: metrics.keyDiameter, height: metrics.keyDiameter)
-                glyph(font: .title2.weight(.semibold))
-            }
-        case .secondary:
-            glyph(font: .title3.weight(.medium))
-        }
-    }
-
-    private func glyph(font: Font) -> some View {
+    private var glyph: some View {
         Image(systemName: systemImage)
-            .font(font)
-            .foregroundStyle(SamadhiColor.ivory)
+            .font(.system(size: diameter * (isPrimary ? 0.36 : 0.34), weight: isPrimary ? .bold : .semibold))
+            .foregroundStyle(glyphColor)
             // play.fill sits left of center inside its own box. This puts it back on the optical axis.
             .offset(x: systemImage == "play.fill" ? metrics.opticalNudge : 0)
     }
 
-    private func keyFill(isPaused: Bool) -> Double {
-        if metrics.increasedContrast { return isPaused ? 0.34 : 0.24 }
-        return isPaused ? 0.2 : 0.12
+    // The primary lens carries a light ivory tint so it reads as the brighter, nearer object; the
+    // secondaries stay clear glass so the field shows through them.
+    private var glass: Glass {
+        if isPrimary {
+            return .regular.tint(SamadhiColor.ivory.opacity(metrics.increasedContrast ? 0.92 : 0.5)).interactive()
+        }
+        return .regular.interactive()
+    }
+
+    private var glyphColor: Color {
+        if isPrimary { return SamadhiColor.ink }
+        return SamadhiColor.ivory.opacity(metrics.increasedContrast ? 1 : 0.92)
+    }
+
+    private var diameter: CGFloat {
+        isPrimary ? metrics.primaryDiameter : metrics.secondaryDiameter
     }
 
     private var isPrimary: Bool {
@@ -264,18 +244,20 @@ private struct TransportRegion: View {
     }
 }
 
+// A press has to be seen as well as felt. Interactive glass brightens and lenses on touch; on top
+// of that the whole control compresses on a quick spring and springs back on release, so the finger
+// gets an answer the moment it lands, not only when the action fires. Reduce Motion swaps the scale
+// for a plain dim with no animation.
 private struct TransportRegionStyle: ButtonStyle {
-    let minWidth: CGFloat
     let reduceMotion: Bool
 
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
-            .scaleEffect(configuration.isPressed && !reduceMotion ? 0.97 : 1)
-            .frame(minWidth: minWidth, maxWidth: .infinity, maxHeight: .infinity)
-            .background(SamadhiColor.ink.opacity(configuration.isPressed ? 0.08 : 0))
-            .contentShape(.rect)
+            .scaleEffect(configuration.isPressed && !reduceMotion ? 0.88 : 1)
+            .brightness(configuration.isPressed ? 0.06 : 0)
+            .opacity(configuration.isPressed && reduceMotion ? 0.72 : 1)
             .animation(
-                reduceMotion ? nil : .easeOut(duration: MotionToken.press),
+                reduceMotion ? nil : .spring(response: 0.22, dampingFraction: 0.55),
                 value: configuration.isPressed
             )
     }
@@ -335,6 +317,6 @@ private struct FinishControlStyle: ButtonStyle {
 
     private var strokeColor: Color {
         if armed { return SamadhiColor.ivory.opacity(increasedContrast ? 0.62 : 0.34) }
-        return SamadhiColor.ivory.opacity(increasedContrast ? 0.58 : 0.24)
+        return SamadhiColor.ivory.opacity(increasedContrast ? 0.58 : 0.3)
     }
 }

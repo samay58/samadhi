@@ -66,10 +66,11 @@ struct ActiveRunScreen: View {
                 )
 
             if transportControlsVisible || state.phase == .confirmingFinish {
-                // The bar keeps its place while Finish is armed so the hold control does not
-                // jump into the bar's slot and the two controls never overlap.
+                // Transport keeps its place while Finish is armed so the hold control does not
+                // jump into its slot. It dims instead of vanishing, so the armed state reads as
+                // focus on one control rather than a hole in the layout.
                 TransportControls(state: state, send: send)
-                    .opacity(state.phase == .confirmingFinish ? 0 : 1)
+                    .opacity(state.phase == .confirmingFinish ? 0.32 : 1)
                     .allowsHitTesting(state.phase != .confirmingFinish)
                     .accessibilityHidden(state.phase == .confirmingFinish)
                     .transition(.opacity.combined(with: .move(edge: .bottom)))
