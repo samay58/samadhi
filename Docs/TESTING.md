@@ -71,6 +71,8 @@ Domain tests cover:
 - Replacement, manual takeover, a lost Auto target, route loss, interruption, playback failure, finish, pause, and recovery each producing the intended cancel, preserve, or forget result, with no cue replayed after recovery
 - One selection tick for an accepted Previous or Next request and one soft impact when Finish arms
 - Song-change causes for an explicit Previous or Next, a natural end inside the 10-second window, and an outside change
+- Boundary look-ahead inside the last 45 seconds of a song: a queued song that fits stays, an unfit queued song with a fit available is replaced once and the choice is kept, an unfit queued song with no fit proceeds with the state saying so, the window is respected, the queue anchor stays on the song that was playing when a prepared song arrives, and an explicit Skip drops the plan (`RunReducerBoundaryLookAheadTests`)
+- The reach rule: a mostly-faster collection is named once after twenty held seconds and never again, the slower direction gets its own single notice, a reachable collection never speaks, Manual takeover pauses the count, and the direction follows the unreachable majority (`RunReducerReachTests`)
 
 Design tests cover clockwise and counterclockwise one-BPM detents, partial-turn accumulation, reverse hysteresis, direction reversal, angle wraparound, multiple revolutions, reset between gestures, exactly 30 BPM per revolution, and readiness feedback only for a genuine transition to a newly runnable import.
 
@@ -101,6 +103,19 @@ These generated fixtures validate the module seam. The opt-in `TempoCorpusValida
 
 The opt-in `TempoProbe` tool takes Apple catalog song identifiers, fetches each preview through the public lookup service, and prints the analyzer's decision, confidence, and strongest tempo candidates. It exists to explain a rejection, not to prove one; it is how the version 5 repair was found and checked. On 2026-08-19 it was run over the 48 songs of one real playlist and the 138 version 4 results cached on the phone: 41 of 48 ready where version 4 had 38, no song lost from the 48, and of the 138 cached answers 132 unchanged, 5 changed, 1 newly rejected. Every changed answer that could be checked against a public BPM listing matched the listing; the newly rejected one had been wrong under version 4.
 
+App-model tests add the run record and the feedback service: the buffer evicting per-second ticks before any story entry when a run outgrows it (oldest tick first, song changes and finish intact, `runDiagnosticsEvictPerSecondTicksBeforeTheStoryOfTheRun`), cue delivery and engine events written as their own entries with transaction identifier, moment, family, sound path, outcome, and detail (`runDiagnosticsRecordCueDeliveryAndEngineEvents`), and the service reporting every outcome through a fake player factory: played through the engine, local sound only, engine unavailable, pattern missing, a start the engine refused, and an arrival cancelled while held (`autoFeedbackServiceRecordsWhatBecameOfEveryCue`, `autoFeedbackServiceForwardsEngineEvents`).
+
+Run them with:
+
+~~~sh
+DEVELOPER_DIR=/Applications/Xcode-beta.app/Contents/Developer \
+  swift test --package-path Packages/SamadhiKit --filter "BoundaryLookAhead|Reach"
+DEVELOPER_DIR=/Applications/Xcode-beta.app/Contents/Developer \
+  xcodebuild test -project Samadhi.xcodeproj -scheme Samadhi \
+  -destination 'platform=iOS Simulator,name=iPhone 17 Pro,OS=latest' \
+  -only-testing:SamadhiTests -parallel-testing-enabled NO CODE_SIGNING_ALLOWED=NO
+~~~
+
 UI tests cover:
 
 - Complete golden run
@@ -118,6 +133,7 @@ UI tests cover:
 - Normal no-argument Simulator launch through local demo music and cadence lock
 - Hidden Debug screen with separate song BPM and step SPM, four Apple Music result states, fresh-song reset, accessibility XXXL, and Reduce Motion
 - The rebuilt transport bar and armed Finish control captured in five environments: normal, accessibility XXXL, Reduce Motion, Increased Contrast, and Reduced Transparency
+- The out-of-reach line from the `-SAMADHI_OUT_OF_REACH=faster` scripted walk, appearing once, leaving on its own, and not returning, in default, Reduce Motion, Increase Contrast, and accessibility L environments, plus the slower direction; and the Debug screen's `Next song` row and cue delivery section
 - An early Finish release that resets the fill with no animation, followed by a full hold that completes the run
 - A recorded pressed state for each transport region and for the whole hold, used to pull key frames at 30 fps
 

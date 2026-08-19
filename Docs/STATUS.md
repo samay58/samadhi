@@ -13,9 +13,12 @@
 | Playback range | The software candidate is 0.85 through 1.15 | Shared limits and endpoint tests across Auto, Manual, track fit, diagnostics, and player commands |
 | Tempo wheel | The wheel has a quiet close action with a separate 44-point touch target | Interface tests and inspected Simulator frames |
 | Transport and Finish | Previous, Pause or Resume, and Next are three separate interactive Liquid Glass circles, the primary one larger and tinted, each compressing on a spring when pressed. Finish is a quiet hairline button below the row that arms a hold whose fill is drawn inside the pill and clipped by its own capsule | Serial interface tests and fresh Simulator frames under `Evidence/Simulator/2026-08-19-transport-glass/` covering five environments; the earlier capsule bar and its hold contact sheets remain under the 2026-08-18 folder |
-| Auto feedback | The reducer owns one directional transaction per meaningful Auto change. Three prototype haptic families, six arrival sounds, and a hidden audition screen exist in the app | Domain, app-model, and packaged-asset tests. Nothing about tactile feel, sound quality, or Apple Music coexistence is physically proved |
+| Auto feedback | The reducer owns one directional transaction per meaningful Auto change. Three prototype haptic families, six arrival sounds, and a hidden audition screen exist in the app. Every cue the service handles now reports what became of it, and the haptic engine reports its lifecycle, into the run record | Domain, app-model, and packaged-asset tests, plus a fake-factory test for each delivery outcome. Nothing about tactile feel, sound quality, or Apple Music coexistence is physically proved; "played" is the engine's word |
+| Song boundaries | Inside the last 45 seconds of a song the reducer judges the queued next song against the settled Auto target and prepares one better fit when it cannot follow; a kept choice is not traded for a marginal one; Skip and Previous carry no plan | Reducer tests for the fitting, replaced, nothing-fits, window, anchor, and Skip cases. Not yet seen at a real boundary on the phone |
+| Reach | When fewer than a quarter of the ready songs can reach the settled target for twenty seconds, the run screen says so once per run per direction in plain words, then takes the line down itself | Reducer one-shot tests and Simulator frames in four environments under `Evidence/Simulator/2026-08-19-out-of-reach/`. Whether a runner reads it is physical |
+| Run record | 2,048 entries; per-second ticks are evicted first and the story of the run survives; schema 11 adds cue delivery, engine, next-song plan, and reach entries | A deterministic eviction test and a delivery-entry test. Under 3 MB for an hour |
 | Song-change cause | Every confirmed song change records a cause: natural end, an outside change, or an explicit Previous or Next | Pure attribution tests, scripted Simulator boundary events, and the Debug row `Last song change` |
-| Debug explanation | Debug builds show the exact source fingerprint, the full motion-to-music calculation, the Auto cue in flight, and the cause of the last song change | Build inspection, schema-version-10 diagnostic tests, and Simulator frames |
+| Debug explanation | Debug builds show the exact source fingerprint, the full motion-to-music calculation, the Auto cue in flight, the next-song outlook, the last three cue outcomes, and the cause of the last song change | Build inspection, schema-version-11 diagnostic tests, and Simulator frames |
 | Release isolation | Neither the hidden Debug screen nor the feedback audition screen ships in Release | Release binary strings and symbol counts read against the Debug dylib |
 
 ## What the phone has proved
@@ -26,15 +29,17 @@ Samay also felt Auto changing the music. The changes felt jarring and unexplaine
 
 The current candidate from `main` at `67adf80` is installed over Samadhi 1.0 build 1 with exact signing. The selected collection stayed byte-for-byte unchanged at SHA-256 `51b4096cc3b2c29ae32d85290b5a9f72166460f23b130d818508f7507b4e8397`. The phone was unlocked, so the hidden Debug screen was read on the device: its source fingerprint `8df37f8dca11dfa0ad38346b2ea2339a5d76c9a10c4a539b471d8a1ea7df02e6` equals the signed build. The new endpoints, the transport and Finish feel, the Auto cues, and the song-change causes have not produced an Apple Music reply, a listening result, or any physical judgment yet.
 
-The analyzer version 5 build `294981e` ran a real 441-second brisk walk with Easy Miles on 2026-08-19, average cadence 113 steps per minute, and its diagnostic file was pulled and parsed under `Evidence/Device/2026-08-19-walk-easy-miles/`. The record proves Auto settled once on Numb and wrote 0.90, that a natural boundary landed on a 163.75 BPM song the walk could not reach, and that the reducer emitted five start cues and three arrivals in the visible window. It does not prove any cue physically played: the service writes no delivery record, and the 512-entry buffer dropped the first 205 seconds and two songs. Samay reported feeling perhaps one haptic and being unable to tell when a change happened. Only 7 of the 41 ready songs can reach a walking cadence inside the rate window, so Auto held the 0.85 floor for most of the walk.
+The analyzer version 5 build `294981e` ran a real 441-second brisk walk with Easy Miles on 2026-08-19, average cadence 113 steps per minute, and its diagnostic file was pulled and parsed under `Evidence/Device/2026-08-19-walk-easy-miles/`. The record proves Auto settled once on Numb and wrote 0.90, that a natural boundary landed on a 163.75 BPM song the walk could not reach, and that the reducer emitted five start cues and three arrivals in the visible window. It does not prove any cue physically played: that build's service wrote no delivery record, and its 512-entry buffer dropped the first 205 seconds and one song. Samay reported feeling perhaps one haptic and being unable to tell when a change happened. Only 7 of the 41 ready songs can reach a walking cadence inside the rate window, so Auto held the 0.85 floor for most of the walk.
+
+The four software gaps that walk exposed are repaired on `main` as of later the same day and installed on the phone (see the gate below). The repair build has not yet walked.
 
 ## Current software gate
 
 - Project generation passed.
 - Formatter lint passed.
-- 181 Swift package tests passed.
-- 44 app-model tests passed.
-- 32 serial interface tests passed.
+- 193 Swift package tests passed.
+- 48 app-model tests passed.
+- 34 serial interface tests passed.
 - Source-fingerprint tests passed.
 - Resource-inclusive Debug and Release Simulator builds passed.
 - The hidden Debug screen was absent from Release.
@@ -55,12 +60,12 @@ The whole physical list is written as one ordered checklist in [PHONE-CHECK-2026
 - Run a clean walking-only check. The 90 SPM floor and five-second walking delay are software choices, not physically tuned constants.
 - Check whether steady lifting motion can falsely look like walking. Samadhi does not need a lifting mode.
 - Complete one 20-minute outdoor run.
-- Repair what the August 19 walk exposed before the next physical run: keep song changes, rate writes, mode changes, and cues out of the buffer eviction; record whether each cue played, fell back, or found no engine; prepare a fitting next song before a natural boundary when the queued song cannot reach the settled target; and say once, plainly, when a collection is mostly out of reach at the current cadence.
+- Walk Easy Miles again on the repair build for at least ten minutes with the phone in the pocket and the screen locked part of the time, then pull the record: it should hold the whole walk, say which cues played and which found no engine, show a prepared song at any natural boundary the queue could not follow, and carry one reach notice. Whether the cues were felt is still the hand's to say.
 
 ## Where we left off
 
 The transport and Finish pass, deterministic song-change causes, and the first directional Auto feedback prototype are merged on `main`, pass the software gate, and are installed on the phone with the in-app fingerprint confirmed on 2026-08-19. Endpoint read-back and listening at 0.85 and 1.15 are still open from the previous candidate and carry over.
 
-The next step is the checklist in [PHONE-CHECK-2026-08-19.md](PHONE-CHECK-2026-08-19.md) from step 2 onward: endpoint listening, transport and Finish feel, blinded direction trials, song-change causes, and lock, call, and route recovery. After that check, the next Main Thing is the 20-minute outdoor run.
+The next step is the same walk again on the repair build, so the complete record can say what the August 19 walk could not. After that, the checklist in [PHONE-CHECK-2026-08-19.md](PHONE-CHECK-2026-08-19.md) from step 2 onward: endpoint listening, transport and Finish feel, blinded direction trials, song-change causes, and lock, call, and route recovery. After that check, the next Main Thing is the 20-minute outdoor run.
 
 Historical implementation detail lives in [PROGRESS.md](PROGRESS.md). Product choices live in [DECISIONS.md](DECISIONS.md). Exact checks and proof limits live in [TESTING.md](TESTING.md).

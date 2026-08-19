@@ -96,6 +96,29 @@ Every physical judgment in `Docs/PHONE-CHECK-2026-08-19.md` is still open. Physi
 
 Later on 2026-08-19, commit `13e88bf` (three interactive glass transport circles, catalog explicit versus clean tie fix, 44 app-model tests) passed the same software gate and was installed in place with the same profile. Built fingerprint `085e5fe7b0e080a19efe281bd69fa5ebaeab00e0d082bc64701cd03d98de4f82`; selected collection unchanged at `524c641b...`; the same fingerprint was then read back on the phone's hidden Debug screen.
 
+## 2026-08-19 walk repair candidate
+
+The run record that evicts ticks first, the cue delivery record, the boundary look-ahead, and the one reach line. Software gate run on 2026-08-19 after the Easy Miles walk.
+
+| Check | Result |
+| --- | --- |
+| `./Scripts/bootstrap.sh` | Passed |
+| Swift formatter lint | Passed |
+| Swift package tests | 193 passed |
+| App-model tests | 48 passed |
+| UI tests, serial | 34 passed |
+| Source-fingerprint tests | Passed |
+| Preserved handoff source and addendum hashes | Untouched; nothing under `original/` was opened for writing |
+| Commit built for the phone | Recorded in the install commit that follows this gate, `main`, clean |
+| Profile | `Samadhi Development 2026-08-15`, UUID `1b613344-c5cd-4802-a31f-9ff5088c1802`, expires 2027-08-15 |
+| Application identifier | `ZL5U59XBJ6.com.samaydhawan.Samadhi` in the embedded profile and the signature |
+| Strict signature verification | Recorded in the install commit that follows this gate |
+| Built Info.plist source fingerprint | Recorded in the install commit that follows this gate, equal to `Scripts/source-fingerprint.sh` |
+| Install | Recorded in the install commit that follows this gate |
+| Selected collection SHA-256 before and after | Recorded in the install commit that follows this gate |
+| In-app read-back | Recorded in the install commit that follows this gate |
+| Evidence | `Evidence/Device/2026-08-19-walk-repair-install/` and `Evidence/Simulator/2026-08-19-out-of-reach/` |
+
 ## Review artifacts
 
 - `MANIFEST.md`: exact-source receipt.
