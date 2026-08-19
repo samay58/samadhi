@@ -862,7 +862,8 @@ private let slowTrack = MusicTrack(
             operationID: 999,
             trackIndex: 1,
             elapsedSeconds: 42,
-            durationSeconds: 180
+            durationSeconds: 180,
+            selectionID: 900
         )
     ).0
     #expect(stale == state)
@@ -874,7 +875,8 @@ private let slowTrack = MusicTrack(
             operationID: 1,
             trackIndex: 1,
             elapsedSeconds: 42,
-            durationSeconds: 180
+            durationSeconds: 180,
+            selectionID: 900
         )
     ).0
     #expect(current.session?.trackIndex == 1)

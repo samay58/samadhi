@@ -76,6 +76,27 @@ public struct TrackMatchPlanner: Sendable {
         return cost(current) <= cost(best) + currentTrackRetention ? current : best
     }
 
+    // Whether one song can carry this cadence inside the rate window. Nil means the song cannot.
+    public func fit(of track: MusicTrack, requestedBPM: Double) -> TrackTempoMatch? {
+        guard TempoEnvelope.locomotionCadenceSPM.contains(requestedBPM),
+            minimumRate > 0,
+            minimumRate <= maximumRate
+        else { return nil }
+        return match(for: track, at: 0, requestedBPM: requestedBPM)
+    }
+
+    // The closest step rhythm this song can reach for the request, even when that is not close
+    // enough to count as a fit. Reach reporting uses its sign to say which way the song misses.
+    public func nearestAchievableCadenceBPM(for track: MusicTrack, requestedBPM: Double) -> Double? {
+        guard let tempo = track.tempo, minimumRate > 0, minimumRate <= maximumRate else { return nil }
+        return tempo.cadenceProjections
+            .map { projection in
+                let rate = min(max(requestedBPM / projection.cadencePulseBPM, minimumRate), maximumRate)
+                return projection.cadencePulseBPM * rate
+            }
+            .min { abs($0 - requestedBPM) < abs($1 - requestedBPM) }
+    }
+
     // Cadence error is scored against the tolerance that admitted the match, so widening the
     // tolerance cannot leave the ranking normalized against a stale constant.
     private func cost(_ match: TrackTempoMatch) -> Double {

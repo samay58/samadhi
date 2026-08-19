@@ -81,6 +81,7 @@ public struct RunReducer: Sendable {
             session.currentTrackID = trackID
             if let index = tracks.firstIndex(where: { $0.id == trackID }) {
                 session.trackIndex = index
+                session.queueAnchorIndex = index
             }
             switch preparation.stage {
             case .playback(.adaptive):
@@ -472,7 +473,8 @@ public struct RunReducer: Sendable {
                 operationID,
                 trackIndex,
                 elapsedSeconds,
-                durationSeconds
+                durationSeconds,
+                selectionID
             )
         ):
             guard active.session.id == sessionID,
@@ -486,7 +488,15 @@ public struct RunReducer: Sendable {
             }
             next.session.trackElapsedSeconds = max(elapsedSeconds, 0)
             next.session.trackDurationSeconds = max(durationSeconds, 0)
-            return (.active(next), [])
+            // Progress is what says how close the boundary is, so the look-ahead runs here too.
+            guard case .playing = next.activity else { return (.active(next), []) }
+            let transition = planTrackTransition(
+                session: next.session,
+                deltaSeconds: 0,
+                selectionID: selectionID
+            )
+            next.session = transition.session
+            return (.active(next), transition.effects)
 
         case let (
             .active(active),
@@ -574,6 +584,15 @@ public struct RunReducer: Sendable {
             if next.session.trackIndex != trackIndex {
                 next.session.songCount += 1
             }
+            // A song Samadhi prepared was slotted in after the one that was playing, so the queue
+            // still continues after that one. Any other arrival moves the anchor with it.
+            let arrivedOnPreparedSong =
+                active.session.preparedNextTrackID == trackID
+                && (reason == .naturalBoundary || reason == .explicitSkip)
+            if !arrivedOnPreparedSong {
+                next.session.queueAnchorIndex = trackIndex
+            }
+            next.session.nextSongOutlook = .notYetKnown
             next.session.trackIndex = trackIndex
             next.session.currentTrackID = trackID
             next.session.lastTrackChangeReason = reason
