@@ -24,7 +24,7 @@ The August 17 workout came from an exact-profile build with a matching source fi
 
 Samay also felt Auto changing the music. The changes felt jarring and unexplained. The workout mixed walking, light jogging, and lifting, so it does not prove the best walking threshold or how much time belonged to each activity.
 
-The expanded 0.85 through 1.15 candidate is installed over Samadhi 1.0 build 1 with exact signing. The selected collection stayed byte-for-byte unchanged at SHA-256 `81a9b31fbc115d607bc766dd25374ecff6874b079276b68c3719cb122cea3f52`. The phone locked before launch, so the new endpoints have not produced an in-app fingerprint read-back, Apple Music reply, or listening result.
+The current candidate from `main` at `67adf80` is installed over Samadhi 1.0 build 1 with exact signing. The selected collection stayed byte-for-byte unchanged at SHA-256 `51b4096cc3b2c29ae32d85290b5a9f72166460f23b130d818508f7507b4e8397`. The phone was unlocked, so the hidden Debug screen was read on the device: its source fingerprint `8df37f8dca11dfa0ad38346b2ea2339a5d76c9a10c4a539b471d8a1ea7df02e6` equals the signed build. The new endpoints, the transport and Finish feel, the Auto cues, and the song-change causes have not produced an Apple Music reply, a listening result, or any physical judgment yet.
 
 ## Current software gate
 
@@ -37,15 +37,14 @@ The expanded 0.85 through 1.15 candidate is installed over Samadhi 1.0 build 1 w
 - Resource-inclusive Debug and Release Simulator builds passed.
 - The hidden Debug screen was absent from Release.
 - The feedback audition screen was absent from Release. The Debug side of that check reads `Samadhi.app/Samadhi.debug.dylib`, because the Debug `Samadhi.app/Samadhi` is a launcher stub.
-- This candidate has no phone build, so it has no recorded in-app source fingerprint.
-- The last physical build used exact profile `Samadhi Development 2026-08-15`, which expires August 15, 2027.
+- This candidate was built for the phone with exact profile `Samadhi Development 2026-08-15`, which expires August 15, 2027, installed in place on 2026-08-19, and read back on the device: in-app source fingerprint `8df37f8dca11dfa0ad38346b2ea2339a5d76c9a10c4a539b471d8a1ea7df02e6`, matching the built Info.plist.
 - The embedded profile and app signature both use `ZL5U59XBJ6.com.samaydhawan.Samadhi`.
+- The `Samadhi Feedback Audition` scheme builds for the phone from the same bundle with the same fingerprint.
 
 ## Still open
 
-The whole physical list is written as one ordered checklist in [PHONE-CHECK-2026-08-19.md](PHONE-CHECK-2026-08-19.md). Nothing from this candidate is on the phone yet.
+The whole physical list is written as one ordered checklist in [PHONE-CHECK-2026-08-19.md](PHONE-CHECK-2026-08-19.md). The candidate is installed and its fingerprint is confirmed; every item below is still a body, ear, or real Apple Music judgment.
 
-- Build this candidate with the exact profile, install it in place, launch it, and confirm the in-app source fingerprint.
 - Get Apple Music read-back at 0.85 and 1.15, then judge both endpoints through headphones for a full musical section.
 - Judge transport and Finish by hand: press response, one tick per Previous or Next, arming, early release, and one completed hold.
 - Run the blinded faster and slower trials for all three prototype families on both sound paths, and listen for ducking, gaps, or a route change while Apple Music plays.
@@ -57,8 +56,8 @@ The whole physical list is written as one ordered checklist in [PHONE-CHECK-2026
 
 ## Where we left off
 
-The transport and Finish pass, deterministic song-change causes, and the first directional Auto feedback prototype are merged on `main` and pass the software gate. No phone build was made this session, so nothing from this candidate is installed and no in-app fingerprint exists for it. Endpoint read-back and listening at 0.85 and 1.15 are still open from the previous candidate and carry over.
+The transport and Finish pass, deterministic song-change causes, and the first directional Auto feedback prototype are merged on `main`, pass the software gate, and are installed on the phone with the in-app fingerprint confirmed on 2026-08-19. Endpoint read-back and listening at 0.85 and 1.15 are still open from the previous candidate and carry over.
 
-The next step is the checklist in [PHONE-CHECK-2026-08-19.md](PHONE-CHECK-2026-08-19.md): fingerprint, endpoint listening, transport and Finish feel, blinded direction trials, song-change causes, and lock, call, and route recovery. After that check, the next Main Thing is the 20-minute outdoor run.
+The next step is the checklist in [PHONE-CHECK-2026-08-19.md](PHONE-CHECK-2026-08-19.md) from step 2 onward: endpoint listening, transport and Finish feel, blinded direction trials, song-change causes, and lock, call, and route recovery. After that check, the next Main Thing is the 20-minute outdoor run.
 
 Historical implementation detail lives in [PROGRESS.md](PROGRESS.md). Product choices live in [DECISIONS.md](DECISIONS.md). Exact checks and proof limits live in [TESTING.md](TESTING.md).

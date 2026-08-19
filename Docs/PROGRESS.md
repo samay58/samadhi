@@ -585,6 +585,16 @@ This checkpoint recorded a passing local candidate before its exact-profile buil
 - Made no phone build and installed nothing, so no source fingerprint exists for this candidate
 - Recovered from the MacBook data volume reaching 100 percent by deleting XCTestDevices clones and two stale DerivedData folders, which left 29 GiB free
 
+## 2026-08-19. Phone install of the candidate
+
+- Verified `main` and `origin/main` at `67adf80`, a clean tree, one worktree, and no leftover packet branches before building
+- Built the `Samadhi` scheme for the paired iPhone with exact profile `Samadhi Development 2026-08-15`, UUID `1b613344-c5cd-4802-a31f-9ff5088c1802`, and confirmed `ZL5U59XBJ6.com.samaydhawan.Samadhi` in the embedded profile and the signature entitlements
+- Confirmed the built Info.plist fingerprint `8df37f8dca11dfa0ad38346b2ea2339a5d76c9a10c4a539b471d8a1ea7df02e6` equals `Scripts/source-fingerprint.sh` on the same checkout
+- Installed in place over Samadhi 1.0 (1) without uninstalling; the selected collection stayed byte-identical at SHA-256 `51b4096c...`, a value the app itself had rewritten on August 18 after the previous install
+- Launched the app on the unlocked phone, opened the hidden Debug screen with `--core-diagnostics`, captured it with `devicectl`, and read the same fingerprint in the app
+- Built the `Samadhi Feedback Audition` scheme for the phone from the same bundle and did not install it separately
+- Recorded the install in `Evidence/Device/2026-08-19-phone-install/` with the Debug screenshot and no song or playlist names
+
 ## Current checkpoint
 
-The transport and Finish pass, deterministic song-change causes, and the first directional Auto feedback prototype are merged on `main` and pass the software gate. No phone build happened this session, so nothing from this candidate is installed. Endpoint read-back and listening at 0.85 and 1.15 carry over from the previous candidate, and tactile feel, sound quality, locked-screen delivery, and Apple Music coexistence have no result at all. The next step is the ordered checklist in [PHONE-CHECK-2026-08-19.md](PHONE-CHECK-2026-08-19.md). After it, the next Main Thing is the 20-minute outdoor run.
+The transport and Finish pass, deterministic song-change causes, and the first directional Auto feedback prototype are merged on `main`, pass the software gate, and are installed on the phone with the in-app fingerprint confirmed. Endpoint read-back and listening at 0.85 and 1.15 carry over from the previous candidate, and tactile feel, sound quality, locked-screen delivery, and Apple Music coexistence have no result at all. The next step is the ordered checklist in [PHONE-CHECK-2026-08-19.md](PHONE-CHECK-2026-08-19.md) from step 2 onward. After it, the next Main Thing is the 20-minute outdoor run.
