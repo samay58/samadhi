@@ -1,0 +1,55 @@
+{
+  "Version": 1.0,
+  "Metadata": {
+    "Project": "Samadhi",
+    "Created": "2026-08-18",
+    "Description": "pulse slower small. Falling two-pulse start. Firm anchor, then a softer longer release."
+  },
+  "Pattern": [
+    {
+      "Event": {
+        "Time": 0.0,
+        "EventType": "HapticTransient",
+        "EventParameters": [
+          {
+            "ParameterID": "HapticIntensity",
+            "ParameterValue": 0.45
+          },
+          {
+            "ParameterID": "HapticSharpness",
+            "ParameterValue": 0.42
+          }
+        ]
+      }
+    },
+    {
+      "Event": {
+        "Time": 0.075,
+        "EventType": "HapticContinuous",
+        "EventDuration": 0.135,
+        "EventParameters": [
+          {
+            "ParameterID": "HapticIntensity",
+            "ParameterValue": 0.2025
+          },
+          {
+            "ParameterID": "HapticSharpness",
+            "ParameterValue": 0.08
+          },
+          {
+            "ParameterID": "AttackTime",
+            "ParameterValue": 0.02
+          },
+          {
+            "ParameterID": "ReleaseTime",
+            "ParameterValue": 0.09
+          },
+          {
+            "ParameterID": "Sustained",
+            "ParameterValue": 0
+          }
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,42 @@
+{
+  "Version": 1.0,
+  "Metadata": {
+    "Project": "Samadhi",
+    "Created": "2026-08-18",
+    "Description": "pulse faster large. Rising two-pulse start. Light anchor, then a firmer sharper pulse."
+  },
+  "Pattern": [
+    {
+      "Event": {
+        "Time": 0.0,
+        "EventType": "HapticTransient",
+        "EventParameters": [
+          {
+            "ParameterID": "HapticIntensity",
+            "ParameterValue": 0.551
+          },
+          {
+            "ParameterID": "HapticSharpness",
+            "ParameterValue": 0.22
+          }
+        ]
+      }
+    },
+    {
+      "Event": {
+        "Time": 0.11,
+        "EventType": "HapticTransient",
+        "EventParameters": [
+          {
+            "ParameterID": "HapticIntensity",
+            "ParameterValue": 0.95
+          },
+          {
+            "ParameterID": "HapticSharpness",
+            "ParameterValue": 0.55
+          }
+        ]
+      }
+    }
+  ]
+}

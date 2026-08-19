@@ -331,23 +331,14 @@ extension RunReducer {
         )
         next.adaptationState = decision.nextState
 
-        guard requireReadback || abs(decision.commandedRate - rampOriginRate) > 0.000_1 else {
-            if decision.isTrackCompatible, session.pendingRateRequestID == nil {
-                next.adaptationState.commandStatus = .applied
-                next.adaptationState.appliedRateReadback = session.appliedPlaybackRate
-                next.adaptationState.achievableBPM = decision.requestedBPM
-            }
-            return (next, [])
-        }
-
-        next.adaptationState.commandStatus = .applying
-        next.adaptationState.appliedRateReadback = nil
-        next.adaptationState.commandLatencySeconds = nil
-        next.pendingRateRequestID = rateRequestID
-        next.pendingCommandedRate = decision.commandedRate
-        return (
-            next,
-            [
+        var effects: [RunEffect] = []
+        if requireReadback || abs(decision.commandedRate - rampOriginRate) > 0.000_1 {
+            next.adaptationState.commandStatus = .applying
+            next.adaptationState.appliedRateReadback = nil
+            next.adaptationState.commandLatencySeconds = nil
+            next.pendingRateRequestID = rateRequestID
+            next.pendingCommandedRate = decision.commandedRate
+            effects.append(
                 .setPlaybackRate(
                     sessionID: session.id,
                     operationID: session.playbackOperationID,
@@ -355,8 +346,15 @@ extension RunReducer {
                     trackID: trackID,
                     rate: decision.commandedRate
                 )
-            ]
-        )
+            )
+        } else if decision.isTrackCompatible, session.pendingRateRequestID == nil {
+            next.adaptationState.commandStatus = .applied
+            next.adaptationState.appliedRateReadback = session.appliedPlaybackRate
+            next.adaptationState.achievableBPM = decision.requestedBPM
+        }
+
+        effects.append(contentsOf: updateAutoFeedback(session: &next))
+        return (next, effects)
     }
 
     private func planTrackTransition(

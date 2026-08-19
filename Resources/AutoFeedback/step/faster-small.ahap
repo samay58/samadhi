@@ -1,0 +1,58 @@
+{
+  "Version": 1.0,
+  "Metadata": {
+    "Project": "Samadhi",
+    "Created": "2026-08-18",
+    "Description": "step faster small. Rising three-step start. Gaps tighten while each step gains weight."
+  },
+  "Pattern": [
+    {
+      "Event": {
+        "Time": 0.0,
+        "EventType": "HapticTransient",
+        "EventParameters": [
+          {
+            "ParameterID": "HapticIntensity",
+            "ParameterValue": 0.27
+          },
+          {
+            "ParameterID": "HapticSharpness",
+            "ParameterValue": 0.25
+          }
+        ]
+      }
+    },
+    {
+      "Event": {
+        "Time": 0.065,
+        "EventType": "HapticTransient",
+        "EventParameters": [
+          {
+            "ParameterID": "HapticIntensity",
+            "ParameterValue": 0.36
+          },
+          {
+            "ParameterID": "HapticSharpness",
+            "ParameterValue": 0.4
+          }
+        ]
+      }
+    },
+    {
+      "Event": {
+        "Time": 0.125,
+        "EventType": "HapticTransient",
+        "EventParameters": [
+          {
+            "ParameterID": "HapticIntensity",
+            "ParameterValue": 0.45
+          },
+          {
+            "ParameterID": "HapticSharpness",
+            "ParameterValue": 0.6
+          }
+        ]
+      }
+    }
+  ]
+}

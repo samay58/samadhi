@@ -38,7 +38,9 @@ struct RootView: View {
     @ViewBuilder
     private var rootContent: some View {
         #if DEBUG
-            if ProcessInfo.processInfo.arguments.contains("--music-feasibility") {
+            if SimulationConfiguration.current.feedbackAudition {
+                FeedbackAuditionView()
+            } else if ProcessInfo.processInfo.arguments.contains("--music-feasibility") {
                 MusicKitFeasibilityView()
             } else if let status = diagnosticFixtureStatus {
                 CoreLoopDiagnosticsView(presentation: .fixture(status))

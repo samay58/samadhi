@@ -1,0 +1,231 @@
+{
+  "generator": "Scripts/generate-auto-feedback-sounds.py",
+  "status": "offline prototype, not an approved product sound",
+  "third_party_material": "none",
+  "sample_rate_hz": 48000,
+  "channels": 1,
+  "bit_depth": 16,
+  "peak_target_dbfs": -9.0,
+  "second_harmonic_gain": 0.18,
+  "root_hz": 294.0,
+  "fourth_hz": 392.0,
+  "fifth_hz": 441.0,
+  "files": [
+    {
+      "file": "pulse/arrival-faster.wav",
+      "family": "pulse",
+      "direction": "faster",
+      "material": "two short soft tones a fifth apart",
+      "sample_rate_hz": 48000,
+      "channels": 1,
+      "bit_depth": 16,
+      "frames": 14880,
+      "duration_seconds": 0.31,
+      "peak_dbfs": -9.0,
+      "rms_dbfs": -20.564,
+      "sha256": "931489e1cce2e6fc7d1bf4fe571f7e360393940571ddfd6b797d0730e7610ae3",
+      "segments": [
+        {
+          "start": 0.0,
+          "duration": 0.13,
+          "start_hz": 294.0,
+          "end_hz": 294.0,
+          "gain_start": 0.75,
+          "gain_end": 0.75,
+          "attack": 0.012,
+          "tau": 0.045
+        },
+        {
+          "start": 0.15,
+          "duration": 0.16,
+          "start_hz": 441.0,
+          "end_hz": 441.0,
+          "gain_start": 1.0,
+          "gain_end": 1.0,
+          "attack": 0.01,
+          "tau": 0.055
+        }
+      ]
+    },
+    {
+      "file": "pulse/arrival-slower.wav",
+      "family": "pulse",
+      "direction": "slower",
+      "material": "two short soft tones a fifth apart",
+      "sample_rate_hz": 48000,
+      "channels": 1,
+      "bit_depth": 16,
+      "frames": 16320,
+      "duration_seconds": 0.34,
+      "peak_dbfs": -9.0,
+      "rms_dbfs": -21.012,
+      "sha256": "feb673af3043aac44eed16bdd9495e33aaaffc6fb2e0a91155ec9f03468e5e97",
+      "segments": [
+        {
+          "start": 0.0,
+          "duration": 0.13,
+          "start_hz": 441.0,
+          "end_hz": 441.0,
+          "gain_start": 1.0,
+          "gain_end": 1.0,
+          "attack": 0.01,
+          "tau": 0.045
+        },
+        {
+          "start": 0.15,
+          "duration": 0.19,
+          "start_hz": 294.0,
+          "end_hz": 294.0,
+          "gain_start": 0.7,
+          "gain_end": 0.7,
+          "attack": 0.014,
+          "tau": 0.07
+        }
+      ]
+    },
+    {
+      "file": "step/arrival-faster.wav",
+      "family": "step",
+      "direction": "faster",
+      "material": "three stepped tones through root, fourth, fifth",
+      "sample_rate_hz": 48000,
+      "channels": 1,
+      "bit_depth": 16,
+      "frames": 16800,
+      "duration_seconds": 0.35,
+      "peak_dbfs": -9.0,
+      "rms_dbfs": -19.827,
+      "sha256": "49b8037a838e1e3d7a4d2f56567c8a9561c8222bd105762c3d09bb628edbe88d",
+      "segments": [
+        {
+          "start": 0.0,
+          "duration": 0.14,
+          "start_hz": 294.0,
+          "end_hz": 294.0,
+          "gain_start": 0.7,
+          "gain_end": 0.7,
+          "attack": 0.01,
+          "tau": 0.048
+        },
+        {
+          "start": 0.1,
+          "duration": 0.14,
+          "start_hz": 392.0,
+          "end_hz": 392.0,
+          "gain_start": 0.85,
+          "gain_end": 0.85,
+          "attack": 0.009,
+          "tau": 0.048
+        },
+        {
+          "start": 0.2,
+          "duration": 0.15,
+          "start_hz": 441.0,
+          "end_hz": 441.0,
+          "gain_start": 1.0,
+          "gain_end": 1.0,
+          "attack": 0.009,
+          "tau": 0.06
+        }
+      ]
+    },
+    {
+      "file": "step/arrival-slower.wav",
+      "family": "step",
+      "direction": "slower",
+      "material": "three stepped tones through root, fourth, fifth",
+      "sample_rate_hz": 48000,
+      "channels": 1,
+      "bit_depth": 16,
+      "frames": 18000,
+      "duration_seconds": 0.375,
+      "peak_dbfs": -9.0,
+      "rms_dbfs": -19.844,
+      "sha256": "6adca6c4fbb51364d3aa425950a4d827d7cfd9f971226001283f2b2f721159e8",
+      "segments": [
+        {
+          "start": 0.0,
+          "duration": 0.14,
+          "start_hz": 441.0,
+          "end_hz": 441.0,
+          "gain_start": 1.0,
+          "gain_end": 1.0,
+          "attack": 0.009,
+          "tau": 0.048
+        },
+        {
+          "start": 0.105,
+          "duration": 0.14,
+          "start_hz": 392.0,
+          "end_hz": 392.0,
+          "gain_start": 0.85,
+          "gain_end": 0.85,
+          "attack": 0.01,
+          "tau": 0.048
+        },
+        {
+          "start": 0.215,
+          "duration": 0.16,
+          "start_hz": 294.0,
+          "end_hz": 294.0,
+          "gain_start": 0.7,
+          "gain_end": 0.7,
+          "attack": 0.014,
+          "tau": 0.068
+        }
+      ]
+    },
+    {
+      "file": "swell/arrival-faster.wav",
+      "family": "swell",
+      "direction": "faster",
+      "material": "one gliding tone across a fifth",
+      "sample_rate_hz": 48000,
+      "channels": 1,
+      "bit_depth": 16,
+      "frames": 15360,
+      "duration_seconds": 0.32,
+      "peak_dbfs": -9.0,
+      "rms_dbfs": -17.339,
+      "sha256": "52fdc7895d2404b3208cbc8e91cb405dd976d2acd2008201fcc48aef03ebd29f",
+      "segments": [
+        {
+          "start": 0.0,
+          "duration": 0.32,
+          "start_hz": 294.0,
+          "end_hz": 441.0,
+          "gain_start": 0.62,
+          "gain_end": 1.0,
+          "attack": 0.015,
+          "tau": 0.15
+        }
+      ]
+    },
+    {
+      "file": "swell/arrival-slower.wav",
+      "family": "swell",
+      "direction": "slower",
+      "material": "one gliding tone across a fifth",
+      "sample_rate_hz": 48000,
+      "channels": 1,
+      "bit_depth": 16,
+      "frames": 16320,
+      "duration_seconds": 0.34,
+      "peak_dbfs": -9.0,
+      "rms_dbfs": -19.877,
+      "sha256": "57bef5665ebdaf0a6265a335b41ad30de82a0872422b0d935383f0bb5039c221",
+      "segments": [
+        {
+          "start": 0.0,
+          "duration": 0.34,
+          "start_hz": 441.0,
+          "end_hz": 294.0,
+          "gain_start": 1.0,
+          "gain_end": 0.6,
+          "attack": 0.012,
+          "tau": 0.13
+        }
+      ]
+    }
+  ]
+}

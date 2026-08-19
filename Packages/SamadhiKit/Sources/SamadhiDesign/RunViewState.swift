@@ -162,6 +162,7 @@ public struct RunViewState: Sendable, Equatable {
     public var track: TrackMetadata
     public var hasArtwork: Bool
     public var showLockBrief: Bool
+    public var finishHoldPressing: Bool
     public var forceReduceMotion: Bool
     public var forceIncreasedContrast: Bool
     public var musicSelection: MusicSelectionPresentation
@@ -176,6 +177,7 @@ public struct RunViewState: Sendable, Equatable {
         track: TrackMetadata = .demoTracks[0],
         hasArtwork: Bool = true,
         showLockBrief: Bool = false,
+        finishHoldPressing: Bool = false,
         forceReduceMotion: Bool = false,
         forceIncreasedContrast: Bool = false,
         rhythmControl: RhythmControlPresentation = RhythmControlPresentation(),
@@ -197,6 +199,7 @@ public struct RunViewState: Sendable, Equatable {
         self.track = track
         self.hasArtwork = hasArtwork
         self.showLockBrief = showLockBrief
+        self.finishHoldPressing = finishHoldPressing
         self.forceReduceMotion = forceReduceMotion
         self.forceIncreasedContrast = forceIncreasedContrast
         self.rhythmControl = rhythmControl

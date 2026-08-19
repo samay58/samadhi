@@ -173,6 +173,57 @@ public final class SimulatedMusicPlayer: MusicPlaybackProviding {
         )
     }
 
+    // Scripted events. The player stays deterministic: it never decides when a boundary or an
+    // interruption happens, the app shell does, from its launch configuration.
+    public func simulateNaturalBoundary(operationID: Int) {
+        guard isCurrent(operationID), let collection else { return }
+        trackIndex = preparedNextTrackIndex ?? (trackIndex + 1) % collection.tracks.count
+        preparedNextTrackIndex = nil
+        continuation?.yield(
+            .trackChanged(
+                operationID: operationID,
+                trackID: collection.tracks[trackIndex].id,
+                reason: .naturalBoundary
+            )
+        )
+    }
+
+    // Control Center, the Music app, or a headphone button moved the queue. Samadhi's prepared next
+    // entry is not consumed because Samadhi did not ask for this change.
+    public func simulateExternalBoundary(operationID: Int) {
+        guard isCurrent(operationID), let collection else { return }
+        trackIndex = (trackIndex + 1) % collection.tracks.count
+        continuation?.yield(
+            .trackChanged(
+                operationID: operationID,
+                trackID: collection.tracks[trackIndex].id,
+                reason: .externalUnknown
+            )
+        )
+    }
+
+    public func simulateInterruption(operationID: Int) {
+        guard isCurrent(operationID) else { return }
+        continuation?.yield(.interruptionBegan(operationID: operationID))
+    }
+
+    public func simulateInterruptionEnded(operationID: Int) {
+        guard isCurrent(operationID) else { return }
+        continuation?.yield(.interruptionEnded(operationID: operationID))
+    }
+
+    // The player can report the entry it is already on. Nothing about the song changed.
+    public func simulateSameSongCallback(operationID: Int) {
+        guard isCurrent(operationID), let collection else { return }
+        continuation?.yield(
+            .trackChanged(
+                operationID: operationID,
+                trackID: collection.tracks[trackIndex].id,
+                reason: .explicitSkip
+            )
+        )
+    }
+
     public func stop(operationID: Int) {
         guard isCurrent(operationID) else { return }
         continuation?.yield(.stateChanged(operationID: operationID, state: .stopped))

@@ -104,6 +104,8 @@ The interaction is calm and the mechanical loop works, but the core feeling is n
 
 The current software candidate accepts steady movement from 90 through 210 SPM. Walking needs five seconds of steady evidence. Running can settle after the motion filter locks. Broken gym movement does not build a target, and raw cadence cannot change the music before the separate Auto target settles. The next physical check must prove that this feels useful during clean walking and does not react to lifting.
 
+The run controls are now one glass capsule bar with a quiet hold-to-finish below it, and the two causes of the reported Finish border overflow were reproduced on video and removed. Every confirmed song change records whether it was a natural end, an outside change, or an explicit Previous or Next. The directional Auto feedback from the workout complaint now exists as a prototype: the app decides when one cue is valid and can play three haptic families with paired arrival sounds. None of that has been felt or heard. Press feel, tactile recognition, sound quality against real music, and locked-screen delivery are all unproved, and no family has been chosen.
+
 The current candidate can change one song from 85 to 115 percent of normal speed. This gives Auto and Manual more useful reach without changing songs as often. The app ramps an automatic change by at most two percentage points per second, so moving from normal speed to either endpoint takes at most eight seconds. Correct commands and Apple Music read-back are software and device checks. Clean sound at the new endpoints still requires Samay's listening approval.
 
 ## Current exclusions

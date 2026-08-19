@@ -19,6 +19,14 @@ targets:
       - App
       - path: Resources
         buildPhase: resources
+        excludes:
+          - "AutoFeedback"
+          - "AutoFeedback/**"
+      # A folder reference keeps AutoFeedback/<family>/ intact in the bundle. The prototype file
+      # names repeat across families, so a flattened resource phase would collide.
+      - path: Resources/AutoFeedback
+        type: folder
+        buildPhase: resources
     dependencies:
       - package: SamadhiKit
         product: SamadhiDomain
@@ -104,3 +112,11 @@ schemes:
       config: Debug
       commandLineArguments:
         "--apple-music-core-loop": true
+  Samadhi Feedback Audition:
+    build:
+      targets:
+        Samadhi: all
+    run:
+      config: Debug
+      commandLineArguments:
+        "--feedback-audition": true

@@ -24,6 +24,7 @@ final class RunPresentationModel {
     @ObservationIgnored private let musicCollection: MusicCollection
     @ObservationIgnored private let diagnosticsStore: RunDiagnosticsStore
     @ObservationIgnored private let hapticFeedback = RunHapticFeedback()
+    @ObservationIgnored private let autoFeedback: any AutoFeedbackPlaying
     @ObservationIgnored private let taskStore = RunTaskStore()
     @ObservationIgnored private var diagnosticsRecorder: RunDiagnosticsRecorder
     @ObservationIgnored private var nextToken = 1
@@ -33,12 +34,14 @@ final class RunPresentationModel {
     init(
         musicCollection selectedCollection: MusicCollection? = nil,
         diagnosticsStore: RunDiagnosticsStore = RunDiagnosticsStore(),
-        diagnosticsRecorder: RunDiagnosticsRecorder = RunDiagnosticsRecorder()
+        diagnosticsRecorder: RunDiagnosticsRecorder = RunDiagnosticsRecorder(),
+        autoFeedback: (any AutoFeedbackPlaying)? = nil
     ) {
         let configuration = SimulationConfiguration.current
         self.configuration = configuration
         self.diagnosticsStore = diagnosticsStore
         self.diagnosticsRecorder = diagnosticsRecorder
+        self.autoFeedback = autoFeedback ?? AutoFeedbackService()
         musicCollection =
             selectedCollection
             ?? (configuration.useAppleMusicCoreLoop
@@ -61,7 +64,15 @@ final class RunPresentationModel {
         cadenceProvider =
             usesProductionServices
             ? CoreMotionCadenceProvider()
-            : SimulatedCadenceProvider(sampleDelay: cadenceDelay)
+            : SimulatedCadenceProvider(
+                sampleDelay: cadenceDelay,
+                profile: configuration.autoFeedbackScenario.map {
+                    SimulatedCadenceProfile.settledChange(
+                        from: AutoFeedbackScenario.baseCadenceSPM,
+                        to: AutoFeedbackScenario.baseCadenceSPM + $0.cadenceOffsetSPM
+                    )
+                } ?? .standard
+            )
         startPlaybackEventMonitoring()
     }
 
@@ -80,6 +91,7 @@ final class RunPresentationModel {
         var phase: RunVisualPhase = .ready
         var controlsVisible = false
         var rhythmControlVisible = false
+        var finishHoldPressing = false
         var cadence: Int?
 
         switch state {
@@ -110,6 +122,7 @@ final class RunPresentationModel {
             }
         case let .confirmingFinish(confirmation):
             phase = .confirmingFinish
+            if case .pressing = confirmation.hold { finishHoldPressing = true }
             if case let .locked(spm) = confirmation.origin.rhythm { cadence = spm }
         case let .routeRecovery(recovery):
             phase = .routeRecovery(restored: recovery.availability == .restored)
@@ -148,6 +161,7 @@ final class RunPresentationModel {
             track: track,
             hasArtwork: !configuration.missingArtwork,
             showLockBrief: showLockBrief,
+            finishHoldPressing: finishHoldPressing,
             rhythmControl: RhythmControlPresentation(
                 mode: session?.rhythmControl.mode ?? .automatic,
                 automaticCorrectionBPM: session?.rhythmControl.automaticCorrectionBPM ?? 0,
@@ -331,6 +345,17 @@ final class RunPresentationModel {
         #endif
     }
 
+    private func recordSameSongCallback() {
+        #if DEBUG
+            persist(
+                diagnosticsRecorder.record(
+                    sameSongCallbackIn: state,
+                    collection: musicCollection
+                )
+            )
+        #endif
+    }
+
     #if DEBUG
         private func persist(_ snapshot: RunDiagnosticSnapshot?) {
             guard let snapshot else { return }
@@ -382,6 +407,7 @@ final class RunPresentationModel {
                     try await musicPlayer.play(operationID: sessionID)
                     guard !Task.isCancelled, let self else { return }
                     startTicker(sessionID: sessionID)
+                    startScriptedPlaybackEvents(sessionID: sessionID)
                     if configuration.simulateRouteLoss {
                         let routeLossDelay: Duration =
                             configuration.fastMode ? .milliseconds(650) : .seconds(2)
@@ -568,7 +594,7 @@ final class RunPresentationModel {
 
         case let .scheduleFinishHold(_, holdID):
             taskStore.replace(.finishHold) { [weak self] in
-                try? await Task.sleep(for: .milliseconds(900))
+                try? await Task.sleep(for: .seconds(FinishHold.durationSeconds))
                 guard !Task.isCancelled else { return }
                 self?.dispatch(.finishHoldCompleted(holdID: holdID))
             }
@@ -584,11 +610,73 @@ final class RunPresentationModel {
         case let .emitHaptic(event):
             emitHaptic(event)
 
+        case let .emitAutoFeedback(cue):
+            autoFeedback.play(cue)
+
+        case let .cancelAutoFeedback(transactionID):
+            autoFeedback.cancel(transactionID: transactionID)
+
         case let .cancelTask(_, kind):
             taskStore.cancel(kind)
 
         case .cancelAllTasks:
+            // Finish and route recovery both cancel everything. No cue may survive either of them.
             taskStore.cancelAll()
+            autoFeedback.cancelAll()
+        }
+    }
+
+    // Deterministic proof for song-change and interruption causes. The player never decides when
+    // these happen; this shell does, from the launch configuration, and only in simulation.
+    private func startScriptedPlaybackEvents(sessionID: Int) {
+        guard let player = musicPlayer as? SimulatedMusicPlayer else { return }
+        let boundaryDelay: Duration =
+            configuration.fastMode ? .milliseconds(1_200) : .milliseconds(2_500)
+        let sameSongDelay: Duration =
+            configuration.fastMode ? .milliseconds(800) : .milliseconds(1_500)
+
+        if configuration.simulateNaturalBoundary {
+            scheduleScriptedEvent(after: boundaryDelay) {
+                player.simulateNaturalBoundary(operationID: sessionID)
+            }
+        }
+        if configuration.simulateExternalBoundary {
+            scheduleScriptedEvent(after: boundaryDelay) {
+                player.simulateExternalBoundary(operationID: sessionID)
+            }
+        }
+        if configuration.simulateSameSongCallback {
+            scheduleScriptedEvent(after: sameSongDelay) {
+                player.simulateSameSongCallback(operationID: sessionID)
+            }
+        }
+        if configuration.simulateInterruption {
+            scheduleScriptedEvent(after: boundaryDelay) {
+                player.simulateInterruption(operationID: sessionID)
+            }
+        }
+    }
+
+    // Entering recovery cancels every task, so the end can only be scheduled once the beginning has
+    // already been handled.
+    private func scheduleScriptedInterruptionEnd(operationID: Int) {
+        guard configuration.simulateInterruption,
+            let player = musicPlayer as? SimulatedMusicPlayer
+        else { return }
+        scheduleScriptedEvent(after: .seconds(1)) {
+            player.simulateInterruptionEnded(operationID: operationID)
+        }
+    }
+
+    // One scripted scenario runs per launch, so they share the simulated-route task slot.
+    private func scheduleScriptedEvent(
+        after delay: Duration,
+        _ body: @escaping @MainActor () -> Void
+    ) {
+        taskStore.replace(.simulatedRoute) {
+            try? await Task.sleep(for: delay)
+            guard !Task.isCancelled else { return }
+            body()
         }
     }
 
@@ -628,6 +716,7 @@ final class RunPresentationModel {
 
         case let .interruptionBegan(operationID):
             dispatch(.playbackInterrupted(sessionID: session.id, operationID: operationID))
+            scheduleScriptedInterruptionEnd(operationID: operationID)
 
         case let .interruptionEnded(operationID):
             dispatch(.playbackInterruptionEnded(sessionID: session.id, operationID: operationID))
@@ -651,6 +740,11 @@ final class RunPresentationModel {
         case let .trackChanged(operationID, trackID, reason):
             guard let trackIndex = musicCollection.tracks.firstIndex(where: { $0.id == trackID })
             else { return }
+            if trackID == session.currentTrackID {
+                // The player named the song it is already on. Nothing changes, so it stays evidence
+                // rather than becoming product state.
+                recordSameSongCallback()
+            }
             dispatch(
                 .playbackTrackChanged(
                     sessionID: session.id,
@@ -735,6 +829,7 @@ private final class RunHapticFeedback {
     private let mediumImpact = UIImpactFeedbackGenerator(style: .medium)
     private let heavyImpact = UIImpactFeedbackGenerator(style: .heavy)
     private let softImpact = UIImpactFeedbackGenerator(style: .soft)
+    private let selection = UISelectionFeedbackGenerator()
     private let notification = UINotificationFeedbackGenerator()
     private var rhythmEngine: CHHapticEngine?
     private var nextRhythmTime = 0.0
@@ -751,6 +846,11 @@ private final class RunHapticFeedback {
         switch event {
         case .start, .resume:
             lightImpact.impactOccurred()
+        case .transportRequest:
+            selection.selectionChanged()
+            selection.prepare()
+        case .finishArmed:
+            softImpact.impactOccurred(intensity: 0.6)
         case .lock:
             notification.notificationOccurred(.success)
         case .pause:

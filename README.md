@@ -10,7 +10,9 @@ Samadhi is a native iPhone music experience that helps movement and music settle
 
 Milestone 2 is in progress. Apple Music is the production player. Tempo analyzer version 4 passes 12 of 12 public preview references. A physical run confirmed that delayed iPhone cadence readings can settle Auto and that Apple Music reports the requested playback speed. Manual belongs to the current song, and the tempo wheel closes without changing playback. The current candidate supports steady movement from 90 through 210 steps per minute and can adjust one song from 85 to 115 percent of normal speed.
 
-The 85 and 115 percent endpoints pass software checks and are installed with exact Samadhi signing. They still need Apple Music read-back and listening approval on the phone. Transport and Finish craft, a known natural song transition, background recovery, and the outdoor run also remain open.
+The run controls are now one glass instrument: a single capsule bar for Previous, Pause or Resume, and Next, with a quiet hold-to-finish button below it. Every confirmed song change records why it happened, and the hidden Debug screen shows the cause. A directional Auto feedback prototype exists in three haptic families with paired arrival sounds, playable from a hidden audition screen, and waits on the phone comparison before any of it is chosen.
+
+The 85 and 115 percent endpoints pass software checks and are installed with exact Samadhi signing. They still need Apple Music read-back and listening approval on the phone. The feel of the new controls, the Auto feedback cues, a known natural song transition, background recovery, and the outdoor run also remain open.
 
 Start with [product ethos](Docs/PRODUCT.md), [current status](Docs/STATUS.md), and [next plan](Docs/PLAN.md). Use the [Milestone 2 specification](Docs/MILESTONE-2-SPEC.md) for the complete release contract. The [music-source decision record](Docs/MUSIC-SOURCE-RESOLUTION-SPEC.md) explains why Apple Music was selected.
 
@@ -33,6 +35,8 @@ DEVELOPER_DIR=/Applications/Xcode-beta.app/Contents/Developer \
   xcrun swift-format lint --configuration .swift-format --recursive \
   App Packages/SamadhiKit/Sources Packages/SamadhiKit/Tests Tests
 ~~~
+
+The `Samadhi Feedback Audition` scheme opens a Debug-only screen that plays the Auto feedback prototypes by hand; it is absent from Release builds.
 
 A normal Debug launch on iPhone Simulator uses two local placeholder playlists, simulated cadence, and silent simulated playback. This keeps the complete import, run, rotary BPM, transport, transition, and summary flow available without Apple Music. Physical iPhone and Release builds never enable this path. Pass `--real-apple-music` only when intentionally debugging MusicKit in Simulator.
 

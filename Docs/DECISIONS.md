@@ -216,6 +216,46 @@ The August 17 workout made the gap concrete. Samay felt Auto working, but the ch
 
 The accepted later direction is one identified Auto transition with two sparse moments. The first matching Apple Music reply produces a short faster or slower haptic. A final matching reply produces one quiet authored sound with a soft terminal haptic. Direction comes from the pattern's timing and shape. No more than three coarse strength levels express reachable change size.
 
-This does not authorize implementation yet. The exact AHAP patterns, sound family, Core Haptics audio path, fallback, and intensity bands require physical comparison with the phone in a pocket, the screen locked, and real music playing. The full contract lives in [AUTO-CHANGE-INTERACTION-SPEC.md](AUTO-CHANGE-INTERACTION-SPEC.md).
+The software half of this now exists. A reducer-owned transaction decides when a cue is valid, and `AutoFeedbackService` owns the Core Haptics engine, its stopped and reset handlers, the registered audio resources, and the fallback to a local audio player. The exact AHAP patterns, sound family, Core Haptics audio path, fallback, and intensity bands stay unapproved. They need physical comparison with the phone in a pocket, the screen locked, and real music playing. The full contract lives in [AUTO-CHANGE-INTERACTION-SPEC.md](AUTO-CHANGE-INTERACTION-SPEC.md).
 
-The current haptic shell is sufficient for wheel detents but not this feature. It starts the custom engine only when the wheel opens, ignores audio events, and lacks complete stop and resource-recovery handling. A later app-shell service must own engine life cycle. The reducer must own the one-time verified trigger and stale-reply protection.
+What remains is physical. Nothing in the prototype set has been felt or heard: tactile character through a pocket, blinded direction recognition, how the arrival sounds sit against real Apple Music, whether music ducks or gaps, locked-screen delivery, and survival through an interruption and an engine reset on a device.
+
+## Transport and Finish are one instrument
+
+Previous, Pause or Resume, and Next live in one glass capsule bar rather than three floating pills. Two restrained treatments were built and rendered. Hairline dividers between the three regions lost to a raised ivory disc behind the primary symbol. The disc names the primary action without adding two lines that do no other work, so the bar stays one object instead of reading as a segmented control, and its circle echoes the tempo aperture directly above it. The disc also gives the paused state a home: it brightens from 12 to 20 percent ivory and holds `play.fill`, which the divided bar has no place for.
+
+Finish sits below the bar and stays quiet. It is a text button with a hairline ivory capsule stroke, no glass at rest, and a 34 point visible pill inside a 44 point touch height. Tapping it arms the hold in place. Finish and the hold are one control with one identity, not two views swapped in a slot, so there is never a second border or a second word on screen. The word and the width change in a single frame; only the material and tint animate.
+
+The hold progress fill is drawn inside the label and clipped by the same capsule that draws the button, so it moves and clips with the pressed shape and cannot leave the border. `FinishHold.durationSeconds` is one constant shared by the reducer's hold window, the long-press minimum, and the fill animation, so the visible sweep and the accepted press can never disagree.
+
+Pressing a transport region darkens it with an ink wash at about 8 percent and compresses its symbol to 0.97 over 100 milliseconds. Under Reduce Motion the wash appears with no scale and no animation. The hold fill still sweeps under Reduce Motion, because a determinate progress indicator is the point of the control. That is a deliberate change from the earlier frozen fill.
+
+Touch carries the difference between a request and an event. An accepted Previous or Next tap gets one selection tick, which says the request was sent and not that the song changed. Arming Finish gets one soft impact. Completing the hold keeps the existing heavy impact. Pause and resume keep their existing medium and light impacts, and the run start and lock are unchanged.
+
+## Auto feedback is a reducer-owned transaction
+
+One meaningful Auto change is one identified transaction. The reducer opens it only in Auto mode, on the confirmed song, when a settled target differs from the last remembered one and the reachable change in step rhythm is at least six steps per minute. The origin is the applied playback rate at commit. The target is the policy target rate, or the clamped boundary when the song is already at its limit.
+
+The start fires on the first identified, verified Apple Music reply that moved the applied rate from the origin toward the target. The arrival fires on a verified reply within 0.005 of the target rate. One reply may produce both. Each transaction emits at most one start and at most one arrival. Nothing else qualifies: not raw or filtered cadence, not an unsettled candidate, not intermediate ramp replies, not a pending, mismatched, rejected, or stale reply, not a reaffirmed target, not a Previous or Next tap, not an old song after a change, and not a transaction that already arrived.
+
+Stopping a cue has two shapes, and the difference matters. Manual takeover and a lost Auto target cancel the cue and forget the remembered target, because the runner or the policy changed intent; choosing Auto again may open a fresh transaction. Route loss, interruption, playback failure, and finish cancel the cue but keep the remembered target, so recovery resumes at the same speed without replaying a cue for a change the runner already felt. A new qualifying target silently replaces the transaction in flight. Pause preserves it. A rejected read-back preserves it.
+
+A confirmed different song clears the transaction state but leaves the identity counter rising. Identifiers are never reused, so a late effect carrying an old identifier cannot be mistaken for the current transaction. The reducer emits the cue and the cancel as effects; the shell only plays what it is handed.
+
+## Song changes carry a cause
+
+MusicKit reports that the current entry changed, never why. Samadhi now decides a cause and records it. A Previous or Next command that Samadhi issued claims the next observed change inside a five second window; a failed command drops the claim, so a later natural boundary is not mislabeled. With no claim, the change counts as a natural end only when the previous song's last observed playback time was within 10 seconds of its duration. Everything else is an outside change, which usually means Control Center, the Music app, or a headphone button.
+
+The rule is a pure function with its own tests, and the hidden Debug screen shows the result as `Last song change`. This exists so that a natural boundary can be told apart from an outside change before any feedback is attached to a boundary, and so a phone check can confirm the cause instead of guessing it.
+
+A same-song callback is now recorded as its own diagnostic entry. The reducer still ignores it and Manual still survives it. The entry exists as evidence that the player repeated itself, not as a state change.
+
+## Auto feedback prototypes are offline originals
+
+Three families exist for the physical comparison: pulse, two transients; swell, one continuous event with rising or falling curves; and step, three transients with tightening or widening gaps. Each family carries both directions and three size bands, which scale peak intensity only and never reorder events, so the learned direction holds at every size. Six arrival sounds were synthesized offline by `Scripts/generate-auto-feedback-sounds.py` using only the Python standard library. There is no sample pack, no recording, no library asset, and no third-party license to preserve, because there is no third-party material in these files. Re-running the script with the same parameters reproduces the same bytes.
+
+None of this is a product asset. The preferred final path is still a small paid commission using this brief and the physical prototype. These files exist so that the phone comparison has something concrete to compare.
+
+`AutoFeedbackService` owns the engine, not the views and not the reducer. It starts one Core Haptics engine lazily with audio allowed, keeps stopped and reset handlers, drops cached players and re-registers audio resources on a reset, and stays silent on hardware without haptics while the sound still plays through a local player. The app configures no `AVAudioSession` category, mode, or active state anywhere, so Samadhi asks for no ducking; the only session use is reading route and interruption notifications.
+
+The audition screen is Debug only. It reaches the app through the `--feedback-audition` launch argument and the `Samadhi Feedback Audition` scheme, and it plays patterns by hand so a person can compare them. Release contains none of its strings or symbols. The prototype files themselves are still packaged in Release, which is the honest state of a prototype set that has not been chosen from yet.

@@ -73,3 +73,34 @@ import Testing
         ]
     )
 }
+
+@Test func scriptedSettledChangeHoldsBothCadencesLongEnoughToProveOneAutoChange() async {
+    let provider = SimulatedCadenceProvider(
+        sampleDelay: .zero,
+        profile: .settledChange(from: 168, to: 188, settledSamples: 5, changedSamples: 18)
+    )
+    var values: [Double?] = []
+    for await event in provider.events() {
+        guard case let .observation(observation) = event else { continue }
+        values.append(observation.stepsPerMinute)
+    }
+
+    #expect(values.count == 25)
+    #expect(values.prefix(2).allSatisfy { $0 == nil })
+    #expect(values.dropFirst(2).prefix(5).allSatisfy { $0 == 168 })
+    #expect(values.suffix(18).allSatisfy { $0 == 188 })
+}
+
+@Test func scriptedProfileKeepsOneSecondBetweenEverySample() async {
+    let provider = SimulatedCadenceProvider(
+        sampleDelay: .zero,
+        profile: .settledChange(from: 160, to: 148, settledSamples: 3, changedSamples: 4)
+    )
+    var elapsed: [Double] = []
+    for await event in provider.events() {
+        guard case let .observation(observation) = event else { continue }
+        elapsed.append(observation.elapsedSeconds)
+    }
+
+    #expect(elapsed == (0..<9).map(Double.init))
+}
