@@ -94,6 +94,8 @@ The software gate above was run on 2026-08-18 with no phone build. The phone ins
 
 Every physical judgment in `Docs/PHONE-CHECK-2026-08-19.md` is still open. Physical results recorded elsewhere in this file belong to earlier builds.
 
+Later on 2026-08-19, commit `13e88bf` (three interactive glass transport circles, catalog explicit versus clean tie fix, 44 app-model tests) passed the same software gate and was installed in place with the same profile. Built fingerprint `085e5fe7b0e080a19efe281bd69fa5ebaeab00e0d082bc64701cd03d98de4f82`; selected collection unchanged at `524c641b...`; the phone was locked, so no in-app read-back for that build yet.
+
 ## Review artifacts
 
 - `MANIFEST.md`: exact-source receipt.

@@ -615,6 +615,12 @@ This checkpoint recorded a passing local candidate before its exact-profile buil
 - Widened the resting Finish pill slightly to sit in proportion under the row
 - Captured fresh normal, paused, accessibility XXXL, Reduce Motion, Increased Contrast, Reduced Transparency, armed, and early-release frames under `Evidence/Simulator/2026-08-19-transport-glass/`
 
+## 2026-08-19. Second phone install
+
+- Built commit `13e88bf` for the paired iPhone with the same exact profile, verified the embedded identifier and strict signature, and confirmed the built fingerprint `085e5fe7...` equals the source script
+- Installed in place; the selected collection stayed byte-identical. The phone was locked, so no launch and no in-app read-back for this build
+- Read the pulled collection: 25 songs, 13 not ready, 11 of them the catalog tie the morning fix addresses; the playlist has to be chosen again in the app to re-resolve them
+
 ## Current checkpoint
 
 The transport and Finish pass, deterministic song-change causes, and the first directional Auto feedback prototype are merged on `main`, pass the software gate, and are installed on the phone with the in-app fingerprint confirmed. Endpoint read-back and listening at 0.85 and 1.15 carry over from the previous candidate, and tactile feel, sound quality, locked-screen delivery, and Apple Music coexistence have no result at all. The next step is the ordered checklist in [PHONE-CHECK-2026-08-19.md](PHONE-CHECK-2026-08-19.md) from step 2 onward. After it, the next Main Thing is the 20-minute outdoor run.

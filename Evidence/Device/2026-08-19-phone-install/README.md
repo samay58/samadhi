@@ -39,3 +39,20 @@ The phone was unlocked. The app was launched once normally, then once with `--co
 ## Still open
 
 Everything in `Docs/PHONE-CHECK-2026-08-19.md`: endpoint listening and read-back at 0.85 and 1.15, transport and Finish feel, the blinded faster and slower trials on both sound paths, the recorded cause after a natural end and after an explicit Next, and lock, interruption, and route recovery. No run was started and no diagnostics file was pulled for this build.
+
+## Second install the same day, commit 13e88bf
+
+The glass transport circles and the catalog tie fix were built and installed in place later on 2026-08-19 with the same profile and procedure.
+
+| Item | Value |
+| --- | --- |
+| Commit | `13e88bff4b5d0604715de7000d3671e668725a5b`, `main`, clean |
+| Profile and identifier | `Samadhi Development 2026-08-15`, UUID `1b613344-c5cd-4802-a31f-9ff5088c1802`, `ZL5U59XBJ6.com.samaydhawan.Samadhi` in the embedded profile and the signature; strict verification passed |
+| Built Info.plist source fingerprint | `085e5fe7b0e080a19efe281bd69fa5ebaeab00e0d082bc64701cd03d98de4f82`, equal to `Scripts/source-fingerprint.sh` on the same checkout |
+| Build date recorded in the app | 2026-08-19T15:18:28Z |
+| Install | In place over the morning build, nothing uninstalled, no app data touched |
+| Selected collection SHA-256 before and after | `524c641b7f304758aafdc4ec8502d2a347b05dac3d18ae69b1650e65b5f24aee`, byte-identical |
+| Phone state | Locked at install time, so no launch and no in-app fingerprint read-back for this build yet |
+
+The selected collection on the phone had changed again between the two installs because the app was used in between; at this install it held 25 songs with 13 not ready, 11 of them `catalogMatchUnavailable` and 2 `rhythmUnclear`. That is the population the tie fix targets. The playlist must be chosen again in the app for the 11 to resolve; nothing on the phone was changed to force that.
+
