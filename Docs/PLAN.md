@@ -52,7 +52,7 @@ Continue in this order:
 - Apple Music feasibility: authorization, library loading, automatic token generation, strict catalog resolution, 10 of 10 local preview decodes, playback, rate writes, pause, and resume passed
 - Token remediation: complete; exact profile `Samadhi Development` fixed catalog access
 - Tempo-source feasibility: passed for City Pocket at 10 of 10 decoded previews
-- Tempo-analysis implementation: version 4 searches 60 through 210 BPM, preserves the measured musical pulse, records an independently supported alternate stride pulse separately, passes 12 of 12 tempo-declared Apple previews, and rejects silent, irregular, and triple-meter ambiguity
+- Tempo-analysis implementation: version 5 searches 60 through 210 BPM with support lags from 30 through 420, judges each tempo together with its half or double so swung and dotted grooves keep their true beat, preserves the measured musical pulse, records an independently supported alternate stride pulse separately, passes 12 of 12 tempo-declared Apple previews, and rejects silent, irregular, and triple-meter ambiguity
 - Spotify feasibility: rejected for adaptive playback; it cannot supply the required app-owned, analyzable, rate-controlled audio path
 - Source decision: Apple Music selected on 2026-07-16; remaining manual drills moved to the reliability gate
 - Source-neutral domain and adaptation rules: bounded rate behavior and coarse track fit are connected; a mismatch may prepare only the latest better fit, while Skip or a player-confirmed natural boundary remains the only commit authority

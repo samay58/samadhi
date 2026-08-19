@@ -8,7 +8,7 @@ Samadhi is a native iPhone music experience that helps movement and music settle
 
 ## Current state
 
-Milestone 2 is in progress. Apple Music is the production player. Tempo analyzer version 4 passes 12 of 12 public preview references. A physical run confirmed that delayed iPhone cadence readings can settle Auto and that Apple Music reports the requested playback speed. Manual belongs to the current song, and the tempo wheel closes without changing playback. The current candidate supports steady movement from 90 through 210 steps per minute and can adjust one song from 85 to 115 percent of normal speed.
+Milestone 2 is in progress. Apple Music is the production player. Tempo analyzer version 5 passes 12 of 12 public preview references and keeps the true beat under swing. A physical run confirmed that delayed iPhone cadence readings can settle Auto and that Apple Music reports the requested playback speed. Manual belongs to the current song, and the tempo wheel closes without changing playback. The current candidate supports steady movement from 90 through 210 steps per minute and can adjust one song from 85 to 115 percent of normal speed.
 
 The run controls are now three separate Liquid Glass circles, a larger tinted one for Pause or Resume between Previous and Next, each springing under the finger, with a quiet hold-to-finish button below. Every confirmed song change records why it happened, and the hidden Debug screen shows the cause. A directional Auto feedback prototype exists in three haptic families with paired arrival sounds, playable from a hidden audition screen, and waits on the phone comparison before any of it is chosen.
 

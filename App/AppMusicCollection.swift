@@ -1,3 +1,4 @@
+import SamadhiAudio
 import SamadhiDesign
 import SamadhiDomain
 
@@ -85,7 +86,7 @@ enum AppMusicCollection {
                     baseBPM: 149.75,
                     confidence: 1,
                     analyzedDurationSeconds: 30,
-                    version: 4
+                    version: LocalTempoAnalyzer.analysisVersion
                 )
             )
         ]
@@ -106,7 +107,7 @@ enum AppMusicCollection {
                         baseBPM: 168,
                         confidence: 0.94,
                         analyzedDurationSeconds: 30,
-                        version: 4
+                        version: LocalTempoAnalyzer.analysisVersion
                     )
                 )
             ),

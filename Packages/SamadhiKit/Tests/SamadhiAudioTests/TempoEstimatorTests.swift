@@ -106,6 +106,37 @@ func generatedTempoCorpusStaysInsideTwoPercent(_ referenceBPM: Double) async thr
     #expect(tempoError(result?.stepPulseSPM ?? 0, referenceBPM: 180) <= 0.02)
 }
 
+@Test func aSwungGrooveKeepsTheBeatInsteadOfTheOneAndAHalfBeatLag() async throws {
+    let sampleRate = 8_000.0
+    let samples = layeredPulseTrain(
+        bpm: 164,
+        durationSeconds: 24,
+        sampleRate: sampleRate,
+        layers: [(beats: 1.0, amplitude: 0.7), (beats: 1.5, amplitude: 1.0)]
+    )
+
+    let result = try await analyze(samples: samples, sampleRate: sampleRate)
+
+    #expect(result != nil)
+    #expect(tempoError(result?.baseBPM ?? 0, referenceBPM: 164) <= 0.02)
+    #expect(tempoError(result?.alternatePulseBPM ?? 0, referenceBPM: 82) <= 0.02)
+}
+
+@Test func aDottedEighthPatternKeepsTheBeatInsteadOfTheFourThirdsLag() async throws {
+    let sampleRate = 8_000.0
+    let samples = layeredPulseTrain(
+        bpm: 117,
+        durationSeconds: 24,
+        sampleRate: sampleRate,
+        layers: [(beats: 1.0, amplitude: 1.0), (beats: 0.75, amplitude: 0.6)]
+    )
+
+    let result = try await analyze(samples: samples, sampleRate: sampleRate)
+
+    #expect(result != nil)
+    #expect(tempoError(result?.baseBPM ?? 0, referenceBPM: 117) <= 0.02)
+}
+
 private func analyze(
     samples: [Float],
     sampleRate: Double,
@@ -145,6 +176,31 @@ private func pulseTrain(
         }
         beat += samplesPerBeat
         beatIndex += 1
+    }
+    return samples
+}
+
+// Several pulse trains at once, each a repeating interval in beats of the stated tempo. A 1.5-beat
+// layer imitates a shuffle; a 0.75-beat layer imitates a dotted-eighth pattern.
+private func layeredPulseTrain(
+    bpm: Double,
+    durationSeconds: Double,
+    sampleRate: Double,
+    layers: [(beats: Double, amplitude: Float)]
+) -> [Float] {
+    let sampleCount = Int(durationSeconds * sampleRate)
+    let samplesPerBeat = sampleRate * 60 / bpm
+    var samples = Array(repeating: Float.zero, count: sampleCount)
+    for layer in layers {
+        var position = 0.0
+        while Int(position) < sampleCount {
+            let start = Int(position)
+            for offset in 0..<min(8, sampleCount - start) {
+                samples[start + offset] = max(
+                    samples[start + offset], layer.amplitude * (1 - (Float(offset) / 8)))
+            }
+            position += samplesPerBeat * layer.beats
+        }
     }
     return samples
 }

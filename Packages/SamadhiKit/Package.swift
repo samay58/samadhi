@@ -21,6 +21,11 @@ let package = Package(
             path: "Tools/TempoCorpusValidator",
             resources: [.process("Corpus.json")]
         ),
+        .executableTarget(
+            name: "TempoProbe",
+            dependencies: ["SamadhiAudio", "SamadhiDomain"],
+            path: "Tools/TempoProbe"
+        ),
         .testTarget(name: "SamadhiDomainTests", dependencies: ["SamadhiDomain"]),
         .testTarget(name: "SamadhiAudioTests", dependencies: ["SamadhiAudio", "SamadhiDomain"]),
         .testTarget(name: "SamadhiMotionTests", dependencies: ["SamadhiMotion"]),

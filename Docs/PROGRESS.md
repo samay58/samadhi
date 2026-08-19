@@ -621,6 +621,16 @@ This checkpoint recorded a passing local candidate before its exact-profile buil
 - Installed in place; the selected collection stayed byte-identical. The phone unlocked shortly after, so the build was launched into the hidden Debug screen and read back the same fingerprint on the device
 - Read the pulled collection: 25 songs, 13 not ready, 11 of them the catalog tie the morning fix addresses; the playlist has to be chosen again in the app to re-resolve them
 
+## 2026-08-19. Tempo analyzer version 5
+
+- Pulled the phone's collection after the Easy Miles import: 48 songs resolved, 10 rejected as rhythm unclear, every one of them swung or broken-beat music
+- Added `TempoProbe`, a development tool that fetches previews by catalog identifier and prints the analyzer's decision, confidence, and strongest tempo candidates
+- Found the recurring cause: the strongest rival peak sat at two thirds or four thirds of the true beat, the swing and dotted-eighth lags, and the analyzer counted it as evidence against the beat
+- Scored each tempo with its half or double, added support lags from 30 through 420 BPM, let the stronger family win when the candidates are not a half-double pair, and stopped counting simple-ratio lags as rivals
+- Kept the triple-meter rejection, the 0.72 confidence bar, and the corpus gate; 20 of 20 synthetic tests and 12 of 12 reference previews pass, and the new dotted-eighth test fails under version 4
+- Reran the 48-song playlist, 41 ready from 38 with none lost, and the 138 cached phone results, 132 unchanged; every changed answer that could be checked against a public BPM listing matched it
+- Moved the analysis version to 5 so every cached result is measured again
+
 ## Current checkpoint
 
 The transport and Finish pass, deterministic song-change causes, and the first directional Auto feedback prototype are merged on `main`, pass the software gate, and are installed on the phone with the in-app fingerprint confirmed. Endpoint read-back and listening at 0.85 and 1.15 carry over from the previous candidate, and tactile feel, sound quality, locked-screen delivery, and Apple Music coexistence have no result at all. The next step is the ordered checklist in [PHONE-CHECK-2026-08-19.md](PHONE-CHECK-2026-08-19.md) from step 2 onward. After it, the next Main Thing is the 20-minute outdoor run.
