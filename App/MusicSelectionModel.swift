@@ -43,7 +43,9 @@ final class MusicSelectionModel {
         }
         self.configuration = configuration
 
-        if configuration.fastMode {
+        if configuration.outOfReachScenario != nil {
+            apply(AppMusicCollection.simulatorOutOfReach)
+        } else if configuration.fastMode {
             applyFixture(configuration.musicSelectionFixture)
         } else if configuration.useAppleMusicCoreLoop {
             apply(AppMusicCollection.appleMusicCoreLoop)

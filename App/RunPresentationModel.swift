@@ -13,8 +13,11 @@ final class RunPresentationModel {
     // This is the boundary between the pure run state machine and iOS. Follow send -> dispatch -> execute.
     private(set) var state: RunState = .ready
     private(set) var showLockBrief = false
+    // The one reach line the reducer allowed. The shell shows it briefly and takes it down itself.
+    private(set) var reachNotice: CollectionReach?
     #if DEBUG
         private(set) var latestCadenceDiagnosticSample: CadenceDiagnosticSample?
+        private(set) var recentCueDeliveries: [AutoFeedbackDeliveryRecord] = []
     #endif
 
     @ObservationIgnored private let reducer: RunReducer
@@ -61,19 +64,56 @@ final class RunPresentationModel {
             configuration.extendedAcquisitionWindow
             ? .milliseconds(1_400)
             : (configuration.fastMode ? .milliseconds(340) : .milliseconds(420))
+        let simulatedProfile: SimulatedCadenceProfile
+        if let scenario = configuration.autoFeedbackScenario {
+            simulatedProfile = SimulatedCadenceProfile.settledChange(
+                from: AutoFeedbackScenario.baseCadenceSPM,
+                to: AutoFeedbackScenario.baseCadenceSPM + scenario.cadenceOffsetSPM
+            )
+        } else if let scenario = configuration.outOfReachScenario {
+            simulatedProfile = SimulatedCadenceProfile(
+                lockedSPM: scenario.cadenceSPM,
+                holdSamples: OutOfReachScenario.heldSamples
+            )
+        } else {
+            simulatedProfile = .standard
+        }
         cadenceProvider =
             usesProductionServices
             ? CoreMotionCadenceProvider()
-            : SimulatedCadenceProvider(
-                sampleDelay: cadenceDelay,
-                profile: configuration.autoFeedbackScenario.map {
-                    SimulatedCadenceProfile.settledChange(
-                        from: AutoFeedbackScenario.baseCadenceSPM,
-                        to: AutoFeedbackScenario.baseCadenceSPM + $0.cadenceOffsetSPM
-                    )
-                } ?? .standard
-            )
+            : SimulatedCadenceProvider(sampleDelay: cadenceDelay, profile: simulatedProfile)
         startPlaybackEventMonitoring()
+        observeAutoFeedbackDelivery()
+    }
+
+    // The service says what became of each cue and what the engine did. Debug builds keep the last
+    // three on the hidden screen and write every one into the run record.
+    private func observeAutoFeedbackDelivery() {
+        autoFeedback.onDelivery = { [weak self] record in
+            guard let self else { return }
+            #if DEBUG
+                recentCueDeliveries = Array((recentCueDeliveries + [record]).suffix(3))
+                persist(
+                    diagnosticsRecorder.record(
+                        autoFeedbackDelivery: record,
+                        state: state,
+                        collection: musicCollection
+                    )
+                )
+            #endif
+        }
+        autoFeedback.onEngineEvent = { [weak self] event in
+            guard let self else { return }
+            #if DEBUG
+                persist(
+                    diagnosticsRecorder.record(
+                        hapticEngine: event,
+                        state: state,
+                        collection: musicCollection
+                    )
+                )
+            #endif
+        }
     }
 
     var viewState: RunViewState {
@@ -161,6 +201,12 @@ final class RunPresentationModel {
             track: track,
             hasArtwork: !configuration.missingArtwork,
             showLockBrief: showLockBrief,
+            reachNotice: reachNotice.map {
+                switch $0 {
+                case .mostlyFaster: .mostlyFaster
+                case .mostlySlower: .mostlySlower
+                }
+            },
             finishHoldPressing: finishHoldPressing,
             rhythmControl: RhythmControlPresentation(
                 mode: session?.rhythmControl.mode ?? .automatic,
@@ -175,8 +221,10 @@ final class RunPresentationModel {
                 appliedRate: session?.adaptationState.appliedRateReadback,
                 commandLatencySeconds: session?.adaptationState.commandLatencySeconds,
                 isAtLimit: session?.adaptationState.isAtLimit ?? false,
-                isFindingBetterFit: session?.pendingTrackSelectionID != nil
-                    || session?.preparedNextTrackID != nil,
+                // The wheel only speaks of a better fit while this song is pinned at its limit. A
+                // song prepared quietly for the boundary is not the wheel's business.
+                isFindingBetterFit: session?.adaptationState.isAtLimit == true
+                    && (session?.pendingTrackSelectionID != nil || session?.preparedNextTrackID != nil),
                 isVisible: rhythmControlVisible,
                 isAvailable: session?.mode == .adaptive
             )
@@ -188,7 +236,8 @@ final class RunPresentationModel {
             CoreLoopDiagnosticPresentation(
                 state: state,
                 collection: musicCollection,
-                cadenceSample: latestCadenceDiagnosticSample
+                cadenceSample: latestCadenceDiagnosticSample,
+                cueDeliveries: recentCueDeliveries
             )
         }
     #endif
@@ -616,6 +665,15 @@ final class RunPresentationModel {
         case let .cancelAutoFeedback(transactionID):
             autoFeedback.cancel(transactionID: transactionID)
 
+        case let .showReachNotice(reach):
+            reachNotice = reach
+            let hold: Duration = configuration.fastMode ? .seconds(4) : .seconds(7)
+            taskStore.replace(.reachNotice) { [weak self] in
+                try? await Task.sleep(for: hold)
+                guard !Task.isCancelled else { return }
+                self?.reachNotice = nil
+            }
+
         case let .cancelTask(_, kind):
             taskStore.cancel(kind)
 
@@ -704,7 +762,8 @@ final class RunPresentationModel {
                     operationID: operationID,
                     trackIndex: trackIndex,
                     elapsedSeconds: Int(progress.elapsedSeconds),
-                    durationSeconds: Int(progress.durationSeconds)
+                    durationSeconds: Int(progress.durationSeconds),
+                    selectionID: token()
                 )
             )
 

@@ -45,6 +45,9 @@
         let resultingStepRhythmSPM: Double?
         let remainingDifferenceSPM: Double?
         let autoCueText: String
+        // What became of the last three cues the service handled, newest last.
+        let cueDeliveryTexts: [String]
+        let nextSongText: String
         let lastSongChangeText: String
         let status: TempoDiagnosticStatus
 
@@ -52,6 +55,7 @@
             state: RunState,
             collection: MusicCollection,
             cadenceSample: CadenceDiagnosticSample?,
+            cueDeliveries: [AutoFeedbackDeliveryRecord] = [],
             build: BuildIdentity = .current,
             environment: DiagnosticEnvironment = .current
         ) {
@@ -114,6 +118,8 @@
                 resultingStepRhythm.map { $0 - target }
             }
             autoCueText = Self.autoCueLabel(session?.autoFeedback.transaction)
+            cueDeliveryTexts = cueDeliveries.map(Self.deliveryLabel)
+            nextSongText = Self.nextSongLabel(session, collection: collection)
             lastSongChangeText = Self.songChangeLabel(session?.lastTrackChangeReason)
             status = Self.status(for: session)
         }
@@ -163,6 +169,11 @@
                 resultingStepRhythmSPM: resultingRunning,
                 remainingDifferenceSPM: resultingRunning.map { $0 - 175 },
                 autoCueText: "Cue 1, faster, medium, began",
+                cueDeliveryTexts: [
+                    "Cue 1 began: played through the engine (pulse, Core Haptics audio)",
+                    "Cue 1 arrived: played through the engine (pulse, Core Haptics audio)",
+                ],
+                nextSongText: "Queued song fits",
                 lastSongChangeText: "Natural end of the song",
                 status: status
             )
@@ -194,6 +205,8 @@
             resultingStepRhythmSPM: Double?,
             remainingDifferenceSPM: Double?,
             autoCueText: String,
+            cueDeliveryTexts: [String],
+            nextSongText: String,
             lastSongChangeText: String,
             status: TempoDiagnosticStatus
         ) {
@@ -222,8 +235,50 @@
             self.resultingStepRhythmSPM = resultingStepRhythmSPM
             self.remainingDifferenceSPM = remainingDifferenceSPM
             self.autoCueText = autoCueText
+            self.cueDeliveryTexts = cueDeliveryTexts
+            self.nextSongText = nextSongText
             self.lastSongChangeText = lastSongChangeText
             self.status = status
+        }
+
+        private static func deliveryLabel(_ record: AutoFeedbackDeliveryRecord) -> String {
+            let outcome: String
+            switch record.outcome {
+            case .playedThroughEngine: outcome = "played through the engine"
+            case .playedLocalSoundOnly: outcome = "local sound only, no haptic"
+            case .engineUnavailable: outcome = "engine unavailable"
+            case .patternMissing: outcome = "pattern missing"
+            case .cancelledBeforePlay: outcome = "cancelled before it played"
+            }
+            let path: String
+            switch record.soundPath {
+            case .coreHaptics: path = "Core Haptics audio"
+            case .avAudioPlayer: path = "local audio player"
+            }
+            var text =
+                "Cue \(record.transactionID) \(record.moment.rawValue): \(outcome) "
+                + "(\(record.family.rawValue), \(path))"
+            if let detail = record.detail, !detail.isEmpty {
+                text += ", \(detail)"
+            }
+            return text
+        }
+
+        private static func nextSongLabel(_ session: RunSession?, collection: MusicCollection) -> String {
+            guard let session else { return "No run" }
+            let planned = (session.preparedNextTrackID ?? session.pendingNextTrackID).flatMap { id in
+                collection.tracks.first { $0.id == id }?.title
+            }
+            switch session.nextSongOutlook {
+            case .notYetKnown:
+                return planned.map { "Prepared \($0) for this song's limit" } ?? "Not judged yet"
+            case .queuedSongFits:
+                return "Queued song fits"
+            case .betterFitPrepared:
+                return planned.map { "Prepared \($0) for the boundary" } ?? "Preparing a better fit"
+            case .nothingFits:
+                return "Nothing in the collection fits; queue proceeds"
+            }
         }
 
         private static func autoCueLabel(_ transaction: AutoFeedbackTransaction?) -> String {
@@ -344,12 +399,28 @@
                         row("Difference from target", signedSPM(presentation.remainingDifferenceSPM))
                         row("Auto cue", presentation.autoCueText)
                             .accessibilityIdentifier("auto-cue")
+                        row("Next song", presentation.nextSongText)
+                            .accessibilityIdentifier("next-song-outlook")
                         row("Last song change", presentation.lastSongChangeText)
                             .accessibilityIdentifier("last-song-change")
                         Text(presentation.status.label)
                             .font(.headline)
                             .foregroundStyle(statusColor)
                             .accessibilityIdentifier("tempo-command-status")
+                    }
+
+                    Section("What became of the cues") {
+                        if presentation.cueDeliveryTexts.isEmpty {
+                            Text("No cue has been handled yet")
+                                .foregroundStyle(.secondary)
+                                .accessibilityIdentifier("cue-delivery-empty")
+                        } else {
+                            ForEach(Array(presentation.cueDeliveryTexts.enumerated()), id: \.offset) { index, text in
+                                Text(text)
+                                    .foregroundStyle(.secondary)
+                                    .accessibilityIdentifier("cue-delivery-\(index)")
+                            }
+                        }
                     }
 
                     Section("Speed comparison") {

@@ -46,6 +46,18 @@ enum AppMusicCollection {
         ]
     )
 
+    // Three walking-tempo songs for the out-of-reach scenario. A 100 step walk sits below every
+    // floor and a 172 step run above every ceiling, so the reach line can be seen both ways.
+    static let simulatorOutOfReach = MusicCollection(
+        id: MusicCollectionID("simulator-out-of-reach"),
+        name: "Slow Sundays",
+        tracks: [
+            demoTrack(id: "reach-126", title: "Low Tide", artist: "Field Note", bpm: 126),
+            demoTrack(id: "reach-132", title: "Porch Light", artist: "Low Season", bpm: 132),
+            demoTrack(id: "reach-138", title: "Late Coffee", artist: "Paper Coast", bpm: 138),
+        ]
+    )
+
     static let simulatorLongName = MusicCollection(
         id: MusicCollectionID("simulator-long-name"),
         name: "Saturday Miles Through the Hills After the Rain",
