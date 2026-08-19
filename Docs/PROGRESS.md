@@ -649,6 +649,7 @@ This checkpoint recorded a passing local candidate before its exact-profile buil
 - Wrote the small-change question into the interaction spec: a 6 SPM change on a 120 BPM song is the smallest band and the weakest cue and the hardest to hear, so it is the first question for the physical comparison; the audition screen already lets the small band be played at medium intensity, so no new control was added
 - Corrected the walk README: one song was lost to the buffer, not two, and the transition into Numb was a prepared better fit
 - Frames under `Evidence/Simulator/2026-08-19-out-of-reach/`; tests in `RunReducerBoundaryLookAheadTests`, `RunReducerReachTests`, and the app-model file
+- Passed the full gate (193 package, 48 app-model, 34 serial interface tests, lint, fingerprint tests), then built commit `0aa99a7` with the exact profile and installed it in place on the phone; built fingerprint `a05aaa3c...` equals the script, collection byte-identical, phone locked so no read-back; record under `Evidence/Device/2026-08-19-walk-repair-install/`
 
 ## Current checkpoint
 

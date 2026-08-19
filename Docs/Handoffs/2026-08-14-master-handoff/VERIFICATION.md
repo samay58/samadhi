@@ -109,14 +109,14 @@ The run record that evicts ticks first, the cue delivery record, the boundary lo
 | UI tests, serial | 34 passed |
 | Source-fingerprint tests | Passed |
 | Preserved handoff source and addendum hashes | Untouched; nothing under `original/` was opened for writing |
-| Commit built for the phone | Recorded in the install commit that follows this gate, `main`, clean |
+| Commit built for the phone | `0aa99a70d068485295a630dd3659768704b96e5d`, `main`, clean |
 | Profile | `Samadhi Development 2026-08-15`, UUID `1b613344-c5cd-4802-a31f-9ff5088c1802`, expires 2027-08-15 |
 | Application identifier | `ZL5U59XBJ6.com.samaydhawan.Samadhi` in the embedded profile and the signature |
-| Strict signature verification | Recorded in the install commit that follows this gate |
-| Built Info.plist source fingerprint | Recorded in the install commit that follows this gate, equal to `Scripts/source-fingerprint.sh` |
-| Install | Recorded in the install commit that follows this gate |
-| Selected collection SHA-256 before and after | Recorded in the install commit that follows this gate |
-| In-app read-back | Recorded in the install commit that follows this gate |
+| Strict signature verification | Passed |
+| Built Info.plist source fingerprint | `a05aaa3cc77a0df2e86f88754f38b03312226375c408940c881df79e0a3e709a`, equal to `Scripts/source-fingerprint.sh` |
+| Install | In place over the analyzer version 5 build, nothing uninstalled, no app data touched |
+| Selected collection SHA-256 before and after | `a51a8e4ab361a1c7c47669aeb02777276eee89600367a1e9efafed03a80f64bf`, unchanged |
+| In-app read-back | None yet; the phone was locked at install |
 | Evidence | `Evidence/Device/2026-08-19-walk-repair-install/` and `Evidence/Simulator/2026-08-19-out-of-reach/` |
 
 ## Review artifacts
