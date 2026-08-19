@@ -17,7 +17,7 @@ Automatic signing can select a wildcard profile even when an exact profile exist
 
 The build is suitable for product testing, not public distribution. Historical commit `cd07fd4` was built from clean `main`, signed with the then-renewed exact profile, and installed on 2026-07-27 without uninstalling the prior app. The selected collection survived byte-for-byte, foreground launch passed, and the physical process was confirmed. The later setup-craft commit `0a59b64` was also installed with the collection preserved, but its foreground launch remained open because the phone was locked. Physical click-wheel feel, audible Auto response, and a natural prepared transition remain open.
 
-After a debug run finishes, pull `Library/Application Support/Samadhi/latest-run-diagnostics.json` directly from the app container. The file overwrites the prior run and contains progress, cadence, target and applied rates, track changes, recovery events, and the honest summary.
+After a debug run finishes, pull `Library/Application Support/Samadhi/latest-run-diagnostics.json` directly from the app container. The file overwrites the prior run and contains progress, cadence, target and applied rates, track changes, recovery events, and the honest summary. Since schema 11 the buffer holds 2,048 entries and drops per-second ticks first, so every song change, rate write, mode change, cue, and notice from a run of any realistic length is still there; only the oldest ticks of a long run are gone.
 
 ~~~sh
 xcrun devicectl device copy from \
@@ -99,6 +99,18 @@ The Auto feedback prototypes are played by hand from a Debug-only screen. It shi
 6. Repeat the set for the other sound path before comparing families. Record the score, the seed, and any ducking, pause, gap, or route change in `Evidence/Device/`.
 
 Nothing in the prototype set becomes a product asset before this comparison. The acceptance bar lives in [AUTO-CHANGE-INTERACTION-SPEC.md](AUTO-CHANGE-INTERACTION-SPEC.md).
+
+## Reading cue outcomes
+
+A cue the reducer sent is not a cue that played. Since schema 11 the record says which it was.
+
+1. In the run file, filter the timeline to `"kind": "autoFeedbackDelivery"`. Each entry carries `autoFeedbackTransactionID`, `autoFeedbackMoment` (`began` or `arrived`), `autoFeedbackFamily`, `autoFeedbackSoundPath`, `autoFeedbackDeliveryOutcome`, and `autoFeedbackDeliveryDetail`.
+2. Read the outcome plainly: `playedThroughEngine` means the haptic engine started the pattern; `playedLocalSoundOnly` means no engine and the arrival sound went through the local player; `engineUnavailable`, `patternMissing`, and `cancelledBeforePlay` mean nothing physical happened, and the detail says why.
+3. Pair each delivery with the `autoFeedback` entry of the same transaction identifier to see what the reducer asked for and when. A `began` that was sent with no delivery entry after it is a bug in the shell, not a physical result.
+4. Filter to `"kind": "hapticEngine"` to see the engine's life: `created`, `started`, `startFailed`, `stopped` with Apple's reason in the detail, `reset`, `unsupported`. A `stopped: application suspended` between a `began` and its `arrived` is the locked-screen case the spec names as a required test.
+5. On an unlocked phone the hidden Debug screen shows the last three outcomes under `What became of the cues`, and the `Next song` row says whether a fitting song was prepared for the coming boundary.
+
+"Played" is the engine's word, not the hand's. Whether the cue could be felt in a pocket stays a physical judgment.
 
 ## Explaining a rejected song
 

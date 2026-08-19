@@ -22,6 +22,8 @@ The runner is usually not looking at the phone. A sentence on the run screen wou
 
 The normal run screen should not explain an Auto change with temporary text. Development diagnostics should keep the detailed numbers. The product should make the change understandable through touch and sound.
 
+One line is allowed, and it is not about an Auto change. When most of the ready collection cannot reach the settled target inside the rate window for twenty seconds, the run screen says so once per run per direction, in plain words ("Most of this playlist is faster than you're moving."), and takes it down on its own. That names the collection, not a change, and it answers the August 19 walk, where Auto held 0.85 for most of seven minutes with nothing said.
+
 ## Interaction decision
 
 Treat one meaningful Auto change as one identified transaction with a start, direction, size, and verified arrival.
@@ -37,6 +39,8 @@ After the first Apple Music reply confirms that the music has started moving tow
 - The size level reflects the reachable change in running pulse calculated from analyzed song tempo and Apple Music's reported speed, not a noisy sensor reading or an unreachable request.
 
 The first prototype bands are 6 through 9, 10 through 15, and 16 or more steps per minute. These are starting points only. The current Auto policy already ignores changes below 6 steps per minute. Physical testing may move the boundaries.
+
+The August 19 walk put a question on the bands before any comparison has run. At walking cadence on a 120 BPM song, a 5 percent speed change is 6 steps per minute: the smallest band, so the weakest cue, and the change hardest to hear in the music. The one Auto change the record shows on a fitting song (Numb, 0.95 to 0.90) was exactly that case, and Samay could not tell whether anything had happened. The first question for the physical comparison is therefore whether the smallest change needs the strongest start cue, not the weakest, because it is the one the music itself will not announce. The audition screen already separates size from direction, so the A/B is a small-band cue played at the medium intensity against the same change; no extra control is needed for it.
 
 ### Change arrives
 
@@ -58,6 +62,8 @@ A truthful song limit may receive the arrival only when the app intentionally ch
 ### Song boundaries
 
 Record why a song changed before adding feedback to the boundary.
+
+Since 2026-08-19 the reducer also looks ahead. Inside the last 45 seconds of a song it judges the queued next song against the settled Auto target; if that song cannot reach the target inside the rate window and something in the ready collection can, one better fit is prepared for the boundary, and a plan that still fits is kept rather than traded for a marginally better one. This is the same prepared-song path the boundary already had; it only starts earlier and judges the next song rather than the current one.
 
 - A user-requested Skip or Previous already has a direct cause. Do not cover it with an Auto story.
 - A natural boundary that uses a previously prepared better-fitting song may use the Auto arrival after the new song and its speed are confirmed.
@@ -86,6 +92,18 @@ The wheel detent shell was not enough for this job, so `AutoFeedbackService` was
 - an identified Apple Music reply now reaches it as a reducer effect and plays the matching cue.
 
 The reducer owns the one-time trigger and all song and request identities. SwiftUI never decides when an Auto cue is valid. The service is idempotent for each transaction and moment, cancels one transaction or every pending cue on demand, and stays silent on hardware without haptics while the sound still plays through a local audio player.
+
+### Delivery record
+
+Sending a cue is not playing one. The August 19 walk sent five start cues and three arrivals and could not say whether a single one reached the hand. Since 2026-08-19 every cue the service handles reports one outcome back to the shell with its transaction identifier, moment, family, and sound path:
+
+- played through the engine: the haptic engine accepted the pattern and started it, with the arrival sound inside the pattern or through the local player as noted;
+- played local sound only: no engine, so the arrival sound went through the local player and no haptic happened;
+- engine unavailable: no haptic hardware, an engine that would not start, or a pattern the engine refused to start, with the reason;
+- pattern missing: the asset did not resolve or did not parse;
+- cancelled before play: an arrival still held behind its own start when a rule ended the transaction.
+
+The engine reports its own lifecycle the same way: created, started, start failed, stopped with Apple's reason, reset, unsupported. Debug builds write every one of these into the run record as `autoFeedbackDelivery` and `hapticEngine` entries and show the last three cue outcomes on the hidden Debug screen. "Played" still says nothing about whether a pocket could feel it; that remains a physical judgment.
 
 Apple documents that the haptic engine can stop after an audio interruption or app suspension. Samadhi uses background audio, but that does not prove custom haptics survive phone lock in this app. The phone-lock case is a required test, not an assumption.
 
