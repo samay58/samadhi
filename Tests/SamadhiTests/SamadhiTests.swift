@@ -259,7 +259,8 @@ import Testing
             operationID: 1,
             trackIndex: 0,
             elapsedSeconds: 12,
-            durationSeconds: 180
+            durationSeconds: 180,
+            selectionID: 900
         )
     )
     _ = apply(.activeSecond(tempoMatched: true))
@@ -363,6 +364,135 @@ import Testing
     #expect(rolling.timeline.last?.cadenceFilterState == "tracking")
     #expect(rolling.timeline.last?.cadenceSampleDisposition == "acceptedFresh")
     #expect(rolling.timeline.last?.filteredCadenceSPM == 159)
+}
+
+// The August 19 walk lost its first 205 seconds and a whole song because the buffer evicted by
+// age alone. Ticks go first now; the story of the run stays.
+@Test func runDiagnosticsEvictPerSecondTicksBeforeTheStoryOfTheRun() throws {
+    var time = Date(timeIntervalSince1970: 1_721_000_000)
+    var recorder = RunDiagnosticsRecorder(now: { time })
+    let collection = importedCollection(id: "long", name: "Long run", readyCount: 3)
+    let reducer = RunReducer(tracks: collection.tracks)
+    var state: RunState = .ready
+    var lastSnapshot: RunDiagnosticSnapshot?
+
+    func apply(_ event: RunEvent) {
+        let oldState = state
+        state = reducer.reduce(state: state, event: event).0
+        time = time.addingTimeInterval(1)
+        if let snapshot = recorder.record(
+            event: event,
+            oldState: oldState,
+            newState: state,
+            collection: collection
+        ) {
+            lastSnapshot = snapshot
+        }
+    }
+
+    apply(.startTapped(sessionID: 1))
+    apply(.authorizationResolved(sessionID: 1, .authorized))
+    apply(.playbackPrepared(sessionID: 1, trackID: collection.tracks[0].id))
+    apply(
+        .cadenceUpdated(
+            sessionID: 1,
+            acquisitionID: 1,
+            stepsPerMinute: 168,
+            deltaSeconds: 1,
+            rateRequestID: 3
+        )
+    )
+
+    // Far more ticks than the buffer holds, with a song change every 400 seconds.
+    let seconds = RunDiagnosticsRecorder.maximumEntries * 2
+    var songChanges = 0
+    for second in 0..<seconds {
+        apply(.activeSecond(tempoMatched: second.isMultiple(of: 2)))
+        if second % 400 == 399 {
+            songChanges += 1
+            let index = 1 + (songChanges % 2)
+            apply(
+                .playbackTrackChanged(
+                    sessionID: 1,
+                    operationID: 1,
+                    trackID: collection.tracks[index].id,
+                    trackIndex: index,
+                    reason: .naturalBoundary,
+                    rateRequestID: 100 + songChanges
+                )
+            )
+        }
+    }
+    apply(.surfaceTapped(timeoutID: 4))
+    apply(.finishTapped)
+    apply(.finishHoldBegan(holdID: 9))
+    apply(.finishHoldCompleted(holdID: 9))
+    apply(.finishCompleted(sessionID: 1))
+    let snapshot = try #require(lastSnapshot)
+
+    #expect(snapshot.completionState == .completed)
+    #expect(snapshot.timeline.count == RunDiagnosticsRecorder.maximumEntries)
+    let story = snapshot.timeline.filter { !$0.kind.isTick }
+    #expect(story.first?.kind == .started)
+    #expect(story.filter { $0.kind == .trackChanged }.count == songChanges)
+    #expect(story.last?.kind == .finished)
+    // Every surviving tick is newer than every evicted one: the oldest ticks went first.
+    let ticks = snapshot.timeline.filter { $0.kind.isTick }
+    #expect(ticks.allSatisfy { $0.kind == .activeSecond })
+    let oldestSurvivingTick = try #require(ticks.first?.activeSeconds)
+    #expect(oldestSurvivingTick == seconds - ticks.count + 1)
+    #expect(ticks.map(\.activeSeconds) == ticks.map(\.activeSeconds).sorted())
+}
+
+@Test func runDiagnosticsRecordCueDeliveryAndEngineEvents() throws {
+    var time = Date(timeIntervalSince1970: 1_721_000_000)
+    var recorder = RunDiagnosticsRecorder(now: { time })
+    let collection = importedCollection(id: "cues", name: "Cue run", readyCount: 3)
+    let reducer = RunReducer(tracks: collection.tracks)
+    var state: RunState = .ready
+    for event in [
+        RunEvent.startTapped(sessionID: 1),
+        .authorizationResolved(sessionID: 1, .authorized),
+        .playbackPrepared(sessionID: 1, trackID: collection.tracks[0].id),
+    ] {
+        let oldState = state
+        state = reducer.reduce(state: state, event: event).0
+        _ = recorder.record(event: event, oldState: oldState, newState: state, collection: collection)
+        time = time.addingTimeInterval(1)
+    }
+
+    let engineSnapshot = recorder.record(
+        hapticEngine: .stopped(reason: "application suspended"),
+        state: state,
+        collection: collection
+    )
+    let engine = try #require(engineSnapshot)
+    #expect(engine.timeline.last?.kind == .hapticEngine)
+    #expect(engine.timeline.last?.hapticEngineEvent == "stopped")
+    #expect(engine.timeline.last?.autoFeedbackDeliveryDetail == "application suspended")
+
+    let deliverySnapshot = recorder.record(
+        autoFeedbackDelivery: AutoFeedbackDeliveryRecord(
+            transactionID: 4,
+            moment: .arrived,
+            family: .swell,
+            soundPath: .avAudioPlayer,
+            outcome: .playedLocalSoundOnly,
+            detail: "engine not running"
+        ),
+        state: state,
+        collection: collection
+    )
+    let delivery = try #require(deliverySnapshot)
+    let entry = try #require(delivery.timeline.last)
+    #expect(entry.kind == .autoFeedbackDelivery)
+    #expect(entry.autoFeedbackTransactionID == 4)
+    #expect(entry.autoFeedbackMoment == "arrived")
+    #expect(entry.autoFeedbackFamily == "swell")
+    #expect(entry.autoFeedbackSoundPath == "avAudioPlayer")
+    #expect(entry.autoFeedbackDeliveryOutcome == "playedLocalSoundOnly")
+    #expect(entry.autoFeedbackDeliveryDetail == "engine not running")
+    #expect(delivery.schemaVersion == 11)
 }
 
 @Test func diagnosticViewKeepsSongBeatsAndRunnerStepsSeparate() throws {
@@ -890,8 +1020,8 @@ private extension SimulationConfiguration {
     )
 }
 
-@Test func diagnosticFileVersionRecordsTheAutoFeedbackFields() {
-    #expect(RunDiagnosticSnapshot.currentSchemaVersion == 10)
+@Test func diagnosticFileVersionRecordsTheDeliveryAndReachFields() {
+    #expect(RunDiagnosticSnapshot.currentSchemaVersion == 11)
 }
 
 @Test func trackChangeAttributionOnlyCallsTheEndOfASongANaturalBoundary() {
