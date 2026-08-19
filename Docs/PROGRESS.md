@@ -618,7 +618,7 @@ This checkpoint recorded a passing local candidate before its exact-profile buil
 ## 2026-08-19. Second phone install
 
 - Built commit `13e88bf` for the paired iPhone with the same exact profile, verified the embedded identifier and strict signature, and confirmed the built fingerprint `085e5fe7...` equals the source script
-- Installed in place; the selected collection stayed byte-identical. The phone was locked, so no launch and no in-app read-back for this build
+- Installed in place; the selected collection stayed byte-identical. The phone unlocked shortly after, so the build was launched into the hidden Debug screen and read back the same fingerprint on the device
 - Read the pulled collection: 25 songs, 13 not ready, 11 of them the catalog tie the morning fix addresses; the playlist has to be chosen again in the app to re-resolve them
 
 ## Current checkpoint
