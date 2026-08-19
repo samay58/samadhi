@@ -22,6 +22,7 @@
 		72E64F72041838CDC66563F9 /* FeedbackAuditionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 154EE935A446131D42338848 /* FeedbackAuditionView.swift */; };
 		7447DD9A496F5085B1D37B6B /* SamadhiDomain in Frameworks */ = {isa = PBXBuildFile; productRef = C461B57BEEA896BE3B7CAC5B /* SamadhiDomain */; };
 		78FAE03DF8A4D42BD14A7DD8 /* silent-loop.wav in Resources */ = {isa = PBXBuildFile; fileRef = CDFAF5B2DD68CC941F094A15 /* silent-loop.wav */; };
+		7E4F98E24CEFF3F70746D3A2 /* CatalogMatchSelection.swift in Sources */ = {isa = PBXBuildFile; fileRef = F806C6B8683EBFAAC8F4B331 /* CatalogMatchSelection.swift */; };
 		871186B28534AC90B4C2EF59 /* RunDiagnosticsStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4ACE7BDE3E8FD53F230A3CF /* RunDiagnosticsStore.swift */; };
 		8E48AE66560F367C401395CF /* SamadhiMotion in Frameworks */ = {isa = PBXBuildFile; productRef = 87200EBB3D911863E80E185E /* SamadhiMotion */; };
 		A592E055654CAC8DE4DBEAD1 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8200E148AF4ABACA3B47ADA2 /* Assets.xcassets */; };
@@ -33,6 +34,7 @@
 		BFB93B5F0188CF63A19E30CB /* RunPresentationModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27E4457C2F93694193D8E85D /* RunPresentationModel.swift */; };
 		D2DEE5D8F696BC6339CA819B /* SimulationConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95B076E4388E9E61360A6215 /* SimulationConfiguration.swift */; };
 		D80D703E28BBEBEDC8A9AE3A /* SamadhiDesign in Frameworks */ = {isa = PBXBuildFile; productRef = A48F446192EFBD7579C7BF67 /* SamadhiDesign */; };
+		DC04EBADBD5D9730DFF4E475 /* CatalogMatchSelectionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6073077C41B4BE8F60B9B920 /* CatalogMatchSelectionTests.swift */; };
 		E36F70535DAEA25AE41BC0E2 /* AutoFeedbackPlaying.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4735B80A07DFC3745740687 /* AutoFeedbackPlaying.swift */; };
 		EC41CEFCE78C60A45AD5680A /* SamadhiApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1CE55560A18BCBFBAF13E01 /* SamadhiApp.swift */; };
 		F1FCC27619C1057F3234368A /* AutoFeedbackServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B2A22B19D1B15484A5882F0 /* AutoFeedbackServiceTests.swift */; };
@@ -73,6 +75,7 @@
 		4B2A22B19D1B15484A5882F0 /* AutoFeedbackServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AutoFeedbackServiceTests.swift; sourceTree = "<group>"; };
 		4D1DC69D053D26289313867F /* TrackChangeAttribution.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackChangeAttribution.swift; sourceTree = "<group>"; };
 		54135107A419A0D2E9DC0C01 /* MusicKitFeasibilityModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicKitFeasibilityModel.swift; sourceTree = "<group>"; };
+		6073077C41B4BE8F60B9B920 /* CatalogMatchSelectionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CatalogMatchSelectionTests.swift; sourceTree = "<group>"; };
 		64781032C8A2BA5D5DD7DF6C /* Samadhi.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Samadhi.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		68062F4BB4E7FDBE2A2EEEC0 /* PlaylistPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaylistPickerView.swift; sourceTree = "<group>"; };
 		76916E6545E70E7C834F3DF5 /* AutoFeedback */ = {isa = PBXFileReference; lastKnownFileType = folder; name = AutoFeedback; path = Resources/AutoFeedback; sourceTree = SOURCE_ROOT; };
@@ -90,6 +93,7 @@
 		E3F20844D8B2427EC13193D1 /* MusicCollectionStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicCollectionStore.swift; sourceTree = "<group>"; };
 		F120283C071A83D9D7B2824A /* AppleMusicCatalogResolver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppleMusicCatalogResolver.swift; sourceTree = "<group>"; };
 		F4ACE7BDE3E8FD53F230A3CF /* RunDiagnosticsStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RunDiagnosticsStore.swift; sourceTree = "<group>"; };
+		F806C6B8683EBFAAC8F4B331 /* CatalogMatchSelection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CatalogMatchSelection.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -137,6 +141,7 @@
 			isa = PBXGroup;
 			children = (
 				4B2A22B19D1B15484A5882F0 /* AutoFeedbackServiceTests.swift */,
+				6073077C41B4BE8F60B9B920 /* CatalogMatchSelectionTests.swift */,
 				131DED91DED56986EDD4FE9B /* SamadhiTests.swift */,
 			);
 			path = SamadhiTests;
@@ -190,6 +195,7 @@
 				B4735B80A07DFC3745740687 /* AutoFeedbackPlaying.swift */,
 				3E0A057778B7B97CA63AAF73 /* AutoFeedbackService.swift */,
 				036B4F7F43B0687A14D17D62 /* BuildIdentity.swift */,
+				F806C6B8683EBFAAC8F4B331 /* CatalogMatchSelection.swift */,
 				E0F72FD4AEB0DCFEBEB35798 /* CoreLoopDiagnosticsView.swift */,
 				154EE935A446131D42338848 /* FeedbackAuditionView.swift */,
 				E3F20844D8B2427EC13193D1 /* MusicCollectionStore.swift */,
@@ -390,6 +396,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				F1FCC27619C1057F3234368A /* AutoFeedbackServiceTests.swift in Sources */,
+				DC04EBADBD5D9730DFF4E475 /* CatalogMatchSelectionTests.swift in Sources */,
 				A9FE8C130C33F60BB2C2925B /* SamadhiTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -413,6 +420,7 @@
 				E36F70535DAEA25AE41BC0E2 /* AutoFeedbackPlaying.swift in Sources */,
 				F26D1547C19449399394A09E /* AutoFeedbackService.swift in Sources */,
 				51EB9C96F9C249EF44D2F1D1 /* BuildIdentity.swift in Sources */,
+				7E4F98E24CEFF3F70746D3A2 /* CatalogMatchSelection.swift in Sources */,
 				07D013B48DAAF6A86489BBE0 /* CoreLoopDiagnosticsView.swift in Sources */,
 				72E64F72041838CDC66563F9 /* FeedbackAuditionView.swift in Sources */,
 				4DF6F900AB14574D241956D6 /* MusicCollectionStore.swift in Sources */,

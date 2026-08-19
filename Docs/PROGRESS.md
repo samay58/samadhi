@@ -595,6 +595,16 @@ This checkpoint recorded a passing local candidate before its exact-profile buil
 - Built the `Samadhi Feedback Audition` scheme for the phone from the same bundle and did not install it separately
 - Recorded the install in `Evidence/Device/2026-08-19-phone-install/` with the Debug screenshot and no song or playlist names
 
+## 2026-08-19. Catalog ties stop dropping songs
+
+- Read the pulled collection file from the phone: 9 of 17 songs in the selected playlist were not ready, 5 as `catalogMatchUnavailable` and 4 as `rhythmUnclear`
+- Traced every `catalogMatchUnavailable` song to a library item with no ISRC, a non-numeric library identifier, and a strict metadata search that returned the explicit and clean edits as an exact tie, which the resolver rejected as ambiguous
+- Added a catalog lookup by the `catalogId` carried inside the library item's encoded play parameters before the metadata search
+- Moved the tie decision into `CatalogMatchSelection`, a pure rule: same content rating as the library track wins, explicit wins when the library rating is unknown, otherwise closest duration then identifier
+- Left `rhythmUnclear` alone, because those songs resolved and the analyzer judged the preview itself
+- Added five app-model tests for the rule; the count is now 44
+- Not yet on the phone. The selected playlist must be chosen again in the app after the next install so the unmatched songs resolve again
+
 ## Current checkpoint
 
 The transport and Finish pass, deterministic song-change causes, and the first directional Auto feedback prototype are merged on `main`, pass the software gate, and are installed on the phone with the in-app fingerprint confirmed. Endpoint read-back and listening at 0.85 and 1.15 carry over from the previous candidate, and tactile feel, sound quality, locked-screen delivery, and Apple Music coexistence have no result at all. The next step is the ordered checklist in [PHONE-CHECK-2026-08-19.md](PHONE-CHECK-2026-08-19.md) from step 2 onward. After it, the next Main Thing is the 20-minute outdoor run.

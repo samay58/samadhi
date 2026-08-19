@@ -15,21 +15,37 @@ struct AppleMusicCatalogResolver {
             }
         }
 
-        if #available(iOS 26.4, *),
-            track.id.rawValue.allSatisfy(\.isNumber)
-        {
-            var request = MusicCatalogResourceRequest<Song>(
-                matching: \.id,
-                equalTo: track.id
-            )
-            request.limit = 1
-            request.options = [.findEquivalents]
-            if let song = try await request.response().items.first {
+        for candidate in [track.id.rawValue, catalogID(from: track.playParameters)]
+        where candidate?.allSatisfy(\.isNumber) == true {
+            if let candidate, let song = try await catalogSong(id: MusicItemID(candidate)) {
                 return song
             }
         }
 
         return try await strictMetadataMatch(for: track)
+    }
+
+    private func catalogSong(id: MusicItemID) async throws -> Song? {
+        var request = MusicCatalogResourceRequest<Song>(matching: \.id, equalTo: id)
+        request.limit = 1
+        if #available(iOS 26.4, *) {
+            request.options = [.findEquivalents]
+        }
+        return try await request.response().items.first
+    }
+
+    /// Library items expose their catalog counterpart only inside the opaque play parameters.
+    /// The encoded form carries a numeric `catalogId` for library songs that came from Apple Music.
+    /// When it is absent or not numeric, the caller falls through to the metadata search.
+    private func catalogID(from parameters: PlayParameters?) -> String? {
+        guard let parameters,
+            let data = try? JSONEncoder().encode(parameters),
+            let object = try? JSONSerialization.jsonObject(with: data) as? [String: Any]
+        else { return nil }
+        let value = object["catalogId"] ?? object["catalogID"]
+        if let string = value as? String { return string }
+        if let number = value as? NSNumber { return number.stringValue }
+        return nil
     }
 
     private func strictMetadataMatch(for track: Track) async throws -> Song? {
@@ -44,22 +60,32 @@ struct AppleMusicCatalogResolver {
         )
         request.limit = 25
         let response = try await request.response()
-        let matches = response.songs.compactMap { song -> (Song, TimeInterval)? in
-            guard textMatches(song.title, track.title),
-                textMatches(song.artistName, track.artistName),
-                textMatches(song.albumTitle ?? "", album),
-                let songDuration = song.duration
-            else { return nil }
-            let delta = abs(songDuration - duration)
-            return delta <= 3 ? (song, delta) : nil
+        let songs = response.songs.filter { song in
+            textMatches(song.title, track.title)
+                && textMatches(song.artistName, track.artistName)
+                && textMatches(song.albumTitle ?? "", album)
+                && song.duration != nil
         }
-        .sorted { $0.1 < $1.1 }
+        let chosenID = CatalogMatchSelection.choose(
+            from: songs.map {
+                CatalogMatchSelection.Candidate(
+                    id: $0.id.rawValue,
+                    durationSeconds: $0.duration ?? 0,
+                    rating: rating($0.contentRating)
+                )
+            },
+            trackDurationSeconds: duration,
+            trackRating: rating(track.contentRating)
+        )
+        return songs.first { $0.id.rawValue == chosenID }
+    }
 
-        guard let best = matches.first else { return nil }
-        if matches.count > 1, matches[1].1 - best.1 < 0.5 {
-            return nil
+    private func rating(_ value: ContentRating?) -> CatalogMatchSelection.Candidate.Rating? {
+        switch value {
+        case .clean: .clean
+        case .explicit: .explicit
+        default: nil
         }
-        return best.0
     }
 
     private func textMatches(_ lhs: String, _ rhs: String) -> Bool {
