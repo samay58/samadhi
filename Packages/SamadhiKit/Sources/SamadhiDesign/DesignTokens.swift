@@ -24,4 +24,6 @@ public enum MotionToken {
     public static let feedback = 0.22
     public static let control = 0.18
     public static let transition = 0.42
+    // Press compression and release. Short enough to read as pressure, not as animation.
+    public static let press = 0.1
 }

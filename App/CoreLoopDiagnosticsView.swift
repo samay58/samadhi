@@ -44,6 +44,8 @@
         let resultingMusicalBPM: Double?
         let resultingStepRhythmSPM: Double?
         let remainingDifferenceSPM: Double?
+        let autoCueText: String
+        let lastSongChangeText: String
         let status: TempoDiagnosticStatus
 
         init(
@@ -111,6 +113,8 @@
             remainingDifferenceSPM = controllingRhythm.flatMap { target in
                 resultingStepRhythm.map { $0 - target }
             }
+            autoCueText = Self.autoCueLabel(session?.autoFeedback.transaction)
+            lastSongChangeText = Self.songChangeLabel(session?.lastTrackChangeReason)
             status = Self.status(for: session)
         }
 
@@ -158,6 +162,8 @@
                 resultingMusicalBPM: reportedRate.map { 84 * $0 },
                 resultingStepRhythmSPM: resultingRunning,
                 remainingDifferenceSPM: resultingRunning.map { $0 - 175 },
+                autoCueText: "Cue 1, faster, medium, began",
+                lastSongChangeText: "Natural end of the song",
                 status: status
             )
         }
@@ -187,6 +193,8 @@
             resultingMusicalBPM: Double?,
             resultingStepRhythmSPM: Double?,
             remainingDifferenceSPM: Double?,
+            autoCueText: String,
+            lastSongChangeText: String,
             status: TempoDiagnosticStatus
         ) {
             self.build = build
@@ -213,7 +221,38 @@
             self.resultingMusicalBPM = resultingMusicalBPM
             self.resultingStepRhythmSPM = resultingStepRhythmSPM
             self.remainingDifferenceSPM = remainingDifferenceSPM
+            self.autoCueText = autoCueText
+            self.lastSongChangeText = lastSongChangeText
             self.status = status
+        }
+
+        private static func autoCueLabel(_ transaction: AutoFeedbackTransaction?) -> String {
+            guard let transaction else { return "No Auto cue in flight" }
+            let phase: String
+            switch transaction.phase {
+            case .committed: phase = "committed, waiting for Apple Music"
+            case .began: phase = "began"
+            case .arrived: phase = transaction.isLimited ? "arrived at this song's limit" : "arrived"
+            }
+            return String(
+                format: "Cue %d, %@, %@, %@ (%+.0f SPM)",
+                transaction.id,
+                transaction.direction.rawValue,
+                transaction.size.rawValue,
+                phase,
+                transaction.changeSPM
+            )
+        }
+
+        private static func songChangeLabel(_ reason: TrackChangeReason?) -> String {
+            switch reason {
+            case .explicitPrevious: "Previous requested here"
+            case .explicitSkip: "Next requested here"
+            case .naturalBoundary: "Natural end of the song"
+            case .externalUnknown: "Changed outside Samadhi"
+            case .recovery: "Recovery"
+            case nil: "No confirmed song change yet"
+            }
         }
 
         private static func autoStatusLabel(_ status: AutoTargetStatus) -> String {
@@ -303,6 +342,10 @@
                         row("Resulting step rhythm", spm(presentation.resultingStepRhythmSPM))
                             .accessibilityIdentifier("resulting-step-rhythm")
                         row("Difference from target", signedSPM(presentation.remainingDifferenceSPM))
+                        row("Auto cue", presentation.autoCueText)
+                            .accessibilityIdentifier("auto-cue")
+                        row("Last song change", presentation.lastSongChangeText)
+                            .accessibilityIdentifier("last-song-change")
                         Text(presentation.status.label)
                             .font(.headline)
                             .foregroundStyle(statusColor)

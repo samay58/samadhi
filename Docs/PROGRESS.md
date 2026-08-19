@@ -542,10 +542,6 @@ This checkpoint recorded a passing local candidate before its exact-profile buil
 - Installed over the existing phone app without uninstalling and preserved the selected collection byte-for-byte
 - Kept endpoint Apple Music read-back, sound quality, and long-form reliability open because the phone locked before launch
 
-## Current checkpoint
-
-The expanded-rate candidate passes the full software gate and is installed with exact signing. Its in-app fingerprint read-back, 0.85 and 1.15 Apple Music replies, and listening approval remain open because the phone locked before launch. After that short physical gate, the next Main Thing remains the transport and Finish craft pass. Directional Auto feedback remains specified for later physical prototyping.
-
 ## 2026-08-17. Core reset consolidation
 
 - Rewrote the public README and current status around the code and evidence that exist today
@@ -555,3 +551,40 @@ The expanded-rate candidate passes the full software gate and is installed with 
 - Confirmed that this repository has one worktree, with no stale worktrees to merge or remove
 - Passed bootstrap, formatter lint, 153 package tests, 27 app-model tests, 28 serial interface tests, and resource-inclusive Debug and Release Simulator builds
 - Confirmed that the hidden developer screen is absent from the Release app
+
+## 2026-08-18. Transport, causes, and Auto feedback candidate
+
+- Replaced the three floating transport pills with one continuous glass capsule bar carrying Previous, Pause or Resume, and Next
+- Chose the raised primary disc over hairline dividers because the disc names the primary action without adding two lines, keeps the bar one object, and gives the paused state somewhere to live
+- Reproduced the Finish overflow on 30 fps video before the change and found the first cause: a resting 136 by 48 point Finish pill and a 190 by 54 point hold pill crossfading in the same slot, with both borders and both labels visible for about eight frames
+- Found the second cause: the hold progress fill was a background capsule drawn behind the glass shape, so it neither clipped to the pill nor followed the pressed scale and showed a second edge offset below and left
+- Found a third defect on video during the work: SwiftUI crossfaded the words `Finish` and `Hold to finish` even inside one view
+- Made Finish and the hold one button whose word and width change in a single frame, with the fill drawn behind the label and clipped by the same capsule before any glass or stroke
+- Shared `FinishHold.durationSeconds` between reducer scheduling, the long-press minimum, and the fill animation
+- Kept the determinate fill sweeping under Reduce Motion and turned off only the press compression
+- Added one selection tick for an accepted Previous or Next tap and a soft impact when Finish arms
+- Added `finishHoldPressing` so `Keep holding to finish` appears only while the hold is actually pressing
+- Moved the Auto feedback decision into the reducer as one identified transaction with a committed origin, a verified start, and a verified arrival
+- Limited each transaction to at most one start and one arrival, and blocked cues for raw or filtered cadence, an unsettled candidate, intermediate ramp replies, pending, mismatched, rejected, and stale replies, a reaffirmed target, a Previous or Next tap, and an old song
+- Made a new qualifying target replace the transaction in flight silently, and made manual takeover, a lost Auto target, route loss, interruption, playback failure, and finish all stop it without replay on recovery
+- Added `externalUnknown` and a pure attribution rule: a claimed Previous or Next inside five seconds, otherwise a natural end only when the previous song was within 10 seconds of its duration, otherwise an outside change
+- Recorded the cause on every confirmed song change and showed it in the hidden Debug screen as `Last song change`
+- Recorded the same-song callback as its own diagnostic entry while the reducer keeps ignoring it
+- Added scripted simulated player events for a natural boundary, an external boundary, an interruption, an interruption end, and a same-song callback, each behind its own launch flag
+- Scheduled the scripted interruption end after recovery starts, because entering recovery cancels every task
+- Advanced the run diagnostic file to version 10 with the Auto cue transaction, phase, direction, size, change in SPM, and limit flag, and added no song or playlist name
+- Added `AutoFeedbackService`: one lazy Core Haptics engine with audio allowed, stopped and reset handlers, dropped cached players and re-registered audio on reset, and sound still playing through a local player when the device has no haptic hardware
+- Built three prototype families, pulse, swell, and step, as 24 AHAP files: six start patterns per family across two directions and three size bands, plus one arrival pattern per direction, with start spans from 0.160 to 0.240 seconds
+- Scaled size by peak intensity only, at 0.45, 0.65, and 0.95, so the event order and the learned direction never change
+- Generated six arrival sounds with the Python standard library at 48 kHz, mono, 16-bit, 0.310 to 0.375 seconds, each peaking at exactly -9.00 dBFS with RMS from -17.3 to -21.0 dBFS
+- Recorded the parameters and SHA-256 of every sound in `Evidence/Audio/2026-08-18-auto-feedback-prototypes/sound-manifest.json`
+- Added a Debug-only audition screen with family, direction, size, sound path, both toggles, and a 10-trial blinded mode with a visible seed and a copyable score
+- Confirmed the audition screen is absent from Release by reading `Samadhi.debug.dylib`, because the Debug `Samadhi.app/Samadhi` is a launcher stub that reports zero matches for everything
+- Inspected 39 Simulator images covering five environments, including a 54-frame hold contact sheet, and wrote both evidence READMEs without song titles, playlist names, or account details
+- Passed formatter lint, 179 package tests, 39 app-model tests, 32 serial interface tests, source-fingerprint tests, and resource-inclusive Debug and Release Simulator builds
+- Made no phone build and installed nothing, so no source fingerprint exists for this candidate
+- Recovered from the MacBook data volume reaching 100 percent by deleting XCTestDevices clones and two stale DerivedData folders, which left 29 GiB free
+
+## Current checkpoint
+
+The transport and Finish pass, deterministic song-change causes, and the first directional Auto feedback prototype are merged on `main` and pass the software gate. No phone build happened this session, so nothing from this candidate is installed. Endpoint read-back and listening at 0.85 and 1.15 carry over from the previous candidate, and tactile feel, sound quality, locked-screen delivery, and Apple Music coexistence have no result at all. The next step is the ordered checklist in [PHONE-CHECK-2026-08-19.md](PHONE-CHECK-2026-08-19.md). After it, the next Main Thing is the 20-minute outdoor run.

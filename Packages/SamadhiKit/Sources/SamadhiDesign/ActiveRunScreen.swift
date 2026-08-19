@@ -27,7 +27,7 @@ struct ActiveRunScreen: View {
                     .frame(minHeight: showsStatus ? 44 : 4)
                     .padding(.horizontal, showsStatus ? Space.x4 : 0)
                     .background {
-                        if showsStatus {
+                        if showsStatusWell {
                             Ellipse()
                                 .fill(SamadhiColor.ink.opacity(0.38))
                                 .frame(width: 210, height: 70)
@@ -65,12 +65,18 @@ struct ActiveRunScreen: View {
                     "Song position, \(RunDurationText.spoken(state.trackElapsedSeconds))"
                 )
 
-            if transportControlsVisible {
+            if transportControlsVisible || state.phase == .confirmingFinish {
+                // The bar keeps its place while Finish is armed so the hold control does not
+                // jump into the bar's slot and the two controls never overlap.
                 TransportControls(state: state, send: send)
+                    .opacity(state.phase == .confirmingFinish ? 0 : 1)
+                    .allowsHitTesting(state.phase != .confirmingFinish)
+                    .accessibilityHidden(state.phase == .confirmingFinish)
                     .transition(.opacity.combined(with: .move(edge: .bottom)))
             }
 
             finishControl
+                .padding(.top, Space.x2)
         }
         .padding(.horizontal, Space.x4)
         .padding(.vertical, Space.x4)
@@ -85,20 +91,14 @@ struct ActiveRunScreen: View {
 
     @ViewBuilder
     private var finishControl: some View {
-        if state.phase == .confirmingFinish {
-            HoldToFinishControl(send: send, reduceMotionOverride: state.forceReduceMotion)
-                .transition(.opacity)
-        } else if transportControlsVisible {
-            Button(action: beginFinish) {
-                Text("Finish")
-                    .font(.body.weight(.semibold))
-                    .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
-                    .frame(width: dynamicTypeSize.isAccessibilitySize ? 176 : 136, height: 48)
-            }
-            .buttonStyle(.glass)
-            .tint(SamadhiColor.ivory.opacity(0.2))
-            .accessibilityIdentifier("finish-run")
-            .accessibilityHint("Changes to a hold control so the run cannot end accidentally")
+        if transportControlsVisible || state.phase == .confirmingFinish {
+            FinishControl(
+                armed: state.phase == .confirmingFinish,
+                send: send,
+                reduceMotionOverride: state.forceReduceMotion,
+                increasedContrastOverride: state.forceIncreasedContrast
+            )
+            .transition(.opacity)
         }
     }
 
@@ -119,6 +119,13 @@ struct ActiveRunScreen: View {
         default:
             .interrupted
         }
+    }
+
+    // The status row holds its height while Finish is armed, but the well and the line only
+    // appear once the hold is actually pressing.
+    private var showsStatusWell: Bool {
+        if state.phase == .confirmingFinish { return state.finishHoldPressing }
+        return showsStatus
     }
 
     private var showsStatus: Bool {
@@ -146,9 +153,6 @@ struct ActiveRunScreen: View {
         if voiceOverEnabled { send(.controlsInteractionChanged(true)) }
     }
 
-    private func beginFinish() {
-        send(.finishTapped)
-    }
 }
 
 private struct RunStatus: View {
@@ -178,7 +182,11 @@ private struct RunStatus: View {
         case .paused:
             statusText("Paused", font: .headline)
         case .confirmingFinish:
-            statusText("Keep holding to finish")
+            if state.finishHoldPressing {
+                statusText("Keep holding to finish")
+            } else {
+                Color.clear.frame(height: 1)
+            }
         case .finishing:
             statusText("Finishing")
         default:

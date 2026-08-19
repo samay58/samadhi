@@ -1,0 +1,26 @@
+{
+  "Version": 1.0,
+  "Metadata": {
+    "Project": "Samadhi",
+    "Created": "2026-08-18",
+    "Description": "step arrival slower. One soft terminal transient paired with the arrival sound."
+  },
+  "Pattern": [
+    {
+      "Event": {
+        "Time": 0.0,
+        "EventType": "HapticTransient",
+        "EventParameters": [
+          {
+            "ParameterID": "HapticIntensity",
+            "ParameterValue": 0.4
+          },
+          {
+            "ParameterID": "HapticSharpness",
+            "ParameterValue": 0.08
+          }
+        ]
+      }
+    }
+  ]
+}

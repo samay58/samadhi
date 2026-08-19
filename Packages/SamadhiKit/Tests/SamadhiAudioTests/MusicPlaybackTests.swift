@@ -109,3 +109,110 @@ import Testing
             )
     )
 }
+
+@MainActor
+private func scriptedPlayer() -> (SimulatedMusicPlayer, MusicCollection) {
+    let player = SimulatedMusicPlayer()
+    let collection = MusicCollection(
+        id: MusicCollectionID("scripted"),
+        name: "Scripted",
+        tracks: [
+            MusicTrack(id: MusicTrackID("one"), title: "One", durationSeconds: 60),
+            MusicTrack(id: MusicTrackID("two"), title: "Two", durationSeconds: 60),
+            MusicTrack(id: MusicTrackID("three"), title: "Three", durationSeconds: 60),
+        ]
+    )
+    return (player, collection)
+}
+
+@Test @MainActor func scriptedNaturalBoundaryUsesThePreparedTrackAndItsOwnReason() async throws {
+    let (player, collection) = scriptedPlayer()
+    var events = player.events().makeAsyncIterator()
+
+    try await player.prepare(collection, startingAt: collection.tracks[0].id, operationID: 70)
+    try await player.prepareNext(
+        trackID: collection.tracks[2].id,
+        operationID: 70,
+        selectionID: 71
+    )
+    player.simulateNaturalBoundary(operationID: 70)
+
+    #expect(await events.next() == .prepared(operationID: 70, trackID: collection.tracks[0].id))
+    #expect(
+        await events.next()
+            == .trackChanged(
+                operationID: 70,
+                trackID: collection.tracks[2].id,
+                reason: .naturalBoundary
+            )
+    )
+}
+
+@Test @MainActor func scriptedExternalBoundaryMovesTheQueueWithoutSamadhisPreparedTrack() async throws {
+    let (player, collection) = scriptedPlayer()
+    var events = player.events().makeAsyncIterator()
+
+    try await player.prepare(collection, startingAt: collection.tracks[0].id, operationID: 72)
+    try await player.prepareNext(
+        trackID: collection.tracks[2].id,
+        operationID: 72,
+        selectionID: 73
+    )
+    player.simulateExternalBoundary(operationID: 72)
+
+    #expect(await events.next() == .prepared(operationID: 72, trackID: collection.tracks[0].id))
+    #expect(
+        await events.next()
+            == .trackChanged(
+                operationID: 72,
+                trackID: collection.tracks[1].id,
+                reason: .externalUnknown
+            )
+    )
+}
+
+@Test @MainActor func scriptedSameSongCallbackNamesTheCurrentTrack() async throws {
+    let (player, collection) = scriptedPlayer()
+    var events = player.events().makeAsyncIterator()
+
+    try await player.prepare(collection, startingAt: collection.tracks[1].id, operationID: 74)
+    player.simulateSameSongCallback(operationID: 74)
+
+    #expect(await events.next() == .prepared(operationID: 74, trackID: collection.tracks[1].id))
+    #expect(
+        await events.next()
+            == .trackChanged(
+                operationID: 74,
+                trackID: collection.tracks[1].id,
+                reason: .explicitSkip
+            )
+    )
+}
+
+@Test @MainActor func scriptedInterruptionReportsItsBeginningAndItsEnd() async throws {
+    let (player, collection) = scriptedPlayer()
+    var events = player.events().makeAsyncIterator()
+
+    try await player.prepare(collection, startingAt: collection.tracks[0].id, operationID: 76)
+    player.simulateInterruption(operationID: 76)
+    player.simulateInterruptionEnded(operationID: 76)
+
+    #expect(await events.next() == .prepared(operationID: 76, trackID: collection.tracks[0].id))
+    #expect(await events.next() == .interruptionBegan(operationID: 76))
+    #expect(await events.next() == .interruptionEnded(operationID: 76))
+}
+
+@Test @MainActor func scriptedEventsFromAnotherOperationAreIgnored() async throws {
+    let (player, collection) = scriptedPlayer()
+    var events = player.events().makeAsyncIterator()
+
+    try await player.prepare(collection, startingAt: collection.tracks[0].id, operationID: 78)
+    player.simulateNaturalBoundary(operationID: 79)
+    player.simulateExternalBoundary(operationID: 79)
+    player.simulateInterruption(operationID: 79)
+    player.simulateSameSongCallback(operationID: 79)
+    player.pause(operationID: 78)
+
+    #expect(await events.next() == .prepared(operationID: 78, trackID: collection.tracks[0].id))
+    #expect(await events.next() == .stateChanged(operationID: 78, state: .paused))
+}

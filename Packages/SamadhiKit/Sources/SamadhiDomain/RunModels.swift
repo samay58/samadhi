@@ -71,6 +71,9 @@ public struct RunSession: Sendable, Equatable {
     public var pendingTrackSelectionID: Int?
     public var pendingNextTrackID: MusicTrackID?
     public var preparedNextTrackID: MusicTrackID?
+    public var autoFeedback: AutoFeedbackState
+    // Why the current song became current. Diagnostics read it; no product rule branches on it.
+    public var lastTrackChangeReason: TrackChangeReason?
 
     public init(id: Int, mode: RunMode = .adaptive, playbackOperationID: Int? = nil) {
         self.id = id
@@ -99,6 +102,8 @@ public struct RunSession: Sendable, Equatable {
         pendingTrackSelectionID = nil
         pendingNextTrackID = nil
         preparedNextTrackID = nil
+        autoFeedback = .initial
+        lastTrackChangeReason = nil
     }
 
     public mutating func recordSecond(cadence: Int?, tempoMatched: Bool?) {
@@ -190,6 +195,9 @@ public enum RunActivity: Sendable, Equatable {
 public enum FinishHold: Sendable, Equatable {
     case armed
     case pressing(holdID: Int)
+
+    // The reducer's hold window and the visible fill share this one duration.
+    public static let durationSeconds = 0.9
 }
 
 public struct ActiveRun: Sendable, Equatable {
@@ -212,7 +220,125 @@ public enum TrackChangeReason: String, Sendable, Equatable, Codable {
     case explicitPrevious
     case explicitSkip
     case naturalBoundary
+    // The player moved to another entry with no Samadhi command and not near the end of the song.
+    // Control Center, the Music app, or a headphone button are the usual causes.
+    case externalUnknown
     case recovery
+}
+
+// One meaningful Auto adjustment is one identified transaction: committed target, verified start,
+// verified arrival. The reducer owns identity and the exactly-once triggers; the app shell only plays.
+public enum AutoFeedbackDirection: String, Sendable, Equatable, Codable {
+    case faster
+    case slower
+}
+
+public enum AutoFeedbackSize: String, Sendable, Equatable, Codable {
+    case small
+    case medium
+    case large
+
+    // Bands are prototype starting points in reachable step rhythm; physical testing may move them.
+    public static let smallRangeSPM = 6.0...9.0
+    public static let mediumRangeSPM = 10.0...15.0
+    public static let largeMinimumSPM = 16.0
+
+    public static func band(forChangeSPM change: Double) -> AutoFeedbackSize? {
+        let rounded = abs(change).rounded()
+        if rounded >= largeMinimumSPM { return .large }
+        if rounded >= mediumRangeSPM.lowerBound { return .medium }
+        if rounded >= smallRangeSPM.lowerBound { return .small }
+        return nil
+    }
+}
+
+public enum AutoFeedbackMoment: String, Sendable, Equatable, Codable {
+    case began
+    case arrived
+}
+
+public enum AutoFeedbackPhase: String, Sendable, Equatable, Codable {
+    case committed
+    case began
+    case arrived
+}
+
+public struct AutoFeedbackCue: Sendable, Equatable {
+    public let transactionID: Int
+    public let moment: AutoFeedbackMoment
+    public let direction: AutoFeedbackDirection
+    public let size: AutoFeedbackSize
+    public let isLimited: Bool
+
+    public init(
+        transactionID: Int,
+        moment: AutoFeedbackMoment,
+        direction: AutoFeedbackDirection,
+        size: AutoFeedbackSize,
+        isLimited: Bool
+    ) {
+        self.transactionID = transactionID
+        self.moment = moment
+        self.direction = direction
+        self.size = size
+        self.isLimited = isLimited
+    }
+}
+
+public struct AutoFeedbackTransaction: Sendable, Equatable {
+    public let id: Int
+    public let trackID: MusicTrackID
+    public let settledTargetSPM: Double
+    public let direction: AutoFeedbackDirection
+    public let size: AutoFeedbackSize
+    public let originRate: Double
+    public let targetRate: Double
+    public let changeSPM: Double
+    public let isLimited: Bool
+    public var phase: AutoFeedbackPhase
+
+    public init(
+        id: Int,
+        trackID: MusicTrackID,
+        settledTargetSPM: Double,
+        direction: AutoFeedbackDirection,
+        size: AutoFeedbackSize,
+        originRate: Double,
+        targetRate: Double,
+        changeSPM: Double,
+        isLimited: Bool,
+        phase: AutoFeedbackPhase = .committed
+    ) {
+        self.id = id
+        self.trackID = trackID
+        self.settledTargetSPM = settledTargetSPM
+        self.direction = direction
+        self.size = size
+        self.originRate = originRate
+        self.targetRate = targetRate
+        self.changeSPM = changeSPM
+        self.isLimited = isLimited
+        self.phase = phase
+    }
+}
+
+public struct AutoFeedbackState: Sendable, Equatable {
+    public var transaction: AutoFeedbackTransaction?
+    // The settled target that last opened a transaction. A reaffirmed target opens nothing.
+    public var lastSettledTargetSPM: Double?
+    public var nextTransactionID: Int
+
+    public init(
+        transaction: AutoFeedbackTransaction? = nil,
+        lastSettledTargetSPM: Double? = nil,
+        nextTransactionID: Int = 1
+    ) {
+        self.transaction = transaction
+        self.lastSettledTargetSPM = lastSettledTargetSPM
+        self.nextTransactionID = nextTransactionID
+    }
+
+    public static let initial = AutoFeedbackState()
 }
 
 public struct RouteRecovery: Sendable, Equatable {
@@ -237,6 +363,10 @@ public enum HapticEvent: Sendable, Equatable {
     case lock
     case pause
     case resume
+    // Previous or Next was requested. The song change itself is confirmed later by the player.
+    case transportRequest
+    // Finish changed into its hold control. The run has not ended.
+    case finishArmed
     case finish
     case rhythmStep(direction: RhythmAdjustmentDirection, isMajor: Bool)
     case rhythmAuto
@@ -293,6 +423,8 @@ public enum RunEffect: Sendable, Equatable {
     case scheduleFinishHold(sessionID: Int, holdID: Int)
     case fadeAndStop(sessionID: Int)
     case emitHaptic(HapticEvent)
+    case emitAutoFeedback(AutoFeedbackCue)
+    case cancelAutoFeedback(transactionID: Int)
     case cancelTask(sessionID: Int, RunTaskKind)
     case cancelAllTasks(sessionID: Int)
 }

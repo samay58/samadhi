@@ -337,10 +337,22 @@ public struct RunReducer: Sendable {
             )
 
         case let (.active(active), .skipTapped):
-            return (state, [.skipTrack(sessionID: active.session.id)])
+            return (
+                state,
+                [
+                    .emitHaptic(.transportRequest),
+                    .skipTrack(sessionID: active.session.id),
+                ]
+            )
 
         case let (.active(active), .previousTapped):
-            return (state, [.previousTrack(sessionID: active.session.id)])
+            return (
+                state,
+                [
+                    .emitHaptic(.transportRequest),
+                    .previousTrack(sessionID: active.session.id),
+                ]
+            )
 
         case let (.active(active), .finishTapped):
             switch active.activity {
@@ -351,7 +363,10 @@ public struct RunReducer: Sendable {
                     .confirmingFinish(
                         FinishConfirmation(session: active.session, origin: active.activity, hold: .armed)
                     ),
-                    [.cancelTask(sessionID: active.session.id, .controlsTimeout)]
+                    [
+                        .emitHaptic(.finishArmed),
+                        .cancelTask(sessionID: active.session.id, .controlsTimeout),
+                    ]
                 )
             }
 
@@ -375,9 +390,14 @@ public struct RunReducer: Sendable {
 
         case let (.confirmingFinish(confirmation), .finishHoldCompleted(holdID)):
             guard confirmation.hold == .pressing(holdID: holdID) else { return (state, []) }
+            var finishedSession = confirmation.session
+            let feedbackEffects = cancelAutoFeedback(
+                session: &finishedSession,
+                forgettingSettledTarget: false
+            )
             return (
-                .finishing(confirmation.session),
-                [
+                .finishing(finishedSession),
+                feedbackEffects + [
                     .cancelAllTasks(sessionID: confirmation.session.id),
                     .fadeAndStop(sessionID: confirmation.session.id),
                     .emitHaptic(.finish),
@@ -530,7 +550,8 @@ public struct RunReducer: Sendable {
             }
             next.session.pendingRateRequestID = nil
             next.session.pendingCommandedRate = nil
-            return (.active(next), [])
+            let feedbackEffects = autoFeedbackAfterRateReadback(session: &next.session)
+            return (.active(next), feedbackEffects)
 
         case let (
             .active(active),
@@ -539,7 +560,7 @@ public struct RunReducer: Sendable {
                 operationID,
                 trackID,
                 trackIndex,
-                _,
+                reason,
                 rateRequestID
             )
         ):
@@ -555,6 +576,7 @@ public struct RunReducer: Sendable {
             }
             next.session.trackIndex = trackIndex
             next.session.currentTrackID = trackID
+            next.session.lastTrackChangeReason = reason
             next.session.trackElapsedSeconds = 0
             next.session.trackDurationSeconds = nil
             next.session.pendingRateRequestID = nil
@@ -564,10 +586,12 @@ public struct RunReducer: Sendable {
             next.session.pendingNextTrackID = nil
             next.session.preparedNextTrackID = nil
             next.session.rhythmControl = .initial
-            return adaptControlAfterTrackChange(
+            let feedbackEffects = resetAutoFeedbackForNewSong(session: &next.session)
+            let adapted = adaptControlAfterTrackChange(
                 active: next,
                 rateRequestID: rateRequestID
             )
+            return (adapted.0, feedbackEffects + adapted.1)
 
         case let (
             .active(active),
@@ -631,10 +655,19 @@ public struct RunReducer: Sendable {
         }
     }
 
+    // Route loss, interruption, and playback failure all enter recovery. A transaction that was in
+    // flight is cancelled here so recovery can never replay it.
     private func routeRecovery(from session: RunSession, origin: RunActivity) -> (RunState, [RunEffect]) {
-        (
-            .routeRecovery(RouteRecovery(session: session, origin: origin, availability: .missing)),
-            [
+        var recovered = session
+        let feedbackEffects = cancelAutoFeedback(
+            session: &recovered,
+            forgettingSettledTarget: false
+        )
+        return (
+            .routeRecovery(
+                RouteRecovery(session: recovered, origin: origin, availability: .missing)
+            ),
+            feedbackEffects + [
                 .cancelAllTasks(sessionID: session.id),
                 .pausePlayback(sessionID: session.id),
             ]

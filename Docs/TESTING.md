@@ -67,8 +67,14 @@ Domain tests cover:
 - Mismatched read-back rejecting the command and preserving latency evidence
 - Tempo-matched coverage preventing unmeasured Manual time from producing a misleading percentage
 - Clockwise and counterclockwise haptic direction through the reducer event
+- One Auto feedback transaction per meaningful change, with a verified start, a verified arrival, and no cue for raw or filtered cadence, an unsettled candidate, an intermediate ramp reply, a pending, mismatched, rejected, or stale reply, a reaffirmed target, a transport tap, or an old song
+- Replacement, manual takeover, a lost Auto target, route loss, interruption, playback failure, finish, pause, and recovery each producing the intended cancel, preserve, or forget result, with no cue replayed after recovery
+- One selection tick for an accepted Previous or Next request and one soft impact when Finish arms
+- Song-change causes for an explicit Previous or Next, a natural end inside the 10-second window, and an outside change
 
 Design tests cover clockwise and counterclockwise one-BPM detents, partial-turn accumulation, reverse hysteresis, direction reversal, angle wraparound, multiple revolutions, reset between gestures, exactly 30 BPM per revolution, and readiness feedback only for a genuine transition to a newly runnable import.
+
+Audio tests cover the simulated player's scripted events: a natural boundary, an external boundary, an interruption, an interruption end, and a same-song callback, each guarded by the current operation identity so a stale call cannot fire one.
 
 Motion tests cover:
 
@@ -76,6 +82,7 @@ Motion tests cover:
 - Five-observation stable lock
 - Three-observation resume lock with the prior estimate as a smoothing seed
 - Purposeful walking acquisition, below-range rejection, broken rep-like movement, isolated spikes, and sustained missing cadence
+- A scripted settled-change profile that holds one cadence long enough for Auto to settle, then moves to a second cadence, which is how each Auto feedback size band is driven on demand in Simulator
 
 The Core Motion adapter compiles for a generic iPhone target. A 29-second physical walk produced changing cadence and a 142 SPM average. A privacy-safe replay now covers the exact 2026-08-15 delivery shape: callbacks advance about every 2.56 seconds while most samples are about 2.57 seconds old. Advancing timestamps allow those delayed new samples. Old first samples, repeats, backward timestamps, out-of-order callbacks, unexplained gaps, missing cadence, and values outside the supported range still fail. A second replay covers steady delayed walking samples near 100 SPM. Full placement calibration is not covered by automated tests.
 
@@ -108,8 +115,13 @@ UI tests cover:
 - In-run aperture click-wheel reveal, clockwise and counterclockwise angular adjustment, fixed Auto bounds, protected center, Manual ownership, and return to Auto
 - Normal no-argument Simulator launch through local demo music and cadence lock
 - Hidden Debug screen with separate song BPM and step SPM, four Apple Music result states, fresh-song reset, accessibility XXXL, and Reduce Motion
+- The rebuilt transport bar and armed Finish control captured in five environments: normal, accessibility XXXL, Reduce Motion, Increased Contrast, and Reduced Transparency
+- An early Finish release that resets the fill with no animation, followed by a full hold that completes the run
+- A recorded pressed state for each transport region and for the whole hold, used to pull key frames at 30 fps
 
-App-model tests cover ready mapping, start transition, atomic store round trips, corrupt persistence, restored selection, cancellation of stale replacement work, complete typed import presentation, ordered three-track import batches, retry of the same playlist, retry after relaunch, distinct authorization and import failures, playlist context for missing or empty imports, current selection during replacement, deterministic empty, compact, 40-playlist, long-name, and selected-loading fixtures, schema-version-9 rolling run diagnostics, unfinished-run survival, a reducer-driven diagnostic timeline through finish, hidden Debug calculations, private launch-argument redaction, immediate Simulator demo readiness, and replacement with a second local playlist.
+App-model tests cover ready mapping, start transition, atomic store round trips, corrupt persistence, restored selection, cancellation of stale replacement work, complete typed import presentation, ordered three-track import batches, retry of the same playlist, retry after relaunch, distinct authorization and import failures, playlist context for missing or empty imports, current selection during replacement, deterministic empty, compact, 40-playlist, long-name, and selected-loading fixtures, schema-version-10 rolling run diagnostics, Auto cue and same-song-callback diagnostic entries, unfinished-run survival, a reducer-driven diagnostic timeline through finish, hidden Debug calculations, private launch-argument redaction, immediate Simulator demo readiness, and replacement with a second local playlist.
+
+App-model tests also cover the packaged Auto feedback prototypes. Every AHAP file in the bundle parses through `CHHapticPattern(contentsOf:)`. The asset catalog resolves a URL for each family, direction, and size, and for each arrival sound. Each arrival sound's own WAV header is read back from the bundle and must report 48000 Hz, one channel, 16 bits, and a duration inside 0.18 to 0.45 seconds. The feedback service plays each moment of a transaction once, holds an arrival that would land on top of its own start, clears pending arrivals on `cancelAll`, and stops only the named transaction on `cancel(transactionID:)`.
 
 ## Visual proof
 
@@ -123,9 +135,15 @@ Earlier released frames cover locked run, controls, summary, Home Screen icon, B
 
 The 2026-07-23 runtime review launched the normal app on iPhone 17 Simulator and inspected the ready and active-run screens. The focused rotary UI test made four strong clockwise turns, reached a requested target above 188 BPM, settled simulated Music BPM at the truthful 185 BPM boundary within two seconds, kept the same song, and never showed `Changing song`.
 
+The transport and Finish rebuild is recorded in `Evidence/Simulator/2026-08-18-transport-finish/`. It holds 39 images, every one opened and read at original size. The before frames show the three floating pills and both overflow causes on a 30 fps contact sheet: two capsule borders and two labels visible at once for about eight frames, then a second capsule edge offset below and left of the pressed pill. The after frames cover the capsule bar and the armed Finish control at normal size, accessibility XXXL, Reduce Motion, Increased Contrast, and Reduced Transparency, plus pressed key frames for each transport region and a 54-frame contact sheet of the hold from arming through cancel, completion, and handoff. No fill edge crosses the border in any after frame. Both bar variants are kept, so the rejected divided bar stays inspectable. Press feel, haptic character, and daylight legibility are physical and are not shown here. The Increased Contrast frame was captured with `simctl ui increase_contrast enabled`, because the launch argument alone did not reach `colorSchemeContrast` on this runtime.
+
+The Auto feedback prototype record lives in `Evidence/Audio/2026-08-18-auto-feedback-prototypes/`. It holds the sound manifest with parameters and checksums, a stacked waveform sheet for all six arrival sounds, the audition screenshot, and the Release isolation counts.
+
 ## Truth boundary
 
 Simulator verifies interaction, accessibility structure, reducer behavior, resource packaging, and deterministic motion. Normal Debug Simulator launches use two local placeholder playlists, simulated cadence, and silent simulated playback. This path is disabled on physical devices and in Release builds. Simulator cannot validate physical cadence quality, real headphone route behavior, audible tempo adaptation, listening artifacts, or the tactile character of haptics.
+
+Release isolation is checked by reading the built binaries, and the Debug side needs care. A Debug build keeps its code in `Samadhi.app/Samadhi.debug.dylib`; `Samadhi.app/Samadhi` is a small launcher stub that reports zero matches for everything, including code that is certainly present. A grep against that stub passes without proving anything. Read the dylib for the Debug side and `Samadhi.app/Samadhi` for Release, and keep a known-present control string in the comparison.
 
 The `Samadhi MusicKit Gate` scheme verifies that the harness and framework calls compile. Physical traces separately prove authorization, library loading, automatic token generation, strict catalog resolution, preview decoding, playback, mechanical rate writes, pause, and resume. Bluetooth listening, background, controlled interruption, and route checks remain separate physical gates.
 
@@ -187,6 +205,7 @@ The `Samadhi MusicKit Gate` scheme verifies that the harness and framework calls
 - 2026-08-17 fingerprinted workout: the pulled file matched source fingerprint `4e454d2859a521367bf83f26ba1287b14d617d0700c630f90ff13ce8f3b5b498`; four supported delayed readings acquired 133 SPM, and Apple Music reported the exact 1.0390625 command after 0.066 seconds
 - 2026-08-17 activity mix: 57 of 61 retained numeric cadence readings were below the current 120 SPM contract; substantial lifting occurred during the same period, so the low readings and elapsed time cannot all be attributed to walking
 - Walking-range tuning: use a clean walking-only check before calling the 90 SPM floor and five-second delay physically tuned
+- Transport, song-change cause, and Auto feedback candidate: no phone build and no install exist for it, so it has no in-app fingerprint and no physical result of any kind. Its ordered physical checklist is `Docs/PHONE-CHECK-2026-08-19.md`
 
 ## Felt-synchronization gate
 
@@ -200,7 +219,7 @@ The final walking candidate passed 152 package tests, 27 app-model tests, and 28
 
 The later expanded-rate candidate passed 153 package tests, 27 app-model tests, 28 serial UI tests, source-fingerprint tests, and resource-inclusive Debug and Release Simulator builds. The hidden Debug interface remained absent from Release. Its exact-profile phone build records source fingerprint `fd8120ad2ac14e1090a687438e6564beb65bde0a61d58fab04d4ec7295535684`. It was installed in place, and the selected collection checksum stayed `81a9b31fbc115d607bc766dd25374ecff6874b079276b68c3719cb122cea3f52`. The phone locked before launch. In-app identity, 0.85 and 1.15 read-back, and listening remain open.
 
-The later Auto feedback gate is physical. It must test faster and slower recognition, three coarse size levels, cue fatigue, screen lock, engine interruption and reset, iPhone speaker, primary Bluetooth headphones, first-play delay, Apple Music ducking or gaps, route changes, and sound-disabled and haptic-disabled fallbacks. Use the acceptance test in `Docs/AUTO-CHANGE-INTERACTION-SPEC.md`. Simulator can verify reducer triggers and asset packaging only.
+The software half of the Auto feedback gate now exists: a reducer-owned transaction, an app-shell service, three prototype families, and a Debug audition screen. The rest of that gate is physical. It must test faster and slower recognition, three coarse size levels, cue fatigue, screen lock, engine interruption and reset, iPhone speaker, primary Bluetooth headphones, first-play delay, Apple Music ducking or gaps, route changes, and sound-disabled and haptic-disabled fallbacks. Use the acceptance test in `Docs/AUTO-CHANGE-INTERACTION-SPEC.md`. Simulator can verify reducer triggers and asset packaging only.
 
 The focused Simulator UI flow proves that Manual remains active before a requested song change and returns to Auto only after the player confirms a different song. It also proves that the explicit close action restores playback controls, including with accessibility XXXL text and Reduce Motion. Frames live under `Evidence/Simulator/2026-08-15-manual-close/`.
 

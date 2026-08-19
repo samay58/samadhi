@@ -2,9 +2,9 @@
 
 ## Status
 
-This is the accepted design direction, not the current Main Thing. It should be built only after the core matching and walking-range decisions are settled and the transport and Finish craft pass is complete.
+The software half of this design exists as of 2026-08-18. The reducer owns one directional transaction per meaningful Auto change, `AutoFeedbackService` owns the Core Haptics engine in the app shell, three prototype haptic families with paired arrival sounds are packaged, and a hidden Debug audition screen plays them by hand. The transport and Finish pass that used to block this work is complete in software.
 
-The exact patterns, sound files, and intensity values are not approved yet. They require physical comparison on the iPhone while moving and listening to music.
+The exact patterns, sound files, and intensity bands are not approved. Nothing here has been felt or heard on a phone. They stay prototypes until the physical comparison on the iPhone while moving and listening to music.
 
 ## What the workout exposed
 
@@ -12,7 +12,7 @@ The August 17 workout proved that Auto can sense a supported cadence, settle on 
 
 That is an interaction failure, not only a tuning problem. The music changes without a clear beginning, direction, or arrival. A later difference in song speed tells the runner that something happened, but it does not make the moment feel intentional.
 
-The workout mixed brisk incline walking, a short light jog, and substantial lifting. The current product rejects values below 120 steps per minute. The trace cannot tell which activity produced each low reading. Expanding Samadhi into rhythmic walking is a sound idea. Adapting music to lifting is not needed now because lifting has no continuous step rhythm for Auto to follow.
+The workout mixed brisk incline walking, a short light jog, and substantial lifting. At the time the product rejected values below 120 steps per minute. The trace cannot tell which activity produced each low reading. Expanding Samadhi into rhythmic walking is a sound idea. Adapting music to lifting is not needed now because lifting has no continuous step rhythm for Auto to follow.
 
 The retained diagnostic shows one confirmed song change. It does not say whether that boundary was natural or followed a user command. Current code may prepare a better next song, but it does not let Auto interrupt the current song. Do not describe this run as proof that Auto cut a song short.
 
@@ -77,15 +77,15 @@ Core Haptics is the right prototype tool because it can combine transient and co
 
 AHAP files are the best working format for the directional family. They keep timing and parameter choices inspectable, versioned, and easy to compare with Quick Look. Programmatic patterns remain appropriate for the live wheel detents.
 
-The current run haptic shell is not ready for this job:
+The wheel detent shell was not enough for this job, so `AutoFeedbackService` was added beside it:
 
-- it starts the custom engine only when the tempo wheel opens;
-- its engine is set to ignore audio events;
-- it has no stop handler;
-- its reset handler restarts the engine but does not recreate cached players or audio resources;
-- Apple Music speed replies currently emit no Auto transition haptic.
+- it starts one engine lazily on the first cue, not when the tempo wheel opens;
+- its engine allows audio events, so a Core Haptics pattern can carry the arrival sound;
+- it keeps both a stopped handler and a reset handler, and turns automatic shutdown off;
+- its reset handler restarts the engine, drops cached players, and registers the audio resources again;
+- an identified Apple Music reply now reaches it as a reducer effect and plays the matching cue.
 
-The later implementation needs one app-shell service that can start lazily, recover from interruptions, recreate registered resources, and fall back safely. The reducer must own the one-time trigger and all song and request identities. SwiftUI must not decide when an Auto cue is valid.
+The reducer owns the one-time trigger and all song and request identities. SwiftUI never decides when an Auto cue is valid. The service is idempotent for each transaction and moment, cancels one transaction or every pending cue on demand, and stays silent on hardware without haptics while the sound still plays through a local audio player.
 
 Apple documents that the haptic engine can stop after an audio interruption or app suspension. Samadhi uses background audio, but that does not prove custom haptics survive phone lock in this app. The phone-lock case is a required test, not an assumption.
 
@@ -98,11 +98,21 @@ References:
 
 ## Prototype and selection
 
-Create three polished families, not a large pile of weak options. Each family includes faster, slower, and three size levels plus its paired arrival sound.
+Create three coherent families, not a large pile of weak options. Each family includes faster, slower, and three size levels plus its paired arrival sound.
 
 The sound may come from a commissioned sound designer, original recording or synthesis, a licensed library asset that is substantially shaped for Samadhi, or offline generation used as sketch material. A generated first pass is not a finished asset. Preserve the source, rights, raw file, processing notes, and checksum for every finalist.
 
 The preferred final path is a small paid commission from an interaction sound designer using this brief and the physical prototype. ElevenLabs is useful for exploring material and vocabulary, not as the automatic source of the shipped sound.
+
+### What exists in software
+
+Three families are packaged under `Resources/AutoFeedback/<family>/`. `pulse` is two transients: a light anchor then a firmer, sharper pulse for faster, and a firm anchor then a softer, longer release for slower. `swell` is one continuous event whose intensity and sharpness climb for faster and fall for slower. `step` is three transients with tightening gaps and rising weight for faster, widening gaps and falling weight for slower. Each family carries both directions across three size bands, plus one soft terminal arrival pattern per direction, which is 24 AHAP files in total. Size scales peak intensity only, at 0.45, 0.65, and 0.95, and never reorders events. Start spans run from 0.160 to 0.240 seconds.
+
+The six arrival sounds are 48 kHz, mono, 16-bit, from 0.310 to 0.375 seconds. Each peaks at exactly -9.00 dBFS with RMS from -17.3 to -21.0 dBFS, so none of them clips. Parameters and SHA-256 for every file live in `Evidence/Audio/2026-08-18-auto-feedback-prototypes/sound-manifest.json`.
+
+Both sound paths are built and selectable at runtime: Core Haptics audio, where the sound is registered as an audio resource and played inside the pattern, and a local audio player holding a preloaded file. The phone comparison picks one.
+
+The audition screen is Debug only. It reaches the app through the `--feedback-audition` launch argument and the `Samadhi Feedback Audition` scheme. It offers family, direction, size, sound path, and separate sound and haptic toggles; buttons to play the start, the arrival, or both; and a 10-trial blinded mode with a visible seed and a copyable summary line carrying family, sound path, seed, and score. Release contains none of its strings or symbols.
 
 Test both Core Haptics custom audio and a small local audio player alongside real Apple Music. Choose from physical results. The implementation must not pause, duck, restart, or reroute the music, and the first cue must not arrive late.
 
@@ -126,6 +136,6 @@ No Simulator result can approve tactile quality, pocket recognition, sound quali
 
 ## Priority
 
-Do not build this next.
+The transport and Finish pass is complete in software, and so is the first prototype of this feature. The next step is the physical comparison in the Physical acceptance section above, run from the checklist in [PHONE-CHECK-2026-08-19.md](PHONE-CHECK-2026-08-19.md).
 
-First settle the core evidence exposed by the workout: how far into brisk walking Samadhi should reach and what approximate alignment should count as good. Do not tune Auto for lifting. Then complete the transport and Finish craft pass. Build this directional Auto feedback before setup, summary, icon, warehouse, or playlist-generation expansion.
+Nothing in the prototype set becomes a product asset before that comparison chooses a family, a size scale, and a sound path. Setup, summary, icon, warehouse, and playlist-generation expansion all stay behind it.

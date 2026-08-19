@@ -748,9 +748,9 @@ private let slowTrack = MusicTrack(
     let previous = coreLoopReducer.reduce(state: state, event: .previousTapped)
 
     #expect(skipped.0.session?.rhythmControl.mode == .manual)
-    #expect(skipped.1 == [.skipTrack(sessionID: 85)])
+    #expect(skipped.1 == [.emitHaptic(.transportRequest), .skipTrack(sessionID: 85)])
     #expect(previous.0.session?.rhythmControl.mode == .manual)
-    #expect(previous.1 == [.previousTrack(sessionID: 85)])
+    #expect(previous.1 == [.emitHaptic(.transportRequest), .previousTrack(sessionID: 85)])
 }
 
 @Test func finishRequiresVisibleControlsAndMatchingHold() {
@@ -842,7 +842,7 @@ private let slowTrack = MusicTrack(
     #expect(result.0.session?.trackElapsedSeconds == 2)
     #expect(result.0.session?.trackIndex == 0)
     #expect(result.0.session?.songCount == 1)
-    #expect(result.1 == [.skipTrack(sessionID: 1)])
+    #expect(result.1 == [.emitHaptic(.transportRequest), .skipTrack(sessionID: 1)])
 }
 
 @Test func previousWaitsForPlayerTruthBeforeChangingTheSong() {
@@ -850,7 +850,7 @@ private let slowTrack = MusicTrack(
     let result = reducer.reduce(state: state, event: .previousTapped)
 
     #expect(result.0 == state)
-    #expect(result.1 == [.previousTrack(sessionID: 1)])
+    #expect(result.1 == [.emitHaptic(.transportRequest), .previousTrack(sessionID: 1)])
 }
 
 @Test func playbackProgressRequiresCurrentSessionAndOperation() {
@@ -1368,7 +1368,7 @@ private let slowTrack = MusicTrack(
     let skipped = planningReducer.reduce(state: state, event: .skipTapped)
 
     #expect(skipped.0.session?.currentTrackID == slowTrack.id)
-    #expect(skipped.1 == [.skipTrack(sessionID: 202)])
+    #expect(skipped.1 == [.emitHaptic(.transportRequest), .skipTrack(sessionID: 202)])
 }
 
 @Test func rhythmDetentsPreserveIncreaseAndDecreaseDirection() {

@@ -242,6 +242,46 @@ private let previewSend: @MainActor (RunAction) -> Void = { _ in }
         ), send: previewSend)
 }
 
+#Preview("Finish holding") {
+    SamadhiScreen(
+        state: RunViewState(
+            phase: .confirmingFinish,
+            cadenceSPM: 168,
+            trackElapsedSeconds: 91,
+            trackProgress: 0.43,
+            finishHoldPressing: true
+        ),
+        send: previewSend
+    )
+}
+
+#Preview("Finish confirmation, accessibility text") {
+    SamadhiScreen(
+        state: RunViewState(
+            phase: .confirmingFinish,
+            cadenceSPM: 168,
+            trackElapsedSeconds: 91,
+            trackProgress: 0.43
+        ),
+        send: previewSend
+    )
+    .environment(\.dynamicTypeSize, .accessibility5)
+}
+
+#Preview("Transport, accessibility text") {
+    SamadhiScreen(
+        state: RunViewState(
+            phase: .running,
+            controlsVisible: true,
+            cadenceSPM: 168,
+            trackElapsedSeconds: 91,
+            trackProgress: 0.43
+        ),
+        send: previewSend
+    )
+    .environment(\.dynamicTypeSize, .accessibility5)
+}
+
 #Preview("Headphones disconnected") {
     SamadhiScreen(state: RunViewState(phase: .routeRecovery(restored: false)), send: previewSend)
 }

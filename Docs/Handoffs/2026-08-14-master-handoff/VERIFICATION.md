@@ -53,6 +53,31 @@ The exact profile has UUID `1b613344-c5cd-4802-a31f-9ff5088c1802` and expires Au
 
 The expanded-rate candidate records source fingerprint `fd8120ad2ac14e1090a687438e6564beb65bde0a61d58fab04d4ec7295535684`. It was installed over the existing app. The selected collection stayed byte-for-byte unchanged at SHA-256 `81a9b31fbc115d607bc766dd25374ecff6874b079276b68c3719cb122cea3f52`. The phone locked when launch was attempted, so in-app identity, endpoint Apple Music read-back, physical walking, and listening remain open.
 
+## 2026-08-18 candidate
+
+Transport and Finish, song-change causes, and the first directional Auto feedback prototype.
+
+| Check | Result |
+| --- | --- |
+| Swift formatter lint | Passed |
+| Swift package tests | 179 passed |
+| App-model tests | 39 passed |
+| UI tests | 32 passed |
+| Source-fingerprint tests | Passed |
+| Resource-inclusive Debug Simulator build | Passed |
+| Resource-inclusive Release Simulator build | Passed |
+| `FeedbackAudition` strings, Debug dylib versus Release | 5 versus 0 |
+| `Audition` symbols, Debug dylib versus Release | 594 versus 0 |
+| `core-loop-diagnostics` strings, Debug dylib versus Release | 1 versus 0 |
+| `CoreLoopDiagnostics` symbols, Debug dylib versus Release | 382 versus 0 |
+| `AutoFeedbackService` strings, Debug dylib versus Release | 4 versus 6, the control row |
+| Preserved handoff source and addendum hashes | Unchanged, all five match `MANIFEST.md` |
+| Phone build or install | None |
+
+The Debug side of every isolation count reads `Samadhi.app/Samadhi.debug.dylib`. In a Debug build `Samadhi.app/Samadhi` is a launcher stub that reports zero matches for everything, including code that is certainly present, so a grep against it passes without proving anything. The `AutoFeedbackService` row is the control: that is production code, so it stays in Release, which shows the zeros above belong to the audition surface and not to a build that dropped the feature. Release still packages the 30 prototype files, 24 patterns and 6 sounds.
+
+No phone build was made and nothing was installed. This candidate has no in-app source fingerprint. Every physical result recorded elsewhere in this file still belongs to the earlier expanded-rate build.
+
 ## Review artifacts
 
 - `MANIFEST.md`: exact-source receipt.

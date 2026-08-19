@@ -1,5 +1,6 @@
 import Foundation
 import SamadhiDomain
+import SamadhiMotion
 import Testing
 
 @testable import Samadhi
@@ -283,27 +284,35 @@ import Testing
     #expect(snapshot.summary.automaticSeconds == 1)
     #expect(snapshot.summary.manualSeconds == 0)
     #expect(snapshot.summary.songCount == 2)
+    // Auto commits a target on the first locked cadence, so the trace also carries the
+    // transaction's committed, began, and cancelled moments.
     #expect(
         snapshot.timeline.map(\.kind) == [
             .started,
             .cadenceUpdated,
+            .autoFeedback,
             .rateApplied,
+            .autoFeedback,
             .playerProgress,
             .activeSecond,
             .trackChanged,
+            .autoFeedback,
             .finishRequested,
             .finished,
         ]
     )
-    #expect(snapshot.timeline[2].appliedRate == 0.98)
-    #expect(snapshot.timeline[3].trackElapsedSeconds == 12)
+    #expect(snapshot.timeline.first { $0.kind == .rateApplied }?.appliedRate == 0.98)
+    #expect(snapshot.timeline.first { $0.kind == .playerProgress }?.trackElapsedSeconds == 12)
     #expect(snapshot.schemaVersion == RunDiagnosticSnapshot.currentSchemaVersion)
     #expect(snapshot.completionState == .completed)
     #expect(snapshot.timeline[1].controlMode == RhythmControlMode.automatic.rawValue)
     #expect(snapshot.timeline[1].automaticCorrectionBPM == 0)
     #expect(snapshot.timeline[1].requestedBPM == 162)
     #expect(snapshot.timeline[1].derivedTargetRate != nil)
-    #expect(snapshot.timeline[5].trackChangeReason == TrackChangeReason.naturalBoundary.rawValue)
+    #expect(
+        snapshot.timeline.first { $0.kind == .trackChanged }?.trackChangeReason
+            == TrackChangeReason.naturalBoundary.rawValue
+    )
 }
 
 @Test func runDiagnosticsSurviveAnUnfinishedRunAndKeepCadenceTiming() throws {
@@ -878,4 +887,279 @@ private extension SimulationConfiguration {
         setupReviewMode: false,
         musicSelectionFixture: .standard
     )
+}
+
+@Test func diagnosticFileVersionRecordsTheAutoFeedbackFields() {
+    #expect(RunDiagnosticSnapshot.currentSchemaVersion == 10)
+}
+
+@Test func trackChangeAttributionOnlyCallsTheEndOfASongANaturalBoundary() {
+    #expect(
+        TrackChangeAttribution.reason(
+            claimed: .explicitSkip,
+            previousPlaybackTimeSeconds: 12,
+            previousDurationSeconds: 180
+        ) == .explicitSkip
+    )
+    #expect(
+        TrackChangeAttribution.reason(
+            claimed: nil,
+            previousPlaybackTimeSeconds: 174,
+            previousDurationSeconds: 180
+        ) == .naturalBoundary
+    )
+    #expect(
+        TrackChangeAttribution.reason(
+            claimed: nil,
+            previousPlaybackTimeSeconds: 182,
+            previousDurationSeconds: 180
+        ) == .naturalBoundary
+    )
+    #expect(
+        TrackChangeAttribution.reason(
+            claimed: nil,
+            previousPlaybackTimeSeconds: 40,
+            previousDurationSeconds: 180
+        ) == .externalUnknown
+    )
+    #expect(
+        TrackChangeAttribution.reason(
+            claimed: nil,
+            previousPlaybackTimeSeconds: nil,
+            previousDurationSeconds: 180
+        ) == .externalUnknown
+    )
+    #expect(
+        TrackChangeAttribution.reason(
+            claimed: nil,
+            previousPlaybackTimeSeconds: 174,
+            previousDurationSeconds: nil
+        ) == .externalUnknown
+    )
+}
+
+@Test func runDiagnosticsRecordEveryAutoFeedbackPhaseWithoutPrivateNames() throws {
+    var time = Date(timeIntervalSince1970: 1_721_000_000)
+    var recorder = RunDiagnosticsRecorder(now: { time })
+    let collection = importedCollection(id: "playlist", name: "Field fixture", readyCount: 3)
+    let reducer = RunReducer(tracks: collection.tracks)
+    var state: RunState = .ready
+    var latest: RunDiagnosticSnapshot?
+
+    @discardableResult
+    func apply(_ event: RunEvent) -> [RunEffect] {
+        let oldState = state
+        let result = reducer.reduce(state: state, event: event)
+        state = result.0
+        time = time.addingTimeInterval(1)
+        if let snapshot = recorder.record(
+            event: event,
+            oldState: oldState,
+            newState: state,
+            collection: collection
+        ) {
+            latest = snapshot
+        }
+        return result.1
+    }
+
+    func replyToCommand(in effects: [RunEffect]) {
+        for effect in effects {
+            guard case let .setPlaybackRate(sessionID, operationID, requestID, trackID, rate) = effect
+            else { continue }
+            apply(
+                .playbackRateApplied(
+                    sessionID: sessionID,
+                    operationID: operationID,
+                    requestID: requestID,
+                    trackID: trackID,
+                    rate: rate,
+                    latencySeconds: 0.07
+                )
+            )
+        }
+    }
+
+    apply(.startTapped(sessionID: 1))
+    apply(.authorizationResolved(sessionID: 1, .authorized))
+    apply(.playbackPrepared(sessionID: 1, trackID: collection.tracks[0].id))
+    for token in 0..<6 {
+        replyToCommand(
+            in: apply(
+                .cadenceUpdated(
+                    sessionID: 1,
+                    acquisitionID: 1,
+                    stepsPerMinute: 162,
+                    deltaSeconds: 1,
+                    rateRequestID: 20 + token
+                )
+            )
+        )
+    }
+    let snapshot = try #require(latest)
+    let cueEntries = snapshot.timeline.filter { $0.kind == .autoFeedback }
+
+    #expect(cueEntries.count >= 2)
+    #expect(cueEntries.first?.autoFeedbackTransactionID == 1)
+    #expect(cueEntries.first?.autoFeedbackPhase == AutoFeedbackPhase.committed.rawValue)
+    #expect(cueEntries.first?.autoFeedbackDirection == AutoFeedbackDirection.slower.rawValue)
+    #expect(cueEntries.first?.autoFeedbackSize == AutoFeedbackSize.small.rawValue)
+    #expect(cueEntries.first?.autoFeedbackLimited == false)
+    #expect((cueEntries.first?.autoFeedbackChangeSPM ?? 0) < 0)
+    #expect(cueEntries.map(\.autoFeedbackPhase).contains(AutoFeedbackPhase.began.rawValue))
+    #expect(cueEntries.map(\.autoFeedbackPhase).contains(AutoFeedbackPhase.arrived.rawValue))
+    #expect(cueEntries.allSatisfy { $0.autoFeedbackTransactionID == 1 })
+    #expect(state.session?.autoFeedback.transaction?.phase == .arrived)
+}
+
+@Test func runDiagnosticsRecordACancelledTransactionAndASameSongCallback() throws {
+    var time = Date(timeIntervalSince1970: 1_721_000_000)
+    var recorder = RunDiagnosticsRecorder(now: { time })
+    let collection = importedCollection(id: "playlist", name: "Field fixture", readyCount: 3)
+    let reducer = RunReducer(tracks: collection.tracks)
+    var state: RunState = .ready
+    var latest: RunDiagnosticSnapshot?
+
+    @discardableResult
+    func apply(_ event: RunEvent) -> [RunEffect] {
+        let oldState = state
+        let result = reducer.reduce(state: state, event: event)
+        state = result.0
+        time = time.addingTimeInterval(1)
+        if let snapshot = recorder.record(
+            event: event,
+            oldState: oldState,
+            newState: state,
+            collection: collection
+        ) {
+            latest = snapshot
+        }
+        return result.1
+    }
+
+    apply(.startTapped(sessionID: 2))
+    apply(.authorizationResolved(sessionID: 2, .authorized))
+    apply(.playbackPrepared(sessionID: 2, trackID: collection.tracks[0].id))
+    apply(
+        .cadenceUpdated(
+            sessionID: 2,
+            acquisitionID: 1,
+            stepsPerMinute: 162,
+            deltaSeconds: 1,
+            rateRequestID: 40
+        )
+    )
+    #expect(state.session?.autoFeedback.transaction != nil)
+
+    let sameSong = recorder.record(sameSongCallbackIn: state, collection: collection)
+    if let sameSong { latest = sameSong }
+    apply(.audioRouteLost)
+    let snapshot = try #require(latest)
+
+    #expect(snapshot.timeline.contains { $0.kind == .sameSongCallback })
+    let cancelled = try #require(
+        snapshot.timeline.last { $0.kind == .autoFeedback && $0.autoFeedbackPhase == "cancelled" }
+    )
+    #expect(cancelled.autoFeedbackTransactionID == 1)
+    #expect(state.session?.autoFeedback.transaction == nil)
+}
+
+@Test func diagnosticViewNamesTheAutoCueAndTheLastSongChange() throws {
+    let collection = importedCollection(id: "playlist", name: "Field fixture", readyCount: 3)
+    let reducer = RunReducer(tracks: collection.tracks)
+    var state: RunState = .ready
+    func apply(_ event: RunEvent) {
+        state = reducer.reduce(state: state, event: event).0
+    }
+
+    apply(.startTapped(sessionID: 5))
+    apply(.authorizationResolved(sessionID: 5, .authorized))
+    apply(.playbackPrepared(sessionID: 5, trackID: collection.tracks[0].id))
+    apply(
+        .playbackTrackChanged(
+            sessionID: 5,
+            operationID: 5,
+            trackID: collection.tracks[1].id,
+            trackIndex: 1,
+            reason: .externalUnknown,
+            rateRequestID: 50
+        )
+    )
+    apply(
+        .cadenceUpdated(
+            sessionID: 5,
+            acquisitionID: 1,
+            stepsPerMinute: 162,
+            deltaSeconds: 1,
+            rateRequestID: 51
+        )
+    )
+    let transaction = try #require(state.session?.autoFeedback.transaction)
+    let presentation = CoreLoopDiagnosticPresentation(
+        state: state,
+        collection: collection,
+        cadenceSample: nil
+    )
+
+    #expect(transaction.direction == .slower)
+    #expect(presentation.autoCueText.contains("Cue \(transaction.id)"))
+    #expect(presentation.autoCueText.contains("slower"))
+    #expect(presentation.autoCueText.contains("small"))
+    #expect(presentation.autoCueText.contains("waiting for Apple Music"))
+    #expect(presentation.lastSongChangeText == "Changed outside Samadhi")
+}
+
+// The scripted cadence is raw sensor truth. It reaches Auto only after the shell's filter, so this
+// proves each launch scenario really produces the band it claims.
+@Test(
+    arguments: [
+        (AutoFeedbackScenario.fasterSmall, AutoFeedbackDirection.faster, AutoFeedbackSize.small),
+        (AutoFeedbackScenario.fasterMedium, AutoFeedbackDirection.faster, AutoFeedbackSize.medium),
+        (AutoFeedbackScenario.fasterLarge, AutoFeedbackDirection.faster, AutoFeedbackSize.large),
+        (AutoFeedbackScenario.slowerSmall, AutoFeedbackDirection.slower, AutoFeedbackSize.small),
+        (AutoFeedbackScenario.slowerMedium, AutoFeedbackDirection.slower, AutoFeedbackSize.medium),
+        (AutoFeedbackScenario.slowerLarge, AutoFeedbackDirection.slower, AutoFeedbackSize.large),
+    ]
+)
+func everyScriptedAutoFeedbackScenarioSettlesInsideItsBand(
+    scenario: AutoFeedbackScenario,
+    direction: AutoFeedbackDirection,
+    size: AutoFeedbackSize
+) async throws {
+    let basePulseSPM = Double(AutoFeedbackScenario.baseCadenceSPM)
+    let provider = SimulatedCadenceProvider(
+        sampleDelay: .zero,
+        profile: .settledChange(
+            from: AutoFeedbackScenario.baseCadenceSPM,
+            to: AutoFeedbackScenario.baseCadenceSPM + scenario.cadenceOffsetSPM
+        )
+    )
+    var filter = CadenceFilter()
+    let policy = AutoTargetPolicy()
+    var targetState = AutoTargetState.initial
+    var firstSettledTargetSPM: Double?
+
+    for await event in provider.events() {
+        guard case let .observation(observation) = event else { continue }
+        guard case let .locked(stepsPerMinute) = filter.ingest(observation) else { continue }
+        targetState = policy.update(
+            state: targetState,
+            cadenceSPM: stepsPerMinute,
+            cadenceReliable: true,
+            deltaSeconds: 1
+        )
+        if firstSettledTargetSPM == nil { firstSettledTargetSPM = targetState.settledTargetSPM }
+    }
+
+    let firstTarget = try #require(firstSettledTargetSPM)
+    let finalTarget = try #require(targetState.settledTargetSPM)
+    // Playback starts at normal speed on a song analyzed at the base cadence, so the reachable
+    // change in step rhythm is the settled target itself moving.
+    let changeSPM = finalTarget - firstTarget
+    let reachableRate = finalTarget / basePulseSPM
+
+    #expect(firstTarget == basePulseSPM)
+    #expect(AutoFeedbackSize.band(forChangeSPM: changeSPM) == size)
+    #expect((changeSPM > 0 ? AutoFeedbackDirection.faster : .slower) == direction)
+    #expect(TempoEnvelope.rateRange.contains(reachableRate))
 }

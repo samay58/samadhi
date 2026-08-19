@@ -63,6 +63,91 @@ final class SamadhiUITests: XCTestCase {
         XCTAssertTrue(element("run-screen").waitForExistence(timeout: 2))
     }
 
+    func testTransportAndFinishBeforeStateEvidence() {
+        captureTransportAndFinishBeforeState(named: "normal")
+        captureTransportAndFinishBeforeState(
+            named: "accessibility-xxxl",
+            arguments: [
+                "-UIPreferredContentSizeCategoryName",
+                "UICTContentSizeCategoryAccessibilityXXXL",
+            ]
+        )
+        captureTransportAndFinishBeforeState(
+            named: "reduce-motion",
+            arguments: ["-UIAccessibilityReduceMotionEnabled", "YES"]
+        )
+        captureTransportAndFinishBeforeState(
+            named: "increased-contrast",
+            arguments: ["-UIAccessibilityDarkerSystemColorsEnabled", "YES"]
+        )
+        captureTransportAndFinishBeforeState(
+            named: "reduced-transparency",
+            arguments: ["-UIAccessibilityReduceTransparencyEnabled", "YES"]
+        )
+    }
+
+    func testTransportAndFinishAfterStateEvidence() {
+        captureTransportAndFinishAfterState(named: "normal")
+        captureTransportAndFinishAfterState(
+            named: "accessibility-xxxl",
+            arguments: [
+                "-UIPreferredContentSizeCategoryName",
+                "UICTContentSizeCategoryAccessibilityXXXL",
+            ]
+        )
+        captureTransportAndFinishAfterState(
+            named: "reduce-motion",
+            arguments: ["-UIAccessibilityReduceMotionEnabled", "YES"]
+        )
+        captureTransportAndFinishAfterState(
+            named: "increased-contrast",
+            arguments: ["-UIAccessibilityDarkerSystemColorsEnabled", "YES"]
+        )
+        captureTransportAndFinishAfterState(
+            named: "reduced-transparency",
+            arguments: ["-UIAccessibilityReduceTransparencyEnabled", "YES"]
+        )
+    }
+
+    func testFinishHoldReleasedEarlyKeepsTheRunThenCompletes() {
+        prepareApp("-SAMADHI_TEST_ACQUISITION_WINDOW")
+        app.launch()
+        revealTransport()
+        armFinish()
+
+        let hold = app.buttons["hold-to-finish"]
+        hold.press(forDuration: 0.4)
+        XCTAssertTrue(hold.exists)
+        XCTAssertFalse(element("run-summary").exists)
+        XCTAssertTrue(element("run-screen").exists)
+        attachScreenshot(named: "after-finish-cancelled-normal")
+
+        hold.press(forDuration: 1.5)
+        XCTAssertTrue(element("run-summary").waitForExistence(timeout: 4))
+    }
+
+    func testTransportPressedStateEvidence() {
+        prepareApp("-SAMADHI_TEST_ACQUISITION_WINDOW")
+        app.launch()
+        revealTransport()
+
+        // One extra reveal lets the bar settle so the first press is not lost in the fade in.
+        refreshTransport()
+        app.buttons["previous-track"].press(forDuration: 0.3)
+        refreshTransport()
+        app.buttons["skip-track"].press(forDuration: 0.3)
+
+        refreshTransport()
+        app.buttons["pause-run"].press(forDuration: 0.3)
+
+        let resume = app.buttons["resume-run"]
+        XCTAssertTrue(resume.waitForExistence(timeout: 3))
+        attachScreenshot(named: "after-transport-paused-normal")
+        resume.press(forDuration: 0.3)
+
+        XCTAssertTrue(app.buttons["pause-run"].waitForExistence(timeout: 3))
+    }
+
     func testMissingArtworkStillStarts() {
         prepareApp("-SAMADHI_MISSING_ARTWORK")
         app.launch()
@@ -548,6 +633,83 @@ final class SamadhiUITests: XCTestCase {
         attachment.name = name
         attachment.lifetime = .keepAlways
         add(attachment)
+    }
+
+    private func revealTransport() {
+        XCTAssertTrue(app.buttons["start-run"].waitForExistence(timeout: 20))
+        app.buttons["start-run"].tap()
+        // The lock brief is transient, so the run screen itself is the stable landmark.
+        XCTAssertTrue(element("track-identity").waitForExistence(timeout: 20))
+        refreshTransport()
+    }
+
+    // Revealed controls time out after three seconds, so every capture step reveals again and
+    // retries when a slow machine loses the race. A paused run keeps its controls up.
+    private func refreshTransport() {
+        for _ in 0..<6 {
+            if app.buttons["resume-run"].exists { return }
+            element("track-identity").tap()
+            if app.buttons["pause-run"].waitForExistence(timeout: 3) { return }
+        }
+        XCTFail("transport controls never became visible")
+    }
+
+    // Arming can lose the race with the control timeout, so the tap retries until it takes.
+    private func armFinish() {
+        let finish = app.buttons["finish-run"]
+        let hold = app.buttons["hold-to-finish"]
+        for _ in 0..<4 {
+            if hold.exists { return }
+            refreshTransport()
+            guard finish.waitForExistence(timeout: 3) else { continue }
+            finish.tap()
+            if hold.waitForExistence(timeout: 5) { return }
+        }
+        XCTFail("Finish never armed")
+    }
+
+    private func captureTransportAndFinishAfterState(
+        named name: String,
+        arguments: [String] = []
+    ) {
+        prepareApp(arguments)
+        app.launch()
+        revealTransport()
+
+        XCTAssertTrue(app.buttons["previous-track"].exists)
+        XCTAssertTrue(app.buttons["skip-track"].exists)
+        attachScreenshot(named: "after-transport-\(name)")
+
+        armFinish()
+        attachScreenshot(named: "after-finish-armed-\(name)")
+        app.terminate()
+    }
+
+    private func captureTransportAndFinishBeforeState(
+        named name: String,
+        arguments: [String] = []
+    ) {
+        prepareApp(arguments)
+        app.launch()
+        XCTAssertTrue(app.buttons["start-run"].waitForExistence(timeout: 3))
+        app.buttons["start-run"].tap()
+        XCTAssertTrue(element("cadence-lock").waitForExistence(timeout: 6))
+        element("track-identity").tap()
+
+        let pause = app.buttons["pause-run"]
+        let previous = app.buttons["previous-track"]
+        let next = app.buttons["skip-track"]
+        let finish = app.buttons["finish-run"]
+        XCTAssertTrue(pause.waitForExistence(timeout: 2))
+        XCTAssertTrue(previous.exists)
+        XCTAssertTrue(next.exists)
+        XCTAssertTrue(finish.exists)
+        attachScreenshot(named: "before-transport-\(name)")
+
+        finish.tap()
+        XCTAssertTrue(app.buttons["hold-to-finish"].waitForExistence(timeout: 2))
+        attachScreenshot(named: "before-finish-armed-\(name)")
+        app.terminate()
     }
 
     private func assertCloseTargetClearsDial(close: XCUIElement, dial: XCUIElement) {

@@ -42,6 +42,9 @@
         }
 
         private var pendingTrackChange: PendingTrackChange?
+        // The last progress seen for the entry that was current before this observation. A change is
+        // only natural when the previous song had reached its end.
+        private var lastObservedPlaybackTime: Double?
 
         func events() -> AsyncStream<MusicPlaybackEvent> {
             AsyncStream(bufferingPolicy: .bufferingNewest(128)) { continuation in
@@ -100,6 +103,7 @@
             preparedNextTrackID = nil
             latestSelectionID = 0
             pendingTrackChange = nil
+            lastObservedPlaybackTime = nil
             continuation?.yield(.prepared(operationID: operationID, trackID: trackID))
         }
 
@@ -214,6 +218,7 @@
             preparedNextTrackID = nil
             latestSelectionID = 0
             pendingTrackChange = nil
+            lastObservedPlaybackTime = nil
         }
 
         private func startMonitoring() {
@@ -307,10 +312,13 @@
             guard let itemID = player.queue.currentEntry?.item?.id.rawValue else { return }
             let trackID = MusicTrackID(itemID)
             if trackID != lastTrackID {
-                let reason =
-                    pendingTrackChange?.reason(at: ProcessInfo.processInfo.systemUptime)
-                    ?? .naturalBoundary
+                let reason = TrackChangeAttribution.reason(
+                    claimed: pendingTrackChange?.reason(at: ProcessInfo.processInfo.systemUptime),
+                    previousPlaybackTimeSeconds: lastObservedPlaybackTime,
+                    previousDurationSeconds: lastTrackID.flatMap { durations[$0] }
+                )
                 lastTrackID = trackID
+                lastObservedPlaybackTime = nil
                 pendingTrackChange = nil
                 pendingRateRequest = nil
                 rateReadbackTask?.cancel()
@@ -324,6 +332,7 @@
                     )
                 )
             }
+            lastObservedPlaybackTime = player.playbackTime
             guard let track = collection.tracks.first(where: { $0.id == trackID }) else { return }
             continuation?.yield(
                 .progress(

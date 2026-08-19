@@ -12,8 +12,11 @@
 | Manual | Manual stays with the confirmed song and returns to Auto only after a different song is confirmed | Reducer, app-model, and interface tests |
 | Playback range | The software candidate is 0.85 through 1.15 | Shared limits and endpoint tests across Auto, Manual, track fit, diagnostics, and player commands |
 | Tempo wheel | The wheel has a quiet close action with a separate 44-point touch target | Interface tests and inspected Simulator frames |
-| Debug explanation | Debug builds show the exact source fingerprint and the full motion-to-music calculation | Build inspection, diagnostic tests, and Simulator frames |
-| Release isolation | The hidden Debug screen does not ship in Release | Release binary inspection |
+| Transport and Finish | Previous, Pause or Resume, and Next are one glass capsule bar with a raised primary disc. Finish is a quiet hairline button below the bar that arms a hold whose fill is drawn inside the pill and clipped by the same capsule | Serial interface tests and 39 inspected Simulator images covering five environments, two of them contact sheets, with no fill edge outside the border in any after frame |
+| Auto feedback | The reducer owns one directional transaction per meaningful Auto change. Three prototype haptic families, six arrival sounds, and a hidden audition screen exist in the app | Domain, app-model, and packaged-asset tests. Nothing about tactile feel, sound quality, or Apple Music coexistence is physically proved |
+| Song-change cause | Every confirmed song change records a cause: natural end, an outside change, or an explicit Previous or Next | Pure attribution tests, scripted Simulator boundary events, and the Debug row `Last song change` |
+| Debug explanation | Debug builds show the exact source fingerprint, the full motion-to-music calculation, the Auto cue in flight, and the cause of the last song change | Build inspection, schema-version-10 diagnostic tests, and Simulator frames |
+| Release isolation | Neither the hidden Debug screen nor the feedback audition screen ships in Release | Release binary strings and symbol counts read against the Debug dylib |
 
 ## What the phone has proved
 
@@ -27,28 +30,35 @@ The expanded 0.85 through 1.15 candidate is installed over Samadhi 1.0 build 1 w
 
 - Project generation passed.
 - Formatter lint passed.
-- 153 Swift package tests passed.
-- 27 app-model tests passed.
-- 28 serial interface tests passed.
+- 179 Swift package tests passed.
+- 39 app-model tests passed.
+- 32 serial interface tests passed.
 - Source-fingerprint tests passed.
 - Resource-inclusive Debug and Release Simulator builds passed.
 - The hidden Debug screen was absent from Release.
-- The physical build used exact profile `Samadhi Development 2026-08-15`, which expires August 15, 2027.
+- The feedback audition screen was absent from Release. The Debug side of that check reads `Samadhi.app/Samadhi.debug.dylib`, because the Debug `Samadhi.app/Samadhi` is a launcher stub.
+- This candidate has no phone build, so it has no recorded in-app source fingerprint.
+- The last physical build used exact profile `Samadhi Development 2026-08-15`, which expires August 15, 2027.
 - The embedded profile and app signature both use `ZL5U59XBJ6.com.samaydhawan.Samadhi`.
 
 ## Still open
 
-- Launch the installed expanded-rate build and confirm its in-app source fingerprint.
+The whole physical list is written as one ordered checklist in [PHONE-CHECK-2026-08-19.md](PHONE-CHECK-2026-08-19.md). Nothing from this candidate is on the phone yet.
+
+- Build this candidate with the exact profile, install it in place, launch it, and confirm the in-app source fingerprint.
 - Get Apple Music read-back at 0.85 and 1.15, then judge both endpoints through headphones for a full musical section.
+- Judge transport and Finish by hand: press response, one tick per Previous or Next, arming, early release, and one completed hold.
+- Run the blinded faster and slower trials for all three prototype families on both sound paths, and listen for ducking, gaps, or a route change while Apple Music plays.
+- Read `Last song change` after one natural end and after one explicit Next, and confirm both causes.
+- Check screen lock, an interruption, and route recovery, including that no old Auto cue replays afterward.
 - Run a clean walking-only check. The 90 SPM floor and five-second walking delay are software choices, not physically tuned constants.
 - Check whether steady lifting motion can falsely look like walking. Samadhi does not need a lifting mode.
-- Rebuild Play, Pause, Previous, Next, and Finish as one coherent control system. Fix the Finish border overflow.
-- Prove one known natural song boundary, screen lock, interruption, and route recovery.
-- Prototype the faster and slower haptic and sound cues only after the core behavior gate.
 - Complete one 20-minute outdoor run.
 
 ## Where we left off
 
-The core reset is consolidated in the current candidate. The next physical gate is short: launch, confirm the fingerprint, compare 0.85 and 1.15 with the known 0.90 and 1.10 pair, and record Apple Music's replies. If the endpoints sound clean, the next Main Thing is the transport and Finish craft pass.
+The transport and Finish pass, deterministic song-change causes, and the first directional Auto feedback prototype are merged on `main` and pass the software gate. No phone build was made this session, so nothing from this candidate is installed and no in-app fingerprint exists for it. Endpoint read-back and listening at 0.85 and 1.15 are still open from the previous candidate and carry over.
+
+The next step is the checklist in [PHONE-CHECK-2026-08-19.md](PHONE-CHECK-2026-08-19.md): fingerprint, endpoint listening, transport and Finish feel, blinded direction trials, song-change causes, and lock, call, and route recovery. After that check, the next Main Thing is the 20-minute outdoor run.
 
 Historical implementation detail lives in [PROGRESS.md](PROGRESS.md). Product choices live in [DECISIONS.md](DECISIONS.md). Exact checks and proof limits live in [TESTING.md](TESTING.md).

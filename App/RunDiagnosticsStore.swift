@@ -3,7 +3,7 @@ import SamadhiDomain
 import SamadhiMotion
 
 struct RunDiagnosticSnapshot: Codable, Equatable, Sendable {
-    static let currentSchemaVersion = 9
+    static let currentSchemaVersion = 10
 
     enum CompletionState: String, Codable, Sendable {
         case inProgress
@@ -25,6 +25,8 @@ struct RunDiagnosticSnapshot: Codable, Equatable, Sendable {
             case started
             case cadenceObserved
             case cadenceUpdated
+            case autoFeedback
+            case sameSongCallback
             case cadenceLost
             case rateApplied
             case playerProgress
@@ -86,6 +88,13 @@ struct RunDiagnosticSnapshot: Codable, Equatable, Sendable {
         let trackDurationSeconds: Int?
         let tempoMatched: Bool?
         let trackChangeReason: String?
+        let autoFeedbackTransactionID: Int?
+        // The transaction's phase, or "cancelled" when a rule ended it before it arrived.
+        let autoFeedbackPhase: String?
+        let autoFeedbackDirection: String?
+        let autoFeedbackSize: String?
+        let autoFeedbackChangeSPM: Double?
+        let autoFeedbackLimited: Bool?
 
         init(
             offsetSeconds: Double,
@@ -130,7 +139,13 @@ struct RunDiagnosticSnapshot: Codable, Equatable, Sendable {
             trackElapsedSeconds: Int,
             trackDurationSeconds: Int?,
             tempoMatched: Bool?,
-            trackChangeReason: String? = nil
+            trackChangeReason: String? = nil,
+            autoFeedbackTransactionID: Int? = nil,
+            autoFeedbackPhase: String? = nil,
+            autoFeedbackDirection: String? = nil,
+            autoFeedbackSize: String? = nil,
+            autoFeedbackChangeSPM: Double? = nil,
+            autoFeedbackLimited: Bool? = nil
         ) {
             self.offsetSeconds = offsetSeconds
             self.kind = kind
@@ -175,6 +190,12 @@ struct RunDiagnosticSnapshot: Codable, Equatable, Sendable {
             self.trackDurationSeconds = trackDurationSeconds
             self.tempoMatched = tempoMatched
             self.trackChangeReason = trackChangeReason
+            self.autoFeedbackTransactionID = autoFeedbackTransactionID
+            self.autoFeedbackPhase = autoFeedbackPhase
+            self.autoFeedbackDirection = autoFeedbackDirection
+            self.autoFeedbackSize = autoFeedbackSize
+            self.autoFeedbackChangeSPM = autoFeedbackChangeSPM
+            self.autoFeedbackLimited = autoFeedbackLimited
         }
     }
 
@@ -296,7 +317,7 @@ struct RunDiagnosticsRecorder {
             timeline.removeAll(keepingCapacity: true)
         }
 
-        guard startedAt != nil, newState != oldState, let kind = kind(for: event) else { return nil }
+        guard startedAt != nil, newState != oldState else { return nil }
         let tempoMatched: Bool?
         if case let .activeSecond(value) = event {
             tempoMatched = value
@@ -306,19 +327,58 @@ struct RunDiagnosticsRecorder {
 
         // A finish leaves no session on the new state, so the entry still reads the run it ended.
         let stateForEntry = newState.session == nil ? oldState : newState
-        append(
-            kind: kind,
-            state: stateForEntry,
-            collection: collection,
-            tempoMatched: tempoMatched,
-            trackChangeReason: trackChangeReason(for: event),
-            cadenceSample: nil
-        )
+        let eventKind = kind(for: event)
+        if let eventKind {
+            append(
+                kind: eventKind,
+                state: stateForEntry,
+                collection: collection,
+                tempoMatched: tempoMatched,
+                trackChangeReason: trackChangeReason(for: event),
+                cadenceSample: nil
+            )
+        }
+        let feedback = autoFeedbackEvidence(from: oldState, to: newState)
+        if let feedback {
+            append(
+                kind: .autoFeedback,
+                state: stateForEntry,
+                collection: collection,
+                tempoMatched: nil,
+                trackChangeReason: nil,
+                cadenceSample: nil,
+                autoFeedback: feedback
+            )
+        }
+        guard eventKind != nil || feedback != nil else { return nil }
         return checkpoint(
             completingWith: newState,
             session: stateForEntry.session,
             collection: collection,
-            isImmediate: isImmediateCheckpoint(kind)
+            isImmediate: feedback != nil || eventKind.map(isImmediateCheckpoint) == true
+        )
+    }
+
+    // The player named the song it is already on. Product state does not move, so this is recorded
+    // straight from the shell as evidence.
+    mutating func record(
+        sameSongCallbackIn state: RunState,
+        collection: MusicCollection
+    ) -> RunDiagnosticSnapshot? {
+        guard startedAt != nil else { return nil }
+        append(
+            kind: .sameSongCallback,
+            state: state,
+            collection: collection,
+            tempoMatched: nil,
+            trackChangeReason: nil,
+            cadenceSample: nil
+        )
+        return checkpoint(
+            completingWith: state,
+            session: state.session,
+            collection: collection,
+            isImmediate: true
         )
     }
 
@@ -350,7 +410,8 @@ struct RunDiagnosticsRecorder {
         collection: MusicCollection,
         tempoMatched: Bool?,
         trackChangeReason: TrackChangeReason?,
-        cadenceSample cadenceObservation: CadenceDiagnosticSample?
+        cadenceSample cadenceObservation: CadenceDiagnosticSample?,
+        autoFeedback: AutoFeedbackEvidence? = nil
     ) {
         guard let startedAt else { return }
         let session = stateForEntry.session
@@ -417,7 +478,13 @@ struct RunDiagnosticsRecorder {
                 trackElapsedSeconds: session?.trackElapsedSeconds ?? 0,
                 trackDurationSeconds: session?.trackDurationSeconds,
                 tempoMatched: tempoMatched,
-                trackChangeReason: trackChangeReason?.rawValue
+                trackChangeReason: trackChangeReason?.rawValue,
+                autoFeedbackTransactionID: autoFeedback?.transactionID,
+                autoFeedbackPhase: autoFeedback?.phase,
+                autoFeedbackDirection: autoFeedback?.direction,
+                autoFeedbackSize: autoFeedback?.size,
+                autoFeedbackChangeSPM: autoFeedback?.changeSPM,
+                autoFeedbackLimited: autoFeedback?.isLimited
             )
         )
         if timeline.count > Self.maximumEntries {
@@ -519,11 +586,50 @@ struct RunDiagnosticsRecorder {
         case .started, .cadenceUpdated, .cadenceLost, .rateApplied, .trackChanged,
             .paused, .resumeRequested, .routeLost, .routeRestored, .interruptionBegan,
             .interruptionEnded, .playbackFailed, .rhythmAdjusted, .rhythmModeChanged,
-            .finishRequested, .finished:
+            .finishRequested, .finished, .autoFeedback, .sameSongCallback:
             true
         case .cadenceObserved, .playerProgress, .activeSecond:
             false
         }
+    }
+
+    struct AutoFeedbackEvidence: Equatable {
+        let transactionID: Int
+        let phase: String
+        let direction: String
+        let size: String
+        let changeSPM: Double
+        let isLimited: Bool
+    }
+
+    // One entry every time the transaction identity or its phase moves, including the moment a rule
+    // ends it, so a Debug trace shows that nothing replayed.
+    private func autoFeedbackEvidence(
+        from oldState: RunState,
+        to newState: RunState
+    ) -> AutoFeedbackEvidence? {
+        let previous = oldState.session?.autoFeedback.transaction
+        let current = newState.session?.autoFeedback.transaction
+        if let current {
+            guard previous?.id != current.id || previous?.phase != current.phase else { return nil }
+            return AutoFeedbackEvidence(
+                transactionID: current.id,
+                phase: current.phase.rawValue,
+                direction: current.direction.rawValue,
+                size: current.size.rawValue,
+                changeSPM: current.changeSPM,
+                isLimited: current.isLimited
+            )
+        }
+        guard let previous else { return nil }
+        return AutoFeedbackEvidence(
+            transactionID: previous.id,
+            phase: "cancelled",
+            direction: previous.direction.rawValue,
+            size: previous.size.rawValue,
+            changeSPM: previous.changeSPM,
+            isLimited: previous.isLimited
+        )
     }
 
     private func trackChangeReason(for event: RunEvent) -> TrackChangeReason? {

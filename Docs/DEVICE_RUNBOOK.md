@@ -87,6 +87,19 @@ The expanded-rate build is already installed with exact signing. Its expected so
 7. Record whether `Tempo matched` appeared, whether the music moved in the expected direction, whether Auto felt stable or hunted, whether Manual reset after the confirmed song change, and whether playback produced weak physical feedback.
 8. Pull `latest-run-diagnostics.json` immediately. Confirm accepted cadence, settled Auto target, requested rate, Apple Music read-back, reply time, remaining difference, result state, song identity, and source fingerprint before making a product claim.
 
+## Feedback audition
+
+The Auto feedback prototypes are played by hand from a Debug-only screen. It ships in Debug builds and is absent from Release.
+
+1. Select the `Samadhi Feedback Audition` scheme in Xcode and run it on the paired iPhone. The scheme passes `--feedback-audition`, so the app opens straight into the audition screen.
+2. Start a real song in the Music app first and leave it playing in the background. Ducking, gaps, and route changes only show up against real Apple Music.
+3. Use headphones at a safe volume, and put the phone in the normal pocket position for anything about tactile recognition.
+4. Pick a family, a direction, a size, and a sound path, then play the start, the arrival, or both. The sound and haptic toggles work independently so either half can be judged alone.
+5. For a blinded run, write down the seed shown on screen and start the 10 trials. The screen picks the direction, plays the cue, takes the answer, and reports the score out of 10. Copy the summary line, which carries family, sound path, seed, and score.
+6. Repeat the set for the other sound path before comparing families. Record the score, the seed, and any ducking, pause, gap, or route change in `Evidence/Device/`.
+
+Nothing in the prototype set becomes a product asset before this comparison. The acceptance bar lives in [AUTO-CHANGE-INTERACTION-SPEC.md](AUTO-CHANGE-INTERACTION-SPEC.md).
+
 ## Automated tempo corpus
 
 The real-preview accuracy check does not need device interaction. Run the opt-in `TempoCorpusValidator` from the package and provide an output path under `Evidence/Device/`. It verifies fixed Apple catalog metadata, downloads each preview into temporary storage, analyzes it, deletes it, and fails below 10 of 12 exact musical-pulse results. Supported stride relationships are reported separately. Normal automated tests do not use the network.
