@@ -26,6 +26,8 @@ Samay also felt Auto changing the music. The changes felt jarring and unexplaine
 
 The current candidate from `main` at `67adf80` is installed over Samadhi 1.0 build 1 with exact signing. The selected collection stayed byte-for-byte unchanged at SHA-256 `51b4096cc3b2c29ae32d85290b5a9f72166460f23b130d818508f7507b4e8397`. The phone was unlocked, so the hidden Debug screen was read on the device: its source fingerprint `8df37f8dca11dfa0ad38346b2ea2339a5d76c9a10c4a539b471d8a1ea7df02e6` equals the signed build. The new endpoints, the transport and Finish feel, the Auto cues, and the song-change causes have not produced an Apple Music reply, a listening result, or any physical judgment yet.
 
+The analyzer version 5 build `294981e` ran a real 441-second brisk walk with Easy Miles on 2026-08-19, average cadence 113 steps per minute, and its diagnostic file was pulled and parsed under `Evidence/Device/2026-08-19-walk-easy-miles/`. The record proves Auto settled once on Numb and wrote 0.90, that a natural boundary landed on a 163.75 BPM song the walk could not reach, and that the reducer emitted five start cues and three arrivals in the visible window. It does not prove any cue physically played: the service writes no delivery record, and the 512-entry buffer dropped the first 205 seconds and two songs. Samay reported feeling perhaps one haptic and being unable to tell when a change happened. Only 7 of the 41 ready songs can reach a walking cadence inside the rate window, so Auto held the 0.85 floor for most of the walk.
+
 ## Current software gate
 
 - Project generation passed.
@@ -53,6 +55,7 @@ The whole physical list is written as one ordered checklist in [PHONE-CHECK-2026
 - Run a clean walking-only check. The 90 SPM floor and five-second walking delay are software choices, not physically tuned constants.
 - Check whether steady lifting motion can falsely look like walking. Samadhi does not need a lifting mode.
 - Complete one 20-minute outdoor run.
+- Repair what the August 19 walk exposed before the next physical run: keep song changes, rate writes, mode changes, and cues out of the buffer eviction; record whether each cue played, fell back, or found no engine; prepare a fitting next song before a natural boundary when the queued song cannot reach the settled target; and say once, plainly, when a collection is mostly out of reach at the current cadence.
 
 ## Where we left off
 

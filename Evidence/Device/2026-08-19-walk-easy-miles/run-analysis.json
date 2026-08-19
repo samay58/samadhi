@@ -1,0 +1,322 @@
+{
+ "build": {
+  "appVersion": "1.0",
+  "buildDate": "2026-08-19T17:30:34Z",
+  "buildNumber": "1",
+  "diagnosticFileVersion": 10,
+  "gitBranch": "main",
+  "gitCommit": "294981e6c278901f278838c4c47ac38af43a0faa",
+  "sourceFingerprint": "55438218da031307a32d9e1fdb190ecf4a880571e17533d5436f19a81317f24b",
+  "tempoAnalyzerVersion": 5,
+  "trackedFilesDirty": false
+ },
+ "capturedAt": "2026-08-19T18:56:47Z",
+ "collection": "Easy Miles",
+ "readyTrackCount": 41,
+ "summary": {
+  "automaticSeconds": 420,
+  "averageCadence": 113,
+  "durationSeconds": 441,
+  "manualSeconds": 21,
+  "songCount": 6,
+  "tempoMatchedCoveragePercent": 99,
+  "tempoMatchedPercent": 67
+ },
+ "timelineEntries": 512,
+ "timelineCap": 512,
+ "visibleActiveSecondRange": [
+  205,
+  441
+ ],
+ "lostActiveSecondsAtStart": 205,
+ "visibleTracks": [
+  "Bermuda",
+  "Nightrider (feat. Freddie Gibbs)",
+  "Numb",
+  "WEIGHT OFF (feat. BADBADNOTGOOD)"
+ ],
+ "cadenceSPM": {
+  "min": 108,
+  "max": 115,
+  "mean": 110.9
+ },
+ "autoSettledTargetChanges": [
+  [
+   205,
+   "Numb",
+   114,
+   "settled",
+   0.95
+  ],
+  [
+   272,
+   "Numb",
+   114,
+   "considering",
+   0.95
+  ],
+  [
+   277,
+   "Numb",
+   108,
+   "settled",
+   0.9
+  ]
+ ],
+ "rateWritesPerTrack": {
+  "Numb": 1,
+  "Nightrider (feat. Freddie Gibbs)": 2,
+  "WEIGHT OFF (feat. BADBADNOTGOOD)": 15,
+  "Bermuda": 1
+ },
+ "trackChanges": [
+  [
+   402.2,
+   "Nightrider (feat. Freddie Gibbs)",
+   "naturalBoundary",
+   163.75,
+   true
+  ],
+  [
+   409.4,
+   "WEIGHT OFF (feat. BADBADNOTGOOD)",
+   "explicitSkip",
+   159.75,
+   true
+  ],
+  [
+   411.5,
+   "Bermuda",
+   "explicitSkip",
+   120.25,
+   false
+  ],
+  [
+   412.5,
+   "WEIGHT OFF (feat. BADBADNOTGOOD)",
+   "explicitPrevious",
+   159.75,
+   true
+  ]
+ ],
+ "feedbackTransactions": {
+  "3": {
+   "track": "Numb",
+   "direction": "slower",
+   "size": "small",
+   "changeSPM": -6.0,
+   "limited": false,
+   "phases": [
+    [
+     336.0,
+     "committed"
+    ],
+    [
+     336.0,
+     "arrived"
+    ]
+   ]
+  },
+  "4": {
+   "track": "Nightrider (feat. Freddie Gibbs)",
+   "direction": "slower",
+   "size": "small",
+   "changeSPM": -8.2,
+   "limited": true,
+   "phases": [
+    [
+     402.2,
+     "committed"
+    ],
+    [
+     402.3,
+     "began"
+    ],
+    [
+     402.5,
+     "arrived"
+    ],
+    [
+     409.4,
+     "cancelled"
+    ]
+   ]
+  },
+  "5": {
+   "track": "Bermuda",
+   "direction": "faster",
+   "size": "small",
+   "changeSPM": 5.8,
+   "limited": false,
+   "phases": [
+    [
+     411.5,
+     "committed"
+    ],
+    [
+     411.5,
+     "began"
+    ],
+    [
+     412.5,
+     "cancelled"
+    ]
+   ]
+  },
+  "6": {
+   "track": "WEIGHT OFF (feat. BADBADNOTGOOD)",
+   "direction": "slower",
+   "size": "large",
+   "changeSPM": -23.2,
+   "limited": true,
+   "phases": [
+    [
+     421.1,
+     "committed"
+    ],
+    [
+     421.2,
+     "began"
+    ],
+    [
+     422.4,
+     "cancelled"
+    ]
+   ]
+  },
+  "7": {
+   "track": "WEIGHT OFF (feat. BADBADNOTGOOD)",
+   "direction": "slower",
+   "size": "medium",
+   "changeSPM": -14.2,
+   "limited": true,
+   "phases": [
+    [
+     428.9,
+     "committed"
+    ],
+    [
+     429.0,
+     "began"
+    ],
+    [
+     431.4,
+     "cancelled"
+    ]
+   ]
+  },
+  "8": {
+   "track": "WEIGHT OFF (feat. BADBADNOTGOOD)",
+   "direction": "slower",
+   "size": "large",
+   "changeSPM": -18.2,
+   "limited": true,
+   "phases": [
+    [
+     442.1,
+     "committed"
+    ],
+    [
+     442.2,
+     "began"
+    ],
+    [
+     446.0,
+     "arrived"
+    ],
+    [
+     506.0,
+     "cancelled"
+    ]
+   ]
+  }
+ },
+ "manualAutoActions": [
+  [
+   414.1,
+   "automatic",
+   0.85
+  ],
+  [
+   414.7,
+   "manual",
+   0.851
+  ],
+  [
+   420.0,
+   "manual",
+   0.995
+  ],
+  [
+   421.1,
+   "automatic",
+   0.975
+  ],
+  [
+   422.4,
+   "manual",
+   0.851
+  ],
+  [
+   424.3,
+   "automatic",
+   0.85
+  ],
+  [
+   426.5,
+   "manual",
+   0.939
+  ],
+  [
+   428.2,
+   "manual",
+   0.939
+  ],
+  [
+   428.9,
+   "automatic",
+   0.919
+  ],
+  [
+   431.4,
+   "manual",
+   0.851
+  ],
+  [
+   432.5,
+   "manual",
+   0.964
+  ],
+  [
+   442.1,
+   "automatic",
+   0.944
+  ]
+ ],
+ "tail": [
+  [
+   506.0,
+   "routeLost"
+  ],
+  [
+   1426.8,
+   "routeRestored"
+  ],
+  [
+   1428.9,
+   "resumeRequested"
+  ],
+  [
+   1430.3,
+   "paused"
+  ],
+  [
+   1432.8,
+   "finishRequested"
+  ],
+  [
+   1433.2,
+   "finished"
+  ]
+ ]
+}
