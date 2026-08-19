@@ -631,6 +631,15 @@ This checkpoint recorded a passing local candidate before its exact-profile buil
 - Reran the 48-song playlist, 41 ready from 38 with none lost, and the 138 cached phone results, 132 unchanged; every changed answer that could be checked against a public BPM listing matched it
 - Moved the analysis version to 5 so every cached result is measured again
 
+## 2026-08-19. First walk on the version 5 build
+
+- Pulled the run file from the phone after a 441-second brisk walk with Easy Miles at an average 113 steps per minute and parsed it into `Evidence/Device/2026-08-19-walk-easy-miles/`
+- Found the 512-entry diagnostics buffer had dropped the first 205 active seconds and two songs, so the song Samay saw retuned repeatedly is not in the record
+- Read one Auto change on Numb, 0.95 to 0.90 after cadence fell from 114 to 108, then a natural boundary into a 163.75 BPM song pinned at 0.85 because the app only prepares a better next song while the current song is already at its limit
+- Counted five start cues and three arrivals emitted by the reducer, against Samay's report of feeling perhaps one; the service records nothing about delivery, so the gap cannot be placed on the reducer, the engine, the route, or the hand
+- Measured the collection against the walk: 7 of 41 ready songs reach 108 steps per minute inside the rate window, so Auto sat at the floor for most of the session and reported `atLimit` rather than saying the playlist is out of reach
+- Wrote the six gaps into the evidence README and the repair list into STATUS; no code changed
+
 ## Current checkpoint
 
-The transport and Finish pass, deterministic song-change causes, and the first directional Auto feedback prototype are merged on `main`, pass the software gate, and are installed on the phone with the in-app fingerprint confirmed. Endpoint read-back and listening at 0.85 and 1.15 carry over from the previous candidate, and tactile feel, sound quality, locked-screen delivery, and Apple Music coexistence have no result at all. The next step is the ordered checklist in [PHONE-CHECK-2026-08-19.md](PHONE-CHECK-2026-08-19.md) from step 2 onward. After it, the next Main Thing is the 20-minute outdoor run.
+The transport and Finish pass, deterministic song-change causes, and the first directional Auto feedback prototype are merged on `main`, pass the software gate, and are installed on the phone with the in-app fingerprint confirmed. Endpoint read-back and listening at 0.85 and 1.15 carry over from the previous candidate, and tactile feel, sound quality, locked-screen delivery, and Apple Music coexistence have no result at all. The August 19 walk on the version 5 build is parsed under `Evidence/Device/2026-08-19-walk-easy-miles/`; it exposed a lossy diagnostics buffer, no cue delivery record, no look-ahead at natural boundaries, and a jogging playlist mostly out of reach at walking cadence. Those repairs come before the next physical run. After them, the ordered checklist in [PHONE-CHECK-2026-08-19.md](PHONE-CHECK-2026-08-19.md) from step 2 onward, then the 20-minute outdoor run.
