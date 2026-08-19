@@ -1,0 +1,10 @@
+# Out-of-reach line and cue delivery rows
+
+Captured on the iPhone 17 Pro Simulator, iOS 27, from the serial interface tests on 2026-08-19, commit after `5a0cf88`. Demo playlists only; no private music. The scripted walk uses the `-SAMADHI_OUT_OF_REACH=faster` and `=slower` launch arguments against the three-song "Slow Sundays" demo set (126, 132, and 138 BPM): 100 steps per minute sits below every song's floor inside the 0.85 to 1.15 window, 172 above every ceiling.
+
+- `out-of-reach-default.jpg`: the run screen about 28 seconds into the walk. One line in the status slot under the dial, the same place the lock brief lives: "Most of this playlist is faster than you're moving." The test then waits for it to leave on its own (four seconds in fast mode, seven in a normal run) and proves it does not return while the walk continues.
+- `out-of-reach-reduce-motion.jpg`, `out-of-reach-increased-contrast.jpg`, `out-of-reach-dynamic-type-large.jpg`: the same moment under Reduce Motion, Increase Contrast, and the accessibility L text size. Nothing on the line moves, so Reduce Motion has nothing to reduce; Increase Contrast lifts the line to full ivory; at the large size it wraps to three lines inside the 300 point column and the dial yields room.
+- `out-of-reach-slower.jpg`: the opposite direction, "Most of this playlist is slower than you're moving.", from a scripted 172 step run against the same set.
+- `debug-cue-deliveries.png`: the hidden Debug screen from the `--diagnostic-scenario=verified` fixture, showing the new `Next song` row and the `What became of the cues` section with the last cue outcomes. The fixture values are scripted; a real outcome only exists on the phone.
+
+What these frames prove: the reducer's one-shot reach rule reaches the screen, the words are the ones in the code, and the line survives the four environments. What they do not prove: whether a runner ever looks down to read it, whether the hold length is right on a real walk, or anything about cue delivery on hardware.

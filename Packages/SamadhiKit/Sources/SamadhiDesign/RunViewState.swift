@@ -153,6 +153,20 @@ public struct RhythmControlPresentation: Sendable, Equatable {
     }
 }
 
+// The one line the run screen may say about reach. It is not Auto-change copy: it names the
+// collection, once, in the runner's words, and then leaves.
+public enum ReachNoticePresentation: Sendable, Equatable {
+    case mostlyFaster
+    case mostlySlower
+
+    public var text: String {
+        switch self {
+        case .mostlyFaster: "Most of this playlist is faster than you're moving."
+        case .mostlySlower: "Most of this playlist is slower than you're moving."
+        }
+    }
+}
+
 public struct RunViewState: Sendable, Equatable {
     public var phase: RunVisualPhase
     public var controlsVisible: Bool
@@ -162,6 +176,7 @@ public struct RunViewState: Sendable, Equatable {
     public var track: TrackMetadata
     public var hasArtwork: Bool
     public var showLockBrief: Bool
+    public var reachNotice: ReachNoticePresentation?
     public var finishHoldPressing: Bool
     public var forceReduceMotion: Bool
     public var forceIncreasedContrast: Bool
@@ -177,6 +192,7 @@ public struct RunViewState: Sendable, Equatable {
         track: TrackMetadata = .demoTracks[0],
         hasArtwork: Bool = true,
         showLockBrief: Bool = false,
+        reachNotice: ReachNoticePresentation? = nil,
         finishHoldPressing: Bool = false,
         forceReduceMotion: Bool = false,
         forceIncreasedContrast: Bool = false,
@@ -199,6 +215,7 @@ public struct RunViewState: Sendable, Equatable {
         self.track = track
         self.hasArtwork = hasArtwork
         self.showLockBrief = showLockBrief
+        self.reachNotice = reachNotice
         self.finishHoldPressing = finishHoldPressing
         self.forceReduceMotion = forceReduceMotion
         self.forceIncreasedContrast = forceIncreasedContrast

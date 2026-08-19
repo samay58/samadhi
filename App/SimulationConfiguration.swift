@@ -43,6 +43,25 @@ enum AutoFeedbackScenario: String, CaseIterable, Equatable {
     }
 }
 
+// A scripted walk whose cadence most of the Simulator collection cannot reach, so the reach
+// notice can be seen. Faster means the songs are faster than the body; slower the reverse.
+enum OutOfReachScenario: String, CaseIterable, Equatable {
+    case faster
+    case slower
+
+    // Against the out-of-reach demo set (126, 132, and 138 BPM), 100 steps per minute sits below
+    // every song's floor and 172 above every song's ceiling inside the rate window.
+    var cadenceSPM: Int {
+        switch self {
+        case .faster: 100
+        case .slower: 172
+        }
+    }
+
+    // Walking acquisition, the filter, the twenty held seconds, and a margin.
+    static let heldSamples = 60
+}
+
 struct SimulationConfiguration {
     // Launch flags make previews and UI tests deterministic. They are not product settings.
     let fastMode: Bool
@@ -53,6 +72,7 @@ struct SimulationConfiguration {
     let simulateExternalBoundary: Bool
     let simulateSameSongCallback: Bool
     let autoFeedbackScenario: AutoFeedbackScenario?
+    let outOfReachScenario: OutOfReachScenario?
     let feedbackAudition: Bool
     let missingArtwork: Bool
     let extendedAcquisitionWindow: Bool
@@ -70,6 +90,7 @@ struct SimulationConfiguration {
         simulateExternalBoundary: Bool = false,
         simulateSameSongCallback: Bool = false,
         autoFeedbackScenario: AutoFeedbackScenario? = nil,
+        outOfReachScenario: OutOfReachScenario? = nil,
         feedbackAudition: Bool = false,
         missingArtwork: Bool,
         extendedAcquisitionWindow: Bool,
@@ -86,6 +107,7 @@ struct SimulationConfiguration {
         self.simulateExternalBoundary = simulateExternalBoundary
         self.simulateSameSongCallback = simulateSameSongCallback
         self.autoFeedbackScenario = autoFeedbackScenario
+        self.outOfReachScenario = outOfReachScenario
         self.feedbackAudition = feedbackAudition
         self.missingArtwork = missingArtwork
         self.extendedAcquisitionWindow = extendedAcquisitionWindow
@@ -120,6 +142,13 @@ struct SimulationConfiguration {
                     return nil
                 }
                 return AutoFeedbackScenario(rawValue: String(argument.dropFirst(prefix.count)))
+            }(),
+            outOfReachScenario: {
+                let prefix = "-SAMADHI_OUT_OF_REACH="
+                guard let argument = arguments.first(where: { $0.hasPrefix(prefix) }) else {
+                    return nil
+                }
+                return OutOfReachScenario(rawValue: String(argument.dropFirst(prefix.count)))
             }(),
             feedbackAudition: {
                 #if DEBUG

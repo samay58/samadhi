@@ -145,6 +145,13 @@ private let previewSend: @MainActor (RunAction) -> Void = { _ in }
     SamadhiScreen(state: RunViewState(phase: .running, cadenceSPM: 194), send: previewSend)
 }
 
+#Preview("Playlist out of reach") {
+    SamadhiScreen(
+        state: RunViewState(phase: .running, cadenceSPM: 112, reachNotice: .mostlyFaster),
+        send: previewSend
+    )
+}
+
 #Preview("Tempo control, Auto") {
     SamadhiScreen(
         state: RunViewState(

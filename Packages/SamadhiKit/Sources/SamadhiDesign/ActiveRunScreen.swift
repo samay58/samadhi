@@ -134,7 +134,7 @@ struct ActiveRunScreen: View {
         case .preparing, .acquiring, .paused, .confirmingFinish, .finishing:
             true
         case .running:
-            state.showLockBrief
+            state.showLockBrief || state.reachNotice != nil
         default:
             false
         }
@@ -166,6 +166,11 @@ private struct RunStatus: View {
             statusText("Preparing your music")
         case .acquiring:
             statusText("Listening for your stride")
+        case .running where state.reachNotice != nil && !state.showLockBrief:
+            ReachNoticeLine(
+                notice: state.reachNotice,
+                increasedContrastOverride: state.forceIncreasedContrast
+            )
         case .running where state.showLockBrief:
             VStack(spacing: Space.x1) {
                 Text("Tempo matched")
@@ -199,6 +204,32 @@ private struct RunStatus: View {
         Text(text)
             .font(font)
             .accessibilityIdentifier("run-status")
+    }
+}
+
+// One quiet sentence in the status slot, the same place the lock brief lives, so the screen stays
+// one object. The shell takes it down on its own after a few seconds; nothing here moves, so
+// Reduce Motion has nothing to reduce.
+private struct ReachNoticeLine: View {
+    let notice: ReachNoticePresentation?
+    let increasedContrastOverride: Bool
+
+    @Environment(\.colorSchemeContrast) private var colorSchemeContrast
+
+    var body: some View {
+        Text(notice?.text ?? "")
+            .font(.callout.weight(.medium))
+            .dynamicTypeSize(...DynamicTypeSize.accessibility2)
+            .foregroundStyle(SamadhiColor.ivory.opacity(increasedContrast ? 1 : 0.9))
+            .multilineTextAlignment(.center)
+            .lineLimit(3)
+            .fixedSize(horizontal: false, vertical: true)
+            .frame(maxWidth: 300)
+            .accessibilityIdentifier("reach-notice")
+    }
+
+    private var increasedContrast: Bool {
+        colorSchemeContrast == .increased || increasedContrastOverride
     }
 }
 

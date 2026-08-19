@@ -525,6 +525,49 @@ final class SamadhiUITests: XCTestCase {
         attachScreenshot(named: "tempo-close-increased-contrast")
     }
 
+    // The reducer says once, in human words, when most of the collection cannot follow the body.
+    // The scripted walk holds 100 steps per minute against three walking songs whose floors all
+    // sit above it, so the line must appear, and it must appear once.
+    func testOutOfReachPlaylistIsNamedOnceInEveryEnvironment() {
+        let environments: [(name: String, arguments: [String])] = [
+            ("default", []),
+            ("reduce-motion", ["-UIAccessibilityReduceMotionEnabled", "YES"]),
+            ("increased-contrast", ["-UIAccessibilityDarkerSystemColorsEnabled", "YES"]),
+            (
+                "dynamic-type-large",
+                ["-UIPreferredContentSizeCategoryName", "UICTContentSizeCategoryAccessibilityL"]
+            ),
+        ]
+        for environment in environments {
+            prepareApp(["-SAMADHI_OUT_OF_REACH=faster"] + environment.arguments)
+            app.launch()
+            XCTAssertTrue(app.staticTexts["Slow Sundays"].waitForExistence(timeout: 5))
+            app.buttons["start-run"].tap()
+            XCTAssertTrue(element("cadence-lock").waitForExistence(timeout: 10))
+
+            let notice = element("reach-notice")
+            XCTAssertTrue(notice.waitForExistence(timeout: 25), environment.name)
+            XCTAssertEqual(notice.label, "Most of this playlist is faster than you're moving.")
+            attachScreenshot(named: "out-of-reach-\(environment.name)")
+
+            // It leaves on its own and does not come back while the walk continues.
+            XCTAssertTrue(notice.waitForNonExistence(timeout: 10), environment.name)
+            XCTAssertFalse(notice.waitForExistence(timeout: 4), environment.name)
+            app.terminate()
+        }
+    }
+
+    func testOutOfReachNoticeNamesTheSlowerDirectionToo() {
+        prepareApp("-SAMADHI_OUT_OF_REACH=slower")
+        app.launch()
+        app.buttons["start-run"].tap()
+        XCTAssertTrue(element("cadence-lock").waitForExistence(timeout: 10))
+        let notice = element("reach-notice")
+        XCTAssertTrue(notice.waitForExistence(timeout: 25))
+        XCTAssertEqual(notice.label, "Most of this playlist is slower than you're moving.")
+        attachScreenshot(named: "out-of-reach-slower")
+    }
+
     func testNormalSimulatorLaunchUsesLocalDemoMusic() {
         continueAfterFailure = false
         app = XCUIApplication()
@@ -564,6 +607,13 @@ final class SamadhiUITests: XCTestCase {
         XCTAssertTrue(element("sensor-sample-status").label.contains("Accepted, delayed but new"))
         XCTAssertTrue(element("settled-auto-target").label.contains("175 SPM, settled"))
         attachScreenshot(named: "core-diagnostics-sensor-and-auto-target")
+        for _ in 0..<6 where !element("cue-delivery-0").exists {
+            app.swipeUp()
+        }
+        XCTAssertTrue(element("next-song-outlook").label.contains("Queued song fits"))
+        XCTAssertTrue(element("cue-delivery-0").label.contains("played through the engine"))
+        XCTAssertTrue(element("cue-delivery-1").exists)
+        attachScreenshot(named: "core-diagnostics-cue-deliveries")
     }
 
     func testDiagnosticsDistinguishEveryAppleMusicResult() {
