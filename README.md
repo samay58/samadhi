@@ -4,59 +4,57 @@
 
 *music in stride*
 
-Samadhi is a native iPhone music experience that helps movement and music settle into one rhythm. It imports an Apple Music playlist, analyzes available previews on the phone, remembers the selection, and plays ready tracks through a cadence-aware run.
+Samadhi is a native iPhone music player that lets movement and music settle into one rhythm. You import an Apple Music playlist. The phone analyzes each song's tempo locally, senses your steps through Core Motion, chooses songs that fit, and gently adjusts their speed while you walk or run.
+
+It is deliberately small. There is no backend, account, analytics, GPS, or coaching, and no third-party code ships in the app.
 
 ## Current state
 
-Milestone 2 is in progress. Apple Music is the production player. Tempo analyzer version 5 passes 12 of 12 public preview references and keeps the true beat under swing. A physical run confirmed that delayed iPhone cadence readings can settle Auto and that Apple Music reports the requested playback speed. Manual belongs to the current song, and the tempo wheel closes without changing playback. The current candidate supports steady movement from 90 through 210 steps per minute and can adjust one song from 85 to 115 percent of normal speed.
-
-The run controls are now three separate Liquid Glass circles, a larger tinted one for Pause or Resume between Previous and Next, each springing under the finger, with a quiet hold-to-finish button below. Every confirmed song change records why it happened, and the hidden Debug screen shows the cause. A directional Auto feedback prototype exists in three haptic families with paired arrival sounds, playable from a hidden audition screen, and waits on the phone comparison before any of it is chosen.
-
-The 85 and 115 percent endpoints pass software checks and are installed with exact Samadhi signing. They still need Apple Music read-back and listening approval on the phone. The feel of the new controls, the Auto feedback cues, a known natural song transition, background recovery, and the outdoor run also remain open.
-
-Start with [product ethos](Docs/PRODUCT.md), [current status](Docs/STATUS.md), and [next plan](Docs/PLAN.md). Use the [Milestone 2 specification](Docs/MILESTONE-2-SPEC.md) for the complete release contract. The [music-source decision record](Docs/MUSIC-SOURCE-RESOLUTION-SPEC.md) explains why Apple Music was selected.
+The software works end to end, and the proof that it feels right is still open. The finish line for this milestone is one 20-minute outdoor run with one imported playlist. [Docs/STATUS.md](Docs/STATUS.md) says exactly what has and has not been proved on a phone, and [Docs/PLAN.md](Docs/PLAN.md) says what happens next.
 
 ## Build
 
-Requirements:
-
-- Xcode with iOS 26 SDK support
-- XcodeGen
+You need Xcode with an iOS 26 or later SDK and [XcodeGen](https://github.com/yonaskolb/XcodeGen).
 
 ~~~sh
-./Scripts/bootstrap.sh
-./Scripts/test.sh
+./Scripts/bootstrap.sh    # Generate the Xcode project from project.yml
+./Scripts/gate.sh         # Run every software check
+./Scripts/sim.sh run      # See the app in Simulator
 ~~~
 
-Code formatting:
+A Debug launch in Simulator uses two local placeholder playlists, simulated cadence, and silent playback, so the whole flow works without Apple Music. Physical iPhones and Release builds never take this path.
 
-~~~sh
-DEVELOPER_DIR=/Applications/Xcode-beta.app/Contents/Developer \
-  xcrun swift-format lint --configuration .swift-format --recursive \
-  App Packages/SamadhiKit/Sources Packages/SamadhiKit/Tests Tests
-~~~
+[Docs/DEVELOPMENT.md](Docs/DEVELOPMENT.md) covers machine setup and the development loop.
 
-The `Samadhi Feedback Audition` scheme opens a Debug-only screen that plays the Auto feedback prototypes by hand; it is absent from Release builds.
+## Layout
 
-A normal Debug launch on iPhone Simulator uses two local placeholder playlists, simulated cadence, and silent simulated playback. This keeps the complete import, run, rotary BPM, transport, transition, and summary flow available without Apple Music. Physical iPhone and Release builds never enable this path. Pass `--real-apple-music` only when intentionally debugging MusicKit in Simulator.
+| Path | Holds |
+| --- | --- |
+| `App/` | The app shell: Apple Music, haptics, task ownership, diagnostics, and Debug harnesses |
+| `Packages/SamadhiKit/` | The tested core: `SamadhiDomain`, `SamadhiMotion`, `SamadhiAudio`, `SamadhiDesign`, and two tempo tools |
+| `Tests/` | App-model and interface tests |
+| `Scripts/` | The gate, the Simulator loop, and the phone loop |
+| `Docs/` | The project guide below |
+| `Evidence/` | Proof behind the claims, described in [Evidence/README.md](Evidence/README.md) |
 
 ## Project guide
 
 | Question | Source |
 | --- | --- |
-| What feeling are we building? | [Docs/PRODUCT.md](Docs/PRODUCT.md) |
-| Where are we now? | [Docs/STATUS.md](Docs/STATUS.md) |
-| What happens next? | [Docs/PLAN.md](Docs/PLAN.md) |
-| What exactly are we building next? | [Docs/MILESTONE-2-SPEC.md](Docs/MILESTONE-2-SPEC.md) |
-| What makes the music feel synchronized? | [Docs/ADAPTIVE-AUDIO-PLAYBOOK.md](Docs/ADAPTIVE-AUDIO-PLAYBOOK.md) |
-| What is the prioritized execution sequence? | [Docs/FELT-SYNCHRONIZATION-EXECUTION-SPEC.md](Docs/FELT-SYNCHRONIZATION-EXECUTION-SPEC.md) |
-| How is this MacBook prepared to continue the work? | [Docs/MACBOOK-SETUP.md](Docs/MACBOOK-SETUP.md) |
-| What do product terms mean? | [Docs/CONTEXT.md](Docs/CONTEXT.md) |
-| Why was Apple Music selected? | [Docs/MUSIC-SOURCE-RESOLUTION-SPEC.md](Docs/MUSIC-SOURCE-RESOLUTION-SPEC.md) |
-| How is code shaped? | [Docs/ARCHITECTURE.md](Docs/ARCHITECTURE.md) |
-| Why were key choices made? | [Docs/DECISIONS.md](Docs/DECISIONS.md) |
-| What proves current behavior? | [Docs/TESTING.md](Docs/TESTING.md) |
-| What changed over time? | [Docs/PROGRESS.md](Docs/PROGRESS.md) |
-| How should brand feel? | [Docs/BRAND.md](Docs/BRAND.md) |
-
-No third-party production dependency ships in app.
+| What feeling are we building? | [PRODUCT.md](Docs/PRODUCT.md) |
+| Where are we now? | [STATUS.md](Docs/STATUS.md) |
+| What happens next? | [PLAN.md](Docs/PLAN.md) |
+| How do I work on it? | [DEVELOPMENT.md](Docs/DEVELOPMENT.md) |
+| How do I use a real phone? | [DEVICE_RUNBOOK.md](Docs/DEVICE_RUNBOOK.md) |
+| What must a phone check prove? | [PHONE-CHECK.md](Docs/PHONE-CHECK.md) |
+| How is the code shaped? | [ARCHITECTURE.md](Docs/ARCHITECTURE.md) |
+| What proves current behavior? | [TESTING.md](Docs/TESTING.md) |
+| Why were key choices made? | [DECISIONS.md](Docs/DECISIONS.md) |
+| What exactly is the milestone? | [MILESTONE-2-SPEC.md](Docs/MILESTONE-2-SPEC.md) |
+| How should an Auto change feel? | [AUTO-CHANGE-INTERACTION-SPEC.md](Docs/AUTO-CHANGE-INTERACTION-SPEC.md) |
+| What makes music feel synchronized? | [ADAPTIVE-AUDIO-PLAYBOOK.md](Docs/ADAPTIVE-AUDIO-PLAYBOOK.md) |
+| Which technology was checked? | [RESEARCH-2026-11.md](Docs/RESEARCH-2026-11.md) |
+| What do product terms mean? | [CONTEXT.md](Docs/CONTEXT.md) |
+| How should the brand feel? | [BRAND.md](Docs/BRAND.md) |
+| What changed over time? | [PROGRESS.md](Docs/PROGRESS.md) |
+| What is finished and kept for reference? | [Archive](Docs/Archive/README.md) |

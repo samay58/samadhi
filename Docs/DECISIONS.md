@@ -34,11 +34,11 @@ Use compact interlocking ribbon icon on opaque parchment. In-app mark uses nativ
 
 ## Evidence
 
-Simulator screenshots, preview states, test logs, and result summary prove current build. They do not prove physical cadence or listening quality.
+Simulator frames and test results prove interface behavior. They do not prove physical cadence or listening quality. Written records stay in Git; images stay only for the current interface. See `Evidence/README.md`.
 
 ## Documentation
 
-Active truth lives in PRODUCT.md, STATUS.md, and PLAN.md. Architecture, decisions, testing, progress, and brand support those files. Superseded build handoff and completed prompt artifacts were removed; Git history preserves them.
+Active truth lives in PRODUCT.md, STATUS.md, and PLAN.md. Architecture, decisions, testing, progress, and brand support those files. Finished handoffs, reviews, and closed gates live in `Docs/Archive/`.
 
 ## Import before generation
 
@@ -78,7 +78,7 @@ The remaining Bluetooth listening note, locked background playback, track change
 
 Do not build a Spotify spike. Spotify's iOS SDK remotely controls the Spotify app and does not expose an app-owned audio signal or documented music playback-rate control. Its Developer Policy prohibits analyzing Spotify content and requires audio content to remain in its original form. Playlist metadata alone does not close Samadhi's adaptive playback loop. Spotify import and playback are outside Milestone 2.
 
-The complete source decision and pass thresholds live in [MUSIC-SOURCE-RESOLUTION-SPEC.md](MUSIC-SOURCE-RESOLUTION-SPEC.md).
+The complete source decision and pass thresholds live in [MUSIC-SOURCE-RESOLUTION-SPEC.md](Archive/MUSIC-SOURCE-RESOLUTION-SPEC.md).
 
 ## MusicKit service configuration
 

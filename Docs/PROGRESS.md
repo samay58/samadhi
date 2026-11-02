@@ -651,6 +651,11 @@ This checkpoint recorded a passing local candidate before its exact-profile buil
 - Frames under `Evidence/Simulator/2026-08-19-out-of-reach/`; tests in `RunReducerBoundaryLookAheadTests`, `RunReducerReachTests`, and the app-model file
 - Passed the full gate (193 package, 48 app-model, 34 serial interface tests, lint, fingerprint tests), then built commit `0aa99a7` with the exact profile and installed it in place on the phone; built fingerprint `a05aaa3c...` equals the script, collection byte-identical, phone locked so no read-back; record under `Evidence/Device/2026-08-19-walk-repair-install/`
 
-## Current checkpoint
+## 2026-11-02. Repository sweep and Mac Mini loop
 
-The transport and Finish pass, deterministic song-change causes, and the first directional Auto feedback prototype are merged on `main` and pass the software gate. The August 19 walk on the version 5 build is parsed under `Evidence/Device/2026-08-19-walk-easy-miles/`; the four software gaps it exposed (a lossy diagnostics buffer, no cue delivery record, no look-ahead at natural boundaries, nothing said about a playlist out of reach) are repaired on `main` and the repair build is installed on the phone; see STATUS for the commit and fingerprint. Endpoint read-back and listening at 0.85 and 1.15 carry over from the previous candidate, and tactile feel, sound quality, locked-screen delivery, and Apple Music coexistence have no result at all. The next physical step is the same walk again, ten minutes or more with Easy Miles, so the complete record can say which cues played; then the ordered checklist in [PHONE-CHECK-2026-08-19.md](PHONE-CHECK-2026-08-19.md) from step 2 onward, then the 20-minute outdoor run.
+- Removed 112 superseded images, logs, and export manifests from the tree, kept at tag `archive/evidence-2026-08-19`, and wrote the evidence policy in `Evidence/README.md`
+- Moved finished handoffs, reviews, closed gates, and old device ledgers to `Docs/Archive/`
+- Cut `STATUS.md`, `PLAN.md`, `TESTING.md`, and `DEVICE_RUNBOOK.md` back to current truth
+- Replaced the MacBook note with a machine-neutral `DEVELOPMENT.md` and scripted the build, Simulator, and phone loop
+
+Current state and next steps live in [STATUS.md](STATUS.md) and [PLAN.md](PLAN.md).

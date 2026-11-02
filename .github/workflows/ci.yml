@@ -1,0 +1,33 @@
+# The part of the gate that needs no Simulator or signing. Interface tests and phone checks stay on
+# a real Mac through Scripts/gate.sh.
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  core:
+    runs-on: macos-26
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v5
+      - name: Show toolchain
+        run: |
+          xcodebuild -version
+          swift --version
+      - name: Lint
+        run: |
+          if ! output=$(xcrun swift-format lint --configuration .swift-format --recursive \
+            App Packages/SamadhiKit/Sources Packages/SamadhiKit/Tests Tests 2>&1) || [ -n "$output" ]; then
+            echo "$output"
+            exit 1
+          fi
+      - name: Source fingerprint tests
+        run: ./Scripts/test-source-fingerprint.sh
+      - name: Package tests
+        run: swift test --package-path Packages/SamadhiKit

@@ -1,12 +1,12 @@
-# Phone check for August 19
+# Phone check
 
 Short, ordered, and explicit. Everything below is a body, ear, Bluetooth, lock-screen, or real Apple Music judgment that software cannot make. Each block names what to do, what counts, and where to write the result. Nothing here needs debugging; if a step fails, record it and move on.
 
-Before starting: build the exact-profile candidate from the current `main`, confirm the embedded profile identifier is `ZL5U59XBJ6.com.samaydhawan.Samadhi`, install in place, and confirm the selected collection checksum is unchanged. Do not uninstall the app.
+Before starting, run `./Scripts/phone.sh install`. It builds with the exact profile, checks the signature, installs in place, and confirms the selected collection is unchanged. Do not uninstall the app.
 
 ## 1. Launch and fingerprint (2 minutes)
 
-- Open Samadhi, start a short run, open the hidden Debug screen, and read the source fingerprint. It must match the fingerprint of the signed build you inspected before installing. No fingerprint is recorded for this candidate yet, so write down the one you read.
+- Open Samadhi, start a short run, open the hidden Debug screen, and read the source fingerprint. It must match the fingerprint of the signed build you inspected before installing.
 - Result: match or mismatch. If mismatch, stop and rebuild.
 
 ## 2. Endpoint listening (10 minutes, headphones)
@@ -14,7 +14,7 @@ Before starting: build the exact-profile candidate from the current `main`, conf
 - Use the Debug endpoint controls on one song with a clear beat: play 0.90 and 1.10 first (the known pair), then 0.85 and 1.15, each for a full musical section.
 - Record Apple Music read-back for 0.85 and 1.15 from the Debug screen (requested versus reported).
 - Judge each endpoint: clean, slightly rough, or unusable. Say which song.
-- Result goes to `Evidence/Device/2026-08-19-phone-check/README.md`.
+- Result goes to `Evidence/Device/YYYY-MM-DD-phone-check/README.md`.
 
 ## 3. Transport and Finish feel (5 minutes)
 
@@ -45,7 +45,7 @@ Before starting: build the exact-profile candidate from the current `main`, conf
 
 ## 7. Save
 
-- Pull `latest-run-diagnostics.json` from the app container (see `Docs/DEVICE_RUNBOOK.md`) and copy it, plus notes, into `Evidence/Device/2026-08-19-phone-check/`.
+- Run `./Scripts/phone.sh pull`, then write the notes and the parsed result into `Evidence/Device/YYYY-MM-DD-phone-check/`. The raw record stays local.
 - Write three lines at the top of that README: fingerprint, endpoint verdict, blinded score per family.
 
 Nothing in this checklist should take more than about 45 minutes. If it does, stop and record where time went.

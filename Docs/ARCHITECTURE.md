@@ -26,8 +26,6 @@ Reducer owns product state transitions. App shell owns time, UIKit, haptics, tas
 | SamadhiDesign | Screens, controls, fluid field, aperture, previews, tokens |
 | App target | Presentation mapping, effect execution, UIKit, task ownership |
 
-No diagnostics module exists. Empty marker target was removed.
-
 ## State ownership
 
 RunReducer is sole authority for phase changes. Mutually exclusive phases use enums. Reducer remains free of SwiftUI, Core Motion, audio frameworks, UIKit, and wall-clock access.
@@ -55,11 +53,11 @@ Stale events carry session, acquisition, timeout, or hold identifiers. Reducer i
 
 Reducer receives the selected tracks. Production composition passes only adaptive-ready imported tracks while deterministic fixtures retain their configured collection. Domain no longer assumes collection size.
 
-`TrackMatchPlanner` is the source-neutral coarse-matching seam. Given a requested BPM and a quality envelope, it ranks ready tracks by the smallest stretch against the measured running-range pulse. A lower musical pulse participates only when analysis independently found a supported stride pulse. The planner preserves source order for ties and retains the current song when switching would provide only a marginal improvement. Preparation may update the next queue candidate, but only Skip or a player-confirmed natural boundary changes transport. Production connection remains a reducer and player-queue task, not a SwiftUI responsibility.
+`TrackMatchPlanner` is the source-neutral coarse-matching seam. Given a requested BPM and a quality envelope, it ranks ready tracks by the smallest stretch against the measured running-range pulse. A lower musical pulse participates only when analysis independently found a supported stride pulse. The planner preserves source order for ties and retains the current song when switching would provide only a marginal improvement. Preparation may update the next queue candidate, but only Skip or a player-confirmed natural boundary changes transport. That connection belongs to the reducer and player queue, not to SwiftUI.
 
 ## Production seams
 
-Milestone 2 replaces simulated motion and audio behind current boundaries according to [MILESTONE-2-SPEC.md](MILESTONE-2-SPEC.md). Do not bypass reducer from SwiftUI. Do not let Core Motion, MusicKit, or audio callbacks mutate view state directly.
+Real motion and audio sit behind the same boundaries as the simulated ones. Do not bypass the reducer from SwiftUI. Do not let Core Motion, MusicKit, or audio callbacks mutate view state directly.
 
 Production services need:
 
@@ -91,7 +89,7 @@ Debug builds overwrite one local latest-run diagnostic file after finish. `RunDi
 - Finish requires visible control plus hold
 - Progress resets on track navigation
 - Reduce Motion freezes ambient motion
-- No Samadhi backend; Apple Music is the only allowed production network path if it passes the physical gate
+- No Samadhi backend; Apple Music is the only production network path
 - Tempo match measurement enters the reducer as evidence from the app shell; the reducer does not infer a match from cadence alone
 - Playback progress and recovery callbacks carry session and operation identity before entering the reducer
 - Applied-rate callbacks also carry request and track identity; stale feedback cannot alter a replacement run

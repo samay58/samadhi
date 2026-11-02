@@ -1,5 +1,4 @@
 #!/bin/sh
 set -eu
-cd "$(dirname "$0")/.."
+. "$(dirname "$0")/lib.sh"
 xcodegen generate
-

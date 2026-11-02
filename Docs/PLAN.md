@@ -36,46 +36,33 @@ Milestone 2 turns the interaction prototype into a useful music product.
 
 The finish line is one real outdoor run, not a feature checklist. Samay should be able to import one Apple Music playlist, start running, hear music settle into his cadence, lock the phone, recover from normal interruptions, finish, and trust the summary. Stop expanding scope until that run works.
 
-The first normal field run disproved the original product mechanic. Later field evidence exposed stale cadence, over-sensitive wheel movement, startup selection against an invented 168 SPM prior, and a cadence range too narrow for brisk walking. The current software candidate accepts steady movement from 90 through 210 SPM, waits five seconds before walking can control music, rejects broken lifting-like motion, accepts five SPM of remaining match error, and widens one-song playback from 0.85 through 1.15. The saved private collection report still reflects the prior range. A clean walking and endpoint-listening phone check remains the truth gate.
-
-Manual control has one additional release-blocking contract. The wheel cannot display or commit a BPM the current song cannot produce inside its proven playback-rate envelope. Its integer range must come from the current cadence projection and player limits. At either boundary, value movement and detent feedback stop together, one restrained terminal haptic marks the limit, and reversing responds immediately. Playlist-wide range remains available through explicit Skip or a natural boundary. It must not appear as unreachable wheel travel.
-
-The MacBook continuation audit and storage discipline are recorded in [MACBOOK-SETUP.md](MACBOOK-SETUP.md). The Simulator runtime, paired iPhone, and full software gate are available. A fresh exact Samadhi profile was created and used for an in-place install with app data preserved.
+The wheel keeps one release-blocking contract. It cannot display or commit a BPM the current song cannot produce inside its proven playback-rate envelope. At either boundary, value movement and detent feedback stop together, one restrained terminal haptic marks the limit, and reversing responds immediately.
 
 Continue in this order:
 
-1. Run the phone check in [PHONE-CHECK-2026-08-19.md](PHONE-CHECK-2026-08-19.md). The candidate is installed and its in-app source fingerprint is confirmed. Take the endpoints through headphones, judge transport and Finish by hand, run the blinded faster and slower trials for all three families on both sound paths, read the recorded cause after a natural boundary and after an explicit Next, and check screen lock, an interruption, and route recovery.
-2. Complete one 20-minute outdoor run with an imported playlist. The run must feel good, survive normal phone conditions, and end with an honest summary.
+1. Walk Easy Miles on the repair build and read the record. This answers what the August 19 walk could not: whether cues played, what happened at a boundary, and whether the reach line fired.
+2. Run [PHONE-CHECK.md](PHONE-CHECK.md): endpoint listening, transport and Finish feel, blinded direction trials, song-change causes, and lock, call, and route recovery.
+3. Complete one 20-minute outdoor run with an imported playlist. It must feel good, survive normal phone conditions, and end with an honest summary.
 
-## Current gate state
+After that run, the open question is beat phase. Tempo match and beat lock stay distinct until phase is measured. The gate and the app-owned audio pivot are written in [FELT-SYNCHRONIZATION-EXECUTION-SPEC.md](Archive/FELT-SYNCHRONIZATION-EXECUTION-SPEC.md).
 
-- Apple Music feasibility: authorization, library loading, automatic token generation, strict catalog resolution, 10 of 10 local preview decodes, playback, rate writes, pause, and resume passed
-- Token remediation: complete; exact profile `Samadhi Development` fixed catalog access
-- Tempo-source feasibility: passed for City Pocket at 10 of 10 decoded previews
-- Tempo-analysis implementation: version 5 searches 60 through 210 BPM with support lags from 30 through 420, judges each tempo together with its half or double so swung and dotted grooves keep their true beat, preserves the measured musical pulse, records an independently supported alternate stride pulse separately, passes 12 of 12 tempo-declared Apple previews, and rejects silent, irregular, and triple-meter ambiguity
-- Spotify feasibility: rejected for adaptive playback; it cannot supply the required app-owned, analyzable, rate-controlled audio path
-- Source decision: Apple Music selected on 2026-07-16; remaining manual drills moved to the reliability gate
-- Source-neutral domain and adaptation rules: bounded rate behavior and coarse track fit are connected; a mismatch may prepare only the latest better fit, while Skip or a player-confirmed natural boundary remains the only commit authority
-- Cadence boundary, deterministic filter, and Core Motion adapter: connected in the focused core loop and normal imported run; the candidate accepts 90 through 210 SPM, with longer evidence for walking and calibration still open
-- Production playback: validated catalog fixture `1558215042`, live cadence updates, bounded reducer effects, identified MusicKit read-back, and honest measurement are connected
-- Playlist import and persistence: implemented with strict resolution that reads a library song's own catalog identifier first and breaks explicit versus clean ties by content rating, local preview analysis, versioned cache keys, atomic replacement, complete typed per-track results, retry after relaunch, three-track bounded concurrency, private timing diagnostics, and ready-only production filtering
-- Normal run composition: restored imported tracks use Apple Music playback and Core Motion; Debug Simulator uses isolated local placeholder playlists with simulated cadence and silent playback
-- Last released body-to-music gate: 103 package tests, 15 app-model tests, 10 UI tests, formatter, normal Simulator build, focused rotary-control UI proof, runtime screen review, renewed exact-profile build, embedded application identifier verification, and physical installation pass
-- Physical body-to-music observation: passed; the corrected 59-second run averaged 155 SPM and measured 98 percent tempo matched from MusicKit read-back
-- Physical imported-collection gate: real playlist selection, local analysis, reinstall and relaunch restoration, and basic progress passed at 13 of 25 ready tracks; a natural transition remains open
-- Device evidence: the baseline build recorded base commit `4f5394f`, dirty state, and build time, then produced one real Apple Music and motion trace. The exact-profile Auto candidate preserved the selected collection. Its later workout file confirmed source fingerprint `4e454d2859a521367bf83f26ba1287b14d617d0700c630f90ff13ce8f3b5b498`, real phone motion, and real Apple Music. Evidence lives under `Evidence/Device/2026-08-15-core-reset/` and `Evidence/Device/2026-08-17-auto-target/`.
-- Auto software repair: the saved delayed pattern acquires in replay and acquired physically at 133 SPM; invalid timing still fails, and a separate settled target ignores ordinary noise and one spike before accepting sustained changes
-- Workout result: 49 of 61 retained numeric cadence readings were from 90 through 119 SPM. The workout mixed walking, light jogging, and substantial lifting, so the trace cannot label every reading. The software candidate now covers that steady movement range. Lifting remains outside Auto.
-- Transport and Finish craft: the three floating pills became one glass capsule bar, which read as a milky slab on the phone, and then became three separate interactive glass circles with a larger tinted primary and a spring press; Finish is a quiet hairline button that arms a hold drawn inside its own capsule. Both reported overflow causes were reproduced on 30 fps video before the change and are gone from the after frames. 39 Simulator images were inspected, including a 54-frame hold contact sheet. Press feel, haptic character, and daylight legibility remain physical
-- Auto interaction: Samay felt the changes, but they felt jarring and unexplained. The reducer now owns one directional transaction per meaningful Auto change, an app-shell service plays it, and three prototype families with paired arrival sounds can be played by hand from a hidden Debug audition screen. Patterns, sounds, and size bands stay unapproved until the phone comparison. No screen-copy change is planned
-- Song-change cause: a pure attribution rule labels every confirmed change as an explicit Previous or Next, a natural end, or an outside change, and the hidden Debug screen shows the last one. The MusicKit wiring of that rule is read by hand, not covered by an automated test
-- Rhythm control: Manual is scoped to the confirmed song, and a quiet 44-point close action sits clear of the wheel and returns directly to transport; physical audible and tactile proof remains open
-- Candidate verification: formatter lint, 179 package tests, source-fingerprint tests, resource-inclusive Debug and Release Simulator builds, 44 app-model tests, and 32 serial UI tests pass. Neither the hidden Debug screen nor the feedback audition screen appears in Release. Commit `67adf80` was built with the exact profile, installed in place on 2026-08-19, and read back on the phone with source fingerprint `8df37f8dca11dfa0ad38346b2ea2339a5d76c9a10c4a539b471d8a1ea7df02e6`; the record lives under `Evidence/Device/2026-08-19-phone-install/`. Fresh frames live under `Evidence/Simulator/2026-08-18-transport-finish/`, and the audio prototype record lives under `Evidence/Audio/2026-08-18-auto-feedback-prototypes/`.
-- Felt-synchronization research: complete enough to set direction; Weav used adaptive arrangements, djay separates BPM from beat sync, and published running work supports compatible-track selection plus phase-aware control
-- Device harness: exact-profile catalog search, strict identity resolution, temporary preview download, local PCM decoding, playback, rate controls, route observation, and trace export remain available on the physical iPhone 17 Pro
-- Perceptibility result: 0.90 versus 1.10 was clearly audible on `LITE SPOTS` through Beoplay Eleven; the 0.85 through 1.15 candidate is covered in software but still needs physical read-back and full-song listening
+The source decision and deferred reliability requirements live in [MUSIC-SOURCE-RESOLUTION-SPEC.md](Archive/MUSIC-SOURCE-RESOLUTION-SPEC.md). A later reliability failure must be fixed before Milestone 2 completion. It does not reopen Spotify or a second-provider project.
 
-The source decision and deferred reliability requirements live in [MUSIC-SOURCE-RESOLUTION-SPEC.md](MUSIC-SOURCE-RESOLUTION-SPEC.md). A later reliability failure must be fixed before Milestone 2 completion. It does not reopen Spotify or a second-provider project.
+## Decisions waiting on Samay
+
+These came out of the November sweep. None has been built, because each changes the product or adds scope.
+
+1. Try `ApplicationMusicPlayer.transition = .crossfade(duration:)` on the phone. Apple's player supports it, Samadhi has never set it, and it may soften the abrupt song change Samay named as the biggest hole. The milestone spec currently excludes crossfade design beyond preventing an accidental gap, so this needs his yes. See [RESEARCH-2026-11.md](RESEARCH-2026-11.md).
+2. Keep or remove Auto fine-tune. `PRODUCT.md` and `CONTEXT.md` describe it, and the reducer supports it, but no control sends `adjustRhythmControl` since the wheel moved to `commitRhythmTarget`. Either the wheel gains it back or the reducer path and its tests go.
+
+## Known debt before any public Release
+
+Nothing here affects today's Debug phone builds.
+
+- Diagnostics and simulator launch flags still compile into Release, although Release never records and the Debug screens are absent. Wrap them in `#if DEBUG` before an App Store build.
+- `RunReducer.init(trackCount:)` exists only for tests, and it keeps a `demo-0` fallback in the domain. Move those tests to `init(tracks:)`.
+- `FeedbackAuditionView` plays cues directly. It is a Debug harness that goes away once a cue family is chosen.
+- If `resume` is still in flight when the runner pauses, Apple Music can start after the pause. The ticker no longer restarts, but playback itself is unguarded.
 
 ## Milestone boundary
 

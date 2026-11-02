@@ -3,21 +3,14 @@
 ## Full gate
 
 ~~~sh
-./Scripts/bootstrap.sh
-./Scripts/test.sh
+./Scripts/gate.sh
 ~~~
 
-Scripts/test.sh runs Swift package tests, app-model tests, and UI tests serially on iPhone 17 Pro Simulator.
+This regenerates the project and fails if it drifted from `project.yml`, runs the formatter lint, the source-fingerprint tests, the Swift package tests, and the app-model and interface tests serially on iPhone 17 Pro Simulator. It then builds Debug and Release and proves the Debug-only screens are absent from Release, with a control string on each side.
 
-The 2026-07-27 setup-craft gate passed 118 package tests, 25 app-model tests, and 21 UI tests serially.
+GitHub Actions repeats the lint, fingerprint, and package tests on every push. Interface tests and phone checks stay on a real Mac.
 
-Formatter gate:
-
-~~~sh
-DEVELOPER_DIR=/Applications/Xcode-beta.app/Contents/Developer \
-  xcrun swift-format lint --configuration .swift-format --recursive \
-  App Packages/SamadhiKit/Sources Packages/SamadhiKit/Tests Tests
-~~~
+LATEST_GATE_PLACEHOLDER
 
 ## Coverage
 
@@ -29,6 +22,7 @@ Domain tests cover:
 - Resume reacquisition with cadence prior
 - Permission fallback
 - Route loss and explicit resume
+- Each recovery naming its own cause, an immediate retry after a playback failure, and ending the run from any recovery even if the route never returns
 - Finish visibility and hold identity
 - Cancellation ordering
 - Active wheel and VoiceOver control pinning
@@ -108,10 +102,8 @@ App-model tests add the run record and the feedback service: the buffer evicting
 Run them with:
 
 ~~~sh
-DEVELOPER_DIR=/Applications/Xcode-beta.app/Contents/Developer \
-  swift test --package-path Packages/SamadhiKit --filter "BoundaryLookAhead|Reach"
-DEVELOPER_DIR=/Applications/Xcode-beta.app/Contents/Developer \
-  xcodebuild test -project Samadhi.xcodeproj -scheme Samadhi \
+swift test --package-path Packages/SamadhiKit --filter "BoundaryLookAhead|Reach"
+xcodebuild test -project Samadhi.xcodeproj -scheme Samadhi \
   -destination 'platform=iOS Simulator,name=iPhone 17 Pro,OS=latest' \
   -only-testing:SamadhiTests -parallel-testing-enabled NO CODE_SIGNING_ALLOWED=NO
 ~~~
@@ -151,11 +143,11 @@ Two captured visual passes were inspected at original resolution. Pass one expos
 
 The accessibility UI test uses the system `UICTContentSizeCategoryAccessibilityXXXL` launch value and proves the primary control is wider than 75 percent of the window. The final frame keeps the wrapped playlist identity above readiness, full-width Start, and Change playlist.
 
-Earlier released frames cover locked run, controls, summary, Home Screen icon, BPM Auto fine-tune, the Manual safety limit, accessibility-size BPM controls, the resting `Turn` affordance, the prior rotary BPM click wheel, and normal local-demo readiness. Evidence/Previews/ covers other accessibility and state-specific visual checks.
+Earlier released frames, kept at tag `archive/evidence-2026-08-19`, cover locked run, controls, summary, Home Screen icon, BPM Auto fine-tune, the Manual safety limit, accessibility-size BPM controls, the resting `Turn` affordance, the prior rotary BPM click wheel, and normal local-demo readiness. Evidence/Previews/ covers other accessibility and state-specific visual checks.
 
 The 2026-07-23 runtime review launched the normal app on iPhone 17 Simulator and inspected the ready and active-run screens. The focused rotary UI test made four strong clockwise turns, reached a requested target above 188 BPM, settled simulated Music BPM at the truthful 185 BPM boundary within two seconds, kept the same song, and never showed `Changing song`.
 
-The glass-circle transport that replaced the capsule bar on 2026-08-19 is recorded in `Evidence/Simulator/2026-08-19-transport-glass/`: normal, paused, accessibility XXXL, Reduce Motion, Increased Contrast, Reduced Transparency, armed, and early-release frames, each opened and read. The earlier capsule-bar rebuild is recorded in `Evidence/Simulator/2026-08-18-transport-finish/`. It holds 39 images, every one opened and read at original size. The before frames show the three floating pills and both overflow causes on a 30 fps contact sheet: two capsule borders and two labels visible at once for about eight frames, then a second capsule edge offset below and left of the pressed pill. The after frames cover the capsule bar and the armed Finish control at normal size, accessibility XXXL, Reduce Motion, Increased Contrast, and Reduced Transparency, plus pressed key frames for each transport region and a 54-frame contact sheet of the hold from arming through cancel, completion, and handoff. No fill edge crosses the border in any after frame. Both bar variants are kept, so the rejected divided bar stays inspectable. Press feel, haptic character, and daylight legibility are physical and are not shown here. The Increased Contrast frame was captured with `simctl ui increase_contrast enabled`, because the launch argument alone did not reach `colorSchemeContrast` on this runtime.
+The glass-circle transport that replaced the capsule bar on 2026-08-19 is recorded in `Evidence/Simulator/2026-08-19-transport-glass/`: normal, paused, accessibility XXXL, Reduce Motion, Increased Contrast, Reduced Transparency, armed, and early-release frames, each opened and read. The earlier capsule-bar rebuild is recorded in `Evidence/Simulator/2026-08-18-transport-finish/`. Its 39 images, each opened and read at original size, are kept at tag `archive/evidence-2026-08-19`. The before frames show the three floating pills and both overflow causes on a 30 fps contact sheet: two capsule borders and two labels visible at once for about eight frames, then a second capsule edge offset below and left of the pressed pill. The after frames cover the capsule bar and the armed Finish control at normal size, accessibility XXXL, Reduce Motion, Increased Contrast, and Reduced Transparency, plus pressed key frames for each transport region and a 54-frame contact sheet of the hold from arming through cancel, completion, and handoff. No fill edge crosses the border in any after frame. Both bar variants are kept, so the rejected divided bar stays inspectable. Press feel, haptic character, and daylight legibility are physical and are not shown here. The Increased Contrast frame was captured with `simctl ui increase_contrast enabled`, because the launch argument alone did not reach `colorSchemeContrast` on this runtime.
 
 The Auto feedback prototype record lives in `Evidence/Audio/2026-08-18-auto-feedback-prototypes/`. It holds the sound manifest with parameters and checksums, a stacked waveform sheet for all six arrival sounds, the audition screenshot, and the Release isolation counts.
 
@@ -167,71 +159,11 @@ Release isolation is checked by reading the built binaries, and the Debug side n
 
 The `Samadhi MusicKit Gate` scheme verifies that the harness and framework calls compile. Physical traces separately prove authorization, library loading, automatic token generation, strict catalog resolution, preview decoding, playback, mechanical rate writes, pause, and resume. Bluetooth listening, background, controlled interruption, and route checks remain separate physical gates.
 
-## Current device checks
-
-- Unsigned generic iPhone build: passed
-- Signed generic and physical iPhone builds: passed
-- Current BPM-control exact-profile signed build, installation, launch, and running process check: passed
-- Physical iPhone installation and gate launch: passed
-- Normal Simulator app: launched and visually checked
-- Normal Debug Simulator local-demo flow: two playlists, start, cadence lock, rotary BPM, transport, transition, finish, and summary passed without Apple Music
-- MusicKit harness Simulator app: launched and visually checked
-- Background audio entry in built Info.plist: verified as an array containing `audio`
-- Physical device signing, build, installation, and launch: passed
-- Import-capable normal app exact-profile build, installation, and launch: passed
-- Latest-run diagnostics exact-profile build and installation: passed; existing selected playlist survived byte-for-byte
-- Latest-run diagnostics foreground launch: blocked because the physical iPhone is locked
-- Focused body-to-music exact-profile build, installation, and launch argument: passed
-- Physical cadence seam: passed for a 29-second walk with changing cadence and a 142 SPM average
-- Automatic cadence-driven rate response: passed; the corrected 59-second physical run averaged 155 SPM and measured 98 percent tempo matched from MusicKit read-back
-- Focused rate diagnostics: target, pending feedback, and MusicKit read-back are shown separately; commanded values are no longer echoed as applied
-- Contextual Music authorization and 40-playlist loading: passed
-- Real playback plus 0.94, 1.00, and 1.06 rate writes: passed mechanically
-- Pause and resume observation: passed
-- Direct library preview coverage: failed at 0 of 10 in every sample
-- ISRC catalog retry: blocked because all 40 sampled tracks omitted ISRC
-- Exact-App-ID signing: passed with `Samadhi Development` and application identifier `ZL5U59XBJ6.com.samaydhawan.Samadhi`
-- Automatic developer token: passed with repeated direct catalog responses
-- Strict catalog resolution: passed for 10 of 10 City Pocket tracks with 0.0-second duration deltas
-- Temporary preview download and PCM decode: passed for 10 of 10 City Pocket tracks
-- Built-in-speaker listening: passed provisionally; no major pitch change or unpleasant artifacts were reported at 0.94 and 1.06
-- Bluetooth A2DP route: passed on Beoplay Eleven
-- Bluetooth rate writes during playback: passed at 0.94, 1.00, and 1.06
-- Bluetooth listening note: not recorded
-- Spotify adaptive playback: rejected by documented platform capability and policy review; no code spike warranted
-- Screen-lock background, next track, controlled interruption, and route-loss checks: deferred to the reliability gate
-- Real playlist selection and analysis: the July import passed at 13 ready, 8 unreadable, and 4 unavailable tracks from a 25-track physical selection; the latest pulled collection has 15 saved ready analyses
-- Reinstall and relaunch restoration: passed with the selected collection checksum unchanged and the physical ready screen showing 13 of 25 ready
-- Production-player progress: passed from a pulled schema-version-2 trace advancing from 0 through 6 seconds on one stable catalog identity
-- Imported natural track transition: not yet physically run
-- BPM control: deterministic command truth, rapid-detent coalescing, compatible-track response, rotary UI interaction, and Simulator design pass; physical audible response and directional click-wheel feel remain open
-- Blinded perceptibility harness: 0.92 versus 1.08 sequence, direction answer, MusicKit read-back trace, the known 0.90 and 1.10 controls, and the candidate 0.85 and 1.15 controls compile in the debug gate scheme
-- Paired iPhone state on 2026-07-21: connected over the local network; the exact-profile MusicKit harness built, installed, launched, and showed Beoplay Eleven as its Bluetooth A2DP route
-- Exact profile state on 2026-07-21: embedded `Samadhi Development` profile verified with application identifier `ZL5U59XBJ6.com.samaydhawan.Samadhi`; it expires on 2026-07-23 UTC
-- One-track perceptibility result: 0.90 versus 1.10 was clearly audible on `LITE SPOTS` through Beoplay Eleven, with repeated requested and reported rate agreement
-- Full perceptibility protocol: open; 0.90 versus 1.10 is the only physically heard pair. The 0.85 through 1.15 candidate needs full-song endpoint quality and matching Apple Music read-back before release.
-- Production track-fit and rotary-control build: exact-profile signing, embedded application identifier, wireless installation, foreground launch, and normal setup rendering passed on the restored iPhone on 2026-07-22
-- First normal field run: historical red evidence; 497 wheel adjustments and a 59-BPM requested span produced only a 0.056 MusicKit read-back span, while the summary reported 99 percent from automatic-only eligible samples
-- Field-run remediation: privacy-safe replay, truthful command states, prompt read-back, nearest-boundary behavior, noncommitting candidate preparation, target reapplication, and honest coverage pass deterministically
-- Import remediation: full six-track disclosure fixture, typed failure sections, retry after relaunch, ordered three-track batching, and timing persistence pass in Simulator and model tests
-- Exact BPM and fresh Auto repair: formatter lint, 97 package tests, 15 app-model tests, 10 UI tests, exact `Samadhi Development` signing, application identifier verification, physical build, and installation passed on 2026-07-22; foreground launch waited on the locked phone and was not claimed
-- Physical remediation check: open for audible direction, command latency, compatible track change, clockwise versus counterclockwise haptics, and real import wall time
-- Historical July release profile: `Samadhi Development` UUID `982e709d-7aa8-4d79-aca3-7759c8f70fc5` expired on 2026-07-30 UTC and embedded `ZL5U59XBJ6.com.samaydhawan.Samadhi`. A later device build must inspect its own embedded profile.
-- Current response-latency build: clean commit `66e0616`, exact-profile build, signature inspection, physical installation, and selected-collection checksum preservation passed; foreground launch was blocked by the locked phone
-- Current setup-craft build: clean commit `0a59b64`, exact-profile build, embedded identity and signature inspection, in-place physical installation, and selected-collection checksum preservation passed; foreground launch was blocked by the locked phone
-- 2026-08-15 exact phone build: profile `Samadhi Development 2026-08-15`, embedded identifier `ZL5U59XBJ6.com.samaydhawan.Samadhi`, app signature match, in-place install, and selected-collection checksum preservation passed
-- 2026-08-15 phone baseline: 16 numeric Core Motion readings ranged from 151.56 to 158.10 SPM; 14 were about 2.57 seconds old and failed the 2.0-second freshness check, leaving only two accepted readings when three are required to lock
-- 2026-08-15 Apple Music baseline: Manual and Auto rate writes were reported in about 0.04 to 0.07 seconds; one Auto read-back differed from the requested rate by about 1.19 SPM
-- 2026-08-17 fingerprinted workout: the pulled file matched source fingerprint `4e454d2859a521367bf83f26ba1287b14d617d0700c630f90ff13ce8f3b5b498`; four supported delayed readings acquired 133 SPM, and Apple Music reported the exact 1.0390625 command after 0.066 seconds
-- 2026-08-17 activity mix: 57 of 61 retained numeric cadence readings were below the current 120 SPM contract; substantial lifting occurred during the same period, so the low readings and elapsed time cannot all be attributed to walking
-- Walking-range tuning: use a clean walking-only check before calling the 90 SPM floor and five-second delay physically tuned
-- Transport, song-change cause, and Auto feedback candidate: clean commit `67adf80`, exact-profile build, embedded identity and strict signature inspection, in-place install, selected-collection checksum preservation, and an on-device Debug screen read-back of source fingerprint `8df37f8dca11dfa0ad38346b2ea2339a5d76c9a10c4a539b471d8a1ea7df02e6` passed on 2026-08-19; the audition scheme builds for the phone; every physical judgment in `Docs/PHONE-CHECK-2026-08-19.md` stays open. Later the same day commit `13e88bf` (glass transport circles, catalog tie fix) was built with the same profile and installed in place with the selected collection unchanged; its in-app source fingerprint read `085e5fe7b0e080a19efe281bd69fa5ebaeab00e0d082bc64701cd03d98de4f82` on the device, equal to the built Info.plist
-
 ## Felt-synchronization gate
 
 Use five analyzed songs with prominent, stable beats. Compare 0.92, 1.00, and 1.08 on the supported Bluetooth route, then test 0.90 and 1.10 only if the first endpoints remain clean. Log requested rate, MusicKit read-back, route, audible artifacts, and blinded faster-or-slower recognition. Pass only if Samay identifies direction in at least four of five comparisons and calls the largest clean pair obvious rather than subtle.
 
-The complete sequence, pivot rules, phase questions, and final evidence packet live in [FELT-SYNCHRONIZATION-EXECUTION-SPEC.md](FELT-SYNCHRONIZATION-EXECUTION-SPEC.md).
+The complete sequence, pivot rules, phase questions, and final evidence packet live in [FELT-SYNCHRONIZATION-EXECUTION-SPEC.md](Archive/FELT-SYNCHRONIZATION-EXECUTION-SPEC.md).
 
 The current candidate adds a deterministic dirty-source fingerprint, safe replay of the delayed phone pattern, and a separate settled Auto target. Target tests cover 90, 100, and 110 SPM walking acquisition; 120, 130, 140, and 160 SPM running acquisition; ordinary noise; one spike; sustained faster and slower rhythms; walk-to-jog and jog-to-walk changes; missing readings; broken lifting-like values; and time-based behavior at the saved phone callback interval. The close-control tests verify a 44-point hit area outside the dial, clean dismissal, no run-state mutation, accessibility XXXL, Reduce Motion, and Increased Contrast. Fresh frames live under `Evidence/Simulator/2026-08-17-auto-target-close/`.
 
@@ -247,6 +179,4 @@ The phone baseline and pulled diagnostic live under `Evidence/Device/2026-08-15-
 
 ## Known environment behavior
 
-iOS 27 beta Simulator can terminate concurrent UI test runners. Test script disables parallel execution. Serial suite is required gate.
-
-The MacBook continuation gate passed on 2026-08-13 with 118 Swift package tests and 46 serial iPhone 17 Pro Simulator tests. The current simulator is the only local device kept for Samadhi. Physical-device checks remain distinct and require the available paired iPhone.
+The iOS 27 Simulator can terminate concurrent UI test runners, so the suite runs serially. Running Simulator commands under a second Xcode version while tests run restarts the shared Simulator service and kills the run.

@@ -154,6 +154,6 @@ No Simulator result can approve tactile quality, pocket recognition, sound quali
 
 ## Priority
 
-The transport and Finish pass is complete in software, and so is the first prototype of this feature. The next step is the physical comparison in the Physical acceptance section above, run from the checklist in [PHONE-CHECK-2026-08-19.md](PHONE-CHECK-2026-08-19.md).
+The transport and Finish pass is complete in software, and so is the first prototype of this feature. The next step is the physical comparison in the Physical acceptance section above, run from the checklist in [PHONE-CHECK.md](PHONE-CHECK.md).
 
 Nothing in the prototype set becomes a product asset before that comparison chooses a family, a size scale, and a sound path. Setup, summary, icon, warehouse, and playlist-generation expansion all stay behind it.
