@@ -24,7 +24,7 @@ Use local MeshGradient, restrained contours, and tempo aperture. No generated vi
 
 ## Depth through hierarchy
 
-Use one visual owner. Reserve glass for controls. Use open typography and tonal washes for passive information. Persistent rings must communicate progress or cadence.
+Use one visual owner. Reserve glass for controls, which now include the tempo wheel's lens. Use open typography and tonal washes for passive information. Persistent rings must communicate progress or cadence.
 
 ## Brand
 
@@ -316,3 +316,13 @@ Reading a playlist is a rare moment, and it was a generic progress bar. Each son
 The field warms with the count of songs read, never with a timer. The progress line is a string that each song plucks, and it reaches only as far as the songs actually read.
 
 Earlier options were rejected. One tick per song on a progress line was the generic version of the same idea. Lines crossing the playlist name hurt legibility, so the map leaves a clearing around it.
+
+## The wheel is a speaker under glass
+
+The painted sphere never read as what it was meant to be, which is a speaker. The wheel is now a driver seen head on: a surround that stays still, a ribbed cone, and a center cap that push forward on the real beat, under a clear Liquid Glass lens. The repository bans glowing orbs, and this replaces one. Reading text stays off glass, because an earlier glass bar read as a milky slab on the phone.
+
+A full-height sheet is not system glass, so the results sheet uses warm parchment over a thin material. The playlist sheet is real glass, so the button behind it fades away while it is open.
+
+## Most interface tests draw the screen directly
+
+Launching the app to check a fixed screen cost about 6 seconds a frame, and direct drawing costs about 0.27. It reads real positions, labels, and button actions from the accessibility tree, using a test-only switch that never ships. Real touch and the whole app wired together keep their tap-through tests. Interface tests now run side by side, because Xcode 27.2 no longer shows the Simulator failure that kept them serial, and the gate skips itself when nothing that affects it changed.

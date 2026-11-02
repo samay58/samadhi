@@ -8,11 +8,20 @@ Samadhi improves in widening rings, from logic out to the phone. Stay in the inn
 
 | Ring | Question it answers | Command | Time |
 | --- | --- | --- | --- |
+| Changes | What can my edits have broken? | `./Scripts/check.sh` runs only the tests they can affect | Seconds to a minute |
 | Logic | Does the reducer, filter, or analyzer behave? | `swift test --package-path Packages/SamadhiKit` | Seconds |
 | Look | Does it read right in every environment? | `./Scripts/sim.sh matrix <name> [args]` | About a minute |
 | Motion | Does the interaction hold up frame by frame? | `./Scripts/sim.sh frames <test>` or `record <name> <seconds>` | Minutes |
-| Gate | Is it ready for a phone? | `./Scripts/gate.sh` | About 15 minutes |
+| Gate | Is it ready for a phone? | `./Scripts/gate.sh` | About 4 minutes, and instant if nothing that affects it changed |
 | Phone | Does it feel right on a body? | `./Scripts/phone.sh install`, then `pull` after moving | A walk |
+
+### Which test goes where
+
+Most interface behavior belongs in `Tests/SamadhiTests/ScreenRenderingTests.swift`. Those tests draw a screen directly from its state, so they read real positions, labels, and button actions and take a fraction of a second. Their environments apply, including the largest text size.
+
+`Tests/SamadhiUITests/` holds what direct drawing cannot prove: real touch, gestures such as the wheel, sheets, and the whole app wired together. These tests launch the app, so they take about 10 seconds each. They run on four Simulator clones, and Xcode splits work by test class, so keep the classes roughly equal in running time.
+
+GitHub runs an older compiler than this Mac, so a long math expression can pass here and fail there. `check.sh` catches these by failing on any expression slower than 500 milliseconds to type-check. Give each step one explicit type.
 
 ### Logic
 
@@ -36,7 +45,7 @@ UI tests in `Tests/SamadhiUITests/` drive states that take interaction to reach,
 ./Scripts/sim.sh frames testTransportAndFinishAfterStateEvidence
 ~~~
 
-For a press, a hold, or a transition, `./Scripts/sim.sh record finish-hold 6` records video and splits it into frames at 30 per second. A running UI test stalls the capture, so record motion without one where you can. `./Scripts/sim.sh run -SAMADHI_FAST_MODE -SAMADHI_MUSIC_READING_DEMO` starts reading a playlist by itself for this. The August overflow in Finish was only visible this way.
+For a press, a hold, or a transition, `./Scripts/sim.sh record finish-hold 6` records video and splits it into frames at 30 per second. A running UI test stalls the capture, so record motion without one where you can. Launching with `-SAMADHI_FAST_MODE` plus `-SAMADHI_MUSIC_READING_DEMO` starts reading a playlist by itself, and `-SAMADHI_RUN_DEMO` starts a run by itself. The August overflow in Finish was only visible this way.
 
 ### Phone
 

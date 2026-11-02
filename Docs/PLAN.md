@@ -54,6 +54,11 @@ This came out of the November sweep. It has not been built, because it changes t
 
 1. Decide after the next walk whether to bring back Auto fine-tune or delete its code. Fine-tune meant nudging Auto by up to 20 BPM above or below the sensed cadence while Auto kept following it. The app has no control for it, because turning the wheel now switches to Manual, so `PRODUCT.md` and `CONTEXT.md` no longer promise it. The reducer path, its tests, and one preview remain, and `MILESTONE-2-SPEC.md` still records the original requirement. Leave all of it alone until then. If the walk leaves Samay wanting to nudge Auto, the wheel gains a way to send `adjustRhythmControl`. If not, the path and its tests go.
 
+## Testing debt
+
+- 32 interface tests still launch the app. Many check a fixed setup state and could move to `ScreenRenderingTests`, leaving about 5 for real touch and the whole flow. Move them one group at a time, and each moved test must still catch what the old one caught.
+- Direct drawing cannot set Reduced Transparency, because the system offers no override for it. Glass under that setting needs a look on a real phone.
+
 ## Known debt before any public Release
 
 Nothing here affects today's Debug phone builds.

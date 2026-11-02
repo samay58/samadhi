@@ -33,6 +33,10 @@ Native ribbon drawing echoes icon without nesting square app icon inside interfa
 
 The signature of the interface is the map a playlist draws of itself. Each song read draws one contour line whose ripple comes from its measured tempo, and the progress line is a string that the same songs pluck. Keep it thin and in the field's own colors. It frames the playlist name and never crosses it.
 
+## The speaker
+
+The tempo wheel is a speaker driver seen head on, under a clear glass lens, with a sunrise grazing it from below. Thin ribs, one domed center cap, and no photo-real detail. It is drawn in the field's own ink so the field stays visible through it, and it moves only on the real beat.
+
 ## Repository cover
 
 User-supplied Midjourney artwork uses wide interwoven rhythm form over parchment contours. Soft italic “music in stride” sits upper-left, outside sculpture, preserving flow and negative space.

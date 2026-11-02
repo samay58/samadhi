@@ -671,5 +671,8 @@ This checkpoint recorded a passing local candidate before its exact-profile buil
 - Replaced the progress bar with a plucked string, set the playlist name lighter and larger with a letter-by-letter arrival, and moved the song, tempo, and count into one centered stack
 - Connected the Reduce Motion and Increased Contrast launch arguments to the design layer, because they had never reached it
 - Shipped this as version 1.1, build 2, and replaced superseded frames with one current sheet
+- Made the controls real Liquid Glass: the playlist sheet is system glass, and Finish, Change playlist, Choose another, and End run join the same family
+- Replaced the painted tempo sphere with a speaker driver under a clear lens, whose cone and center cap pump on the real beat. This is version 1.2, build 3
+- Cut the gate from about 15 minutes to about 4 by drawing screens directly in tests, running interface tests on four Simulator clones, and remembering what last passed. Direct drawing also found Pause and Resume 11 points apart at the largest text size, now fixed
 
 Current state and next steps live in [STATUS.md](STATUS.md) and [PLAN.md](PLAN.md).

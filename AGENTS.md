@@ -24,7 +24,9 @@ Start with Docs/STATUS.md and Docs/PLAN.md. Docs/DEVELOPMENT.md explains the dev
 - Every animation must be interruptible and respect Reduce Motion.
 
 ## Validation
-- Run `./Scripts/gate.sh` before a phone install or a push to main.
+- Run `./Scripts/check.sh` while working. It runs only the tests your changes can affect.
+- Run `./Scripts/gate.sh` before a phone install or a push to main. It skips itself when nothing that affects it changed.
+- Put new interface checks in `Tests/SamadhiTests/ScreenRenderingTests.swift` unless they need real touch or the whole app.
 - Run relevant unit tests after domain changes. Write the failing test first when fixing a bug.
 - Verify every visual milestone in a real Simulator frame, and open the frame before claiming a result.
 - Do not claim cadence quality without physical-device evidence.

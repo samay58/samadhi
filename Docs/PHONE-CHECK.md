@@ -18,6 +18,8 @@ Before starting, run `./Scripts/phone.sh install`. It builds with the exact prof
 
 ## 3. Transport and Finish feel (5 minutes)
 
+- Judge the glass wheel, the speaker's beat pump, and the glass sheet in daylight. The Simulator only approximates glass.
+
 - With controls visible: press Pause, Resume, Previous, Next several times. Each Previous or Next should tick once; the song change follows only when Apple Music confirms it.
 - Tap Finish, release early twice, then hold to completion once. The fill must never show outside the pill; early release must snap the fill back; completion must feel like one event.
 - Repeat with the phone in the pocket position for Finish only (no accidental finish while walking for one minute with the screen on).
