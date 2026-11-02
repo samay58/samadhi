@@ -653,7 +653,8 @@ This checkpoint recorded a passing local candidate before its exact-profile buil
 
 ## 2026-11-02. Repository sweep and Mac Mini loop
 
-- Removed 112 superseded images, logs, and export manifests from the tree, kept at tag `archive/evidence-2026-08-19`, and wrote the evidence policy in `Evidence/README.md`
+- Removed 112 superseded images, logs, and export manifests from the tree, kept in the [evidence archive](https://github.com/samay58/samadhi/releases/tag/evidence-archive-2026-08-19), and wrote the evidence policy in `Evidence/README.md`
+- Rewrote Git history to remove those files, which took a fresh clone from 208 MB to about 25 MB. The original history is backed up in the same release, and `Docs/Archive/COMMIT-MAP.txt` maps old hashes to new
 - Moved finished handoffs, reviews, closed gates, and old device ledgers to `Docs/Archive/`
 - Cut `STATUS.md`, `PLAN.md`, `TESTING.md`, and `DEVICE_RUNBOOK.md` back to current truth
 - Replaced the MacBook note with a machine-neutral `DEVELOPMENT.md` and scripted the build, Simulator, and phone loop

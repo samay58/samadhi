@@ -71,6 +71,7 @@ final class SamadhiUITests: XCTestCase {
         XCTAssertTrue(element("route-recovery").waitForExistence(timeout: 3))
         let endRun = app.buttons["route-end-run"]
         XCTAssertTrue(endRun.waitForExistence(timeout: 2))
+        attachScreenshot(named: "route-recovery-with-end-run")
         endRun.tap()
         XCTAssertTrue(element("run-summary").waitForExistence(timeout: 3))
     }

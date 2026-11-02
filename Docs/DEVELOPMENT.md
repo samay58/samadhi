@@ -58,7 +58,7 @@ Raw captures stay in `Evidence/Temp/`, which Git ignores. Commit a dated folder 
 ## Setting up a Mac
 
 1. Install Xcode and XcodeGen. Keep one current Simulator runtime with an iPhone 17 Pro. The scripts create that Simulator if the runtime is present.
-2. Run `sudo DevToolsSecurity -enable` once. Without it, the test host launches frozen and `xcodebuild test` hangs without an error, waiting for an authorization nobody can see.
+2. Select the Xcode to use with `sudo xcode-select -s /Applications/Xcode.app`, and run `sudo DevToolsSecurity -enable` once. Without it, the test host launches frozen and `xcodebuild test` hangs without an error, waiting for an authorization nobody can see.
 3. Clone the repository and run `./Scripts/bootstrap.sh`.
 4. Run `./Scripts/gate.sh`. A pass means this Mac can do everything short of the phone.
 5. For phone work, install the exact provisioning profile and pair the phone. See [DEVICE_RUNBOOK.md](DEVICE_RUNBOOK.md). Never copy certificates, Derived Data, or Simulator contents between Macs.
@@ -67,13 +67,11 @@ The scripts follow `DEVELOPER_DIR`, then the selected Xcode from `xcode-select`.
 
 ## Agent tools
 
-`.mcp.json` registers Xcode's own agent service, so an agent can build, test, and render a SwiftUI preview without an open Xcode window. It needs Xcode 27.2 or later and a one-time setup with `sudo`:
+`.mcp.json` registers Xcode's own agent service. Its 54 tools let an agent build, test, read console output, render a SwiftUI preview, and synthesize taps without an open Xcode window. It needs Xcode 27.2 or later and one setup step with `sudo`:
 
 ~~~sh
-sudo xcode-select -s /Applications/Xcode.app
-sudo xcodebuild -runFirstLaunch
 sudo xcrun mcp-server enable
-xcrun mcp-server start
+xcrun mcp-server open Samadhi.xcodeproj
 ~~~
 
 The first agent call raises a permission prompt on the Mac's screen. Choose Always Allow. Everything else in the loop works without this service.

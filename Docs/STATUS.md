@@ -1,8 +1,10 @@
 # Current status
 
-Last checked: 2026-11-02. No product code has changed since 2026-08-19.
+Last checked: 2026-11-02.
 
-The app is one good walk short of knowing whether its latest repairs work. The phone has the repair build, commit `0aa99a7`. The recorded walk has not been run on it, as far as this repository's evidence shows. The next proof must come from a phone in a pocket.
+The app is one good walk short of knowing whether its August repairs work. The phone has the repair build, original commit `0aa99a7`. No walk on that build is recorded here, and the phone may hold a later run that has not been pulled.
+
+The repository is now ahead of the phone. The November sweep fixed recovery dead ends and several timing bugs in software, and none of that has been installed or tried on a phone. The next step is one install, then one walk.
 
 ## Product state
 
@@ -20,6 +22,7 @@ The app is one good walk short of knowing whether its latest repairs work. The p
 | Auto feedback | The reducer owns one directional transaction per meaningful Auto change. Three prototype haptic families, six arrival sounds, and a hidden audition screen exist. Every cue reports what became of it | Domain, app-model, and asset tests. Nothing about feel or sound is physically proved |
 | Song boundaries | In the last 45 seconds of a song the reducer judges the queued next song against the settled target and prepares one better fit when it cannot follow | Reducer tests. Not yet seen at a real boundary on the phone |
 | Reach | When fewer than a quarter of the ready songs can reach the settled target for twenty seconds, the run screen says so once per run per direction | Reducer tests and frames in `Evidence/Simulator/2026-08-19-out-of-reach/` |
+| Recovery | Each audio recovery names its cause: headphones, an interruption, or Apple Music failing. Only the matching event clears it, and every recovery can end the run | Reducer tests, an interface test, and an inspected Simulator frame. Not yet seen on the phone |
 | Run record | 2,048 entries. Per-second ticks are evicted first, so the story of the run survives. Schema 11 adds cue delivery, engine, next-song plan, and reach entries | Eviction and delivery tests. Under 3 MB for an hour |
 | Song-change cause | Every confirmed song change records natural end, outside change, or explicit Previous or Next | Attribution tests and the Debug row `Last song change` |
 | Release isolation | Neither the hidden Debug screen nor the audition screen ships in Release | Release binary strings and symbol counts |

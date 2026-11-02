@@ -70,9 +70,13 @@ struct RunRecoveryScreen: View {
         switch kind {
         case .motionPermission:
             "Motion access is off"
-        case .audio(cause: .routeLost, _):
+        case .audio(cause: .routeLost, restored: true):
+            "Headphones connected"
+        case .audio(cause: .routeLost, restored: false):
             "Headphones disconnected"
-        case .audio(cause: .interrupted, _):
+        case .audio(cause: .interrupted, restored: true):
+            "Interruption over"
+        case .audio(cause: .interrupted, restored: false):
             "Music interrupted"
         case .audio(cause: .playbackFailed, _):
             "Music stopped"
@@ -84,11 +88,11 @@ struct RunRecoveryScreen: View {
         case .motionPermission:
             "Samadhi uses step rhythm to adapt the music. You can change access in Settings or continue at a fixed rhythm."
         case .audio(cause: .routeLost, restored: true):
-            "Your headphones are connected again. Resume when you’re ready."
+            "Resume when you’re ready."
         case .audio(cause: .routeLost, restored: false):
             "Music paused. Reconnect your headphones to continue, or end the run."
         case .audio(cause: .interrupted, restored: true):
-            "The interruption is over. Resume when you’re ready."
+            "Resume when you’re ready."
         case .audio(cause: .interrupted, restored: false):
             "Music paused until the interruption ends."
         case .audio(cause: .playbackFailed, _):

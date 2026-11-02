@@ -13,7 +13,9 @@ This directory holds the proof behind claims in `Docs/STATUS.md` and `Docs/TESTI
 
 Every written record stays. Images stay only when they show the current interface.
 
-On 2026-11-02, 112 superseded images, logs, and export manifests left the tree to keep the repository light. Older records still name those files. They all remain available at the tag [`archive/evidence-2026-08-19`](https://github.com/samay58/samadhi/tree/archive/evidence-2026-08-19/Evidence).
+On 2026-11-02, 112 superseded images, logs, and export manifests left the repository to keep it light, and Git history was rewritten so they no longer download with every clone. Older records still name those files. They are all in the [evidence archive](https://github.com/samay58/samadhi/releases/tag/evidence-archive-2026-08-19).
+
+Commit hashes written in records before 2026-11-02 belong to the original history. [COMMIT-MAP.txt](../Docs/Archive/COMMIT-MAP.txt) gives each one's current hash, and the same release holds a complete backup of the original history. A build's source fingerprint did not change.
 
 ## Adding evidence
 
