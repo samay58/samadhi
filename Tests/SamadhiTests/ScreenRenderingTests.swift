@@ -158,6 +158,23 @@ private final class ActionBox {
         paused.recordFrame(named: "after-transport-paused-\(environment.name)")
     }
 
+    @Test func theOpenWheelShowsItsTempoOverTheSpeaker() throws {
+        let state = RunViewState(
+            phase: .running,
+            rhythmControl: RhythmControlPresentation(
+                mode: .automatic,
+                requestedBPM: 168,
+                appliedBPM: 169,
+                isVisible: true,
+                isAvailable: true
+            )
+        )
+        let screen = try HostedScreen(state)
+
+        #expect(screen.element("rhythm-dial") != nil)
+        screen.recordFrame(named: "tempo-control-open")
+    }
+
     @Test func aLockBriefAppearingDoesNotMoveTheControls() throws {
         var briefed = controls(.running)
         briefed.showLockBrief = true

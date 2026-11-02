@@ -65,6 +65,14 @@ struct RootView: View {
             SamadhiScreen(state: state) { action in
                 send(action)
             }
+            #if DEBUG
+                // Starts a run by itself, because a test runner's snapshots stall a screen recording.
+                .task {
+                    guard ProcessInfo.processInfo.arguments.contains("-SAMADHI_RUN_DEMO") else { return }
+                    try? await Task.sleep(for: .seconds(1.5))
+                    send(.start)
+                }
+            #endif
 
             #if DEBUG
                 if ProcessInfo.processInfo.arguments.contains("--apple-music-core-loop") {

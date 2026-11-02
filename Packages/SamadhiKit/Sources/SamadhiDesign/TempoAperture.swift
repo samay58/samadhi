@@ -13,6 +13,7 @@ public struct TempoAperture: View {
     let progress: Double
     let reduceMotionOverride: Bool
     let increasedContrastOverride: Bool
+    let showsReadout: Bool
 
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Environment(\.colorSchemeContrast) private var contrast
@@ -22,8 +23,10 @@ public struct TempoAperture: View {
         tempoBPM: Int? = nil,
         progress: Double = 0,
         reduceMotionOverride: Bool = false,
-        increasedContrastOverride: Bool = false
+        increasedContrastOverride: Bool = false,
+        showsReadout: Bool = false
     ) {
+        self.showsReadout = showsReadout
         self.mode = mode
         self.tempoBPM = tempoBPM
         self.progress = min(max(progress, 0), 1)
@@ -43,10 +46,10 @@ public struct TempoAperture: View {
                 phase: phase,
                 progress: progress,
                 animatesProgress: !effectiveReduceMotion,
-                increasedContrast: contrast == .increased || increasedContrastOverride
+                increasedContrast: contrast == .increased || increasedContrastOverride,
+                pump: conePump(for: phase),
+                showsReadout: showsReadout
             )
-            .scaleEffect(orbScale(for: phase))
-            .offset(y: orbLift(for: phase))
         }
         .aspectRatio(1, contentMode: .fit)
         .accessibilityElement(children: .ignore)
@@ -61,18 +64,10 @@ public struct TempoAperture: View {
         return (ProcessInfo.processInfo.systemUptime / secondsPerBeat).truncatingRemainder(dividingBy: 1)
     }
 
-    private func orbScale(for phase: Double) -> CGFloat {
-        guard !effectiveReduceMotion, mode == .locked else { return 1 }
-        return 1 + 0.038 * beatImpulse(for: phase)
-    }
-
-    private func orbLift(for phase: Double) -> CGFloat {
+    // How far the cone has pushed forward on this beat. The surround stays still, as on a real driver.
+    private func conePump(for phase: Double) -> Double {
         guard !effectiveReduceMotion, mode == .locked else { return 0 }
-        return -5 * beatImpulse(for: phase)
-    }
-
-    private func beatImpulse(for phase: Double) -> CGFloat {
-        CGFloat(exp(-phase * 7.5))
+        return exp(-phase * 7.5)
     }
 
     private var accessibilityLabel: String {
@@ -101,9 +96,14 @@ private struct TempoOrbDrawing: View {
     let progress: Double
     let animatesProgress: Bool
     let increasedContrast: Bool
+    let pump: Double
+    let showsReadout: Bool
 
     var body: some View {
         ZStack {
+            SpeakerDriver(pump: pump, isQuiet: showsReadout || mode == .interrupted)
+                .padding(18)
+
             // A sunrise under the lens gives the glass something to bend. It swells on the beat.
             Circle()
                 .fill(
@@ -114,7 +114,7 @@ private struct TempoOrbDrawing: View {
                         endRadius: 172
                     )
                 )
-                .opacity(0.72 + 0.28 * exp(-phase * 7.5))
+                .opacity(0.62 + 0.3 * pump)
                 .padding(18)
 
             Color.clear
@@ -164,5 +164,96 @@ private struct TempoOrbDrawing: View {
         case .interrupted:
             [SamadhiColor.plum.opacity(0.4), .clear]
         }
+    }
+}
+
+// A speaker driver seen head on: a rolled surround that stays still, a ribbed cone, and a domed
+// center cap. Each piece pushes forward on the beat, the center furthest, so the wheel moves the way
+// a real speaker does. It is drawn in the field's own ink so the field stays visible through it.
+private struct SpeakerDriver: View {
+    let pump: Double
+    let isQuiet: Bool
+
+    private static let ribCount = 6
+
+    var body: some View {
+        Canvas { context, size in
+            let radius = Double(min(size.width, size.height)) / 2
+            let center = CGPoint(x: size.width / 2, y: size.height / 2)
+            let topLeft = CGPoint(x: 0, y: 0)
+            let bottomRight = CGPoint(x: size.width, y: size.height)
+            let detail: Double = isQuiet ? 0.5 : 1
+
+            func circle(_ ringRadius: Double) -> Path {
+                Path(
+                    ellipseIn: CGRect(
+                        x: center.x - ringRadius,
+                        y: center.y - ringRadius,
+                        width: ringRadius * 2,
+                        height: ringRadius * 2
+                    )
+                )
+            }
+
+            // Light falls from the top left, so a raised ring is bright there and dark opposite.
+            func raised(_ light: Double, _ shade: Double) -> GraphicsContext.Shading {
+                .linearGradient(
+                    Gradient(colors: [
+                        SamadhiColor.ivory.opacity(light * detail),
+                        SamadhiColor.ink.opacity(shade * detail),
+                    ]),
+                    startPoint: topLeft,
+                    endPoint: bottomRight
+                )
+            }
+
+            context.fill(
+                circle(radius),
+                with: .radialGradient(
+                    Gradient(colors: [
+                        SamadhiColor.ink.opacity(0.5),
+                        SamadhiColor.ink.opacity(0.26),
+                        SamadhiColor.ink.opacity(0.42),
+                    ]),
+                    center: center,
+                    startRadius: radius * 0.2,
+                    endRadius: radius
+                )
+            )
+
+            context.stroke(
+                circle(radius * 0.9),
+                with: raised(0.42, 0.58),
+                lineWidth: radius * 0.1
+            )
+
+            for index in 0..<Self.ribCount {
+                let position = Double(index) / Double(Self.ribCount)
+                let travel: Double = 1 + pump * 0.04 * (1 - position)
+                let ribRadius: Double = radius * (0.36 + position * 0.44) * travel
+                context.stroke(
+                    circle(ribRadius),
+                    with: raised(0.26 - position * 0.08, 0.32),
+                    lineWidth: 0.8
+                )
+            }
+
+            let capRadius: Double = radius * 0.27 * (1 + pump * 0.07)
+            context.fill(
+                circle(capRadius),
+                with: .radialGradient(
+                    Gradient(colors: [
+                        SamadhiColor.ivory.opacity(0.42 * detail),
+                        SamadhiColor.apricot.opacity(0.2 * detail),
+                        SamadhiColor.ink.opacity(0.5 * detail),
+                    ]),
+                    center: CGPoint(x: center.x - capRadius * 0.34, y: center.y - capRadius * 0.4),
+                    startRadius: 0,
+                    endRadius: capRadius * 1.5
+                )
+            )
+            context.stroke(circle(capRadius), with: raised(0.3, 0.4), lineWidth: 0.8)
+        }
+        .clipShape(.circle)
     }
 }

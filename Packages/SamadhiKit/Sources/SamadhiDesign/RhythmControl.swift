@@ -128,7 +128,8 @@ struct RhythmControl: View {
             tempoBPM: state.rhythmControl.appliedBPM,
             progress: state.trackProgress,
             reduceMotionOverride: state.forceReduceMotion,
-            increasedContrastOverride: state.forceIncreasedContrast
+            increasedContrastOverride: state.forceIncreasedContrast,
+            showsReadout: state.rhythmControl.isVisible
         )
     }
 
