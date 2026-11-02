@@ -125,34 +125,37 @@ struct PlaylistContourCanvas: View {
     }
 
     private func draw(_ line: PlaylistContourLine, in context: inout GraphicsContext, size: CGSize) {
-        let age = isAnimated ? births[line.id].map { now - $0 } : nil
+        let age: Double? = isAnimated ? births[line.id].map { now - $0 } : nil
         if let age, age < 0 { return }
 
-        let drawn = age.map { 1 - pow(1 - min($0 / Self.drawDuration, 1), 3) } ?? 1
-        let heat = age.map { max(0, 1 - max($0 - Self.drawDuration * 0.5, 0) / Self.heatFade) } ?? 0
+        let drawn: Double = age.map(Self.drawnFraction) ?? 1
+        let heat: Double = age.map(Self.heat) ?? 0
         let swell = swellAmount(for: line)
 
-        let baseY = size.height * screenFraction(for: line.position)
-        let amplitude = 8 + swell * 10
-        let drift = isAnimated ? now * line.crests * 0.11 : 0
-        let peak = 0.5 + (line.seed - 0.5) * 0.4
+        let width = Double(size.width)
+        let baseY: Double = Double(size.height) * screenFraction(for: line.position)
+        let amplitude: Double = 8 + swell * 10
+        let drift: Double = isAnimated ? now * line.crests * 0.11 : 0
+        let peak: Double = 0.5 + (line.seed - 0.5) * 0.4
 
         func y(atFraction fraction: Double) -> Double {
             // Calm at the edges and tallest near one peak, like a ridgeline.
-            let envelope = 0.16 + 0.84 * exp(-pow((fraction - peak) / 0.26, 2))
-            let phase = 2 * .pi * (line.crests * fraction + line.seed) - drift
+            let distance: Double = (fraction - peak) / 0.26
+            let envelope: Double = 0.16 + 0.84 * exp(-(distance * distance))
+            let cycles: Double = line.crests * fraction + line.seed
+            let phase: Double = 2 * Double.pi * cycles - drift
             return baseY + amplitude * envelope * sin(phase)
         }
 
-        let end = size.width * drawn
+        let end: Double = width * drawn
         var path = Path()
         path.move(to: CGPoint(x: 0, y: y(atFraction: 0)))
         var x = 6.0
         while x < end {
-            path.addLine(to: CGPoint(x: x, y: y(atFraction: x / size.width)))
+            path.addLine(to: CGPoint(x: x, y: y(atFraction: x / width)))
             x += 6
         }
-        let tip = CGPoint(x: end, y: y(atFraction: end / size.width))
+        let tip = CGPoint(x: end, y: y(atFraction: end / width))
         path.addLine(to: tip)
 
         let color = ink.mix(with: accent, by: heat).opacity(0.15 + swell * 0.2 + heat * 0.55)
@@ -169,6 +172,16 @@ struct PlaylistContourCanvas: View {
                 with: .color(accent)
             )
         }
+    }
+
+    private static func drawnFraction(age: Double) -> Double {
+        let remaining: Double = 1 - min(age / drawDuration, 1)
+        return 1 - remaining * remaining * remaining
+    }
+
+    private static func heat(age: Double) -> Double {
+        let cooling: Double = max(age - drawDuration * 0.5, 0) / heatFade
+        return max(0, 1 - cooling)
     }
 
     private func screenFraction(for position: Double) -> Double {

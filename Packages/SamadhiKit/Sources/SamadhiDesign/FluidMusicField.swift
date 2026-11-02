@@ -42,7 +42,7 @@ public struct FluidMusicField: View {
     public var body: some View {
         // The field rests at 20 fps and stops once the tempo aperture becomes the motion owner. It
         // runs faster only while a line is being drawn, because a pen stroke shows every dropped frame.
-        TimelineView(.animation(minimumInterval: isDrawing ? 1 / 60 : 1 / 20, paused: !shouldAnimate)) { timeline in
+        TimelineView(.animation(minimumInterval: frameInterval, paused: !shouldAnimate)) { timeline in
             let time = shouldAnimate ? timeline.date.timeIntervalSinceReferenceDate : 0
             ZStack {
                 MeshGradient(
@@ -87,6 +87,10 @@ public struct FluidMusicField: View {
             try? await Task.sleep(for: .seconds(PlaylistContourCanvas.settleDuration))
             if !Task.isCancelled { settledAt = nil }
         }
+    }
+
+    private var frameInterval: TimeInterval {
+        isDrawing ? 1.0 / 60.0 : 1.0 / 20.0
     }
 
     private var isDrawing: Bool {

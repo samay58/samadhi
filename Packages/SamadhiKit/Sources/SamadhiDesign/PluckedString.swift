@@ -48,11 +48,12 @@ private struct PluckedStringCanvas: View, @preconcurrency Animatable {
 
     var body: some View {
         Canvas { context, size in
-            let inset = 7.0
-            let width = max(size.width - inset * 2, 1)
-            let middle = size.height / 2
-            let head = inset + width * min(max(progress, 0), 1)
-            let end = inset + width
+            let inset: Double = 7
+            let width: Double = max(Double(size.width) - inset * 2, 1)
+            let middle = Double(size.height) / 2
+            let clamped: Double = min(max(progress, 0), 1)
+            let head: Double = inset + width * clamped
+            let end: Double = inset + width
             let sincePluck = max(now - pluckedAt, 0)
 
             var rest = Path()
@@ -69,17 +70,19 @@ private struct PluckedStringCanvas: View, @preconcurrency Animatable {
             )
 
             // Pinned at both ends. A quick decaying bow is the pluck, and the ripple is the song.
-            let length = max(head - inset, 0.001)
-            let ripple = isAnimated ? 1.5 + 3.5 * exp(-2.2 * sincePluck) : 0
-            let bow = isAnimated ? 5 * exp(-3 * sincePluck) * cos(20 * sincePluck) : 0
+            let length: Double = max(head - inset, 0.001)
+            let ripple: Double = isAnimated ? 1.5 + 3.5 * exp(-2.2 * sincePluck) : 0
+            let bow: Double = isAnimated ? 5 * exp(-3 * sincePluck) * cos(20 * sincePluck) : 0
             var drawn = Path()
             drawn.move(to: CGPoint(x: inset, y: middle))
-            var x = inset + 2.5
+            var x: Double = inset + 2.5
             while x < head {
-                let along = (x - inset) / length
-                let pinned = sin(.pi * along)
-                let wave = sin(2 * .pi * crests * (x - inset) / width - now * 4)
-                drawn.addLine(to: CGPoint(x: x, y: middle + pinned * (bow + ripple * wave)))
+                let travelled: Double = x - inset
+                let pinned: Double = sin(Double.pi * travelled / length)
+                let phase: Double = 2 * Double.pi * crests * travelled / width
+                let wave: Double = sin(phase - now * 4)
+                let offset: Double = pinned * (bow + ripple * wave)
+                drawn.addLine(to: CGPoint(x: x, y: middle + offset))
                 x += 2.5
             }
             drawn.addLine(to: CGPoint(x: head, y: middle))
@@ -89,7 +92,7 @@ private struct PluckedStringCanvas: View, @preconcurrency Animatable {
                 style: StrokeStyle(lineWidth: 2.25, lineCap: .round, lineJoin: .round)
             )
 
-            let radius = isAnimated ? 4.5 + 2 * exp(-7 * sincePluck) : 4.5
+            let radius: Double = isAnimated ? 4.5 + 2 * exp(-7 * sincePluck) : 4.5
             context.fill(
                 Path(ellipseIn: CGRect(x: head - radius, y: middle - radius, width: radius * 2, height: radius * 2)),
                 with: .color(SamadhiColor.clay)
