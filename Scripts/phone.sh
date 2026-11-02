@@ -172,17 +172,20 @@ case "$command" in
     echo "Selected collection $collection_result"
     ;;
   launch)
-    xcrun devicectl device process launch --device "$(device_id)" "$bundle_id" "$@"
+    device=$(device_id)
+    xcrun devicectl device process launch --device "$device" "$bundle_id" "$@"
     ;;
   screenshot)
     [ $# -eq 1 ] || usage
     mkdir -p "$output_dir"
-    xcrun devicectl device capture screenshot --device "$(device_id)" \
+    device=$(device_id)
+    xcrun devicectl device capture screenshot --device "$device" \
       --destination "$output_dir/$1.png" >/dev/null
     echo "$output_dir/$1.png"
     ;;
   pull)
-    saved=$(save_run_records "$(device_id)")
+    device=$(device_id)
+    saved=$(save_run_records "$device")
     latest=$(find "$saved" -name latest-run-diagnostics.json | head -1)
     if [ -n "$latest" ]; then
       python3 Scripts/read-run.py "$latest"

@@ -658,5 +658,9 @@ This checkpoint recorded a passing local candidate before its exact-profile buil
 - Moved finished handoffs, reviews, closed gates, and old device ledgers to `Docs/Archive/`
 - Cut `STATUS.md`, `PLAN.md`, `TESTING.md`, and `DEVICE_RUNBOOK.md` back to current truth
 - Replaced the MacBook note with a machine-neutral `DEVELOPMENT.md` and scripted the build, Simulator, and phone loop
+- Fixed recovery dead ends, so every audio recovery names its cause and can end the run, and several timing bugs in the run shell
+- Set song changes to Apple Music's four-second crossfade. When and why a song changes stays with the reducer and the player
+- Made the app keep the previous 30 run records instead of overwriting the last one, and made `phone.sh` save every record off the phone before an install
+- Passed the full gate (197 package, 51 app-model, 35 serial interface tests, lint, fingerprint tests). Nothing from this sweep has been installed on a phone
 
 Current state and next steps live in [STATUS.md](STATUS.md) and [PLAN.md](PLAN.md).

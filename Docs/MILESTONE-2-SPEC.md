@@ -2,9 +2,9 @@
 
 ## Adaptive audio and playlist import
 
-Status: Ready for implementation
+Status: Built in software. Its finish line, one real outdoor run, is still open in [PLAN.md](PLAN.md).
 
-This document is the source of truth for the next build milestone. It replaces the proposed Milestone 2 boundary in `PLAN.md`.
+This document defines the active milestone. It replaced the proposed Milestone 2 boundary in `PLAN.md`.
 
 ## Problem Statement
 

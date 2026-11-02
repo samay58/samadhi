@@ -1,10 +1,10 @@
 # Development
 
-The Mac Mini is the main development machine. It has the disk for current Xcode, several Simulator runtimes, and heavy tools, and it stays on. A laptop can do the same work with one checkout, so nothing here depends on one machine. GitHub `main` is the source of truth. Push before changing machines, and pull when you arrive.
+The Mac Mini is the main development machine. It has the disk for current Xcode, several Simulator runtimes, and heavy tools, and it stays on. A laptop with Xcode installed can do the same work from its own checkout, so nothing here depends on one machine. GitHub `main` is the source of truth. Push before changing machines, and pull when you arrive.
 
 ## The loop
 
-Samadhi improves in three rings. Stay in the innermost ring that can answer the question, and move outward only when it cannot.
+Samadhi improves in widening rings, from logic out to the phone. Stay in the innermost ring that can answer the question, and move outward only when it cannot.
 
 | Ring | Question it answers | Command | Time |
 | --- | --- | --- | --- |
