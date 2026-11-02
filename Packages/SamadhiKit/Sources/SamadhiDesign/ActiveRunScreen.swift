@@ -24,7 +24,7 @@ struct ActiveRunScreen: View {
                 )
 
                 RunStatus(state: state)
-                    .frame(minHeight: showsStatus ? 44 : 4)
+                    .frame(minHeight: reservesStatusRow ? 44 : 4)
                     .padding(.horizontal, showsStatus ? Space.x4 : 0)
                     .background {
                         if showsStatusWell {
@@ -129,6 +129,16 @@ struct ActiveRunScreen: View {
         return showsStatus
     }
 
+    // While the controls are up, a status line appearing or leaving must not move them. A runner's
+    // thumb is already on its way to Pause or Finish when the state changes.
+    private var reservesStatusRow: Bool {
+        showsStatus || keepsControlLayout
+    }
+
+    private var keepsControlLayout: Bool {
+        transportControlsVisible || state.phase == .confirmingFinish || state.phase == .finishing
+    }
+
     private var showsStatus: Bool {
         switch state.phase {
         case .preparing, .acquiring, .paused, .confirmingFinish, .finishing:
@@ -144,7 +154,7 @@ struct ActiveRunScreen: View {
         if dynamicTypeSize.isAccessibilitySize {
             return state.rhythmControl.isVisible ? 228 : 250
         }
-        return state.rhythmControl.isVisible || state.controlsVisible ? 244 : 286
+        return state.rhythmControl.isVisible || keepsControlLayout ? 244 : 286
     }
 
     private func showControls() {
@@ -236,18 +246,13 @@ private struct ReachNoticeLine: View {
 private struct TrackIdentity: View {
     let track: TrackMetadata
 
-    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+    // Scales with the artist line below it, so the song name stays the larger of the two.
+    @ScaledMetric(relativeTo: .title) private var titleSize: CGFloat = 29
 
     var body: some View {
         VStack(spacing: Space.x1) {
             Text(track.title)
-                .font(
-                    .system(
-                        size: dynamicTypeSize.isAccessibilitySize ? 24 : 29,
-                        weight: .medium,
-                        design: .serif
-                    )
-                )
+                .font(.system(size: min(titleSize, 44), weight: .medium, design: .serif))
                 .tracking(-0.35)
                 .lineLimit(3)
             Text(track.artist)

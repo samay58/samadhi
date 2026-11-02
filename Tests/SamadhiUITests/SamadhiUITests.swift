@@ -122,6 +122,35 @@ final class SamadhiUITests: XCTestCase {
         )
     }
 
+    // A runner's thumb is already on its way when these controls change, so the target has to stay put.
+    func testFinishKeepsItsPlaceWhenItArms() {
+        prepareApp("-SAMADHI_TEST_ACQUISITION_WINDOW")
+        app.launch()
+        revealTransport()
+        let finish = app.buttons["finish-run"]
+        XCTAssertTrue(finish.waitForExistence(timeout: 3))
+        let finishY = finish.frame.midY
+        finish.tap()
+        let hold = app.buttons["hold-to-finish"]
+        XCTAssertTrue(hold.waitForExistence(timeout: 5))
+        waitForLayoutToSettle()
+        XCTAssertEqual(hold.frame.midY, finishY, accuracy: 1)
+    }
+
+    func testPauseAndResumeShareOnePlace() {
+        prepareApp("-SAMADHI_TEST_ACQUISITION_WINDOW")
+        app.launch()
+        revealTransport()
+        let pause = app.buttons["pause-run"]
+        XCTAssertTrue(pause.waitForExistence(timeout: 3))
+        let pauseY = pause.frame.midY
+        pause.tap()
+        let resume = app.buttons["resume-run"]
+        XCTAssertTrue(resume.waitForExistence(timeout: 5))
+        waitForLayoutToSettle()
+        XCTAssertEqual(resume.frame.midY, pauseY, accuracy: 1)
+    }
+
     func testFinishHoldReleasedEarlyKeepsTheRunThenCompletes() {
         prepareApp("-SAMADHI_TEST_ACQUISITION_WINDOW")
         app.launch()
@@ -137,6 +166,7 @@ final class SamadhiUITests: XCTestCase {
 
         hold.press(forDuration: 1.5)
         XCTAssertTrue(element("run-summary").waitForExistence(timeout: 4))
+        attachScreenshot(named: "run-summary")
     }
 
     func testTransportPressedStateEvidence() {
@@ -335,15 +365,15 @@ final class SamadhiUITests: XCTestCase {
         XCTAssertTrue(element("music-ready").waitForExistence(timeout: 2))
         let readyCount = element("ready-track-count")
         XCTAssertTrue(readyCount.waitForExistence(timeout: 2))
-        XCTAssertEqual(readyCount.label, "1 track ready")
+        XCTAssertEqual(readyCount.label, "1 song ready")
         let results = app.buttons["review-skipped-tracks"]
         XCTAssertTrue(results.waitForExistence(timeout: 2))
-        XCTAssertEqual(results.label, "Review 5 skipped tracks")
+        XCTAssertEqual(results.label, "Review 5 skipped songs")
         XCTAssertTrue(app.buttons["start-run"].exists)
         attachScreenshot(named: "setup-final-partial-ready")
         results.tap()
-        XCTAssertTrue(app.staticTexts["Rhythm unclear"].waitForExistence(timeout: 2))
-        XCTAssertTrue(app.staticTexts["Preview unavailable"].exists)
+        XCTAssertTrue(app.staticTexts["Couldn't find the beat"].waitForExistence(timeout: 2))
+        XCTAssertTrue(app.staticTexts["No preview to listen to"].exists)
         XCTAssertTrue(app.staticTexts["Distant Signal"].waitForExistence(timeout: 2))
         XCTAssertTrue(app.staticTexts["Warm Static"].exists)
         XCTAssertTrue(app.staticTexts["Side Street"].exists)
@@ -718,6 +748,10 @@ final class SamadhiUITests: XCTestCase {
     }
 
     // Arming can lose the race with the control timeout, so the tap retries until it takes.
+    private func waitForLayoutToSettle() {
+        RunLoop.current.run(until: Date().addingTimeInterval(0.8))
+    }
+
     private func armFinish() {
         let finish = app.buttons["finish-run"]
         let hold = app.buttons["hold-to-finish"]

@@ -41,12 +41,6 @@ struct RunRecoveryScreen: View {
             }
             .frame(maxWidth: .infinity)
             .padding(.horizontal, Space.x6)
-            .background {
-                Ellipse()
-                    .fill(SamadhiColor.parchment.opacity(0.76))
-                    .frame(width: 450, height: 480)
-                    .blur(radius: 58)
-            }
             .padding(.horizontal, Space.x4)
         }
         .scrollIndicators(.hidden)
@@ -58,7 +52,7 @@ struct RunRecoveryScreen: View {
         case .motionPermission:
             "figure.run"
         case .audio(cause: .routeLost, _):
-            "airpodspro"
+            "headphones"
         case .audio(cause: .interrupted, _):
             "pause.circle"
         case .audio(cause: .playbackFailed, _):
@@ -113,18 +107,14 @@ struct RunRecoveryScreen: View {
     private var actions: some View {
         switch kind {
         case .motionPermission:
-            Button("Open Settings", action: openSettings)
-                .buttonStyle(.glassProminent)
-                .tint(SamadhiColor.clay)
-                .accessibilityIdentifier("open-settings")
-            Button("Use fixed rhythm", action: useFixedRhythm)
-                .buttonStyle(.glass)
-                .accessibilityIdentifier("use-fixed-rhythm")
+            primaryButton("Open Settings", identifier: "open-settings", action: openSettings)
+            quietButton("Use fixed rhythm", identifier: "use-fixed-rhythm", action: useFixedRhythm)
         case let .audio(cause, restored: true):
-            Button(cause == .playbackFailed ? "Try again" : "Resume", action: resumeRoute)
-                .buttonStyle(.glassProminent)
-                .tint(SamadhiColor.clay)
-                .accessibilityIdentifier("route-resume")
+            primaryButton(
+                cause == .playbackFailed ? "Try again" : "Resume",
+                identifier: "route-resume",
+                action: resumeRoute
+            )
             endRunButton
         case let .audio(cause, restored: false):
             Text(cause == .routeLost ? "Waiting for headphones" : "Waiting")
@@ -136,9 +126,41 @@ struct RunRecoveryScreen: View {
 
     // The route may never come back, so no recovery may trap the runner inside it.
     private var endRunButton: some View {
-        Button("End run", action: endRun)
-            .buttonStyle(.glass)
-            .accessibilityIdentifier("route-end-run")
+        quietButton("End run", identifier: "route-end-run", action: endRun)
+    }
+
+    // A recovery is often read mid-stride, so the way back is the same large target as Start.
+    private func primaryButton(
+        _ title: String,
+        identifier: String,
+        action: @escaping () -> Void
+    ) -> some View {
+        Button(action: action) {
+            Text(title)
+                .font(.headline)
+                .foregroundStyle(SamadhiColor.ivory)
+                .padding(.horizontal, Space.x4)
+                .frame(minWidth: 176, minHeight: 58)
+        }
+        .buttonStyle(.glassProminent)
+        .tint(SamadhiColor.clay)
+        .accessibilityIdentifier(identifier)
+    }
+
+    private func quietButton(
+        _ title: String,
+        identifier: String,
+        action: @escaping () -> Void
+    ) -> some View {
+        Button(action: action) {
+            Text(title)
+                .font(.callout.weight(.semibold))
+                .foregroundStyle(SamadhiColor.ink.opacity(0.82))
+                .frame(minWidth: 176, minHeight: 44)
+                .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .accessibilityIdentifier(identifier)
     }
 
     private func endRun() {

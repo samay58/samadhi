@@ -71,7 +71,7 @@ private struct AnalysisProgressRail: View {
             .accessibilityElement(children: .combine)
             .accessibilityLabel("Playlist analysis progress")
             .accessibilityValue(
-                "\(collection.completedTrackCount) of \(collection.totalTrackCount) tracks analyzed"
+                "\(collection.completedTrackCount) of \(collection.totalTrackCount) songs read"
             )
             .accessibilityIdentifier("music-analysis-progress")
         } else {
@@ -153,8 +153,8 @@ private struct ReadinessStatus: View {
                 }
                 .buttonStyle(.plain)
                 .foregroundStyle(SamadhiColor.ink.opacity(0.82))
-                .accessibilityLabel("Review \(collection.skippedTrackCount) skipped tracks")
-                .accessibilityHint("Shows the result for every imported track")
+                .accessibilityLabel("Review \(collection.skippedTrackCount) skipped songs")
+                .accessibilityHint("Shows the result for every imported song")
                 .accessibilityIdentifier("review-skipped-tracks")
             }
         }
@@ -164,8 +164,8 @@ private struct ReadinessStatus: View {
 
     private var readyTrackCount: String {
         collection.readyTrackCount == 1
-            ? "1 track ready"
-            : "\(collection.readyTrackCount) tracks ready"
+            ? "1 song ready"
+            : "\(collection.readyTrackCount) songs ready"
     }
 }
 

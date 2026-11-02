@@ -302,3 +302,9 @@ Auto held 0.85 for most of seven minutes and reported `atLimit` every second, an
 ## Songs change through Apple's crossfade
 
 Samay named the abrupt break between songs as the biggest hole in the experience. `ApplicationMusicPlayer.transition` offers a built-in crossfade, so the app sets it to four seconds whenever a queue is prepared and clears it on stop. This does not change when or why a song changes, which stays with the reducer and the player. It does not match beats. Four seconds is a starting value for the phone to judge.
+
+## Controls hold still while they change state
+
+A runner's thumb is already moving when Pause becomes Resume or Finish arms. Those controls keep their exact position, so the tempo aperture and the status row keep their size whenever the controls are up. Two interface tests measure this, because a screenshot cannot show a jump.
+
+The setup field has no dark center. Ink text sat on plum at under 3:1, and a blurred dark shape behind a headline is the first thing to go in a review for generated-looking work. The center is now warm apricot, which reads as sunrise.

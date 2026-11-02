@@ -72,10 +72,10 @@ public struct FluidMusicField: View {
         guard usesCollectionPalette else {
             return mode == .ready
                 ? [
-                    SamadhiColor.parchment, Color(red: 0.78, green: 0.75, blue: 0.69), SamadhiColor.ivory,
-                    Color(red: 0.63, green: 0.58, blue: 0.53), Color(red: 0.44, green: 0.43, blue: 0.39),
-                    Color(red: 0.72, green: 0.68, blue: 0.61),
-                    SamadhiColor.ivory, Color(red: 0.58, green: 0.61, blue: 0.55), SamadhiColor.parchment,
+                    SamadhiColor.parchment, Color(red: 0.94, green: 0.86, blue: 0.75), SamadhiColor.ivory,
+                    Color(red: 0.91, green: 0.79, blue: 0.65), Color(red: 0.93, green: 0.83, blue: 0.70),
+                    Color(red: 0.94, green: 0.85, blue: 0.73),
+                    SamadhiColor.ivory, Color(red: 0.86, green: 0.84, blue: 0.72), SamadhiColor.parchment,
                 ]
                 : [
                     SamadhiColor.plum, Color(red: 0.37, green: 0.35, blue: 0.32), SamadhiColor.ink,
@@ -89,7 +89,7 @@ public struct FluidMusicField: View {
         case .ready:
             return [
                 SamadhiColor.parchment, Color(red: 0.95, green: 0.73, blue: 0.48), SamadhiColor.ivory,
-                Color(red: 0.82, green: 0.43, blue: 0.27), Color(red: 0.48, green: 0.29, blue: 0.31),
+                Color(red: 0.82, green: 0.43, blue: 0.27), Color(red: 0.94, green: 0.66, blue: 0.43),
                 Color(red: 0.91, green: 0.58, blue: 0.35),
                 Color(red: 0.58, green: 0.64, blue: 0.48), Color(red: 0.87, green: 0.73, blue: 0.53),
                 SamadhiColor.parchment,

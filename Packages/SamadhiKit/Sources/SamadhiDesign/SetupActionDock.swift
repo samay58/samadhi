@@ -123,6 +123,7 @@ private struct SetupPrimaryButton: View {
         Button(action: action) {
             Text(title)
                 .font(.headline)
+                .foregroundStyle(SamadhiColor.ivory)
                 .multilineTextAlignment(.center)
                 .padding(.horizontal, Space.x4)
                 .frame(

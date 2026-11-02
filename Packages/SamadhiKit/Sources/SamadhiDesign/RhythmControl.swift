@@ -150,8 +150,9 @@ struct RhythmControl: View {
                 .foregroundStyle(
                     state.rhythmControl.isAtLimit
                         ? SamadhiColor.ivory
-                        : SamadhiColor.ivory.opacity(0.76)
+                        : SamadhiColor.ivory.opacity(0.96)
                 )
+                .shadow(color: SamadhiColor.ink.opacity(0.55), radius: 3, y: 1)
                 .lineLimit(1)
         }
     }
@@ -214,8 +215,8 @@ struct RhythmControl: View {
             Text("Turn")
                 .font(.caption.weight(.semibold))
                 .tracking(0.6)
-                .foregroundStyle(SamadhiColor.ivory.opacity(0.78))
-                .shadow(color: SamadhiColor.ink.opacity(0.3), radius: 5, y: 2)
+                .foregroundStyle(SamadhiColor.ivory.opacity(0.96))
+                .shadow(color: SamadhiColor.ink.opacity(0.55), radius: 3, y: 1)
                 .offset(y: size * 0.365)
                 .accessibilityHidden(true)
         }

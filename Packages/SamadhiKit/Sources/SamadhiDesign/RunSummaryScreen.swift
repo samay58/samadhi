@@ -39,6 +39,7 @@ struct RunSummaryScreen: View {
                 Button(action: done) {
                     Text("Done")
                         .font(.headline)
+                        .foregroundStyle(SamadhiColor.ivory)
                         .dynamicTypeSize(...DynamicTypeSize.accessibility2)
                         .frame(width: 164, height: 58)
                 }
@@ -68,7 +69,7 @@ private struct SummaryMetricRail: View {
     }
 
     private var cadenceLabel: String {
-        summary.averageCadence == nil ? "rhythm" : "avg cadence"
+        summary.averageCadence == nil ? "rhythm" : "steps a minute"
     }
 
     private var cadenceSpoken: String {

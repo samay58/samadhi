@@ -18,9 +18,9 @@ struct TrackResultsSheet: View {
                 .ignoresSafeArea()
 
                 List {
-                    trackSection("Rhythm unclear", status: .rhythmUnclear)
-                    trackSection("Preview unavailable", status: .previewUnavailable)
-                    trackSection("Could not match Apple Music item", status: .catalogMatchUnavailable)
+                    trackSection("Couldn't find the beat", status: .rhythmUnclear)
+                    trackSection("No preview to listen to", status: .previewUnavailable)
+                    trackSection("Not found on Apple Music", status: .catalogMatchUnavailable)
                     temporaryFailureSection
                     trackSection("Waiting", status: .pending)
                     trackSection("Ready", status: .ready)
@@ -50,16 +50,17 @@ struct TrackResultsSheet: View {
                     trackRow(track)
                 }
 
-                Button("Retry temporary failures") {
+                Button("Try these again") {
                     dismiss()
                     retry()
                 }
                 .font(.body.weight(.semibold))
                 .foregroundStyle(SamadhiColor.ink.opacity(0.82))
                 .frame(minHeight: 44)
+                .listRowBackground(Color.clear)
                 .accessibilityIdentifier("retry-temporary-imports")
             } header: {
-                sectionHeader("Temporary download or decode failure")
+                sectionHeader("Didn't finish downloading")
                     .accessibilityIdentifier("temporary-failure-section")
             }
         }

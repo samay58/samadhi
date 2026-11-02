@@ -100,7 +100,7 @@ extension MusicSelectionFailurePresentation {
         case .playlistUnavailable:
             "Playlist did not open"
         case .importFailed:
-            "Analysis stopped"
+            "Couldn't read this playlist"
         }
     }
 

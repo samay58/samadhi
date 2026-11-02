@@ -75,7 +75,7 @@ Stable cadence enters the reducer with session and acquisition identity. The red
 
 The debug-only MusicKit harness sits in the app target and is not a production player. It resolves opaque library tracks through strict title, artist, album, and duration agreement, downloads each preview into temporary storage, passes the local file through `TempoAnalyzing`, records the estimate, and deletes the file. `LocalTempoAnalyzer` owns off-main PCM decoding. `TempoEstimator` owns versioned Accelerate spectral-flux and fractional-lag autocorrelation behavior behind the same small interface.
 
-`AppleMusicImportService` reuses the strict resolver, analyzes tracks sequentially, and reports honest progress. `MusicCollectionStore` atomically persists the selected collection and versioned analysis cache. `MusicSelectionModel` owns replacement identity and ignores stale import callbacks. SwiftUI only sends choose, change, and start intent.
+`AppleMusicImportService` reuses the strict resolver, analyzes three tracks at a time, and reports honest progress. `MusicCollectionStore` atomically persists the selected collection and versioned analysis cache. `MusicSelectionModel` owns replacement identity and ignores stale import callbacks. SwiftUI only sends choose, change, and start intent.
 
 `TempoCorpusValidator` is an opt-in development executable. It validates fixed catalog identities whose published titles declare tempo, analyzes temporary provider-hosted previews, writes JSON evidence, and removes the audio. Normal automated tests remain offline.
 

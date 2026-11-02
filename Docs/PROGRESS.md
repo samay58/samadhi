@@ -663,4 +663,9 @@ This checkpoint recorded a passing local candidate before its exact-profile buil
 - Made the app keep the previous 30 run records instead of overwriting the last one, and made `phone.sh` save every record off the phone before an install
 - Passed the full gate (197 package, 51 app-model, 35 serial interface tests, lint, fingerprint tests). Nothing from this sweep has been installed on a phone
 
+- Held Finish and Pause in place when they change state. Finish was jumping 83 points as it armed, and Pause 40 points as it became Resume. Two interface tests now fail if either moves
+- Removed the dark blob behind the setup title and warmed the gray field behind the summary, recovery, and sheets, which took setup text and the Start label past 5:1 contrast
+- Fixed the white row in the song results sheet, the song title shrinking below its artist at large text, the AirPods icon shown for every headphone, and the white launch screen
+- Rewrote failure labels and called songs songs throughout the interface
+
 Current state and next steps live in [STATUS.md](STATUS.md) and [PLAN.md](PLAN.md).

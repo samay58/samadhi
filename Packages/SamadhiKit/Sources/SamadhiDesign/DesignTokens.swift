@@ -5,7 +5,7 @@ public enum SamadhiColor {
     public static let ivory = Color(red: 0.988, green: 0.969, blue: 0.925)
     public static let ink = Color(red: 0.137, green: 0.114, blue: 0.106)
     public static let plum = Color(red: 0.264, green: 0.188, blue: 0.204)
-    public static let clay = Color(red: 0.733, green: 0.345, blue: 0.208)
+    public static let clay = Color(red: 0.690, green: 0.310, blue: 0.180)
     public static let apricot = Color(red: 0.882, green: 0.596, blue: 0.365)
     public static let olive = Color(red: 0.365, green: 0.424, blue: 0.306)
 }
