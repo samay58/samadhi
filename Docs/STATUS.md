@@ -24,7 +24,7 @@ The repository is now ahead of the phone. The November sweep fixed recovery dead
 | Song boundaries | In the last 45 seconds of a song the reducer judges the queued next song against the settled target and prepares one better fit when it cannot follow | Reducer tests. Not yet seen at a real boundary on the phone |
 | Reach | When fewer than a quarter of the ready songs can reach the settled target for twenty seconds, the run screen says so once per run per direction | Reducer tests and frames in `Evidence/Simulator/2026-08-19-out-of-reach/` |
 | Recovery | Each audio recovery names its cause: headphones, an interruption, or Apple Music failing. Only the matching event clears it, and every recovery can end the run | Reducer tests, an interface test, and an inspected Simulator frame. Not yet seen on the phone |
-| Run record | 2,048 entries. Per-second ticks are evicted first, so the story of the run survives. Schema 11 adds cue delivery, engine, next-song plan, and reach entries | Eviction and delivery tests. Under 3 MB for an hour |
+| Run record | The phone keeps the current run and the previous 30. Each holds 2,048 entries. Per-second ticks are evicted first, so the story of the run survives. Schema 11 adds cue delivery, engine, next-song plan, and reach entries | Eviction and delivery tests. Under 3 MB for an hour |
 | Song-change cause | Every confirmed song change records natural end, outside change, or explicit Previous or Next | Attribution tests and the Debug row `Last song change` |
 | Release isolation | Neither the hidden Debug screen nor the audition screen ships in Release | Release binary strings and symbol counts |
 

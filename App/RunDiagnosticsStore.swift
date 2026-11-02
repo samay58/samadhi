@@ -283,8 +283,13 @@ struct RunDiagnosticSnapshot: Codable, Equatable, Sendable {
 actor RunDiagnosticsStore {
     private let directoryURL: URL
     private let fileURL: URL
+    private let archiveURL: URL
+    private let archivedRunLimit: Int
+    // True until the current run has written once. The first write of a run must not replace the
+    // previous run's record, because that file may be the only copy of a real outing.
+    private var previousRunNeedsArchiving = true
 
-    init(directoryURL: URL? = nil) {
+    init(directoryURL: URL? = nil, archivedRunLimit: Int = 30) {
         let directory: URL
         if let directoryURL {
             directory = directoryURL
@@ -304,6 +309,8 @@ actor RunDiagnosticsStore {
         }
         self.directoryURL = directory
         fileURL = directory.appending(path: "latest-run-diagnostics.json")
+        archiveURL = directory.appending(path: "run-records", directoryHint: .isDirectory)
+        self.archivedRunLimit = archivedRunLimit
     }
 
     func save(_ snapshot: RunDiagnosticSnapshot) throws {
@@ -311,10 +318,46 @@ actor RunDiagnosticsStore {
             at: directoryURL,
             withIntermediateDirectories: true
         )
+        if previousRunNeedsArchiving {
+            // Losing a record is worse than repeating this attempt on the next write.
+            try archivePreviousRun()
+            previousRunNeedsArchiving = false
+        }
         let encoder = JSONEncoder()
         encoder.dateEncodingStrategy = .iso8601
         encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
         try encoder.encode(snapshot).write(to: fileURL, options: .atomic)
+        if snapshot.completionState == .completed {
+            previousRunNeedsArchiving = true
+        }
+    }
+
+    private func archivePreviousRun() throws {
+        let manager = FileManager.default
+        guard manager.fileExists(atPath: fileURL.path) else { return }
+        try manager.createDirectory(at: archiveURL, withIntermediateDirectories: true)
+        let attributes = try manager.attributesOfItem(atPath: fileURL.path)
+        let written = attributes[.modificationDate] as? Date ?? Date()
+        let stamp = written.ISO8601Format().replacing(":", with: "-")
+        var destination = archiveURL.appending(path: "\(stamp).json")
+        var attempt = 1
+        while manager.fileExists(atPath: destination.path) {
+            attempt += 1
+            destination = archiveURL.appending(path: "\(stamp)-\(attempt).json")
+        }
+        try manager.moveItem(at: fileURL, to: destination)
+
+        let archived = try manager.contentsOfDirectory(atPath: archiveURL.path)
+            .filter { $0.hasSuffix(".json") }
+            .sorted()
+        for name in archived.dropLast(archivedRunLimit) {
+            try manager.removeItem(at: archiveURL.appending(path: name))
+        }
+    }
+
+    func archivedRunCount() throws -> Int {
+        guard FileManager.default.fileExists(atPath: archiveURL.path) else { return 0 }
+        return try FileManager.default.contentsOfDirectory(atPath: archiveURL.path).count
     }
 
     func latest() throws -> RunDiagnosticSnapshot? {

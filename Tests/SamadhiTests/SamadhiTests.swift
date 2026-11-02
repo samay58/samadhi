@@ -211,6 +211,80 @@ import Testing
     #expect(!encoded.contains("appliedRunningPulseBPM"))
 }
 
+private func archiveFixtureSnapshot(
+    collectionName: String,
+    completionState: RunDiagnosticSnapshot.CompletionState
+) -> RunDiagnosticSnapshot {
+    RunDiagnosticSnapshot(
+        schemaVersion: RunDiagnosticSnapshot.currentSchemaVersion,
+        capturedAt: Date(timeIntervalSince1970: 1_721_000_000),
+        completionState: completionState,
+        collectionID: collectionName,
+        collectionName: collectionName,
+        readyTrackCount: 1,
+        summary: RunDiagnosticSnapshot.Summary(
+            durationSeconds: 60,
+            averageCadence: nil,
+            tempoMatchedPercent: nil,
+            tempoMatchedCoveragePercent: 0,
+            automaticSeconds: 60,
+            manualSeconds: 0,
+            songCount: 1
+        ),
+        timeline: []
+    )
+}
+
+@Test func aNewRunKeepsThePreviousRunRecordInsteadOfOverwritingIt() async throws {
+    let directory = FileManager.default.temporaryDirectory
+        .appending(path: UUID().uuidString, directoryHint: .isDirectory)
+    defer { try? FileManager.default.removeItem(at: directory) }
+    let store = RunDiagnosticsStore(directoryURL: directory)
+
+    try await store.save(archiveFixtureSnapshot(collectionName: "first", completionState: .inProgress))
+    try await store.save(archiveFixtureSnapshot(collectionName: "first", completionState: .inProgress))
+    try await store.save(archiveFixtureSnapshot(collectionName: "first", completionState: .completed))
+    #expect(try await store.archivedRunCount() == 0)
+
+    try await store.save(archiveFixtureSnapshot(collectionName: "second", completionState: .inProgress))
+    #expect(try await store.archivedRunCount() == 1)
+    #expect(try await store.latest()?.collectionName == "second")
+
+    let records = try FileManager.default.contentsOfDirectory(
+        at: directory.appending(path: "run-records"),
+        includingPropertiesForKeys: nil
+    )
+    let kept = try String(contentsOf: try #require(records.first), encoding: .utf8)
+    #expect(kept.contains("first"))
+}
+
+@Test func relaunchingKeepsARunThatNeverFinished() async throws {
+    let directory = FileManager.default.temporaryDirectory
+        .appending(path: UUID().uuidString, directoryHint: .isDirectory)
+    defer { try? FileManager.default.removeItem(at: directory) }
+
+    let killed = RunDiagnosticsStore(directoryURL: directory)
+    try await killed.save(archiveFixtureSnapshot(collectionName: "killed", completionState: .inProgress))
+
+    let relaunched = RunDiagnosticsStore(directoryURL: directory)
+    try await relaunched.save(archiveFixtureSnapshot(collectionName: "next", completionState: .inProgress))
+    #expect(try await relaunched.archivedRunCount() == 1)
+    #expect(try await relaunched.latest()?.collectionName == "next")
+}
+
+@Test func theRunArchiveKeepsOnlyTheNewestRecordsWithinItsLimit() async throws {
+    let directory = FileManager.default.temporaryDirectory
+        .appending(path: UUID().uuidString, directoryHint: .isDirectory)
+    defer { try? FileManager.default.removeItem(at: directory) }
+    let store = RunDiagnosticsStore(directoryURL: directory, archivedRunLimit: 2)
+
+    for run in 0..<5 {
+        try await store.save(archiveFixtureSnapshot(collectionName: "run-\(run)", completionState: .completed))
+    }
+    #expect(try await store.archivedRunCount() == 2)
+    #expect(try await store.latest()?.collectionName == "run-4")
+}
+
 @Test func runDiagnosticsCapturePlayerTruthThroughFinish() throws {
     var time = Date(timeIntervalSince1970: 1_721_000_000)
     var recorder = RunDiagnosticsRecorder(now: { time })

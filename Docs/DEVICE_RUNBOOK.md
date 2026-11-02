@@ -41,7 +41,9 @@ After a run finishes, pull its record while the phone is awake:
 ./Scripts/phone.sh pull
 ~~~
 
-This copies `latest-run-diagnostics.json` to `Evidence/Temp/phone/` and prints a summary. Each finished run overwrites the file on the phone, so pull before the next one. To reread a saved record, run `python3 Scripts/read-run.py <file>`. The raw file can hold personal music data, so it stays out of Git.
+This copies every record on the phone to `~/Documents/Samadhi Run Records/` and prints a summary of the latest. Set `SAMADHI_RUN_ARCHIVE` to use another folder. `install` does the same first, so an install never risks a log. To reread a saved record, run `python3 Scripts/read-run.py <file>`. The raw files can hold personal music data, so they stay out of Git.
+
+The phone keeps the current run in `latest-run-diagnostics.json` and the previous 30 in `run-records/`. Builds from before 2026-11-02 keep only one run, and starting a run on them overwrites it. Installing a newer build keeps that file, and its first run moves it into `run-records/`.
 
 The record holds 2,048 entries and drops per-second ticks first, so every song change, rate write, mode change, cue, and notice from a realistic run survives.
 

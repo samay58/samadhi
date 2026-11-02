@@ -12,7 +12,7 @@ Usage: ./Scripts/phone.sh <command>
   install           Build with the exact profile, verify it, and install in place
   launch [args]     Launch the installed app, for example --core-diagnostics
   screenshot <name> Capture the phone's screen
-  pull              Copy the latest run record here and summarize it
+  pull              Save every run record from the phone and summarize the latest
 TEXT
   exit 2
 }
@@ -20,8 +20,10 @@ TEXT
 bundle_id=com.samaydhawan.Samadhi
 application_id=ZL5U59XBJ6.com.samaydhawan.Samadhi
 collection_path="Library/Application Support/Samadhi/selected-music.json"
-record_path="Library/Application Support/Samadhi/latest-run-diagnostics.json"
+record_directory="Library/Application Support/Samadhi"
 output_dir="$scratch/phone"
+# Outside the repository, because these are personal and must survive a fresh clone.
+run_archive=${SAMADHI_RUN_ARCHIVE:-$HOME/Documents/Samadhi Run Records}
 app_path="$derived_data/Build/Products/Debug-iphoneos/Samadhi.app"
 
 device_list=$(mktemp "${TMPDIR:-/tmp}/samadhi-devices.XXXXXX")
@@ -90,6 +92,17 @@ collection_checksum() {
   rm -rf "$copy"
 }
 
+# Copies everything the phone holds into a new dated folder and prints that folder.
+save_run_records() {
+  stamp=$(date +%Y-%m-%d-%H%M%S)
+  destination="$run_archive/$stamp"
+  mkdir -p "$run_archive"
+  xcrun devicectl device copy from --device "$1" --domain-type appDataContainer \
+    --domain-identifier "$bundle_id" --source "$record_directory" \
+    --destination "$destination" >/dev/null
+  echo "$destination"
+}
+
 [ $# -ge 1 ] || usage
 command=$1
 shift
@@ -135,6 +148,13 @@ case "$command" in
     fi
     codesign --verify --strict "$app_path"
 
+    # The phone may hold the only copy of a real outing. Never go further without saving it.
+    saved=$(save_run_records "$device") || {
+      echo "Could not save the run records from the phone, so nothing was installed." >&2
+      exit 1
+    }
+    echo "Saved run records: $saved"
+
     before=$(collection_checksum "$device")
     xcrun devicectl device install app --device "$device" "$app_path" >/dev/null
     after=$(collection_checksum "$device")
@@ -162,14 +182,15 @@ case "$command" in
     echo "$output_dir/$1.png"
     ;;
   pull)
-    stamp=$(date +%Y-%m-%d-%H%M)
-    mkdir -p "$output_dir"
-    record="$output_dir/$stamp-latest-run-diagnostics.json"
-    xcrun devicectl device copy from --device "$(device_id)" --domain-type appDataContainer \
-      --domain-identifier "$bundle_id" --source "$record_path" --destination "$record" >/dev/null
-    python3 Scripts/read-run.py "$record"
+    saved=$(save_run_records "$(device_id)")
+    latest=$(find "$saved" -name latest-run-diagnostics.json | head -1)
+    if [ -n "$latest" ]; then
+      python3 Scripts/read-run.py "$latest"
+    else
+      echo "The phone holds no run record yet."
+    fi
     echo
-    echo "Raw record stays local: $record"
+    echo "Raw records stay out of Git: $saved"
     ;;
   *)
     usage
