@@ -1,4 +1,3 @@
-import SamadhiAudio
 import SwiftUI
 
 public enum ApertureMode: Sendable, Equatable {
@@ -58,8 +57,8 @@ public struct TempoAperture: View {
     private var visualPhase: Double {
         guard !effectiveReduceMotion, mode != .paused, mode != .interrupted else { return 0.18 }
         let bpm = Double(tempoBPM ?? 96)
-        let snapshot = BeatClockSnapshot(bpm: bpm, anchorUptime: 0)
-        return snapshot.phase(atUptime: ProcessInfo.processInfo.systemUptime)
+        let secondsPerBeat = 60 / max(bpm, 1)
+        return (ProcessInfo.processInfo.systemUptime / secondsPerBeat).truncatingRemainder(dividingBy: 1)
     }
 
     private func orbScale(for phase: Double) -> CGFloat {

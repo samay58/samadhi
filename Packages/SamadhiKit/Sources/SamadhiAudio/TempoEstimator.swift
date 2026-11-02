@@ -75,8 +75,8 @@ package struct TempoEstimator: Sendable {
 
     private func estimate(from scores: [TempoScore], support: [TempoScore]) -> TempoEstimate? {
         // A tempo is judged with its family: the candidate plus its half or double. Swung and live
-        // grooves put a strong lag at one and a half beats, which used to outrank the true beat on
-        // its own; the true beat still has its half or double behind it, and that lag does not.
+        // grooves put a strong lag at one and a half beats. The true beat has its half or double
+        // behind it, and that lag does not.
         let family = scores + support
         guard
             let lower = scores.filter({ $0.tempo < 120 }).max(

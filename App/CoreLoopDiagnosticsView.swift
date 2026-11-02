@@ -3,7 +3,7 @@
     import SamadhiMotion
     import SwiftUI
 
-    enum TempoDiagnosticStatus: String, CaseIterable, Sendable {
+    enum TempoDiagnosticStatus: String, Sendable {
         case waiting
         case verified
         case limited

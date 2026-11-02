@@ -3,7 +3,7 @@ import CoreHaptics
 import Foundation
 import SamadhiDomain
 
-// Working labels for the three prototype cue families. None of them is approved product material.
+// Working labels for the prototype cue families, chosen for the audition, not for the product.
 enum AutoFeedbackFamily: String, CaseIterable, Sendable {
     case pulse
     case swell

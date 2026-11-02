@@ -89,12 +89,35 @@ struct AppleMusicCatalogResolver {
     }
 
     private func textMatches(_ lhs: String, _ rhs: String) -> Bool {
-        normalized(lhs) == normalized(rhs)
+        lhs.normalizedForMatching == rhs.normalizedForMatching
     }
 
-    private func normalized(_ value: String) -> String {
-        value.folding(options: [.caseInsensitive, .diacriticInsensitive], locale: .current)
+}
+
+extension String {
+    // Catalog and library spellings differ by case, accents, and spacing. Those never decide a match.
+    var normalizedForMatching: String {
+        folding(options: [.caseInsensitive, .diacriticInsensitive], locale: .current)
             .split(whereSeparator: \.isWhitespace)
             .joined(separator: " ")
+    }
+}
+
+// Previews download to a temporary file so analysis can read them and the caller can delete them.
+enum PreviewDownload {
+    static func toTemporaryFile(from remoteURL: URL) async throws -> URL {
+        let (downloadedURL, response) = try await URLSession.shared.download(from: remoteURL)
+        if let response = response as? HTTPURLResponse,
+            !(200...299).contains(response.statusCode)
+        {
+            throw URLError(.badServerResponse)
+        }
+
+        let fileExtension = remoteURL.pathExtension.isEmpty ? "m4a" : remoteURL.pathExtension
+        let localURL = FileManager.default.temporaryDirectory
+            .appending(path: UUID().uuidString)
+            .appendingPathExtension(fileExtension)
+        try FileManager.default.moveItem(at: downloadedURL, to: localURL)
+        return localURL
     }
 }

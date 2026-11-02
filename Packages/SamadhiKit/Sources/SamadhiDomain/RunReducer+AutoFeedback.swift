@@ -2,9 +2,6 @@
 // exactly-once began and arrived triggers, and every cancellation rule. Feedback is only ever
 // allowed by something Apple Music actually did on the current confirmed song.
 extension RunReducer {
-    // A read-back this close to the target counts as arrival. It matches the reducer's existing
-    // applied-versus-commanded tolerance so one truth decides both.
-    static let autoFeedbackArrivalTolerance = 0.005
     // Below this the applied rate has not really left its origin, so nothing has begun.
     static let autoFeedbackMovementTolerance = 0.000_5
 
@@ -74,7 +71,7 @@ extension RunReducer {
             effects.append(.emitAutoFeedback(cue(for: transaction, moment: .began)))
         }
 
-        if abs(appliedRate - transaction.targetRate) <= Self.autoFeedbackArrivalTolerance {
+        if abs(appliedRate - transaction.targetRate) <= TempoEnvelope.rateArrivalTolerance {
             transaction.phase = .arrived
             effects.append(.emitAutoFeedback(cue(for: transaction, moment: .arrived)))
         }

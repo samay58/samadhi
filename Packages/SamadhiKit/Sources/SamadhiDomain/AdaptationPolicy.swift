@@ -1,10 +1,3 @@
-public enum AdaptationStatus: Sendable, Equatable {
-    case acquiring
-    case adjusting
-    case matched
-    case musicSteady
-}
-
 public enum TempoCommandStatus: String, Sendable, Equatable, Codable {
     case idle
     case applying
@@ -25,8 +18,6 @@ public struct AdaptationState: Sendable, Equatable {
     public var secondsSinceTargetUpdate: Double
     public var confidenceLostSeconds: Double?
     public var confidenceLossStartRate: Double?
-    public var matchedSeconds: Double
-    public var hasMatched: Bool
     public var requestedBPM: Double?
     public var derivedTargetRate: Double?
     public var isAtLimit: Bool
@@ -46,8 +37,6 @@ public struct AdaptationState: Sendable, Equatable {
         secondsSinceTargetUpdate: Double = 0,
         confidenceLostSeconds: Double? = nil,
         confidenceLossStartRate: Double? = nil,
-        matchedSeconds: Double = 0,
-        hasMatched: Bool = false,
         requestedBPM: Double? = nil,
         derivedTargetRate: Double? = nil,
         isAtLimit: Bool = false,
@@ -66,8 +55,6 @@ public struct AdaptationState: Sendable, Equatable {
         self.secondsSinceTargetUpdate = max(secondsSinceTargetUpdate, 0)
         self.confidenceLostSeconds = confidenceLostSeconds
         self.confidenceLossStartRate = confidenceLossStartRate
-        self.matchedSeconds = max(matchedSeconds, 0)
-        self.hasMatched = hasMatched
         self.requestedBPM = requestedBPM
         self.derivedTargetRate = derivedTargetRate
         self.isAtLimit = isAtLimit
@@ -128,7 +115,6 @@ public struct AdaptationDecision: Sendable, Equatable {
     public let commandedRate: Double
     public let targetRate: Double?
     public let isTrackCompatible: Bool
-    public let status: AdaptationStatus
     public let nextState: AdaptationState
     public let requestedBPM: Double?
     public let derivedTargetRate: Double?
@@ -198,10 +184,6 @@ public struct AdaptationPolicy: Sendable {
             || (requestedChanged && next.secondsSinceTargetUpdate >= 1)
 
         if canUpdateTarget {
-            if trackChanged {
-                next.hasMatched = false
-                next.matchedSeconds = 0
-            }
             guard let target = targetRate(requestedBPM: requestedBPM, baseTempo: input.baseTempoBPM) else {
                 return musicSteady(state: next, input: input)
             }
@@ -252,25 +234,10 @@ public struct AdaptationPolicy: Sendable {
         next.commandStatus = .applying
         next.isAtLimit = false
 
-        if abs(input.appliedRate - target) <= 0.005 {
-            next.matchedSeconds += input.deltaSeconds
-        } else {
-            next.matchedSeconds = 0
-        }
-
-        let status: AdaptationStatus
-        if next.matchedSeconds >= 1 {
-            next.hasMatched = true
-            status = .matched
-        } else {
-            status = .adjusting
-        }
-
         return AdaptationDecision(
             commandedRate: commandedRate,
             targetRate: target,
             isTrackCompatible: true,
-            status: status,
             nextState: next,
             requestedBPM: requestedBPM,
             derivedTargetRate: next.derivedTargetRate,
@@ -289,7 +256,6 @@ public struct AdaptationPolicy: Sendable {
         let lostSeconds = (state.confidenceLostSeconds ?? 0) + input.deltaSeconds
         next.confidenceLossStartRate = startRate
         next.confidenceLostSeconds = lostSeconds
-        next.matchedSeconds = 0
         next.commandStatus = input.rhythmControl.mode == .manual ? state.commandStatus : .idle
 
         let commandedRate: Double
@@ -302,14 +268,12 @@ public struct AdaptationPolicy: Sendable {
         if lostSeconds >= 10 {
             next.targetRate = nil
             next.lastReliableCadenceSPM = nil
-            next.hasMatched = false
         }
 
         return AdaptationDecision(
             commandedRate: commandedRate,
             targetRate: next.targetRate,
             isTrackCompatible: true,
-            status: .acquiring,
             nextState: next,
             requestedBPM: next.requestedBPM,
             derivedTargetRate: next.derivedTargetRate,
@@ -344,8 +308,6 @@ public struct AdaptationPolicy: Sendable {
         next.musicalTempoBPM = input.musicalTempoBPM
         next.cadenceProjectionSourceBPM = input.cadenceProjectionSourceBPM
         next.stepBeatRelationship = input.stepBeatRelationship
-        next.matchedSeconds = 0
-        next.hasMatched = false
         next.confidenceLostSeconds = nil
         next.confidenceLossStartRate = nil
         next.requestedBPM = requestedBPM
@@ -361,7 +323,6 @@ public struct AdaptationPolicy: Sendable {
             commandedRate: commandedRate,
             targetRate: next.targetRate,
             isTrackCompatible: false,
-            status: .musicSteady,
             nextState: next,
             requestedBPM: requestedBPM,
             derivedTargetRate: derivedTargetRate,

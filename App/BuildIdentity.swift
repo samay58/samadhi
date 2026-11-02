@@ -14,11 +14,7 @@ struct BuildIdentity: Codable, Equatable, Sendable {
     let diagnosticFileVersion: Int
 
     static var current: BuildIdentity {
-        from(bundle: .main)
-    }
-
-    static func from(bundle: Bundle) -> BuildIdentity {
-        let info = bundle.infoDictionary ?? [:]
+        let info = Bundle.main.infoDictionary ?? [:]
         return BuildIdentity(
             gitCommit: info["SamadhiGitCommit"] as? String ?? "unknown",
             gitBranch: info["SamadhiGitBranch"] as? String ?? "unknown",

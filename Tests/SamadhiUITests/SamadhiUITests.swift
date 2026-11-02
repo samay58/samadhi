@@ -63,6 +63,18 @@ final class SamadhiUITests: XCTestCase {
         XCTAssertTrue(element("run-screen").waitForExistence(timeout: 2))
     }
 
+    func testRecoveryCanEndTheRunWhenTheRouteNeverReturns() {
+        prepareApp("-SAMADHI_ROUTE_LOST")
+        app.launch()
+        XCTAssertTrue(app.buttons["start-run"].waitForExistence(timeout: 2))
+        app.buttons["start-run"].tap()
+        XCTAssertTrue(element("route-recovery").waitForExistence(timeout: 3))
+        let endRun = app.buttons["route-end-run"]
+        XCTAssertTrue(endRun.waitForExistence(timeout: 2))
+        endRun.tap()
+        XCTAssertTrue(element("run-summary").waitForExistence(timeout: 3))
+    }
+
     func testTransportAndFinishBeforeStateEvidence() {
         captureTransportAndFinishBeforeState(named: "normal")
         captureTransportAndFinishBeforeState(

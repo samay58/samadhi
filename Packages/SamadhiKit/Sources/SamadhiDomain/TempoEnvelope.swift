@@ -4,6 +4,9 @@ public enum TempoEnvelope {
     public static let locomotionCadenceRange: ClosedRange<Int> = 90...210
     public static let runningCadenceRange: ClosedRange<Int> = 120...210
     public static let approximateMatchToleranceSPM = 5.0
+    // A player reply this close to the command counts as arrival everywhere: command status, track
+    // match, and the Auto feedback arrival cue.
+    public static let rateArrivalTolerance = 0.005
 
     public static let locomotionCadenceSPM: ClosedRange<Double> =
         Double(locomotionCadenceRange.lowerBound)...Double(locomotionCadenceRange.upperBound)

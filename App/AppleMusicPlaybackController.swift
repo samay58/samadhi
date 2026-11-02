@@ -1,418 +1,414 @@
-#if os(iOS)
-    import AVFoundation
-    // MusicKit's player stays main-actor owned until its async APIs carry complete sendability.
-    @preconcurrency import MusicKit
-    import SamadhiAudio
-    import SamadhiDomain
+import AVFoundation
+// MusicKit's player stays main-actor owned until its async APIs carry complete sendability.
+@preconcurrency import MusicKit
+import SamadhiAudio
+import SamadhiDomain
 
-    @MainActor
-    final class AppleMusicPlaybackController: MusicPlaybackProviding {
-        private let player = ApplicationMusicPlayer.shared
-        private var continuation: AsyncStream<MusicPlaybackEvent>.Continuation?
-        private var collection: MusicCollection?
-        private var durations: [MusicTrackID: Double] = [:]
-        private var songs: [MusicTrackID: Song] = [:]
-        private var operationID: Int?
-        private var stateTask: Task<Void, Never>?
-        private var interruptionTask: Task<Void, Never>?
-        private var routeTask: Task<Void, Never>?
-        private var lastState: MusicPlaybackState?
-        private var lastRate: Double?
-        private var lastTrackID: MusicTrackID?
-        private struct PendingRateRequest {
-            let id: Int
-            let trackID: MusicTrackID
-            let commandedRate: Double
-            let startedAt: TimeInterval
+@MainActor
+final class AppleMusicPlaybackController: MusicPlaybackProviding {
+    private let player = ApplicationMusicPlayer.shared
+    private var continuation: AsyncStream<MusicPlaybackEvent>.Continuation?
+    private var collection: MusicCollection?
+    private var durations: [MusicTrackID: Double] = [:]
+    private var songs: [MusicTrackID: Song] = [:]
+    private var operationID: Int?
+    private var stateTask: Task<Void, Never>?
+    private var interruptionTask: Task<Void, Never>?
+    private var routeTask: Task<Void, Never>?
+    private var lastState: MusicPlaybackState?
+    private var lastRate: Double?
+    private var lastTrackID: MusicTrackID?
+    private struct PendingRateRequest {
+        let id: Int
+        let trackID: MusicTrackID
+        let commandedRate: Double
+        let startedAt: TimeInterval
+    }
+
+    private var pendingRateRequest: PendingRateRequest?
+    private var rateReadbackTask: Task<Void, Never>?
+    private var preparedNextTrackID: MusicTrackID?
+    private var latestSelectionID = 0
+    private struct PendingTrackChange {
+        static let attributionWindowSeconds: TimeInterval = 5
+
+        let reason: TrackChangeReason
+        let startedAt: TimeInterval
+
+        func reason(at now: TimeInterval) -> TrackChangeReason? {
+            now - startedAt <= Self.attributionWindowSeconds ? reason : nil
         }
+    }
 
-        private var pendingRateRequest: PendingRateRequest?
-        private var rateReadbackTask: Task<Void, Never>?
-        private var preparedNextTrackID: MusicTrackID?
-        private var latestSelectionID = 0
-        private struct PendingTrackChange {
-            static let attributionWindowSeconds: TimeInterval = 5
+    private var pendingTrackChange: PendingTrackChange?
+    // The last progress seen for the entry that was current before this observation. A change is
+    // only natural when the previous song had reached its end.
+    private var lastObservedPlaybackTime: Double?
 
-            let reason: TrackChangeReason
-            let startedAt: TimeInterval
-
-            func reason(at now: TimeInterval) -> TrackChangeReason? {
-                now - startedAt <= Self.attributionWindowSeconds ? reason : nil
-            }
-        }
-
-        private var pendingTrackChange: PendingTrackChange?
-        // The last progress seen for the entry that was current before this observation. A change is
-        // only natural when the previous song had reached its end.
-        private var lastObservedPlaybackTime: Double?
-
-        func events() -> AsyncStream<MusicPlaybackEvent> {
-            AsyncStream(bufferingPolicy: .bufferingNewest(128)) { continuation in
-                self.continuation = continuation
-                self.startMonitoring()
-                continuation.onTermination = { [weak self] _ in
-                    Task { @MainActor in
-                        self?.stopMonitoring()
-                    }
+    func events() -> AsyncStream<MusicPlaybackEvent> {
+        AsyncStream(bufferingPolicy: .bufferingNewest(128)) { continuation in
+            self.continuation = continuation
+            self.startMonitoring()
+            continuation.onTermination = { [weak self] _ in
+                Task { @MainActor in
+                    self?.stopMonitoring()
                 }
             }
         }
+    }
 
-        func prepare(
-            _ collection: MusicCollection,
-            startingAt trackID: MusicTrackID,
-            operationID: Int
-        ) async throws {
-            guard collection.tracks.contains(where: { $0.id == trackID }) else {
-                throw MusicPlaybackError.emptyCollection
-            }
-
-            var songs: [Song] = []
-            var songsByID: [MusicTrackID: Song] = [:]
-            var selectedSong: Song?
-            var durations: [MusicTrackID: Double] = [:]
-            for track in collection.tracks {
-                var request = MusicCatalogResourceRequest<Song>(
-                    matching: \.id,
-                    equalTo: MusicItemID(track.id.rawValue)
-                )
-                request.limit = 1
-                guard let song = try await request.response().items.first else {
-                    throw AppleMusicPlaybackError.trackUnavailable(track.id)
-                }
-                songs.append(song)
-                songsByID[track.id] = song
-                if track.id == trackID { selectedSong = song }
-                durations[track.id] = song.duration ?? track.durationSeconds
-            }
-            guard let selectedSong else { throw AppleMusicPlaybackError.trackUnavailable(trackID) }
-
-            player.stop()
-            player.state.playbackRate = 1
-            player.queue = ApplicationMusicPlayer.Queue(for: songs, startingAt: selectedSong)
-            self.collection = collection
-            self.durations = durations
-            self.songs = songsByID
-            self.operationID = operationID
-            lastState = nil
-            lastRate = nil
-            lastTrackID = trackID
-            pendingRateRequest = nil
-            rateReadbackTask?.cancel()
-            rateReadbackTask = nil
-            preparedNextTrackID = nil
-            latestSelectionID = 0
-            pendingTrackChange = nil
-            lastObservedPlaybackTime = nil
-            continuation?.yield(.prepared(operationID: operationID, trackID: trackID))
+    func prepare(
+        _ collection: MusicCollection,
+        startingAt trackID: MusicTrackID,
+        operationID: Int
+    ) async throws {
+        guard collection.tracks.contains(where: { $0.id == trackID }) else {
+            throw MusicPlaybackError.emptyCollection
         }
 
-        func play(operationID: Int) async throws {
-            guard isCurrent(operationID) else { return }
-            try await player.play()
-        }
-
-        func pause(operationID: Int) {
-            guard isCurrent(operationID) else { return }
-            player.pause()
-        }
-
-        func resume(operationID: Int) async throws {
-            try await play(operationID: operationID)
-        }
-
-        func skipToPrevious(operationID: Int) async throws {
-            guard isCurrent(operationID) else { return }
-            try await claimingTrackChange(.explicitPrevious) {
-                try await player.skipToPreviousEntry()
-            }
-        }
-
-        func skipToNext(operationID: Int) async throws {
-            guard isCurrent(operationID) else { return }
-            try applyPreparedNextIfNeeded()
-            try await claimingTrackChange(.explicitSkip) {
-                try await player.skipToNextEntry()
-            }
-        }
-
-        // MusicKit reports that the entry changed, never why. Claiming the reason around the command
-        // lets the monitor attribute the next observed change; a failed command drops the claim so a
-        // later natural boundary is not mislabelled.
-        private func claimingTrackChange(
-            _ reason: TrackChangeReason,
-            _ command: () async throws -> Void
-        ) async rethrows {
-            pendingTrackChange = PendingTrackChange(
-                reason: reason,
-                startedAt: ProcessInfo.processInfo.systemUptime
+        var songs: [Song] = []
+        var songsByID: [MusicTrackID: Song] = [:]
+        var selectedSong: Song?
+        var durations: [MusicTrackID: Double] = [:]
+        for track in collection.tracks {
+            var request = MusicCatalogResourceRequest<Song>(
+                matching: \.id,
+                equalTo: MusicItemID(track.id.rawValue)
             )
-            do {
-                try await command()
-            } catch {
-                pendingTrackChange = nil
-                throw error
+            request.limit = 1
+            guard let song = try await request.response().items.first else {
+                throw AppleMusicPlaybackError.trackUnavailable(track.id)
             }
+            songs.append(song)
+            songsByID[track.id] = song
+            if track.id == trackID { selectedSong = song }
+            durations[track.id] = song.duration ?? track.durationSeconds
         }
+        guard let selectedSong else { throw AppleMusicPlaybackError.trackUnavailable(trackID) }
 
-        func prepareNext(
-            trackID: MusicTrackID,
-            operationID: Int,
-            selectionID: Int
-        ) async throws {
-            guard isCurrent(operationID), songs[trackID] != nil else {
-                throw MusicPlaybackError.notPrepared
-            }
-            guard selectionID >= latestSelectionID else { return }
-            latestSelectionID = selectionID
-            preparedNextTrackID = trackID
+        player.stop()
+        player.state.playbackRate = 1
+        player.queue = ApplicationMusicPlayer.Queue(for: songs, startingAt: selectedSong)
+        self.collection = collection
+        self.durations = durations
+        self.songs = songsByID
+        self.operationID = operationID
+        resetPlaybackObservation(currentTrackID: trackID)
+        continuation?.yield(.prepared(operationID: operationID, trackID: trackID))
+    }
+
+    func play(operationID: Int) async throws {
+        guard isCurrent(operationID) else { return }
+        try await player.play()
+    }
+
+    func pause(operationID: Int) {
+        guard isCurrent(operationID) else { return }
+        player.pause()
+    }
+
+    func resume(operationID: Int) async throws {
+        try await play(operationID: operationID)
+    }
+
+    func skipToPrevious(operationID: Int) async throws {
+        guard isCurrent(operationID) else { return }
+        try await claimingTrackChange(.explicitPrevious) {
+            try await player.skipToPreviousEntry()
         }
+    }
 
-        func clearPreparedNext(operationID: Int, selectionID: Int) {
-            guard isCurrent(operationID), selectionID >= latestSelectionID else { return }
-            latestSelectionID = selectionID
-            preparedNextTrackID = nil
+    func skipToNext(operationID: Int) async throws {
+        guard isCurrent(operationID) else { return }
+        try applyPreparedNextIfNeeded()
+        try await claimingTrackChange(.explicitSkip) {
+            try await player.skipToNextEntry()
         }
+    }
 
-        func setPlaybackRate(
-            _ rate: Double,
-            operationID: Int,
-            requestID: Int,
-            trackID: MusicTrackID
-        ) {
-            guard isCurrent(operationID),
-                collection?.tracks.contains(where: { $0.id == trackID }) == true,
-                currentTrackID == trackID
-            else { return }
-            let boundedRate = Double(Float(TempoEnvelope.clampRate(rate)))
-            rateReadbackTask?.cancel()
-            pendingRateRequest = PendingRateRequest(
-                id: requestID,
-                trackID: trackID,
-                commandedRate: boundedRate,
-                startedAt: ProcessInfo.processInfo.systemUptime
-            )
-            player.state.playbackRate = Float(boundedRate)
-            rateReadbackTask = Task { [weak self] in
-                for attempt in 0..<8 {
-                    try? await Task.sleep(for: .milliseconds(50))
-                    guard !Task.isCancelled, let self else { return }
-                    if publishPendingRateReadback(force: attempt == 7) { return }
-                }
-            }
-        }
-
-        func stop(operationID: Int) {
-            guard isCurrent(operationID) else { return }
-            player.stop()
-            collection = nil
-            durations = [:]
-            songs = [:]
-            self.operationID = nil
-            lastState = nil
-            lastRate = nil
-            lastTrackID = nil
-            pendingRateRequest = nil
-            rateReadbackTask?.cancel()
-            rateReadbackTask = nil
-            preparedNextTrackID = nil
-            latestSelectionID = 0
+    // MusicKit reports that the entry changed, never why. Claiming the reason around the command
+    // lets the monitor attribute the next observed change; a failed command drops the claim so a
+    // later natural boundary is not mislabelled.
+    private func claimingTrackChange(
+        _ reason: TrackChangeReason,
+        _ command: () async throws -> Void
+    ) async rethrows {
+        pendingTrackChange = PendingTrackChange(
+            reason: reason,
+            startedAt: ProcessInfo.processInfo.systemUptime
+        )
+        do {
+            try await command()
+        } catch {
             pendingTrackChange = nil
-            lastObservedPlaybackTime = nil
+            throw error
         }
+    }
 
-        private func startMonitoring() {
-            guard stateTask == nil else { return }
+    func prepareNext(
+        trackID: MusicTrackID,
+        operationID: Int,
+        selectionID: Int
+    ) async throws {
+        guard isCurrent(operationID), songs[trackID] != nil else {
+            throw MusicPlaybackError.notPrepared
+        }
+        guard selectionID >= latestSelectionID else { return }
+        latestSelectionID = selectionID
+        preparedNextTrackID = trackID
+    }
 
-            stateTask = Task { [weak self] in
-                while !Task.isCancelled {
-                    guard let self else { return }
-                    publishPlayerState()
-                    try? await Task.sleep(for: .seconds(1))
-                }
-            }
-            interruptionTask = Task { [weak self] in
-                for await notification in NotificationCenter.default.notifications(
-                    named: AVAudioSession.interruptionNotification)
-                {
-                    guard !Task.isCancelled, let self else { return }
-                    guard let operationID else { continue }
-                    let rawType = notification.userInfo?[AVAudioSessionInterruptionTypeKey] as? UInt
-                    let type = rawType.flatMap(AVAudioSession.InterruptionType.init(rawValue:))
-                    if type == .began {
-                        player.pause()
-                        continuation?.yield(.interruptionBegan(operationID: operationID))
-                    } else if type == .ended {
-                        continuation?.yield(.interruptionEnded(operationID: operationID))
-                    }
-                }
-            }
-            routeTask = Task { [weak self] in
-                for await notification in NotificationCenter.default.notifications(
-                    named: AVAudioSession.routeChangeNotification)
-                {
-                    guard !Task.isCancelled, let self else { return }
-                    guard let operationID else { continue }
-                    let rawReason = notification.userInfo?[AVAudioSessionRouteChangeReasonKey] as? UInt
-                    let reason = rawReason.flatMap(AVAudioSession.RouteChangeReason.init(rawValue:))
-                    switch reason {
-                    case .oldDeviceUnavailable:
-                        player.pause()
-                        continuation?.yield(.routeLost(operationID: operationID))
-                    case .newDeviceAvailable:
-                        continuation?.yield(.routeRestored(operationID: operationID))
-                    default:
-                        break
-                    }
-                }
+    func clearPreparedNext(operationID: Int, selectionID: Int) {
+        guard isCurrent(operationID), selectionID >= latestSelectionID else { return }
+        latestSelectionID = selectionID
+        preparedNextTrackID = nil
+    }
+
+    func setPlaybackRate(
+        _ rate: Double,
+        operationID: Int,
+        requestID: Int,
+        trackID: MusicTrackID
+    ) {
+        guard isCurrent(operationID),
+            collection?.tracks.contains(where: { $0.id == trackID }) == true,
+            currentTrackID == trackID
+        else { return }
+        let boundedRate = Double(Float(TempoEnvelope.clampRate(rate)))
+        rateReadbackTask?.cancel()
+        pendingRateRequest = PendingRateRequest(
+            id: requestID,
+            trackID: trackID,
+            commandedRate: boundedRate,
+            startedAt: ProcessInfo.processInfo.systemUptime
+        )
+        player.state.playbackRate = Float(boundedRate)
+        rateReadbackTask = Task { [weak self] in
+            for attempt in 0..<8 {
+                try? await Task.sleep(for: .milliseconds(50))
+                guard !Task.isCancelled, let self else { return }
+                if publishPendingRateReadback(force: attempt == 7) { return }
             }
         }
+    }
 
-        private func stopMonitoring() {
-            stateTask?.cancel()
-            interruptionTask?.cancel()
-            routeTask?.cancel()
-            stateTask = nil
-            interruptionTask = nil
-            routeTask = nil
+    func stop(operationID: Int) {
+        guard isCurrent(operationID) else { return }
+        player.stop()
+        collection = nil
+        durations = [:]
+        songs = [:]
+        self.operationID = nil
+        resetPlaybackObservation(currentTrackID: nil)
+    }
+
+    private func resetPlaybackObservation(currentTrackID: MusicTrackID?) {
+        lastState = nil
+        lastRate = nil
+        lastTrackID = currentTrackID
+        pendingRateRequest = nil
+        rateReadbackTask?.cancel()
+        rateReadbackTask = nil
+        preparedNextTrackID = nil
+        latestSelectionID = 0
+        pendingTrackChange = nil
+        lastObservedPlaybackTime = nil
+    }
+
+    private func startMonitoring() {
+        guard stateTask == nil else { return }
+
+        stateTask = Task { [weak self] in
+            while !Task.isCancelled {
+                guard let self else { return }
+                publishPlayerState()
+                try? await Task.sleep(for: .seconds(1))
+            }
         }
-
-        private func publishPlayerState() {
-            guard let operationID, let collection else { return }
-
-            if let currentTrackID,
-                let duration = durations[currentTrackID],
-                duration - player.playbackTime <= 8
+        interruptionTask = Task { [weak self] in
+            for await notification in NotificationCenter.default.notifications(
+                named: AVAudioSession.interruptionNotification)
             {
-                try? applyPreparedNextIfNeeded()
-            }
-
-            let state = playbackState
-            if state != lastState {
-                lastState = state
-                continuation?.yield(.stateChanged(operationID: operationID, state: state))
-            }
-
-            let rate = Double(player.state.playbackRate)
-            if pendingRateRequest != nil {
-                _ = publishPendingRateReadback(force: true)
-            } else if rate != lastRate {
-                lastRate = rate
-                continuation?.yield(
-                    .rateChanged(
-                        operationID: operationID,
-                        requestID: nil,
-                        trackID: currentTrackID,
-                        rate: rate,
-                        latencySeconds: nil
-                    )
-                )
-            }
-
-            guard let itemID = player.queue.currentEntry?.item?.id.rawValue else { return }
-            let trackID = MusicTrackID(itemID)
-            if trackID != lastTrackID {
-                let reason = TrackChangeAttribution.reason(
-                    claimed: pendingTrackChange?.reason(at: ProcessInfo.processInfo.systemUptime),
-                    previousPlaybackTimeSeconds: lastObservedPlaybackTime,
-                    previousDurationSeconds: lastTrackID.flatMap { durations[$0] }
-                )
-                lastTrackID = trackID
-                lastObservedPlaybackTime = nil
-                pendingTrackChange = nil
-                pendingRateRequest = nil
-                rateReadbackTask?.cancel()
-                rateReadbackTask = nil
-                preparedNextTrackID = nil
-                continuation?.yield(
-                    .trackChanged(
-                        operationID: operationID,
-                        trackID: trackID,
-                        reason: reason
-                    )
-                )
-            }
-            lastObservedPlaybackTime = player.playbackTime
-            guard let track = collection.tracks.first(where: { $0.id == trackID }) else { return }
-            continuation?.yield(
-                .progress(
-                    operationID: operationID,
-                    PlaybackProgress(
-                        trackID: trackID,
-                        elapsedSeconds: player.playbackTime,
-                        durationSeconds: durations[trackID] ?? track.durationSeconds
-                    )
-                )
-            )
-        }
-
-        private var playbackState: MusicPlaybackState {
-            switch player.state.playbackStatus {
-            case .playing:
-                .playing
-            case .paused:
-                .paused
-            default:
-                .stopped
+                guard !Task.isCancelled, let self else { return }
+                guard let operationID else { continue }
+                let rawType = notification.userInfo?[AVAudioSessionInterruptionTypeKey] as? UInt
+                let type = rawType.flatMap(AVAudioSession.InterruptionType.init(rawValue:))
+                if type == .began {
+                    player.pause()
+                    continuation?.yield(.interruptionBegan(operationID: operationID))
+                } else if type == .ended {
+                    continuation?.yield(.interruptionEnded(operationID: operationID))
+                }
             }
         }
+        routeTask = Task { [weak self] in
+            for await notification in NotificationCenter.default.notifications(
+                named: AVAudioSession.routeChangeNotification)
+            {
+                guard !Task.isCancelled, let self else { return }
+                guard let operationID else { continue }
+                let rawReason = notification.userInfo?[AVAudioSessionRouteChangeReasonKey] as? UInt
+                let reason = rawReason.flatMap(AVAudioSession.RouteChangeReason.init(rawValue:))
+                switch reason {
+                case .oldDeviceUnavailable:
+                    player.pause()
+                    continuation?.yield(.routeLost(operationID: operationID))
+                case .newDeviceAvailable:
+                    continuation?.yield(.routeRestored(operationID: operationID))
+                default:
+                    break
+                }
+            }
+        }
+    }
 
-        private func isCurrent(_ operationID: Int) -> Bool {
-            self.operationID == operationID && collection != nil
+    private func stopMonitoring() {
+        stateTask?.cancel()
+        interruptionTask?.cancel()
+        routeTask?.cancel()
+        stateTask = nil
+        interruptionTask = nil
+        routeTask = nil
+    }
+
+    private func publishPlayerState() {
+        guard let operationID, let collection else { return }
+
+        if let currentTrackID,
+            let duration = durations[currentTrackID],
+            duration - player.playbackTime <= 8
+        {
+            try? applyPreparedNextIfNeeded()
         }
 
-        @discardableResult
-        private func publishPendingRateReadback(force: Bool) -> Bool {
-            guard let operationID, let request = pendingRateRequest else { return false }
-            let rate = Double(player.state.playbackRate)
-            guard force || abs(rate - request.commandedRate) <= 0.005 else { return false }
+        let state = playbackState
+        if state != lastState {
+            lastState = state
+            continuation?.yield(.stateChanged(operationID: operationID, state: state))
+        }
 
-            pendingRateRequest = nil
-            rateReadbackTask = nil
+        let rate = Double(player.state.playbackRate)
+        if pendingRateRequest != nil {
+            // Never forced here. The poll can land milliseconds after a write, before the
+            // player reports it. The readback task owns the timeout.
+            _ = publishPendingRateReadback(force: false)
+        } else if rate != lastRate {
             lastRate = rate
             continuation?.yield(
                 .rateChanged(
                     operationID: operationID,
-                    requestID: request.id,
-                    trackID: request.trackID,
+                    requestID: nil,
+                    trackID: currentTrackID,
                     rate: rate,
-                    latencySeconds: max(
-                        ProcessInfo.processInfo.systemUptime - request.startedAt,
-                        0
-                    )
+                    latencySeconds: nil
                 )
             )
-            return true
         }
 
-        private func applyPreparedNextIfNeeded() throws {
-            guard let trackID = preparedNextTrackID,
-                let selectedSong = songs[trackID],
-                let currentEntry = player.queue.currentEntry
-            else { return }
-
-            var entries = player.queue.entries
-            guard let selectedIndex = entries.firstIndex(where: { $0.item?.id == selectedSong.id })
-            else { throw AppleMusicPlaybackError.trackUnavailable(trackID) }
-            let selectedEntry = entries.remove(at: selectedIndex)
-            guard let currentIndex = entries.firstIndex(of: currentEntry) else {
-                throw MusicPlaybackError.notPrepared
-            }
-            entries.insert(selectedEntry, at: min(currentIndex + 1, entries.endIndex))
-            player.queue.entries = entries
-            player.queue.currentEntry = currentEntry
+        guard let itemID = player.queue.currentEntry?.item?.id.rawValue else { return }
+        let trackID = MusicTrackID(itemID)
+        if trackID != lastTrackID {
+            let reason = TrackChangeAttribution.reason(
+                claimed: pendingTrackChange?.reason(at: ProcessInfo.processInfo.systemUptime),
+                previousPlaybackTimeSeconds: lastObservedPlaybackTime,
+                previousDurationSeconds: lastTrackID.flatMap { durations[$0] }
+            )
+            lastTrackID = trackID
+            lastObservedPlaybackTime = nil
+            pendingTrackChange = nil
+            pendingRateRequest = nil
+            rateReadbackTask?.cancel()
+            rateReadbackTask = nil
             preparedNextTrackID = nil
+            continuation?.yield(
+                .trackChanged(
+                    operationID: operationID,
+                    trackID: trackID,
+                    reason: reason
+                )
+            )
         }
+        lastObservedPlaybackTime = player.playbackTime
+        guard let track = collection.tracks.first(where: { $0.id == trackID }) else { return }
+        continuation?.yield(
+            .progress(
+                operationID: operationID,
+                PlaybackProgress(
+                    trackID: trackID,
+                    elapsedSeconds: player.playbackTime,
+                    durationSeconds: durations[trackID] ?? track.durationSeconds
+                )
+            )
+        )
+    }
 
-        private var currentTrackID: MusicTrackID? {
-            guard let rawValue = player.queue.currentEntry?.item?.id.rawValue else {
-                return lastTrackID
-            }
-            return MusicTrackID(rawValue)
+    private var playbackState: MusicPlaybackState {
+        switch player.state.playbackStatus {
+        case .playing:
+            .playing
+        case .paused:
+            .paused
+        default:
+            .stopped
         }
     }
 
-    enum AppleMusicPlaybackError: Error, Sendable, Equatable {
-        case trackUnavailable(MusicTrackID)
+    private func isCurrent(_ operationID: Int) -> Bool {
+        self.operationID == operationID && collection != nil
     }
-#endif
+
+    @discardableResult
+    private func publishPendingRateReadback(force: Bool) -> Bool {
+        guard let operationID, let request = pendingRateRequest else { return false }
+        let rate = Double(player.state.playbackRate)
+        guard force || abs(rate - request.commandedRate) <= 0.005 else { return false }
+
+        pendingRateRequest = nil
+        rateReadbackTask?.cancel()
+        rateReadbackTask = nil
+        lastRate = rate
+        continuation?.yield(
+            .rateChanged(
+                operationID: operationID,
+                requestID: request.id,
+                trackID: request.trackID,
+                rate: rate,
+                latencySeconds: max(
+                    ProcessInfo.processInfo.systemUptime - request.startedAt,
+                    0
+                )
+            )
+        )
+        return true
+    }
+
+    private func applyPreparedNextIfNeeded() throws {
+        guard let trackID = preparedNextTrackID,
+            let selectedSong = songs[trackID],
+            let currentEntry = player.queue.currentEntry
+        else { return }
+
+        var entries = player.queue.entries
+        guard let selectedIndex = entries.firstIndex(where: { $0.item?.id == selectedSong.id })
+        else { throw AppleMusicPlaybackError.trackUnavailable(trackID) }
+        let selectedEntry = entries.remove(at: selectedIndex)
+        guard let currentIndex = entries.firstIndex(of: currentEntry) else {
+            throw MusicPlaybackError.notPrepared
+        }
+        entries.insert(selectedEntry, at: min(currentIndex + 1, entries.endIndex))
+        player.queue.entries = entries
+        player.queue.currentEntry = currentEntry
+        preparedNextTrackID = nil
+    }
+
+    private var currentTrackID: MusicTrackID? {
+        guard let rawValue = player.queue.currentEntry?.item?.id.rawValue else {
+            return lastTrackID
+        }
+        return MusicTrackID(rawValue)
+    }
+}
+
+enum AppleMusicPlaybackError: Error, Sendable, Equatable {
+    case trackUnavailable(MusicTrackID)
+}

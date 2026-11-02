@@ -8,6 +8,8 @@ enum RunDurationText {
     static func spoken(_ seconds: Int) -> String {
         let minutes = seconds / 60
         let remainder = seconds % 60
-        return "\(minutes) minutes, \(remainder) seconds"
+        let minuteWord = minutes == 1 ? "minute" : "minutes"
+        let secondWord = remainder == 1 ? "second" : "seconds"
+        return "\(minutes) \(minuteWord), \(remainder) \(secondWord)"
     }
 }

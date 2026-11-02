@@ -280,15 +280,15 @@ public enum AutoFeedbackSize: String, Sendable, Equatable, Codable {
     case large
 
     // Bands are prototype starting points in reachable step rhythm; physical testing may move them.
-    public static let smallRangeSPM = 6.0...9.0
-    public static let mediumRangeSPM = 10.0...15.0
+    public static let smallMinimumSPM = 6.0
+    public static let mediumMinimumSPM = 10.0
     public static let largeMinimumSPM = 16.0
 
     public static func band(forChangeSPM change: Double) -> AutoFeedbackSize? {
         let rounded = abs(change).rounded()
         if rounded >= largeMinimumSPM { return .large }
-        if rounded >= mediumRangeSPM.lowerBound { return .medium }
-        if rounded >= smallRangeSPM.lowerBound { return .small }
+        if rounded >= mediumMinimumSPM { return .medium }
+        if rounded >= smallMinimumSPM { return .small }
         return nil
     }
 }
@@ -382,10 +382,17 @@ public struct AutoFeedbackState: Sendable, Equatable {
     public static let initial = AutoFeedbackState()
 }
 
+public enum RouteRecoveryCause: Sendable, Equatable {
+    case routeLost
+    case interrupted
+    case playbackFailed
+}
+
 public struct RouteRecovery: Sendable, Equatable {
     public var session: RunSession
     public var origin: RunActivity
     public var availability: RouteAvailability
+    public var cause: RouteRecoveryCause
 }
 
 public enum RunState: Sendable, Equatable {
@@ -525,6 +532,7 @@ public enum RunEvent: Sendable, Equatable {
     case audioRouteLost
     case audioRouteRestored
     case routeResumeTapped(acquisitionID: Int, timeoutID: Int)
+    case recoveryEndRunTapped
     // Progress carries a selection identifier because the boundary look-ahead may prepare a next
     // song from it; the player orders prepare and clear commands by that identifier.
     case playbackProgress(

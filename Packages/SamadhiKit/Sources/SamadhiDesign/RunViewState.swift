@@ -3,13 +3,11 @@ import SamadhiDomain
 public struct TrackMetadata: Sendable, Equatable {
     public let title: String
     public let artist: String
-    public let collection: String
     public let durationSeconds: Int
 
-    public init(title: String, artist: String, collection: String = "Night Motion", durationSeconds: Int = 214) {
+    public init(title: String, artist: String, durationSeconds: Int = 214) {
         self.title = title
         self.artist = artist
-        self.collection = collection
         self.durationSeconds = durationSeconds
     }
 
@@ -29,7 +27,7 @@ public enum RunVisualPhase: Sendable, Equatable {
     case confirmingFinish
     case finishing
     case permissionRecovery
-    case routeRecovery(restored: Bool)
+    case routeRecovery(cause: RouteRecoveryCause, restored: Bool)
     case summary(RunSummary)
 }
 
@@ -110,9 +108,6 @@ public struct RhythmControlPresentation: Sendable, Equatable {
     public var appliedBPM: Int?
     public var commandStatus: TempoCommandStatus
     public var achievableBPM: Int?
-    public var commandedRate: Double?
-    public var appliedRate: Double?
-    public var commandLatencySeconds: Double?
     public var isAtLimit: Bool
     public var isFindingBetterFit: Bool
     public var isVisible: Bool
@@ -127,9 +122,6 @@ public struct RhythmControlPresentation: Sendable, Equatable {
         appliedBPM: Int? = nil,
         commandStatus: TempoCommandStatus = .idle,
         achievableBPM: Int? = nil,
-        commandedRate: Double? = nil,
-        appliedRate: Double? = nil,
-        commandLatencySeconds: Double? = nil,
         isAtLimit: Bool = false,
         isFindingBetterFit: Bool = false,
         isVisible: Bool = false,
@@ -143,9 +135,6 @@ public struct RhythmControlPresentation: Sendable, Equatable {
         self.appliedBPM = appliedBPM
         self.commandStatus = commandStatus
         self.achievableBPM = achievableBPM
-        self.commandedRate = commandedRate
-        self.appliedRate = appliedRate
-        self.commandLatencySeconds = commandLatencySeconds
         self.isAtLimit = isAtLimit
         self.isFindingBetterFit = isFindingBetterFit
         self.isVisible = isVisible
@@ -247,6 +236,7 @@ public enum RunAction: Sendable, Equatable {
     case useFixedRhythm
     case openSettings
     case routeResume
+    case endRunFromRecovery
     case done
     case chooseMusic
     case changeMusic

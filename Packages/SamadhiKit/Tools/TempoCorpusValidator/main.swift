@@ -2,6 +2,9 @@ import Foundation
 import SamadhiAudio
 import SamadhiDomain
 
+private let allowedPulseErrorFraction = 0.02
+private let requiredPassCount = 10
+
 private struct CorpusFixture: Codable {
     let catalogID: String
     let title: String
@@ -72,11 +75,11 @@ private enum TempoCorpusValidator {
             generatedAt: Date(),
             source: "Apple catalog lookup and provider-hosted preview assets",
             referenceBasis: "The exact Apple catalog title declares the reference tempo",
-            allowedPulseError: 0.02,
-            requiredPassCount: 10,
+            allowedPulseError: allowedPulseErrorFraction,
+            requiredPassCount: requiredPassCount,
             passedCount: passedCount,
             totalCount: results.count,
-            passed: passedCount >= 10,
+            passed: passedCount >= requiredPassCount,
             results: results
         )
         let encoder = JSONEncoder()
@@ -166,7 +169,7 @@ private enum TempoCorpusValidator {
             confidence: analysis?.confidence,
             analysisVersion: analysis?.version,
             pulseError: pulseError,
-            passed: pulseError.map { $0 <= 0.02 } ?? false,
+            passed: pulseError.map { $0 <= allowedPulseErrorFraction } ?? false,
             error: error
         )
     }

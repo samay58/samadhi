@@ -259,7 +259,7 @@ final class AppleMusicImportService: MusicLibraryImporting {
         let downloadStartedAt = ProcessInfo.processInfo.systemUptime
         let localURL: URL
         do {
-            localURL = try await downloadPreview(remoteURL)
+            localURL = try await PreviewDownload.toTemporaryFile(from: remoteURL)
         } catch is CancellationError {
             throw CancellationError()
         } catch {
@@ -400,22 +400,6 @@ final class AppleMusicImportService: MusicLibraryImporting {
         max(ProcessInfo.processInfo.systemUptime - start, 0)
     }
 
-    private func downloadPreview(_ remoteURL: URL) async throws -> URL {
-        let (downloadedURL, response) = try await URLSession.shared.download(from: remoteURL)
-        if let response = response as? HTTPURLResponse,
-            !(200...299).contains(response.statusCode)
-        {
-            throw URLError(.badServerResponse)
-        }
-
-        let fileExtension = remoteURL.pathExtension.isEmpty ? "m4a" : remoteURL.pathExtension
-        let localURL = FileManager.default.temporaryDirectory
-            .appending(path: UUID().uuidString)
-            .appendingPathExtension(fileExtension)
-        try FileManager.default.moveItem(at: downloadedURL, to: localURL)
-        return localURL
-    }
-
     private func sourceFingerprint(for track: Track) -> String {
         [
             track.title,
@@ -423,14 +407,8 @@ final class AppleMusicImportService: MusicLibraryImporting {
             track.albumTitle ?? "",
             String(format: "%.3f", track.duration ?? 0),
         ]
-        .map(normalized)
+        .map(\.normalizedForMatching)
         .joined(separator: "|")
-    }
-
-    private func normalized(_ value: String) -> String {
-        value.folding(options: [.caseInsensitive, .diacriticInsensitive], locale: .current)
-            .split(whereSeparator: \.isWhitespace)
-            .joined(separator: " ")
     }
 }
 

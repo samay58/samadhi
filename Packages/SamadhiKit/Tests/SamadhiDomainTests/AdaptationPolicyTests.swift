@@ -37,7 +37,6 @@ private let policy = AdaptationPolicy()
     #expect(decision.commandedRate == 1.02)
     #expect(decision.targetRate == 1.15)
     #expect(decision.nextState.achievableBPM == 184)
-    #expect(decision.status == .musicSteady)
     #expect(decision.isAtLimit)
 }
 
@@ -48,7 +47,6 @@ private let policy = AdaptationPolicy()
     )
 
     var lockedState = initial.nextState
-    lockedState.hasMatched = true
     let ongoing = policy.update(
         state: lockedState,
         input: input(cadence: 171, tempo: 165, appliedRate: 1, deltaSeconds: 1)
@@ -162,9 +160,7 @@ private let policy = AdaptationPolicy()
     #expect(held.commandedRate == 1.04)
     #expect(easing.commandedRate == 1.02)
     #expect(normal.commandedRate == 1)
-    #expect(normal.status == .acquiring)
     #expect(normal.nextState.targetRate == nil)
-    #expect(!normal.nextState.hasMatched)
 }
 
 @Test func automaticCorrectionChangesTheMusicalRequestWithoutChangingCadenceTruth() {
@@ -277,20 +273,6 @@ private let policy = AdaptationPolicy()
     #expect(outsideTolerance == false)
 }
 
-@Test func matchRequiresOneSecondInsideAppliedRateTolerance() {
-    let first = policy.update(
-        state: .initial,
-        input: input(cadence: 170, tempo: 170, appliedRate: 1, deltaSeconds: 0.5)
-    )
-    let second = policy.update(
-        state: first.nextState,
-        input: input(cadence: 170, tempo: 170, appliedRate: 1, deltaSeconds: 0.5)
-    )
-
-    #expect(first.status == .adjusting)
-    #expect(second.status == .matched)
-}
-
 @Test func honestTempoMeasurementRequiresAllInputsAndUsesEffectiveTempo() {
     let matched = TempoMatchEvaluator.measure(
         referenceBPM: 170,
@@ -347,7 +329,6 @@ private let policy = AdaptationPolicy()
         )
     )
 
-    #expect(decision.status == .acquiring)
     #expect(decision.requestedBPM == nil)
     #expect(decision.commandedRate == 1)
     #expect(decision.nextState.targetRate == nil)

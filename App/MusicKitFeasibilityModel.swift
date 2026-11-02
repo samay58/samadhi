@@ -381,7 +381,7 @@
             }
 
             do {
-                let localURL = try await localPreviewURL(for: url)
+                let localURL = try await PreviewDownload.toTemporaryFile(from: url)
                 defer { try? FileManager.default.removeItem(at: localURL) }
                 guard let analysis = try await tempoAnalyzer.analyze(fileURL: localURL) else {
                     record("preview_tempo_rejected", track.title)
@@ -396,22 +396,6 @@
                 record("preview_error", "\(track.title); \(error)")
                 return false
             }
-        }
-
-        private func localPreviewURL(for remoteURL: URL) async throws -> URL {
-            let (downloadedURL, response) = try await URLSession.shared.download(from: remoteURL)
-            if let response = response as? HTTPURLResponse,
-                !(200...299).contains(response.statusCode)
-            {
-                throw URLError(.badServerResponse)
-            }
-
-            let fileExtension = remoteURL.pathExtension.isEmpty ? "m4a" : remoteURL.pathExtension
-            let localURL = FileManager.default.temporaryDirectory
-                .appending(path: UUID().uuidString)
-                .appendingPathExtension(fileExtension)
-            try FileManager.default.moveItem(at: downloadedURL, to: localURL)
-            return localURL
         }
 
         private func trackWithCatalogPreview(for track: Track) async -> Track {

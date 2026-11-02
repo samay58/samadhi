@@ -30,8 +30,8 @@ public struct SamadhiScreen: View {
             ReadyScreen(state: state, send: send)
         case .permissionRecovery:
             RunRecoveryScreen(kind: .motionPermission, send: send)
-        case let .routeRecovery(restored):
-            RunRecoveryScreen(kind: .audioRoute(restored: restored), send: send)
+        case let .routeRecovery(cause, restored):
+            RunRecoveryScreen(kind: .audio(cause: cause, restored: restored), send: send)
         case let .summary(summary):
             RunSummaryScreen(summary: summary, send: send)
         case .preparing, .acquiring, .running, .paused, .confirmingFinish, .finishing:

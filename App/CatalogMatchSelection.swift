@@ -21,7 +21,6 @@ enum CatalogMatchSelection {
     static let durationToleranceSeconds: TimeInterval = 3
     static let tieWindowSeconds: TimeInterval = 0.5
 
-    /// Returns the chosen candidate id, or nil when nothing is close enough.
     static func choose(
         from candidates: [Candidate],
         trackDurationSeconds: TimeInterval,

@@ -290,11 +290,11 @@ private let previewSend: @MainActor (RunAction) -> Void = { _ in }
 }
 
 #Preview("Headphones disconnected") {
-    SamadhiScreen(state: RunViewState(phase: .routeRecovery(restored: false)), send: previewSend)
+    SamadhiScreen(state: RunViewState(phase: .routeRecovery(cause: .routeLost, restored: false)), send: previewSend)
 }
 
 #Preview("Route restored") {
-    SamadhiScreen(state: RunViewState(phase: .routeRecovery(restored: true)), send: previewSend)
+    SamadhiScreen(state: RunViewState(phase: .routeRecovery(cause: .routeLost, restored: true)), send: previewSend)
 }
 
 #Preview("Motion permission denied") {

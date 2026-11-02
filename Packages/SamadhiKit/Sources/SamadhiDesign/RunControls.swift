@@ -277,8 +277,8 @@ private struct FinishControlStyle: ButtonStyle {
             .padding(.horizontal, metrics.horizontalPadding)
             .padding(.vertical, metrics.verticalPadding)
             .frame(minHeight: metrics.visibleHeight)
-            // Arming swaps the word and the width in one frame. Crossfading them showed both
-            // words and both widths at once, which is the overlap this control used to have.
+            // Arming swaps the word and the width in one frame. A crossfade would show both words
+            // and both widths at once.
             .transaction { $0.animation = nil }
             // Progress sits behind the label inside the same capsule clip, so it moves and clips
             // with the pressed shape and can never leave the border.
@@ -305,7 +305,8 @@ private struct FinishControlStyle: ButtonStyle {
                     .opacity(increasedContrast ? 1 : 0.92)
                     .frame(width: filled ? proxy.size.width : 0)
             }
-            // Filling shares one duration with the reducer. Release resets with no animation.
+            // Filling shares one duration with the reducer. Release resets with no animation. This
+            // stays under Reduce Motion because the fill is the hold's only sign of progress.
             .animation(filled ? .linear(duration: FinishHold.durationSeconds) : nil, value: filled)
         }
     }

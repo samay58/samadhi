@@ -90,6 +90,14 @@ public struct CadenceFilter: Sendable {
         return acquire(value)
     }
 
+    // A delayed batch may be as old as the gap it covers plus delivery delay, within a hard ceiling.
+    private static func allowedSampleAge(forInterval interval: Double) -> Double {
+        min(
+            max(maximumFirstSampleAgeSeconds, interval + deliveryDelayToleranceSeconds),
+            maximumDeferredSampleAgeSeconds
+        )
+    }
+
     private mutating func acceptTiming(of observation: CadenceObservation) -> Bool {
         guard let previousElapsedSeconds = lastElapsedSeconds else {
             if observation.sampleAgeSeconds <= Self.maximumFirstSampleAgeSeconds {
@@ -131,13 +139,7 @@ public struct CadenceFilter: Sendable {
             return false
         }
 
-        let allowedAge = min(
-            max(
-                Self.maximumFirstSampleAgeSeconds,
-                sampleInterval + Self.deliveryDelayToleranceSeconds
-            ),
-            Self.maximumDeferredSampleAgeSeconds
-        )
+        let allowedAge = Self.allowedSampleAge(forInterval: sampleInterval)
         guard observation.sampleAgeSeconds <= allowedAge else {
             lastSampleDisposition = .staleSample
             return false
@@ -191,10 +193,7 @@ public struct CadenceFilter: Sendable {
             return false
         }
 
-        let allowedAge = min(
-            max(Self.maximumFirstSampleAgeSeconds, interval + Self.deliveryDelayToleranceSeconds),
-            Self.maximumDeferredSampleAgeSeconds
-        )
+        let allowedAge = Self.allowedSampleAge(forInterval: interval)
         guard observation.sampleAgeSeconds <= allowedAge else {
             recordUntrustedTiming(observation)
             lastSampleDisposition = .staleSample

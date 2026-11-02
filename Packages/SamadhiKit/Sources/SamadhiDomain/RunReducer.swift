@@ -299,31 +299,11 @@ public struct RunReducer: Sendable {
 
         case let (.active(active), .resumeTapped(acquisitionID, timeoutID)):
             guard case let .paused(rhythm) = active.activity else { return (state, []) }
-            let resumedRhythm: RhythmState
-            let cadenceEffect: [RunEffect]
-            switch rhythm {
-            case .fixed:
-                resumedRhythm = .fixed
-                cadenceEffect = []
-            case let .locked(spm):
-                resumedRhythm = .acquiring(priorSPM: spm, acquisitionID: acquisitionID)
-                cadenceEffect = [
-                    .beginCadenceAcquisition(
-                        sessionID: active.session.id,
-                        acquisitionID: acquisitionID,
-                        priorSPM: spm
-                    )
-                ]
-            case let .acquiring(prior, _):
-                resumedRhythm = .acquiring(priorSPM: prior, acquisitionID: acquisitionID)
-                cadenceEffect = [
-                    .beginCadenceAcquisition(
-                        sessionID: active.session.id,
-                        acquisitionID: acquisitionID,
-                        priorSPM: prior
-                    )
-                ]
-            }
+            let (resumedRhythm, cadenceEffect) = resuming(
+                rhythm,
+                sessionID: active.session.id,
+                acquisitionID: acquisitionID
+            )
             var next = active
             next.session.cadenceAcquisitionID = resumedRhythm == .fixed ? nil : acquisitionID
             next.activity = .playing(
@@ -406,51 +386,44 @@ public struct RunReducer: Sendable {
             )
 
         case let (.active(active), .audioRouteLost):
-            return routeRecovery(from: active.session, origin: active.activity)
+            return routeRecovery(from: active.session, origin: active.activity, cause: .routeLost)
 
         case let (.confirmingFinish(confirmation), .audioRouteLost):
-            return routeRecovery(from: confirmation.session, origin: confirmation.origin)
+            return routeRecovery(
+                from: confirmation.session,
+                origin: confirmation.origin,
+                cause: .routeLost
+            )
+
+        case let (.routeRecovery(recovery), .recoveryEndRunTapped):
+            return (
+                .finishing(recovery.session),
+                [
+                    .cancelAllTasks(sessionID: recovery.session.id),
+                    .fadeAndStop(sessionID: recovery.session.id),
+                    .emitHaptic(.finish),
+                ]
+            )
 
         case let (.routeRecovery(recovery), .audioRouteRestored):
-            // A restored route never restarts a running session without explicit user intent.
-            var next = recovery
-            next.availability = .restored
-            if case .paused = recovery.origin {
-                return (.active(ActiveRun(session: recovery.session, activity: recovery.origin)), [])
-            }
-            return (.routeRecovery(next), [])
+            return restoring(recovery, resolving: .routeLost, state: state)
+
+        case let (.routeRecovery(recovery), .audioRouteLost):
+            return (.routeRecovery(routeWentMissing(recovery)), [])
 
         case let (.routeRecovery(recovery), .routeResumeTapped(acquisitionID, timeoutID)):
             guard recovery.availability == .restored,
                 case let .playing(rhythm, _) = recovery.origin
             else { return (state, []) }
-            let nextRhythm: RhythmState
-            var effects: [RunEffect] = [.resumePlayback(sessionID: recovery.session.id)]
-            switch rhythm {
-            case .fixed:
-                nextRhythm = .fixed
-            case let .locked(spm):
-                nextRhythm = .acquiring(priorSPM: spm, acquisitionID: acquisitionID)
-                effects.append(
-                    .beginCadenceAcquisition(
-                        sessionID: recovery.session.id,
-                        acquisitionID: acquisitionID,
-                        priorSPM: spm
-                    )
-                )
-            case let .acquiring(prior, _):
-                nextRhythm = .acquiring(priorSPM: prior, acquisitionID: acquisitionID)
-                effects.append(
-                    .beginCadenceAcquisition(
-                        sessionID: recovery.session.id,
-                        acquisitionID: acquisitionID,
-                        priorSPM: prior
-                    )
-                )
-            }
-            effects.append(
-                .scheduleControlsTimeout(sessionID: recovery.session.id, timeoutID: timeoutID)
+            let (nextRhythm, cadenceEffect) = resuming(
+                rhythm,
+                sessionID: recovery.session.id,
+                acquisitionID: acquisitionID
             )
+            let effects: [RunEffect] =
+                [.resumePlayback(sessionID: recovery.session.id)] + cadenceEffect + [
+                    .scheduleControlsTimeout(sessionID: recovery.session.id, timeoutID: timeoutID)
+                ]
             var resumedSession = recovery.session
             resumedSession.cadenceAcquisitionID = nextRhythm == .fixed ? nil : acquisitionID
             return (
@@ -549,7 +522,7 @@ public struct RunReducer: Sendable {
             next.session.adaptationState.appliedRateReadback = rate
             next.session.adaptationState.commandLatencySeconds = max(latencySeconds, 0)
             if let commandedRate = next.session.pendingCommandedRate,
-                abs(commandedRate - rate) <= 0.005
+                abs(commandedRate - rate) <= TempoEnvelope.rateArrivalTolerance
             {
                 next.session.adaptationState.commandStatus = .applied
                 next.session.adaptationState.achievableBPM =
@@ -612,40 +585,47 @@ public struct RunReducer: Sendable {
             )
             return (adapted.0, feedbackEffects + adapted.1)
 
-        case let (
-            .active(active),
-            .playbackRouteLost(sessionID, operationID)
-        ),
-            let (
-                .active(active),
-                .playbackInterrupted(sessionID, operationID)
-            ),
-            let (
-                .active(active),
-                .playbackFailed(sessionID, operationID)
-            ):
+        case let (.active(active), .playbackRouteLost(sessionID, operationID)):
             guard active.session.id == sessionID,
                 active.session.playbackOperationID == operationID
             else { return (state, []) }
-            return routeRecovery(from: active.session, origin: active.activity)
+            return routeRecovery(from: active.session, origin: active.activity, cause: .routeLost)
 
-        case let (
-            .routeRecovery(recovery),
-            .playbackRouteRestored(sessionID, operationID)
-        ),
-            let (
-                .routeRecovery(recovery),
-                .playbackInterruptionEnded(sessionID, operationID)
-            ):
+        case let (.active(active), .playbackInterrupted(sessionID, operationID)):
+            guard active.session.id == sessionID,
+                active.session.playbackOperationID == operationID
+            else { return (state, []) }
+            return routeRecovery(from: active.session, origin: active.activity, cause: .interrupted)
+
+        case let (.active(active), .playbackFailed(sessionID, operationID)):
+            guard active.session.id == sessionID,
+                active.session.playbackOperationID == operationID
+            else { return (state, []) }
+            // A paused run keeps its own Resume, which is already the retry.
+            if case .paused = active.activity { return (state, []) }
+            return routeRecovery(
+                from: active.session,
+                origin: active.activity,
+                cause: .playbackFailed
+            )
+
+        case let (.routeRecovery(recovery), .playbackRouteRestored(sessionID, operationID)):
             guard recovery.session.id == sessionID,
                 recovery.session.playbackOperationID == operationID
             else { return (state, []) }
-            var next = recovery
-            next.availability = .restored
-            if case .paused = recovery.origin {
-                return (.active(ActiveRun(session: recovery.session, activity: recovery.origin)), [])
-            }
-            return (.routeRecovery(next), [])
+            return restoring(recovery, resolving: .routeLost, state: state)
+
+        case let (.routeRecovery(recovery), .playbackInterruptionEnded(sessionID, operationID)):
+            guard recovery.session.id == sessionID,
+                recovery.session.playbackOperationID == operationID
+            else { return (state, []) }
+            return restoring(recovery, resolving: .interrupted, state: state)
+
+        case let (.routeRecovery(recovery), .playbackRouteLost(sessionID, operationID)):
+            guard recovery.session.id == sessionID,
+                recovery.session.playbackOperationID == operationID
+            else { return (state, []) }
+            return (.routeRecovery(routeWentMissing(recovery)), [])
 
         case let (.active(active), .activeSecond(tempoMatched)):
             // Only stable playback enters the summary. Paused and cadence-acquisition time is excluded.
@@ -676,19 +656,82 @@ public struct RunReducer: Sendable {
 
     // Route loss, interruption, and playback failure all enter recovery. A transaction that was in
     // flight is cancelled here so recovery can never replay it.
-    private func routeRecovery(from session: RunSession, origin: RunActivity) -> (RunState, [RunEffect]) {
+    private func routeRecovery(
+        from session: RunSession,
+        origin: RunActivity,
+        cause: RouteRecoveryCause
+    ) -> (RunState, [RunEffect]) {
         var recovered = session
         let feedbackEffects = cancelAutoFeedback(
             session: &recovered,
             forgettingSettledTarget: false
         )
+        // A failure has nothing to wait for, so the runner can retry at once.
+        let availability: RouteAvailability = cause == .playbackFailed ? .restored : .missing
         return (
             .routeRecovery(
-                RouteRecovery(session: recovered, origin: origin, availability: .missing)
+                RouteRecovery(
+                    session: recovered,
+                    origin: origin,
+                    availability: availability,
+                    cause: cause
+                )
             ),
             feedbackEffects + [
                 .cancelAllTasks(sessionID: session.id),
                 .pausePlayback(sessionID: session.id),
+            ]
+        )
+    }
+
+    // Only the event that answers the cause can clear it. Headphones connecting during a call do
+    // not end the call, and a call ending does not bring headphones back. A restored route never
+    // restarts a running session without explicit user intent.
+    private func restoring(
+        _ recovery: RouteRecovery,
+        resolving cause: RouteRecoveryCause,
+        state: RunState
+    ) -> (RunState, [RunEffect]) {
+        guard recovery.cause == cause else { return (state, []) }
+        if case .paused = recovery.origin {
+            return (.active(ActiveRun(session: recovery.session, activity: recovery.origin)), [])
+        }
+        var next = recovery
+        next.availability = .restored
+        return (.routeRecovery(next), [])
+    }
+
+    // Losing the route outranks any other recovery, because resuming now would play into nothing.
+    private func routeWentMissing(_ recovery: RouteRecovery) -> RouteRecovery {
+        var next = recovery
+        next.availability = .missing
+        next.cause = .routeLost
+        return next
+    }
+
+    // Resuming always listens again, seeded by the last known cadence. Fixed rhythm never listens.
+    private func resuming(
+        _ rhythm: RhythmState,
+        sessionID: Int,
+        acquisitionID: Int
+    ) -> (RhythmState, [RunEffect]) {
+        let prior: Int?
+        switch rhythm {
+        case .fixed:
+            return (.fixed, [])
+        case let .locked(spm):
+            prior = spm
+        case let .acquiring(priorSPM, _):
+            prior = priorSPM
+        }
+        return (
+            .acquiring(priorSPM: prior, acquisitionID: acquisitionID),
+            [
+                .beginCadenceAcquisition(
+                    sessionID: sessionID,
+                    acquisitionID: acquisitionID,
+                    priorSPM: prior
+                )
             ]
         )
     }

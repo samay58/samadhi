@@ -14,7 +14,7 @@ let package = Package(
         .target(name: "SamadhiDomain"),
         .target(name: "SamadhiMotion", dependencies: ["SamadhiDomain"]),
         .target(name: "SamadhiAudio", dependencies: ["SamadhiDomain"]),
-        .target(name: "SamadhiDesign", dependencies: ["SamadhiDomain", "SamadhiAudio"]),
+        .target(name: "SamadhiDesign", dependencies: ["SamadhiDomain"]),
         .executableTarget(
             name: "TempoCorpusValidator",
             dependencies: ["SamadhiAudio", "SamadhiDomain"],

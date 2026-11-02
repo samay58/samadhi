@@ -985,7 +985,6 @@ private extension SimulationConfiguration {
         SimulationConfiguration(
             fastMode: true,
             permissionDenied: false,
-            simulateRouteLoss: false,
             missingArtwork: false,
             extendedAcquisitionWindow: false,
             useAppleMusicCoreLoop: false,
@@ -998,7 +997,6 @@ private extension SimulationConfiguration {
     static let productionFixture = SimulationConfiguration(
         fastMode: false,
         permissionDenied: false,
-        simulateRouteLoss: false,
         missingArtwork: false,
         extendedAcquisitionWindow: false,
         useAppleMusicCoreLoop: false,
@@ -1010,7 +1008,6 @@ private extension SimulationConfiguration {
     static let simulatorFixture = SimulationConfiguration(
         fastMode: false,
         permissionDenied: false,
-        simulateRouteLoss: false,
         missingArtwork: false,
         extendedAcquisitionWindow: false,
         useAppleMusicCoreLoop: false,

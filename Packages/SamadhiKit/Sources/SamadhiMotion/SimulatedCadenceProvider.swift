@@ -6,7 +6,7 @@ public enum SimulatedCadenceSignal: Sendable, Equatable {
     case locked(spm: Int)
 }
 
-// A scripted walk through cadence. The standard profile is the original demo shape. A settled
+// A scripted walk through cadence. A settled
 // change profile holds one cadence long enough for Auto to settle, then moves to a second cadence
 // and holds it long enough for Auto to commit exactly one new target.
 public struct SimulatedCadenceProfile: Sendable, Equatable {

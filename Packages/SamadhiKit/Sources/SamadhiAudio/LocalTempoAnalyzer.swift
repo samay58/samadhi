@@ -7,7 +7,7 @@ public protocol TempoAnalyzing: Sendable {
 }
 
 public struct LocalTempoAnalyzer: TempoAnalyzing {
-    public static let analysisVersion = 5
+    public static var analysisVersion: Int { TempoEstimator.analysisVersion }
 
     private let estimator = TempoEstimator()
 

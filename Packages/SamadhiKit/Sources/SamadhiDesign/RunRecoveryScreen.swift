@@ -1,13 +1,17 @@
+import SamadhiDomain
 import SwiftUI
 
 enum RunRecoveryKind {
     case motionPermission
-    case audioRoute(restored: Bool)
+    case audio(cause: RouteRecoveryCause, restored: Bool)
 }
 
 struct RunRecoveryScreen: View {
     let kind: RunRecoveryKind
     let send: @MainActor (RunAction) -> Void
+
+    @ScaledMetric(relativeTo: .largeTitle) private var symbolSize = 52
+    @ScaledMetric(relativeTo: .largeTitle) private var titleSize = 38
 
     var body: some View {
         ScrollView {
@@ -15,12 +19,12 @@ struct RunRecoveryScreen: View {
                 Spacer(minLength: Space.x12)
 
                 Image(systemName: symbol)
-                    .font(.system(size: 52, weight: .medium))
+                    .font(.system(size: symbolSize, weight: .medium))
                     .symbolRenderingMode(.hierarchical)
                     .accessibilityHidden(true)
 
                 Text(title)
-                    .font(.system(size: 38, weight: .medium, design: .serif))
+                    .font(.system(size: titleSize, weight: .medium, design: .serif))
                     .multilineTextAlignment(.center)
                     .accessibilityAddTraits(.isHeader)
 
@@ -53,8 +57,12 @@ struct RunRecoveryScreen: View {
         switch kind {
         case .motionPermission:
             "figure.run"
-        case .audioRoute:
+        case .audio(cause: .routeLost, _):
             "airpodspro"
+        case .audio(cause: .interrupted, _):
+            "pause.circle"
+        case .audio(cause: .playbackFailed, _):
+            "music.note"
         }
     }
 
@@ -62,8 +70,12 @@ struct RunRecoveryScreen: View {
         switch kind {
         case .motionPermission:
             "Motion access is off"
-        case .audioRoute:
+        case .audio(cause: .routeLost, _):
             "Headphones disconnected"
+        case .audio(cause: .interrupted, _):
+            "Music interrupted"
+        case .audio(cause: .playbackFailed, _):
+            "Music stopped"
         }
     }
 
@@ -71,10 +83,16 @@ struct RunRecoveryScreen: View {
         switch kind {
         case .motionPermission:
             "Samadhi uses step rhythm to adapt the music. You can change access in Settings or continue at a fixed rhythm."
-        case .audioRoute(restored: true):
+        case .audio(cause: .routeLost, restored: true):
             "Your headphones are connected again. Resume when you’re ready."
-        case .audioRoute(restored: false):
-            "Music paused. Reconnect your headphones to continue safely."
+        case .audio(cause: .routeLost, restored: false):
+            "Music paused. Reconnect your headphones to continue, or end the run."
+        case .audio(cause: .interrupted, restored: true):
+            "The interruption is over. Resume when you’re ready."
+        case .audio(cause: .interrupted, restored: false):
+            "Music paused until the interruption ends."
+        case .audio(cause: .playbackFailed, _):
+            "Apple Music stopped responding. Try again, or end the run."
         }
     }
 
@@ -82,7 +100,7 @@ struct RunRecoveryScreen: View {
         switch kind {
         case .motionPermission:
             "permission-recovery"
-        case .audioRoute:
+        case .audio:
             "route-recovery"
         }
     }
@@ -98,16 +116,29 @@ struct RunRecoveryScreen: View {
             Button("Use fixed rhythm", action: useFixedRhythm)
                 .buttonStyle(.glass)
                 .accessibilityIdentifier("use-fixed-rhythm")
-        case .audioRoute(restored: true):
-            Button("Resume", action: resumeRoute)
+        case let .audio(cause, restored: true):
+            Button(cause == .playbackFailed ? "Try again" : "Resume", action: resumeRoute)
                 .buttonStyle(.glassProminent)
                 .tint(SamadhiColor.clay)
                 .accessibilityIdentifier("route-resume")
-        case .audioRoute(restored: false):
-            Text("Waiting for headphones")
+            endRunButton
+        case let .audio(cause, restored: false):
+            Text(cause == .routeLost ? "Waiting for headphones" : "Waiting")
                 .font(.callout)
                 .foregroundStyle(SamadhiColor.ink.opacity(0.65))
+            endRunButton
         }
+    }
+
+    // The route may never come back, so no recovery may trap the runner inside it.
+    private var endRunButton: some View {
+        Button("End run", action: endRun)
+            .buttonStyle(.glass)
+            .accessibilityIdentifier("route-end-run")
+    }
+
+    private func endRun() {
+        send(.endRunFromRecovery)
     }
 
     private func openSettings() {

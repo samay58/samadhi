@@ -1,4 +1,3 @@
-import CoreHaptics
 import Foundation
 import Observation
 import SamadhiAudio
@@ -124,7 +123,6 @@ final class RunPresentationModel {
         let track = TrackMetadata(
             title: domainTrack.title,
             artist: domainTrack.artist ?? "",
-            collection: musicCollection.name,
             durationSeconds: max(Int(domainTrack.durationSeconds.rounded()), 1)
         )
         let trackDuration = session?.trackDurationSeconds ?? track.durationSeconds
@@ -165,7 +163,10 @@ final class RunPresentationModel {
             if case .pressing = confirmation.hold { finishHoldPressing = true }
             if case let .locked(spm) = confirmation.origin.rhythm { cadence = spm }
         case let .routeRecovery(recovery):
-            phase = .routeRecovery(restored: recovery.availability == .restored)
+            phase = .routeRecovery(
+                cause: recovery.cause,
+                restored: recovery.availability == .restored
+            )
         case .finishing:
             phase = .finishing
         case let .summary(summary):
@@ -217,9 +218,6 @@ final class RunPresentationModel {
                 appliedBPM: appliedBPM,
                 commandStatus: session?.adaptationState.commandStatus ?? .idle,
                 achievableBPM: session?.adaptationState.achievableBPM.map { Int($0.rounded()) },
-                commandedRate: session?.adaptationState.commandedRate,
-                appliedRate: session?.adaptationState.appliedRateReadback,
-                commandLatencySeconds: session?.adaptationState.commandLatencySeconds,
                 isAtLimit: session?.adaptationState.isAtLimit ?? false,
                 // The wheel only speaks of a better fit while this song is pinned at its limit. A
                 // song prepared quietly for the boundary is not the wheel's business.
@@ -313,6 +311,8 @@ final class RunPresentationModel {
             UIApplication.shared.open(url)
         case .routeResume:
             dispatch(.routeResumeTapped(acquisitionID: token(), timeoutID: token()))
+        case .endRunFromRecovery:
+            dispatch(.recoveryEndRunTapped)
         case .done:
             dispatch(.summaryDismissed)
         case .chooseMusic, .changeMusic, .retryMusicImport:
@@ -415,7 +415,6 @@ final class RunPresentationModel {
     #endif
 
     private func execute(_ effect: RunEffect) {
-        // Platform services execute reducer effects and return identified events through dispatch.
         switch effect {
         case let .requestMotionAuthorization(sessionID):
             let delay: Duration = configuration.fastMode ? .milliseconds(60) : .milliseconds(260)
@@ -446,7 +445,7 @@ final class RunPresentationModel {
                     guard !Task.isCancelled else { return }
                     dispatch(.playbackPrepared(sessionID: sessionID, trackID: startingTrackID))
                 } catch {
-                    dispatch(.playbackFailed(sessionID: sessionID, operationID: sessionID))
+                    reportPlaybackFailure(sessionID: sessionID)
                 }
             }
 
@@ -457,7 +456,7 @@ final class RunPresentationModel {
                     guard !Task.isCancelled, let self else { return }
                     startTicker(sessionID: sessionID)
                     startScriptedPlaybackEvents(sessionID: sessionID)
-                    if configuration.simulateRouteLoss {
+                    if configuration.scriptedPlayback == .routeLoss {
                         let routeLossDelay: Duration =
                             configuration.fastMode ? .milliseconds(650) : .seconds(2)
                         let restoreDelay: Duration =
@@ -475,7 +474,7 @@ final class RunPresentationModel {
                         }
                     }
                 } catch {
-                    self?.dispatch(.playbackFailed(sessionID: sessionID, operationID: sessionID))
+                    self?.reportPlaybackFailure(sessionID: sessionID)
                 }
             }
 
@@ -548,6 +547,8 @@ final class RunPresentationModel {
             }
 
         case let .pausePlayback(sessionID):
+            // A resume still in flight would otherwise restart the ticker on a paused run.
+            taskStore.cancel(.playbackCommand)
             taskStore.cancel(.ticker)
             musicPlayer.pause(operationID: sessionID)
 
@@ -558,7 +559,7 @@ final class RunPresentationModel {
                     guard !Task.isCancelled else { return }
                     self?.startTicker(sessionID: sessionID)
                 } catch {
-                    self?.dispatch(.playbackFailed(sessionID: sessionID, operationID: sessionID))
+                    self?.reportPlaybackFailure(sessionID: sessionID)
                 }
             }
 
@@ -567,7 +568,7 @@ final class RunPresentationModel {
                 do {
                     try await musicPlayer.skipToPrevious(operationID: sessionID)
                 } catch {
-                    self?.dispatch(.playbackFailed(sessionID: sessionID, operationID: sessionID))
+                    self?.reportPlaybackFailure(sessionID: sessionID)
                 }
             }
 
@@ -576,7 +577,7 @@ final class RunPresentationModel {
                 do {
                     try await musicPlayer.skipToNext(operationID: sessionID)
                 } catch {
-                    self?.dispatch(.playbackFailed(sessionID: sessionID, operationID: sessionID))
+                    self?.reportPlaybackFailure(sessionID: sessionID)
                 }
             }
 
@@ -598,6 +599,7 @@ final class RunPresentationModel {
                         )
                     )
                 } catch {
+                    guard !Task.isCancelled else { return }
                     self?.dispatch(
                         .nextTrackPreparationFailed(
                             sessionID: sessionID,
@@ -678,10 +680,20 @@ final class RunPresentationModel {
             taskStore.cancel(kind)
 
         case .cancelAllTasks:
-            // Finish and route recovery both cancel everything. No cue may survive either of them.
+            // Finish and route recovery both cancel everything. No cue may survive either of them,
+            // and neither may a status line whose own timer was just cancelled.
             taskStore.cancelAll()
             autoFeedback.cancelAll()
+            reachNotice = nil
+            showLockBrief = false
         }
+    }
+
+    // Replacing or cancelling a command cancels its task. That is not the player failing, and
+    // reporting it would throw a healthy run into recovery.
+    private func reportPlaybackFailure(sessionID: Int) {
+        guard !Task.isCancelled else { return }
+        dispatch(.playbackFailed(sessionID: sessionID, operationID: sessionID))
     }
 
     // Deterministic proof for song-change and interruption causes. The player never decides when
@@ -693,32 +705,32 @@ final class RunPresentationModel {
         let sameSongDelay: Duration =
             configuration.fastMode ? .milliseconds(800) : .milliseconds(1_500)
 
-        if configuration.simulateNaturalBoundary {
+        switch configuration.scriptedPlayback {
+        case .naturalBoundary:
             scheduleScriptedEvent(after: boundaryDelay) {
                 player.simulateNaturalBoundary(operationID: sessionID)
             }
-        }
-        if configuration.simulateExternalBoundary {
+        case .externalBoundary:
             scheduleScriptedEvent(after: boundaryDelay) {
                 player.simulateExternalBoundary(operationID: sessionID)
             }
-        }
-        if configuration.simulateSameSongCallback {
+        case .sameSongCallback:
             scheduleScriptedEvent(after: sameSongDelay) {
                 player.simulateSameSongCallback(operationID: sessionID)
             }
-        }
-        if configuration.simulateInterruption {
+        case .interruption:
             scheduleScriptedEvent(after: boundaryDelay) {
                 player.simulateInterruption(operationID: sessionID)
             }
+        case .routeLoss, nil:
+            break
         }
     }
 
     // Entering recovery cancels every task, so the end can only be scheduled once the beginning has
     // already been handled.
     private func scheduleScriptedInterruptionEnd(operationID: Int) {
-        guard configuration.simulateInterruption,
+        guard configuration.scriptedPlayback == .interruption,
             let player = musicPlayer as? SimulatedMusicPlayer
         else { return }
         scheduleScriptedEvent(after: .seconds(1)) {
@@ -726,7 +738,7 @@ final class RunPresentationModel {
         }
     }
 
-    // One scripted scenario runs per launch, so they share the simulated-route task slot.
+    // One scenario runs per launch, so they share the simulated-route task slot.
     private func scheduleScriptedEvent(
         after delay: Duration,
         _ body: @escaping @MainActor () -> Void
@@ -879,136 +891,5 @@ final class RunPresentationModel {
 
     private func emitHaptic(_ event: HapticEvent) {
         hapticFeedback.emit(event)
-    }
-}
-
-@MainActor
-private final class RunHapticFeedback {
-    private let lightImpact = UIImpactFeedbackGenerator(style: .light)
-    private let mediumImpact = UIImpactFeedbackGenerator(style: .medium)
-    private let heavyImpact = UIImpactFeedbackGenerator(style: .heavy)
-    private let softImpact = UIImpactFeedbackGenerator(style: .soft)
-    private let selection = UISelectionFeedbackGenerator()
-    private let notification = UINotificationFeedbackGenerator()
-    private var rhythmEngine: CHHapticEngine?
-    private var nextRhythmTime = 0.0
-
-    func prepareRhythmStep() {
-        prepareRhythmEngine()
-        try? rhythmEngine?.start()
-        nextRhythmTime = rhythmEngine?.currentTime ?? 0
-        lightImpact.prepare()
-        softImpact.prepare()
-    }
-
-    func emit(_ event: HapticEvent) {
-        switch event {
-        case .start, .resume:
-            lightImpact.impactOccurred()
-        case .transportRequest:
-            selection.selectionChanged()
-            selection.prepare()
-        case .finishArmed:
-            softImpact.impactOccurred(intensity: 0.6)
-        case .lock:
-            notification.notificationOccurred(.success)
-        case .pause:
-            mediumImpact.impactOccurred()
-        case .finish:
-            heavyImpact.impactOccurred()
-        case let .rhythmStep(direction, isMajor):
-            if !playRhythmDetent(direction: direction, isMajor: isMajor) {
-                switch direction {
-                case .increase:
-                    lightImpact.impactOccurred(intensity: isMajor ? 1 : 0.76)
-                case .decrease:
-                    softImpact.impactOccurred(intensity: isMajor ? 1 : 0.88)
-                }
-            }
-            lightImpact.prepare()
-            softImpact.prepare()
-        case .rhythmAuto:
-            softImpact.impactOccurred(intensity: 0.82)
-            softImpact.prepare()
-        case .rhythmLimit:
-            notification.notificationOccurred(.warning)
-        }
-    }
-
-    private func prepareRhythmEngine() {
-        guard rhythmEngine == nil,
-            CHHapticEngine.capabilitiesForHardware().supportsHaptics
-        else { return }
-        do {
-            let engine = try CHHapticEngine()
-            engine.playsHapticsOnly = true
-            engine.isAutoShutdownEnabled = false
-            try engine.start()
-            rhythmEngine = engine
-            engine.resetHandler = { [weak self] in
-                try? self?.rhythmEngine?.start()
-            }
-        } catch {
-            rhythmEngine = nil
-        }
-    }
-
-    private func playRhythmDetent(
-        direction: RhythmAdjustmentDirection,
-        isMajor: Bool
-    ) -> Bool {
-        guard let engine = rhythmEngine else { return false }
-        do {
-            let primary = CHHapticEvent(
-                eventType: .hapticTransient,
-                parameters: [
-                    CHHapticEventParameter(
-                        parameterID: .hapticIntensity,
-                        value: isMajor ? 0.74 : 0.46
-                    ),
-                    CHHapticEventParameter(
-                        parameterID: .hapticSharpness,
-                        value: direction == .increase ? 0.22 : 0.1
-                    ),
-                ],
-                relativeTime: direction == .increase ? 0 : 0.012
-            )
-            let directionalAccent = CHHapticEvent(
-                eventType: .hapticTransient,
-                parameters: [
-                    CHHapticEventParameter(
-                        parameterID: .hapticIntensity,
-                        value: isMajor ? 0.3 : 0.18
-                    ),
-                    CHHapticEventParameter(
-                        parameterID: .hapticSharpness,
-                        value: 0.04
-                    ),
-                ],
-                relativeTime: direction == .increase ? 0.012 : 0
-            )
-            var events = [primary, directionalAccent]
-            if isMajor {
-                events.append(
-                    CHHapticEvent(
-                        eventType: .hapticContinuous,
-                        parameters: [
-                            CHHapticEventParameter(parameterID: .hapticIntensity, value: 0.14),
-                            CHHapticEventParameter(parameterID: .hapticSharpness, value: 0.04),
-                        ],
-                        relativeTime: 0.018,
-                        duration: 0.032
-                    )
-                )
-            }
-
-            let player = try engine.makePlayer(with: CHHapticPattern(events: events, parameters: []))
-            let scheduledTime = max(engine.currentTime, nextRhythmTime)
-            try player.start(atTime: scheduledTime)
-            nextRhythmTime = scheduledTime + (isMajor ? 0.05 : 0.034)
-            return true
-        } catch {
-            return false
-        }
     }
 }

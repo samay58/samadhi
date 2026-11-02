@@ -3,8 +3,7 @@ import SamadhiDomain
 import SamadhiMotion
 
 struct RunDiagnosticSnapshot: Codable, Equatable, Sendable {
-    // Schema 11 adds cue delivery and engine events, the next-song outlook, the reach notice, and
-    // a buffer that evicts per-second ticks before anything that tells the story of the run.
+    // Bump when a reader of the pulled file needs to know the shape changed.
     static let currentSchemaVersion = 11
 
     enum CompletionState: String, Codable, Sendable {
@@ -340,8 +339,7 @@ struct CadenceDiagnosticSample {
 
 struct RunDiagnosticsRecorder {
     // About 1.4 KB per pretty-printed entry, so a full buffer is under 3 MB. Ticks fill whatever
-    // the story of the run leaves free and are the first to go; the August 19 walk lost its first
-    // 205 seconds and a whole song to a buffer that evicted by age alone.
+    // the story of the run leaves free and are the first to go.
     static let maximumEntries = 2_048
     private static let checkpointInterval: TimeInterval = 5
 
@@ -717,7 +715,7 @@ struct RunDiagnosticsRecorder {
             .rhythmAdjusted
         case .rhythmControlSetManual, .rhythmControlReset:
             .rhythmModeChanged
-        case .finishHoldCompleted:
+        case .finishHoldCompleted, .recoveryEndRunTapped:
             .finishRequested
         case .finishCompleted:
             .finished

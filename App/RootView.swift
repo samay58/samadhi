@@ -3,8 +3,10 @@ import SamadhiDomain
 import SwiftUI
 
 struct RootView: View {
-    // RootView owns the app's one presentation model. Screens receive rendered state and send intent back.
+    // Screens receive rendered state and send intent back. The run model is replaced only when a
+    // different collection is chosen, so restoring at launch builds one production player.
     @State private var runModel = RunPresentationModel()
+    @State private var installedCollection: MusicCollection?
     @State private var musicModel = MusicSelectionModel()
     #if DEBUG
         @State private var showingCoreDiagnostics = false
@@ -87,8 +89,10 @@ struct RootView: View {
 
     private func installSelectedCollection() {
         guard let collection = musicModel.selectedCollection?.adaptiveReadyCollection,
-            !collection.tracks.isEmpty
+            !collection.tracks.isEmpty,
+            collection != installedCollection
         else { return }
+        installedCollection = collection
         runModel = RunPresentationModel(musicCollection: collection)
     }
 

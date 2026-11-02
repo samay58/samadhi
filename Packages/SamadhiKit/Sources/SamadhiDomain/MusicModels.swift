@@ -246,11 +246,6 @@ public struct PlaybackProgress: Sendable, Equatable {
         self.elapsedSeconds = max(elapsedSeconds, 0)
         self.durationSeconds = max(durationSeconds, 0)
     }
-
-    public var fraction: Double {
-        guard durationSeconds > 0 else { return 0 }
-        return min(elapsedSeconds / durationSeconds, 1)
-    }
 }
 
 public struct CadenceObservation: Sendable, Equatable {

@@ -43,7 +43,6 @@ public struct AutoTargetPolicy: Sendable {
     private let walkingAcquisitionDurationSeconds = 5.0
     private let changeSustainSeconds = 5.0
     private let minimumCommitIntervalSeconds = 8.0
-    private let targetDeadbandSPM = 4.0
     private let candidateThresholdSPM = 6.0
     private let candidateAgreementSPM = 3.0
     private let uncertaintyClearSeconds = 12.0
@@ -94,11 +93,6 @@ public struct AutoTargetPolicy: Sendable {
         }
 
         let movement = cadenceSPM - settledTarget
-        guard abs(movement) > targetDeadbandSPM else {
-            clearCandidate(state: &next)
-            next.status = .settled
-            return next
-        }
         guard abs(movement) >= candidateThresholdSPM else {
             clearCandidate(state: &next)
             next.status = .settled

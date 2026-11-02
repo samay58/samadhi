@@ -1176,6 +1176,7 @@ private let slowTrack = MusicTrack(
     #expect(
         current.1 == [
             .cancelTask(sessionID: 101, .acquisition),
+            .cancelTask(sessionID: 101, .controlsTimeout),
             .cancelTask(sessionID: 101, .ticker),
             .pausePlayback(sessionID: 101),
         ])
@@ -1703,4 +1704,168 @@ private func incompatibleRun(cadence: Int = 168) -> RunState {
             activity: .playing(rhythm: .locked(spm: cadence), controls: .hidden)
         )
     )
+}
+
+private func runningRun(sessionID: Int) -> RunState {
+    var state = acquiringCoreLoopRun(sessionID: sessionID)
+    state =
+        coreLoopReducer.reduce(
+            state: state,
+            event: .cadenceUpdated(
+                sessionID: sessionID,
+                acquisitionID: state.session?.cadenceAcquisitionID ?? 0,
+                stepsPerMinute: 150,
+                deltaSeconds: 1,
+                rateRequestID: 9_000
+            )
+        ).0
+    return state
+}
+
+@Test func playbackFailureNamesItselfAndCanRetryImmediately() throws {
+    let state = runningRun(sessionID: 900)
+    let session = try #require(state.session)
+    let result = coreLoopReducer.reduce(
+        state: state,
+        event: .playbackFailed(sessionID: session.id, operationID: session.playbackOperationID)
+    )
+
+    guard case let .routeRecovery(recovery) = result.0 else {
+        Issue.record("Expected recovery")
+        return
+    }
+    #expect(recovery.cause == .playbackFailed)
+    #expect(recovery.availability == .restored)
+
+    let retried = coreLoopReducer.reduce(
+        state: result.0,
+        event: .routeResumeTapped(acquisitionID: 901, timeoutID: 902)
+    )
+    #expect(retried.1.contains(.resumePlayback(sessionID: session.id)))
+}
+
+@Test func routeLossAndInterruptionKeepTheirOwnCauseAndWait() throws {
+    let state = runningRun(sessionID: 910)
+    let session = try #require(state.session)
+    let lost = coreLoopReducer.reduce(
+        state: state,
+        event: .playbackRouteLost(sessionID: session.id, operationID: session.playbackOperationID)
+    )
+    let interrupted = coreLoopReducer.reduce(
+        state: state,
+        event: .playbackInterrupted(sessionID: session.id, operationID: session.playbackOperationID)
+    )
+
+    guard case let .routeRecovery(lostRecovery) = lost.0,
+        case let .routeRecovery(interruptedRecovery) = interrupted.0
+    else {
+        Issue.record("Expected recovery")
+        return
+    }
+    #expect(lostRecovery.cause == .routeLost)
+    #expect(lostRecovery.availability == .missing)
+    #expect(interruptedRecovery.cause == .interrupted)
+    #expect(interruptedRecovery.availability == .missing)
+}
+
+@Test func aRunnerCanEndTheRunFromAnyRecoveryEvenIfTheRouteNeverReturns() throws {
+    let state = runningRun(sessionID: 920)
+    let session = try #require(state.session)
+    let lost = coreLoopReducer.reduce(state: state, event: .audioRouteLost)
+    let ended = coreLoopReducer.reduce(state: lost.0, event: .recoveryEndRunTapped)
+
+    guard case .finishing = ended.0 else {
+        Issue.record("Expected the run to finish")
+        return
+    }
+    #expect(ended.1.contains(.fadeAndStop(sessionID: session.id)))
+    #expect(ended.1.contains(.cancelAllTasks(sessionID: session.id)))
+}
+
+@Test func playbackFailureWhilePausedLeavesThePausedRunAndItsResume() throws {
+    let running = runningRun(sessionID: 930)
+    let session = try #require(running.session)
+    let paused = coreLoopReducer.reduce(state: running, event: .pauseTapped).0
+    let result = coreLoopReducer.reduce(
+        state: paused,
+        event: .playbackFailed(sessionID: session.id, operationID: session.playbackOperationID)
+    )
+    #expect(result.0 == paused)
+}
+
+@Test func cadenceFailureCancelsAnyCueBeforeRecovery() throws {
+    let state = runningRun(sessionID: 940)
+    let session = try #require(state.session)
+    let acquisitionID = try #require(session.cadenceAcquisitionID)
+    let result = coreLoopReducer.reduce(
+        state: state,
+        event: .cadenceAcquisitionFailed(sessionID: session.id, acquisitionID: acquisitionID)
+    )
+
+    guard case .permissionRecovery = result.0 else {
+        Issue.record("Expected permission recovery")
+        return
+    }
+    #expect(result.1.contains(.cancelTask(sessionID: session.id, .controlsTimeout)))
+    #expect(result.1.contains(.pausePlayback(sessionID: session.id)))
+}
+
+@Test func losingHeadphonesDisarmsTryAgainAfterAPlaybackFailure() throws {
+    let state = runningRun(sessionID: 950)
+    let session = try #require(state.session)
+    let failed = coreLoopReducer.reduce(
+        state: state,
+        event: .playbackFailed(sessionID: session.id, operationID: session.playbackOperationID)
+    )
+    let lost = coreLoopReducer.reduce(
+        state: failed.0,
+        event: .playbackRouteLost(sessionID: session.id, operationID: session.playbackOperationID)
+    )
+
+    guard case let .routeRecovery(recovery) = lost.0 else {
+        Issue.record("Expected recovery")
+        return
+    }
+    #expect(recovery.cause == .routeLost)
+    #expect(recovery.availability == .missing)
+    let resumed = coreLoopReducer.reduce(
+        state: lost.0,
+        event: .routeResumeTapped(acquisitionID: 951, timeoutID: 952)
+    )
+    #expect(resumed.0 == lost.0)
+}
+
+@Test func onlyTheMatchingEventClearsARecovery() throws {
+    let state = runningRun(sessionID: 960)
+    let session = try #require(state.session)
+    let operationID = session.playbackOperationID
+    let interrupted = coreLoopReducer.reduce(
+        state: state,
+        event: .playbackInterrupted(sessionID: session.id, operationID: operationID)
+    )
+    let wrongRestore = coreLoopReducer.reduce(
+        state: interrupted.0,
+        event: .playbackRouteRestored(sessionID: session.id, operationID: operationID)
+    )
+    #expect(wrongRestore.0 == interrupted.0)
+
+    let ended = coreLoopReducer.reduce(
+        state: interrupted.0,
+        event: .playbackInterruptionEnded(sessionID: session.id, operationID: operationID)
+    )
+    guard case let .routeRecovery(recovery) = ended.0 else {
+        Issue.record("Expected recovery")
+        return
+    }
+    #expect(recovery.availability == .restored)
+
+    let lost = coreLoopReducer.reduce(
+        state: state,
+        event: .playbackRouteLost(sessionID: session.id, operationID: operationID)
+    )
+    let wrongEnd = coreLoopReducer.reduce(
+        state: lost.0,
+        event: .playbackInterruptionEnded(sessionID: session.id, operationID: operationID)
+    )
+    #expect(wrongEnd.0 == lost.0)
 }

@@ -15,6 +15,7 @@
 		4CDD1CED415564CC371BD9F1 /* MusicKitFeasibilityModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54135107A419A0D2E9DC0C01 /* MusicKitFeasibilityModel.swift */; };
 		4DF6F900AB14574D241956D6 /* MusicCollectionStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3F20844D8B2427EC13193D1 /* MusicCollectionStore.swift */; };
 		51EB9C96F9C249EF44D2F1D1 /* BuildIdentity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 036B4F7F43B0687A14D17D62 /* BuildIdentity.swift */; };
+		5544DF7A7296D1D817D4E92E /* RunHapticFeedback.swift in Sources */ = {isa = PBXBuildFile; fileRef = A75D06B0EC32A4DC4962C0CE /* RunHapticFeedback.swift */; };
 		59F6A7F42EF07136C8A749D2 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A28146360481C17881F591C3 /* RootView.swift */; };
 		5E251FAC2B1E45BD32CE4F33 /* MusicKitFeasibilityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 288FFDAAC404B6DC56E04D4B /* MusicKitFeasibilityView.swift */; };
 		5F50657EDDD9980B6A3AB8ED /* AppleMusicPlaybackController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CA2C5D0E9C7986791DAA0C1 /* AppleMusicPlaybackController.swift */; };
@@ -83,6 +84,7 @@
 		84DEE35021BD9A5D2A7F5F45 /* SamadhiUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SamadhiUITests.swift; sourceTree = "<group>"; };
 		95B076E4388E9E61360A6215 /* SimulationConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SimulationConfiguration.swift; sourceTree = "<group>"; };
 		A28146360481C17881F591C3 /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
+		A75D06B0EC32A4DC4962C0CE /* RunHapticFeedback.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RunHapticFeedback.swift; sourceTree = "<group>"; };
 		AB90BB4B3A76F3AFC7FD65D2 /* SamadhiKit */ = {isa = PBXFileReference; lastKnownFileType = folder; name = SamadhiKit; path = Packages/SamadhiKit; sourceTree = SOURCE_ROOT; };
 		B1CE55560A18BCBFBAF13E01 /* SamadhiApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SamadhiApp.swift; sourceTree = "<group>"; };
 		B4735B80A07DFC3745740687 /* AutoFeedbackPlaying.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AutoFeedbackPlaying.swift; sourceTree = "<group>"; };
@@ -205,6 +207,7 @@
 				68062F4BB4E7FDBE2A2EEEC0 /* PlaylistPickerView.swift */,
 				A28146360481C17881F591C3 /* RootView.swift */,
 				F4ACE7BDE3E8FD53F230A3CF /* RunDiagnosticsStore.swift */,
+				A75D06B0EC32A4DC4962C0CE /* RunHapticFeedback.swift */,
 				27E4457C2F93694193D8E85D /* RunPresentationModel.swift */,
 				475C0E9AEDB57921D9893CA3 /* RunTaskStore.swift */,
 				B1CE55560A18BCBFBAF13E01 /* SamadhiApp.swift */,
@@ -430,6 +433,7 @@
 				AA09908690CAEFD7301A8CE1 /* PlaylistPickerView.swift in Sources */,
 				59F6A7F42EF07136C8A749D2 /* RootView.swift in Sources */,
 				871186B28534AC90B4C2EF59 /* RunDiagnosticsStore.swift in Sources */,
+				5544DF7A7296D1D817D4E92E /* RunHapticFeedback.swift in Sources */,
 				BFB93B5F0188CF63A19E30CB /* RunPresentationModel.swift in Sources */,
 				AADD64A3B49FF8F3E42C941C /* RunTaskStore.swift in Sources */,
 				EC41CEFCE78C60A45AD5680A /* SamadhiApp.swift in Sources */,

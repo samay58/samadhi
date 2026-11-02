@@ -17,7 +17,7 @@ enum MusicSelectionFixture: Equatable {
 
 // A scripted Auto adjustment for Simulator proof. The simulated cadence settles, then moves by the
 // named band and direction so the reducer opens exactly one feedback transaction.
-enum AutoFeedbackScenario: String, CaseIterable, Equatable {
+enum AutoFeedbackScenario: String, Equatable {
     case fasterSmall = "faster-small"
     case fasterMedium = "faster-medium"
     case fasterLarge = "faster-large"
@@ -45,7 +45,7 @@ enum AutoFeedbackScenario: String, CaseIterable, Equatable {
 
 // A scripted walk whose cadence most of the Simulator collection cannot reach, so the reach
 // notice can be seen. Faster means the songs are faster than the body; slower the reverse.
-enum OutOfReachScenario: String, CaseIterable, Equatable {
+enum OutOfReachScenario: String, Equatable {
     case faster
     case slower
 
@@ -62,15 +62,20 @@ enum OutOfReachScenario: String, CaseIterable, Equatable {
     static let heldSamples = 60
 }
 
+// One scripted playback event per launch, so a UI test can prove one cause at a time.
+enum ScriptedPlaybackScenario: String, CaseIterable {
+    case routeLoss = "-SAMADHI_ROUTE_LOST"
+    case interruption = "-SAMADHI_INTERRUPTION"
+    case naturalBoundary = "-SAMADHI_NATURAL_BOUNDARY"
+    case externalBoundary = "-SAMADHI_EXTERNAL_BOUNDARY"
+    case sameSongCallback = "-SAMADHI_SAME_SONG_CALLBACK"
+}
+
 struct SimulationConfiguration {
     // Launch flags make previews and UI tests deterministic. They are not product settings.
     let fastMode: Bool
     let permissionDenied: Bool
-    let simulateRouteLoss: Bool
-    let simulateInterruption: Bool
-    let simulateNaturalBoundary: Bool
-    let simulateExternalBoundary: Bool
-    let simulateSameSongCallback: Bool
+    let scriptedPlayback: ScriptedPlaybackScenario?
     let autoFeedbackScenario: AutoFeedbackScenario?
     let outOfReachScenario: OutOfReachScenario?
     let feedbackAudition: Bool
@@ -84,11 +89,7 @@ struct SimulationConfiguration {
     init(
         fastMode: Bool,
         permissionDenied: Bool,
-        simulateRouteLoss: Bool,
-        simulateInterruption: Bool = false,
-        simulateNaturalBoundary: Bool = false,
-        simulateExternalBoundary: Bool = false,
-        simulateSameSongCallback: Bool = false,
+        scriptedPlayback: ScriptedPlaybackScenario? = nil,
         autoFeedbackScenario: AutoFeedbackScenario? = nil,
         outOfReachScenario: OutOfReachScenario? = nil,
         feedbackAudition: Bool = false,
@@ -101,11 +102,7 @@ struct SimulationConfiguration {
     ) {
         self.fastMode = fastMode
         self.permissionDenied = permissionDenied
-        self.simulateRouteLoss = simulateRouteLoss
-        self.simulateInterruption = simulateInterruption
-        self.simulateNaturalBoundary = simulateNaturalBoundary
-        self.simulateExternalBoundary = simulateExternalBoundary
-        self.simulateSameSongCallback = simulateSameSongCallback
+        self.scriptedPlayback = scriptedPlayback
         self.autoFeedbackScenario = autoFeedbackScenario
         self.outOfReachScenario = outOfReachScenario
         self.feedbackAudition = feedbackAudition
@@ -131,11 +128,9 @@ struct SimulationConfiguration {
         return SimulationConfiguration(
             fastMode: arguments.contains("-SAMADHI_FAST_MODE"),
             permissionDenied: arguments.contains("-SAMADHI_PERMISSION_DENIED"),
-            simulateRouteLoss: arguments.contains("-SAMADHI_ROUTE_LOST"),
-            simulateInterruption: arguments.contains("-SAMADHI_INTERRUPTION"),
-            simulateNaturalBoundary: arguments.contains("-SAMADHI_NATURAL_BOUNDARY"),
-            simulateExternalBoundary: arguments.contains("-SAMADHI_EXTERNAL_BOUNDARY"),
-            simulateSameSongCallback: arguments.contains("-SAMADHI_SAME_SONG_CALLBACK"),
+            scriptedPlayback: ScriptedPlaybackScenario.allCases.first {
+                arguments.contains($0.rawValue)
+            },
             autoFeedbackScenario: {
                 let prefix = "-SAMADHI_AUTO_FEEDBACK="
                 guard let argument = arguments.first(where: { $0.hasPrefix(prefix) }) else {
