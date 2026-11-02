@@ -6,6 +6,8 @@ struct ActiveRunScreen: View {
 
     @Environment(\.accessibilityVoiceOverEnabled) private var voiceOverEnabled
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+    // Grows with the text it reserves room for, so controls stay put at every text size.
+    @ScaledMetric(relativeTo: .callout) private var statusRowHeight: CGFloat = 52
 
     var body: some View {
         ScrollView {
@@ -24,7 +26,7 @@ struct ActiveRunScreen: View {
                 )
 
                 RunStatus(state: state)
-                    .frame(minHeight: reservesStatusRow ? 52 : 4)
+                    .frame(minHeight: reservesStatusRow ? statusRowHeight : 4)
                     .padding(.horizontal, showsStatus ? Space.x4 : 0)
                     .background {
                         if showsStatusWell {

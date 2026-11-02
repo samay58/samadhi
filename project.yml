@@ -95,7 +95,8 @@ schemes:
       config: Debug
       targets:
         - SamadhiTests
-        - SamadhiUITests
+        - name: SamadhiUITests
+          parallelizable: true
   Samadhi MusicKit Gate:
     build:
       targets:

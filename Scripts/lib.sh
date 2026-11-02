@@ -27,7 +27,18 @@ simulator_destination="platform=iOS Simulator,name=$simulator_name,OS=latest"
 derived_data=.build/xcode
 scratch=Evidence/Temp
 
-# Serial on purpose: the iOS 27 Simulator can terminate concurrent UI test runners.
+# Interface tests run side by side on Simulator clones, one test class per clone. Everything else
+# stays serial, because two Xcode actions sharing one Simulator can stop each other.
+xcodebuild_interface_tests() {
+  xcodebuild test "$@" \
+    -project Samadhi.xcodeproj \
+    -derivedDataPath "$derived_data" \
+    -parallel-testing-enabled YES \
+    -parallel-testing-worker-count 4 \
+    -collect-test-diagnostics never \
+    CODE_SIGNING_ALLOWED=NO
+}
+
 xcodebuild_serial() {
   xcodebuild "$@" \
     -project Samadhi.xcodeproj \

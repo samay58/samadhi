@@ -102,14 +102,24 @@ MATRIX
   frames)
     [ $# -eq 1 ] || usage
     boot
-    result_bundle="$output_dir/$1.xcresult"
+    # A bare name is a tap-through test. Anything with a slash is a full test path.
+    case "$1" in
+      */*) target=$1 ;;
+      *)
+        class=$(awk -v name="$1" '/^final class /{c=$3; sub(":", "", c)} index($0, "func " name "(") {print c}' \
+          Tests/SamadhiUITests/SamadhiUITests.swift)
+        target="SamadhiUITests/$class/$1"
+        ;;
+    esac
+    result_bundle="$output_dir/$(echo "$1" | tr '/()' '---').xcresult"
     mkdir -p "$output_dir"
-    rm -rf "$result_bundle" "$output_dir/$1"
+    frames_dir="$output_dir/$(echo "$1" | tr '/()' '---')"
+    rm -rf "$result_bundle" "$frames_dir"
     xcodebuild_serial test -scheme Samadhi -destination "$simulator_destination" \
-      -only-testing:"SamadhiUITests/SamadhiUITests/$1" \
+      -only-testing:"$target" \
       -resultBundlePath "$result_bundle" -quiet
-    xcrun xcresulttool export attachments --path "$result_bundle" --output-path "$output_dir/$1"
-    echo "$output_dir/$1/"
+    xcrun xcresulttool export attachments --path "$result_bundle" --output-path "$frames_dir"
+    echo "$frames_dir/"
     ;;
   flags)
     grep -hoE '"-{1,2}[A-Za-z_-]+=?"' App/SimulationConfiguration.swift App/RootView.swift \

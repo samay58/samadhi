@@ -1,196 +1,118 @@
 import XCTest
 
 @MainActor
-final class SamadhiUITests: XCTestCase {
-    private var app: XCUIApplication!
+// Xcode splits work between Simulator clones by test class, so these classes are what let the
+// interface tests run side by side. Keep them roughly equal in running time.
+class SamadhiUITestCase: XCTestCase {
+    fileprivate var app: XCUIApplication!
 
-    func testGoldenFlow() {
-        prepareApp("-SAMADHI_TEST_ACQUISITION_WINDOW")
-        app.launch()
-        XCTAssertTrue(app.wait(for: .runningForeground, timeout: 5))
-        XCTAssertTrue(element("ready-screen").waitForExistence(timeout: 10))
-        let start = app.buttons["start-run"]
-        XCTAssertTrue(start.waitForExistence(timeout: 2))
-        start.tap()
+    // The reducer says once, in human words, when most of the collection cannot follow the body.
 
-        XCTAssertTrue(app.staticTexts["Listening for your stride"].waitForExistence(timeout: 2))
-        XCTAssertTrue(element("cadence-lock").waitForExistence(timeout: 3))
+    // The scripted walk holds 100 steps per minute against three walking songs whose floors all
 
-        element("track-identity").tap()
-        let pause = app.buttons["pause-run"]
-        XCTAssertTrue(pause.waitForExistence(timeout: 2))
-        pause.tap()
+    // sit above it, so the line must appear, and it must appear once.
 
-        let resume = app.buttons["resume-run"]
-        XCTAssertTrue(resume.waitForExistence(timeout: 2))
-        resume.tap()
+    // Direct drawing covers the wording in every environment. This real walk proves it leaves and stays gone.
 
-        XCTAssertTrue(app.buttons["skip-track"].waitForExistence(timeout: 2))
-        app.buttons["skip-track"].tap()
-        XCTAssertTrue(app.staticTexts["Afterimage"].waitForExistence(timeout: 4))
-
-        element("track-identity").tap()
-        XCTAssertTrue(app.buttons["finish-run"].waitForExistence(timeout: 2))
-        app.buttons["finish-run"].tap()
-        let hold = app.buttons["hold-to-finish"]
-        XCTAssertTrue(hold.waitForExistence(timeout: 2))
-        hold.press(forDuration: 1.5)
-
-        XCTAssertTrue(element("run-summary").waitForExistence(timeout: 3))
-        app.buttons["summary-done"].tap()
-        XCTAssertTrue(element("ready-screen").waitForExistence(timeout: 2))
+    fileprivate func element(_ identifier: String) -> XCUIElement {
+        app.descendants(matching: .any).matching(identifier: identifier).firstMatch
     }
 
-    func testPermissionRecoveryUsesFixedRhythm() {
-        prepareApp("-SAMADHI_PERMISSION_DENIED")
-        app.launch()
-        XCTAssertTrue(app.buttons["start-run"].waitForExistence(timeout: 2))
+    fileprivate var playlistChoices: XCUIElementQuery {
+        app.buttons.matching(
+            NSPredicate(format: "identifier BEGINSWITH %@", "playlist-choice-")
+        )
+    }
+
+    fileprivate func attachScreenshot(named name: String) {
+        let attachment = XCTAttachment(screenshot: XCUIScreen.main.screenshot())
+        attachment.name = name
+        attachment.lifetime = .keepAlways
+        add(attachment)
+    }
+
+    fileprivate func revealTransport() {
+        XCTAssertTrue(app.buttons["start-run"].waitForExistence(timeout: 20))
         app.buttons["start-run"].tap()
-        XCTAssertTrue(element("permission-recovery").waitForExistence(timeout: 2))
-        app.buttons["use-fixed-rhythm"].tap()
-        XCTAssertTrue(element("run-screen").waitForExistence(timeout: 2))
+        // The lock brief is transient, so the run screen itself is the stable landmark.
+        XCTAssertTrue(element("track-identity").waitForExistence(timeout: 20))
+        refreshTransport()
     }
 
-    func testRouteLossRequiresExplicitResume() {
-        prepareApp("-SAMADHI_ROUTE_LOST")
-        app.launch()
-        XCTAssertTrue(app.buttons["start-run"].waitForExistence(timeout: 2))
-        app.buttons["start-run"].tap()
-        XCTAssertTrue(element("route-recovery").waitForExistence(timeout: 3))
-        let resume = app.buttons["route-resume"]
-        XCTAssertTrue(resume.waitForExistence(timeout: 2))
-        resume.tap()
-        XCTAssertTrue(element("run-screen").waitForExistence(timeout: 2))
+    // Revealed controls time out after three seconds, so every capture step reveals again and
+
+    // retries when a slow machine loses the race. A paused run keeps its controls up.
+
+    fileprivate func refreshTransport() {
+        for _ in 0..<6 {
+            if app.buttons["resume-run"].exists { return }
+            element("track-identity").tap()
+            if app.buttons["pause-run"].waitForExistence(timeout: 3) { return }
+        }
+        XCTFail("transport controls never became visible")
     }
 
-    func testRecoveryCanEndTheRunWhenTheRouteNeverReturns() {
-        prepareApp("-SAMADHI_ROUTE_LOST")
-        app.launch()
-        XCTAssertTrue(app.buttons["start-run"].waitForExistence(timeout: 2))
-        app.buttons["start-run"].tap()
-        XCTAssertTrue(element("route-recovery").waitForExistence(timeout: 3))
-        let endRun = app.buttons["route-end-run"]
-        XCTAssertTrue(endRun.waitForExistence(timeout: 2))
-        attachScreenshot(named: "route-recovery-with-end-run")
-        endRun.tap()
-        XCTAssertTrue(element("run-summary").waitForExistence(timeout: 3))
-    }
+    // Arming can lose the race with the control timeout, so the tap retries until it takes.
 
-    func testTransportAndFinishBeforeStateEvidence() {
-        captureTransportAndFinishBeforeState(named: "normal")
-        captureTransportAndFinishBeforeState(
-            named: "accessibility-xxxl",
-            arguments: [
-                "-UIPreferredContentSizeCategoryName",
-                "UICTContentSizeCategoryAccessibilityXXXL",
-            ]
-        )
-        captureTransportAndFinishBeforeState(
-            named: "reduce-motion",
-            arguments: ["-UIAccessibilityReduceMotionEnabled", "YES"]
-        )
-        captureTransportAndFinishBeforeState(
-            named: "increased-contrast",
-            arguments: ["-UIAccessibilityDarkerSystemColorsEnabled", "YES"]
-        )
-        captureTransportAndFinishBeforeState(
-            named: "reduced-transparency",
-            arguments: ["-UIAccessibilityReduceTransparencyEnabled", "YES"]
-        )
-    }
-
-    func testTransportAndFinishAfterStateEvidence() {
-        captureTransportAndFinishAfterState(named: "normal")
-        captureTransportAndFinishAfterState(
-            named: "accessibility-xxxl",
-            arguments: [
-                "-UIPreferredContentSizeCategoryName",
-                "UICTContentSizeCategoryAccessibilityXXXL",
-            ]
-        )
-        captureTransportAndFinishAfterState(
-            named: "reduce-motion",
-            arguments: ["-UIAccessibilityReduceMotionEnabled", "YES"]
-        )
-        captureTransportAndFinishAfterState(
-            named: "increased-contrast",
-            arguments: ["-UIAccessibilityDarkerSystemColorsEnabled", "YES"]
-        )
-        captureTransportAndFinishAfterState(
-            named: "reduced-transparency",
-            arguments: ["-UIAccessibilityReduceTransparencyEnabled", "YES"]
-        )
-    }
-
-    // A runner's thumb is already on its way when these controls change, so the target has to stay put.
-    func testFinishKeepsItsPlaceWhenItArms() {
-        prepareApp("-SAMADHI_TEST_ACQUISITION_WINDOW")
-        app.launch()
-        revealTransport()
+    fileprivate func armFinish() {
         let finish = app.buttons["finish-run"]
-        XCTAssertTrue(finish.waitForExistence(timeout: 3))
-        let finishY = finish.frame.midY
-        finish.tap()
         let hold = app.buttons["hold-to-finish"]
-        XCTAssertTrue(hold.waitForExistence(timeout: 5))
-        waitForVisualSettle(seconds: 0.8)
-        XCTAssertEqual(hold.frame.midY, finishY, accuracy: 1)
+        for _ in 0..<4 {
+            if hold.exists { return }
+            refreshTransport()
+            guard finish.waitForExistence(timeout: 3) else { continue }
+            finish.tap()
+            if hold.waitForExistence(timeout: 5) { return }
+        }
+        XCTFail("Finish never armed")
     }
 
-    func testPauseAndResumeShareOnePlace() {
-        prepareApp("-SAMADHI_TEST_ACQUISITION_WINDOW")
-        app.launch()
-        revealTransport()
-        let pause = app.buttons["pause-run"]
-        XCTAssertTrue(pause.waitForExistence(timeout: 3))
-        let pauseY = pause.frame.midY
-        pause.tap()
-        let resume = app.buttons["resume-run"]
-        XCTAssertTrue(resume.waitForExistence(timeout: 5))
-        waitForVisualSettle(seconds: 0.8)
-        XCTAssertEqual(resume.frame.midY, pauseY, accuracy: 1)
+    fileprivate func assertCloseTargetClearsDial(close: XCUIElement, dial: XCUIElement) {
+        XCTAssertTrue(dial.exists)
+        let closeFrame = close.frame
+        let dialFrame = dial.frame
+        let centerDistance = hypot(
+            closeFrame.midX - dialFrame.midX,
+            closeFrame.midY - dialFrame.midY
+        )
+        let dialRadius = min(dialFrame.width, dialFrame.height) / 2
+        let closeHalfDiagonal = hypot(closeFrame.width, closeFrame.height) / 2
+        XCTAssertGreaterThanOrEqual(centerDistance, dialRadius + closeHalfDiagonal)
     }
 
-    func testFinishHoldReleasedEarlyKeepsTheRunThenCompletes() {
-        prepareApp("-SAMADHI_TEST_ACQUISITION_WINDOW")
-        app.launch()
-        revealTransport()
-        armFinish()
-
-        let hold = app.buttons["hold-to-finish"]
-        hold.press(forDuration: 0.4)
-        XCTAssertTrue(hold.exists)
-        XCTAssertFalse(element("run-summary").exists)
-        XCTAssertTrue(element("run-screen").exists)
-        attachScreenshot(named: "after-finish-cancelled-normal")
-
-        hold.press(forDuration: 1.5)
-        XCTAssertTrue(element("run-summary").waitForExistence(timeout: 4))
-        attachScreenshot(named: "run-summary")
+    fileprivate func waitForVisualSettle(seconds: TimeInterval = 0.3) {
+        RunLoop.current.run(until: Date(timeIntervalSinceNow: seconds))
     }
 
-    func testTransportPressedStateEvidence() {
-        prepareApp("-SAMADHI_TEST_ACQUISITION_WINDOW")
-        app.launch()
-        revealTransport()
-
-        // One extra reveal lets the bar settle so the first press is not lost in the fade in.
-        refreshTransport()
-        app.buttons["previous-track"].press(forDuration: 0.3)
-        refreshTransport()
-        app.buttons["skip-track"].press(forDuration: 0.3)
-
-        refreshTransport()
-        app.buttons["pause-run"].press(forDuration: 0.3)
-
-        let resume = app.buttons["resume-run"]
-        XCTAssertTrue(resume.waitForExistence(timeout: 3))
-        attachScreenshot(named: "after-transport-paused-normal")
-        resume.press(forDuration: 0.3)
-
-        XCTAssertTrue(app.buttons["pause-run"].waitForExistence(timeout: 3))
+    fileprivate func currentDisplayedBPM() -> Int? {
+        app.staticTexts.allElementsBoundByIndex
+            .lazy
+            .compactMap { Int($0.label) }
+            .first { 90...210 ~= $0 }
     }
 
+    fileprivate func turn(from start: XCUICoordinate, to end: XCUICoordinate) {
+        start.press(
+            forDuration: 0.12,
+            thenDragTo: end,
+            withVelocity: .slow,
+            thenHoldForDuration: 0.2
+        )
+    }
+
+    fileprivate func prepareApp(_ additionalArgument: String? = nil) {
+        prepareApp(additionalArgument.map { [$0] } ?? [])
+    }
+
+    fileprivate func prepareApp(_ additionalArguments: [String]) {
+        continueAfterFailure = false
+        app = XCUIApplication()
+        app.launchArguments = ["-SAMADHI_FAST_MODE"]
+        app.launchArguments.append(contentsOf: additionalArguments)
+    }
+}
+
+final class PlaylistReadingUITests: SamadhiUITestCase {
     func testMissingArtworkStillStarts() {
         prepareApp("-SAMADHI_MISSING_ARTWORK")
         app.launch()
@@ -199,6 +121,74 @@ final class SamadhiUITests: XCTestCase {
         XCTAssertTrue(element("run-screen").waitForExistence(timeout: 2))
     }
 
+    func testAnalysisProgressIsHonest() {
+        prepareApp("-SAMADHI_MUSIC_ANALYZING")
+        app.launch()
+
+        XCTAssertTrue(element("music-analyzing").waitForExistence(timeout: 2))
+        XCTAssertTrue(app.staticTexts["2 of 8"].exists)
+        XCTAssertFalse(app.buttons["start-run"].exists)
+    }
+
+    func testPartialCollectionCanStartWithFailuresVisible() {
+        prepareApp("-SAMADHI_MUSIC_PARTIAL")
+        app.launch()
+
+        XCTAssertTrue(element("music-ready").waitForExistence(timeout: 2))
+        let readyCount = element("ready-track-count")
+        XCTAssertTrue(readyCount.waitForExistence(timeout: 2))
+        XCTAssertEqual(readyCount.label, "1 song ready")
+        let results = app.buttons["review-skipped-tracks"]
+        XCTAssertTrue(results.waitForExistence(timeout: 2))
+        XCTAssertEqual(results.label, "Review 5 skipped songs")
+        XCTAssertTrue(app.buttons["start-run"].exists)
+        attachScreenshot(named: "setup-final-partial-ready")
+        results.tap()
+        XCTAssertTrue(app.staticTexts["Couldn't find the beat"].waitForExistence(timeout: 2))
+        XCTAssertTrue(app.staticTexts["No preview to listen to"].exists)
+        XCTAssertTrue(app.staticTexts["Distant Signal"].waitForExistence(timeout: 2))
+        XCTAssertTrue(app.staticTexts["Warm Static"].exists)
+        XCTAssertTrue(app.staticTexts["Side Street"].exists)
+
+        let temporaryHeading = element("temporary-failure-section")
+        let retry = app.buttons["retry-temporary-imports"]
+        let readyTrack = app.staticTexts["Soft Current"]
+        XCTAssertTrue(temporaryHeading.exists)
+        XCTAssertTrue(retry.exists)
+        XCTAssertTrue(readyTrack.exists)
+        XCTAssertGreaterThan(retry.frame.minY, temporaryHeading.frame.minY)
+        XCTAssertLessThan(retry.frame.minY, readyTrack.frame.minY)
+        attachScreenshot(named: "setup-final-track-results")
+    }
+
+    func testImportFailureOffersRetry() {
+        prepareApp("-SAMADHI_MUSIC_IMPORT_FAILURE")
+        app.launch()
+
+        XCTAssertTrue(element("music-import-failed").waitForExistence(timeout: 2))
+        XCTAssertTrue(app.buttons["retry-music-import"].exists)
+        XCTAssertTrue(app.buttons["choose-another-music"].exists)
+        XCTAssertFalse(app.buttons["start-run"].exists)
+        attachScreenshot(named: "setup-final-import-failure")
+
+        app.buttons["retry-music-import"].tap()
+        XCTAssertTrue(element("music-ready").waitForExistence(timeout: 3))
+        XCTAssertTrue(app.staticTexts["Soft Miles"].exists)
+    }
+
+    func testNormalSimulatorLaunchUsesLocalDemoMusic() {
+        continueAfterFailure = false
+        app = XCUIApplication()
+        app.launch()
+
+        XCTAssertTrue(element("music-ready").waitForExistence(timeout: 3))
+        XCTAssertTrue(app.staticTexts["Samadhi demo"].exists)
+        app.buttons["start-run"].tap()
+        XCTAssertTrue(element("cadence-lock").waitForExistence(timeout: 6))
+    }
+}
+
+final class PlaylistSetupUITests: SamadhiUITestCase {
     func testNoCollectionRequiresMusicChoice() {
         prepareApp("-SAMADHI_MUSIC_NONE")
         app.launch()
@@ -208,6 +198,125 @@ final class SamadhiUITests: XCTestCase {
         XCTAssertFalse(app.buttons["change-music"].exists)
     }
 
+    func testReadingAPlaylistDrawsItsSongsThenOffersStart() {
+        prepareApp("-SAMADHI_MUSIC_LIBRARY_READING")
+        app.launch()
+
+        XCTAssertTrue(app.buttons["choose-music"].waitForExistence(timeout: 3))
+        attachScreenshot(named: "reading-0-empty")
+        app.buttons["choose-music"].tap()
+        XCTAssertTrue(element("playlist-picker").waitForExistence(timeout: 3))
+        app.buttons["playlist-choice-simulator-morning-miles"].tap()
+
+        XCTAssertTrue(element("music-analyzing").waitForExistence(timeout: 3))
+        XCTAssertFalse(app.buttons["start-run"].exists)
+        waitForVisualSettle(seconds: 2)
+        attachScreenshot(named: "reading-1-early")
+        XCTAssertFalse(app.buttons["start-run"].exists)
+        waitForVisualSettle(seconds: 2.4)
+        attachScreenshot(named: "reading-2-late")
+
+        XCTAssertTrue(element("music-ready").waitForExistence(timeout: 12))
+        XCTAssertTrue(app.buttons["start-run"].isHittable)
+        waitForVisualSettle(seconds: 2.4)
+        attachScreenshot(named: "reading-3-ready")
+    }
+
+    func testReadingAPlaylistStaysCompleteWithReduceMotion() {
+        prepareApp([
+            "-SAMADHI_MUSIC_LIBRARY_READING",
+            "-UIAccessibilityReduceMotionEnabled",
+            "YES",
+        ])
+        app.launch()
+
+        XCTAssertTrue(app.buttons["choose-music"].waitForExistence(timeout: 3))
+        app.buttons["choose-music"].tap()
+        XCTAssertTrue(element("playlist-picker").waitForExistence(timeout: 3))
+        app.buttons["playlist-choice-simulator-morning-miles"].tap()
+
+        XCTAssertTrue(element("music-analyzing").waitForExistence(timeout: 3))
+        waitForVisualSettle(seconds: 3)
+        attachScreenshot(named: "reading-reduce-motion")
+        XCTAssertTrue(element("music-ready").waitForExistence(timeout: 12))
+        XCTAssertTrue(app.buttons["start-run"].isHittable)
+        attachScreenshot(named: "reading-reduce-motion-ready")
+    }
+
+    func testPlaylistLoadingKeepsOneTruthfulBusyAction() {
+        prepareApp("-SAMADHI_MUSIC_LOADING")
+        app.launch()
+
+        XCTAssertTrue(element("music-loading").waitForExistence(timeout: 2))
+        XCTAssertFalse(app.buttons["start-run"].exists)
+        XCTAssertFalse(app.buttons["choose-music"].exists)
+    }
+
+    func testPlaylistLoadingKeepsTheExistingSelectionVisible() {
+        prepareApp("-SAMADHI_MUSIC_LOADING_SELECTED")
+        app.launch()
+
+        XCTAssertTrue(element("music-loading").waitForExistence(timeout: 2))
+        XCTAssertTrue(app.staticTexts["Samadhi demo"].exists)
+        XCTAssertFalse(app.buttons["start-run"].exists)
+        XCTAssertFalse(app.buttons["change-music"].exists)
+    }
+
+    func testLongPlaylistNameRemainsCompleteAtNormalSize() {
+        prepareApp("-SAMADHI_MUSIC_LONG_NAME")
+        app.launch()
+
+        let name = app.staticTexts["Saturday Miles Through the Hills After the Rain"]
+        XCTAssertTrue(name.waitForExistence(timeout: 2))
+        XCTAssertTrue(app.buttons["start-run"].exists)
+        XCTAssertTrue(app.buttons["change-music"].exists)
+    }
+
+    func testLongPlaylistNameKeepsStartReachableAtAccessibilitySize() {
+        prepareApp([
+            "-SAMADHI_MUSIC_LONG_NAME",
+            "-UIPreferredContentSizeCategoryName",
+            "UICTContentSizeCategoryAccessibilityXXXL",
+        ])
+        app.launch()
+
+        let name = app.staticTexts["Saturday Miles Through the Hills After the Rain"]
+        XCTAssertTrue(name.waitForExistence(timeout: 2))
+        let start = app.buttons["start-run"]
+        XCTAssertTrue(start.exists)
+        if !start.isHittable {
+            app.swipeUp()
+        }
+        XCTAssertTrue(start.isHittable)
+        XCTAssertGreaterThan(start.frame.width, app.windows.firstMatch.frame.width * 0.75)
+        attachScreenshot(named: "setup-final-long-name-ax5")
+    }
+
+    func testImportFailureCanChooseAnotherPlaylist() {
+        prepareApp("-SAMADHI_MUSIC_IMPORT_FAILURE")
+        app.launch()
+
+        XCTAssertTrue(element("music-import-failed").waitForExistence(timeout: 2))
+        app.buttons["choose-another-music"].tap()
+        XCTAssertTrue(element("playlist-picker").waitForExistence(timeout: 2))
+    }
+
+    func testAuthorizationFailureUsesSettingsAndLibraryRetry() {
+        prepareApp("-SAMADHI_MUSIC_AUTHORIZATION_FAILURE")
+        app.launch()
+
+        XCTAssertTrue(element("music-import-failed").waitForExistence(timeout: 2))
+        XCTAssertTrue(app.staticTexts["Apple Music access is off"].exists)
+        XCTAssertTrue(app.buttons["open-settings"].exists)
+        XCTAssertTrue(app.buttons["retry-playlist-library"].exists)
+        attachScreenshot(named: "setup-final-authorization-failure")
+
+        app.buttons["retry-playlist-library"].tap()
+        XCTAssertTrue(element("playlist-picker").waitForExistence(timeout: 2))
+    }
+}
+
+final class PlaylistPickerUITests: SamadhiUITestCase {
     func testPlaylistPickerOpensScrollsAndSelects() {
         prepareApp("-SAMADHI_MUSIC_LIBRARY_LARGE")
         app.launch()
@@ -288,51 +397,6 @@ final class SamadhiUITests: XCTestCase {
         attachScreenshot(named: "setup-review-ready")
     }
 
-    func testReadingAPlaylistDrawsItsSongsThenOffersStart() {
-        prepareApp("-SAMADHI_MUSIC_LIBRARY_READING")
-        app.launch()
-
-        XCTAssertTrue(app.buttons["choose-music"].waitForExistence(timeout: 3))
-        attachScreenshot(named: "reading-0-empty")
-        app.buttons["choose-music"].tap()
-        XCTAssertTrue(element("playlist-picker").waitForExistence(timeout: 3))
-        app.buttons["playlist-choice-simulator-morning-miles"].tap()
-
-        XCTAssertTrue(element("music-analyzing").waitForExistence(timeout: 3))
-        XCTAssertFalse(app.buttons["start-run"].exists)
-        waitForVisualSettle(seconds: 2)
-        attachScreenshot(named: "reading-1-early")
-        XCTAssertFalse(app.buttons["start-run"].exists)
-        waitForVisualSettle(seconds: 2.4)
-        attachScreenshot(named: "reading-2-late")
-
-        XCTAssertTrue(element("music-ready").waitForExistence(timeout: 12))
-        XCTAssertTrue(app.buttons["start-run"].isHittable)
-        waitForVisualSettle(seconds: 2.4)
-        attachScreenshot(named: "reading-3-ready")
-    }
-
-    func testReadingAPlaylistStaysCompleteWithReduceMotion() {
-        prepareApp([
-            "-SAMADHI_MUSIC_LIBRARY_READING",
-            "-UIAccessibilityReduceMotionEnabled",
-            "YES",
-        ])
-        app.launch()
-
-        XCTAssertTrue(app.buttons["choose-music"].waitForExistence(timeout: 3))
-        app.buttons["choose-music"].tap()
-        XCTAssertTrue(element("playlist-picker").waitForExistence(timeout: 3))
-        app.buttons["playlist-choice-simulator-morning-miles"].tap()
-
-        XCTAssertTrue(element("music-analyzing").waitForExistence(timeout: 3))
-        waitForVisualSettle(seconds: 3)
-        attachScreenshot(named: "reading-reduce-motion")
-        XCTAssertTrue(element("music-ready").waitForExistence(timeout: 12))
-        XCTAssertTrue(app.buttons["start-run"].isHittable)
-        attachScreenshot(named: "reading-reduce-motion-ready")
-    }
-
     func testChangingMusicMarksTheCurrentPlaylist() {
         prepareApp()
         app.launch()
@@ -344,134 +408,123 @@ final class SamadhiUITests: XCTestCase {
         XCTAssertTrue(current.label.contains("Current playlist"))
         attachScreenshot(named: "setup-final-picker-current")
     }
+}
 
-    func testPlaylistLoadingKeepsOneTruthfulBusyAction() {
-        prepareApp("-SAMADHI_MUSIC_LOADING")
+final class RunFlowUITests: SamadhiUITestCase {
+    func testGoldenFlow() {
+        prepareApp("-SAMADHI_TEST_ACQUISITION_WINDOW")
         app.launch()
-
-        XCTAssertTrue(element("music-loading").waitForExistence(timeout: 2))
-        XCTAssertFalse(app.buttons["start-run"].exists)
-        XCTAssertFalse(app.buttons["choose-music"].exists)
-    }
-
-    func testPlaylistLoadingKeepsTheExistingSelectionVisible() {
-        prepareApp("-SAMADHI_MUSIC_LOADING_SELECTED")
-        app.launch()
-
-        XCTAssertTrue(element("music-loading").waitForExistence(timeout: 2))
-        XCTAssertTrue(app.staticTexts["Samadhi demo"].exists)
-        XCTAssertFalse(app.buttons["start-run"].exists)
-        XCTAssertFalse(app.buttons["change-music"].exists)
-    }
-
-    func testLongPlaylistNameRemainsCompleteAtNormalSize() {
-        prepareApp("-SAMADHI_MUSIC_LONG_NAME")
-        app.launch()
-
-        let name = app.staticTexts["Saturday Miles Through the Hills After the Rain"]
-        XCTAssertTrue(name.waitForExistence(timeout: 2))
-        XCTAssertTrue(app.buttons["start-run"].exists)
-        XCTAssertTrue(app.buttons["change-music"].exists)
-    }
-
-    func testLongPlaylistNameKeepsStartReachableAtAccessibilitySize() {
-        prepareApp([
-            "-SAMADHI_MUSIC_LONG_NAME",
-            "-UIPreferredContentSizeCategoryName",
-            "UICTContentSizeCategoryAccessibilityXXXL",
-        ])
-        app.launch()
-
-        let name = app.staticTexts["Saturday Miles Through the Hills After the Rain"]
-        XCTAssertTrue(name.waitForExistence(timeout: 2))
+        XCTAssertTrue(app.wait(for: .runningForeground, timeout: 5))
+        XCTAssertTrue(element("ready-screen").waitForExistence(timeout: 10))
         let start = app.buttons["start-run"]
-        XCTAssertTrue(start.exists)
-        if !start.isHittable {
-            app.swipeUp()
-        }
-        XCTAssertTrue(start.isHittable)
-        XCTAssertGreaterThan(start.frame.width, app.windows.firstMatch.frame.width * 0.75)
-        attachScreenshot(named: "setup-final-long-name-ax5")
+        XCTAssertTrue(start.waitForExistence(timeout: 2))
+        start.tap()
+
+        XCTAssertTrue(app.staticTexts["Listening for your stride"].waitForExistence(timeout: 2))
+        XCTAssertTrue(element("cadence-lock").waitForExistence(timeout: 3))
+
+        element("track-identity").tap()
+        let pause = app.buttons["pause-run"]
+        XCTAssertTrue(pause.waitForExistence(timeout: 2))
+        pause.tap()
+
+        let resume = app.buttons["resume-run"]
+        XCTAssertTrue(resume.waitForExistence(timeout: 2))
+        resume.tap()
+
+        XCTAssertTrue(app.buttons["skip-track"].waitForExistence(timeout: 2))
+        app.buttons["skip-track"].tap()
+        XCTAssertTrue(app.staticTexts["Afterimage"].waitForExistence(timeout: 4))
+
+        element("track-identity").tap()
+        XCTAssertTrue(app.buttons["finish-run"].waitForExistence(timeout: 2))
+        app.buttons["finish-run"].tap()
+        let hold = app.buttons["hold-to-finish"]
+        XCTAssertTrue(hold.waitForExistence(timeout: 2))
+        hold.press(forDuration: 1.5)
+
+        XCTAssertTrue(element("run-summary").waitForExistence(timeout: 3))
+        app.buttons["summary-done"].tap()
+        XCTAssertTrue(element("ready-screen").waitForExistence(timeout: 2))
     }
 
-    func testAnalysisProgressIsHonest() {
-        prepareApp("-SAMADHI_MUSIC_ANALYZING")
+    func testPermissionRecoveryUsesFixedRhythm() {
+        prepareApp("-SAMADHI_PERMISSION_DENIED")
         app.launch()
-
-        XCTAssertTrue(element("music-analyzing").waitForExistence(timeout: 2))
-        XCTAssertTrue(app.staticTexts["2 of 8"].exists)
-        XCTAssertFalse(app.buttons["start-run"].exists)
+        XCTAssertTrue(app.buttons["start-run"].waitForExistence(timeout: 2))
+        app.buttons["start-run"].tap()
+        XCTAssertTrue(element("permission-recovery").waitForExistence(timeout: 2))
+        app.buttons["use-fixed-rhythm"].tap()
+        XCTAssertTrue(element("run-screen").waitForExistence(timeout: 2))
     }
 
-    func testPartialCollectionCanStartWithFailuresVisible() {
-        prepareApp("-SAMADHI_MUSIC_PARTIAL")
+    func testRouteLossRequiresExplicitResume() {
+        prepareApp("-SAMADHI_ROUTE_LOST")
         app.launch()
-
-        XCTAssertTrue(element("music-ready").waitForExistence(timeout: 2))
-        let readyCount = element("ready-track-count")
-        XCTAssertTrue(readyCount.waitForExistence(timeout: 2))
-        XCTAssertEqual(readyCount.label, "1 song ready")
-        let results = app.buttons["review-skipped-tracks"]
-        XCTAssertTrue(results.waitForExistence(timeout: 2))
-        XCTAssertEqual(results.label, "Review 5 skipped songs")
-        XCTAssertTrue(app.buttons["start-run"].exists)
-        attachScreenshot(named: "setup-final-partial-ready")
-        results.tap()
-        XCTAssertTrue(app.staticTexts["Couldn't find the beat"].waitForExistence(timeout: 2))
-        XCTAssertTrue(app.staticTexts["No preview to listen to"].exists)
-        XCTAssertTrue(app.staticTexts["Distant Signal"].waitForExistence(timeout: 2))
-        XCTAssertTrue(app.staticTexts["Warm Static"].exists)
-        XCTAssertTrue(app.staticTexts["Side Street"].exists)
-
-        let temporaryHeading = element("temporary-failure-section")
-        let retry = app.buttons["retry-temporary-imports"]
-        let readyTrack = app.staticTexts["Soft Current"]
-        XCTAssertTrue(temporaryHeading.exists)
-        XCTAssertTrue(retry.exists)
-        XCTAssertTrue(readyTrack.exists)
-        XCTAssertGreaterThan(retry.frame.minY, temporaryHeading.frame.minY)
-        XCTAssertLessThan(retry.frame.minY, readyTrack.frame.minY)
-        attachScreenshot(named: "setup-final-track-results")
+        XCTAssertTrue(app.buttons["start-run"].waitForExistence(timeout: 2))
+        app.buttons["start-run"].tap()
+        XCTAssertTrue(element("route-recovery").waitForExistence(timeout: 3))
+        let resume = app.buttons["route-resume"]
+        XCTAssertTrue(resume.waitForExistence(timeout: 2))
+        resume.tap()
+        XCTAssertTrue(element("run-screen").waitForExistence(timeout: 2))
     }
 
-    func testImportFailureOffersRetry() {
-        prepareApp("-SAMADHI_MUSIC_IMPORT_FAILURE")
+    func testRecoveryCanEndTheRunWhenTheRouteNeverReturns() {
+        prepareApp("-SAMADHI_ROUTE_LOST")
         app.launch()
-
-        XCTAssertTrue(element("music-import-failed").waitForExistence(timeout: 2))
-        XCTAssertTrue(app.buttons["retry-music-import"].exists)
-        XCTAssertTrue(app.buttons["choose-another-music"].exists)
-        XCTAssertFalse(app.buttons["start-run"].exists)
-        attachScreenshot(named: "setup-final-import-failure")
-
-        app.buttons["retry-music-import"].tap()
-        XCTAssertTrue(element("music-ready").waitForExistence(timeout: 3))
-        XCTAssertTrue(app.staticTexts["Soft Miles"].exists)
+        XCTAssertTrue(app.buttons["start-run"].waitForExistence(timeout: 2))
+        app.buttons["start-run"].tap()
+        XCTAssertTrue(element("route-recovery").waitForExistence(timeout: 3))
+        let endRun = app.buttons["route-end-run"]
+        XCTAssertTrue(endRun.waitForExistence(timeout: 2))
+        attachScreenshot(named: "route-recovery-with-end-run")
+        endRun.tap()
+        XCTAssertTrue(element("run-summary").waitForExistence(timeout: 3))
     }
 
-    func testImportFailureCanChooseAnotherPlaylist() {
-        prepareApp("-SAMADHI_MUSIC_IMPORT_FAILURE")
+    func testFinishHoldReleasedEarlyKeepsTheRunThenCompletes() {
+        prepareApp("-SAMADHI_TEST_ACQUISITION_WINDOW")
         app.launch()
+        revealTransport()
+        armFinish()
 
-        XCTAssertTrue(element("music-import-failed").waitForExistence(timeout: 2))
-        app.buttons["choose-another-music"].tap()
-        XCTAssertTrue(element("playlist-picker").waitForExistence(timeout: 2))
+        let hold = app.buttons["hold-to-finish"]
+        hold.press(forDuration: 0.4)
+        XCTAssertTrue(hold.exists)
+        XCTAssertFalse(element("run-summary").exists)
+        XCTAssertTrue(element("run-screen").exists)
+        attachScreenshot(named: "after-finish-cancelled-normal")
+
+        hold.press(forDuration: 1.5)
+        XCTAssertTrue(element("run-summary").waitForExistence(timeout: 4))
+        attachScreenshot(named: "run-summary")
     }
 
-    func testAuthorizationFailureUsesSettingsAndLibraryRetry() {
-        prepareApp("-SAMADHI_MUSIC_AUTHORIZATION_FAILURE")
+    func testTransportPressedStateEvidence() {
+        prepareApp("-SAMADHI_TEST_ACQUISITION_WINDOW")
         app.launch()
+        revealTransport()
 
-        XCTAssertTrue(element("music-import-failed").waitForExistence(timeout: 2))
-        XCTAssertTrue(app.staticTexts["Apple Music access is off"].exists)
-        XCTAssertTrue(app.buttons["open-settings"].exists)
-        XCTAssertTrue(app.buttons["retry-playlist-library"].exists)
-        attachScreenshot(named: "setup-final-authorization-failure")
+        // One extra reveal lets the bar settle so the first press is not lost in the fade in.
+        refreshTransport()
+        app.buttons["previous-track"].press(forDuration: 0.3)
+        refreshTransport()
+        app.buttons["skip-track"].press(forDuration: 0.3)
 
-        app.buttons["retry-playlist-library"].tap()
-        XCTAssertTrue(element("playlist-picker").waitForExistence(timeout: 2))
+        refreshTransport()
+        app.buttons["pause-run"].press(forDuration: 0.3)
+
+        let resume = app.buttons["resume-run"]
+        XCTAssertTrue(resume.waitForExistence(timeout: 3))
+        attachScreenshot(named: "after-transport-paused-normal")
+        resume.press(forDuration: 0.3)
+
+        XCTAssertTrue(app.buttons["pause-run"].waitForExistence(timeout: 3))
     }
+}
 
+final class TempoAndDiagnosticsUITests: SamadhiUITestCase {
     func testTempoControlRevealsAndSwitchesOwnership() {
         prepareApp()
         app.launch()
@@ -613,58 +666,17 @@ final class SamadhiUITests: XCTestCase {
         attachScreenshot(named: "tempo-close-increased-contrast")
     }
 
-    // The reducer says once, in human words, when most of the collection cannot follow the body.
-    // The scripted walk holds 100 steps per minute against three walking songs whose floors all
-    // sit above it, so the line must appear, and it must appear once.
-    func testOutOfReachPlaylistIsNamedOnceInEveryEnvironment() {
-        let environments: [(name: String, arguments: [String])] = [
-            ("default", []),
-            ("reduce-motion", ["-UIAccessibilityReduceMotionEnabled", "YES"]),
-            ("increased-contrast", ["-UIAccessibilityDarkerSystemColorsEnabled", "YES"]),
-            (
-                "dynamic-type-large",
-                ["-UIPreferredContentSizeCategoryName", "UICTContentSizeCategoryAccessibilityL"]
-            ),
-        ]
-        for environment in environments {
-            prepareApp(["-SAMADHI_OUT_OF_REACH=faster"] + environment.arguments)
-            app.launch()
-            XCTAssertTrue(app.staticTexts["Slow Sundays"].waitForExistence(timeout: 5))
-            app.buttons["start-run"].tap()
-            XCTAssertTrue(element("cadence-lock").waitForExistence(timeout: 10))
-
-            let notice = element("reach-notice")
-            XCTAssertTrue(notice.waitForExistence(timeout: 25), environment.name)
-            XCTAssertEqual(notice.label, "Most of this playlist is faster than you're moving.")
-            attachScreenshot(named: "out-of-reach-\(environment.name)")
-
-            // It leaves on its own and does not come back while the walk continues.
-            XCTAssertTrue(notice.waitForNonExistence(timeout: 10), environment.name)
-            XCTAssertFalse(notice.waitForExistence(timeout: 4), environment.name)
-            app.terminate()
-        }
-    }
-
-    func testOutOfReachNoticeNamesTheSlowerDirectionToo() {
-        prepareApp("-SAMADHI_OUT_OF_REACH=slower")
+    func testOutOfReachNoticeLeavesOnItsOwnAndStaysGone() {
+        prepareApp("-SAMADHI_OUT_OF_REACH=faster")
         app.launch()
+        XCTAssertTrue(app.staticTexts["Slow Sundays"].waitForExistence(timeout: 5))
         app.buttons["start-run"].tap()
         XCTAssertTrue(element("cadence-lock").waitForExistence(timeout: 10))
+
         let notice = element("reach-notice")
         XCTAssertTrue(notice.waitForExistence(timeout: 25))
-        XCTAssertEqual(notice.label, "Most of this playlist is slower than you're moving.")
-        attachScreenshot(named: "out-of-reach-slower")
-    }
-
-    func testNormalSimulatorLaunchUsesLocalDemoMusic() {
-        continueAfterFailure = false
-        app = XCUIApplication()
-        app.launch()
-
-        XCTAssertTrue(element("music-ready").waitForExistence(timeout: 3))
-        XCTAssertTrue(app.staticTexts["Samadhi demo"].exists)
-        app.buttons["start-run"].tap()
-        XCTAssertTrue(element("cadence-lock").waitForExistence(timeout: 6))
+        XCTAssertTrue(notice.waitForNonExistence(timeout: 10))
+        XCTAssertFalse(notice.waitForExistence(timeout: 4))
     }
 
     func testDiagnosticsKeepSongBeatsAndRunnerStepsSeparate() {
@@ -704,21 +716,6 @@ final class SamadhiUITests: XCTestCase {
         attachScreenshot(named: "core-diagnostics-cue-deliveries")
     }
 
-    func testDiagnosticsDistinguishEveryAppleMusicResult() {
-        for status in ["waiting", "verified", "limited", "rejected"] {
-            prepareApp("--diagnostic-scenario=\(status)")
-            app.launch()
-            XCTAssertTrue(element("core-loop-diagnostics").waitForExistence(timeout: 3))
-            for _ in 0..<4 where !element("tempo-command-status").exists {
-                app.swipeUp()
-            }
-            XCTAssertTrue(element("tempo-command-status").exists)
-            XCTAssertFalse(element("tempo-command-status").label.isEmpty)
-            attachScreenshot(named: "core-diagnostics-\(status)")
-            app.terminate()
-        }
-    }
-
     func testTrackResetShowsNoOldAppleMusicReadback() {
         prepareApp("--diagnostic-scenario=waiting")
         app.launch()
@@ -732,165 +729,5 @@ final class SamadhiUITests: XCTestCase {
         XCTAssertTrue(element("tempo-command-status").exists)
         XCTAssertEqual(element("tempo-command-status").label, "Waiting for Apple Music")
         attachScreenshot(named: "core-diagnostics-track-reset")
-    }
-
-    func testDiagnosticsRemainReadableAtAccessibilitySizeWithReduceMotion() {
-        prepareApp([
-            "--diagnostic-scenario=limited",
-            "-UIPreferredContentSizeCategoryName",
-            "UICTContentSizeCategoryAccessibilityXXXL",
-            "-UIAccessibilityReduceMotionEnabled",
-            "YES",
-        ])
-        app.launch()
-
-        XCTAssertTrue(element("core-loop-diagnostics").waitForExistence(timeout: 3))
-        for _ in 0..<12 where !element("measured-song-speed").exists {
-            app.swipeUp()
-        }
-        XCTAssertTrue(element("measured-song-speed").exists)
-        for _ in 0..<12 where !element("tempo-command-status").exists {
-            app.swipeUp()
-        }
-        XCTAssertEqual(element("tempo-command-status").label, "Limited by this song")
-        attachScreenshot(named: "core-diagnostics-accessibility-reduce-motion")
-    }
-
-    private func element(_ identifier: String) -> XCUIElement {
-        app.descendants(matching: .any).matching(identifier: identifier).firstMatch
-    }
-
-    private var playlistChoices: XCUIElementQuery {
-        app.buttons.matching(
-            NSPredicate(format: "identifier BEGINSWITH %@", "playlist-choice-")
-        )
-    }
-
-    private func attachScreenshot(named name: String) {
-        let attachment = XCTAttachment(screenshot: XCUIScreen.main.screenshot())
-        attachment.name = name
-        attachment.lifetime = .keepAlways
-        add(attachment)
-    }
-
-    private func revealTransport() {
-        XCTAssertTrue(app.buttons["start-run"].waitForExistence(timeout: 20))
-        app.buttons["start-run"].tap()
-        // The lock brief is transient, so the run screen itself is the stable landmark.
-        XCTAssertTrue(element("track-identity").waitForExistence(timeout: 20))
-        refreshTransport()
-    }
-
-    // Revealed controls time out after three seconds, so every capture step reveals again and
-    // retries when a slow machine loses the race. A paused run keeps its controls up.
-    private func refreshTransport() {
-        for _ in 0..<6 {
-            if app.buttons["resume-run"].exists { return }
-            element("track-identity").tap()
-            if app.buttons["pause-run"].waitForExistence(timeout: 3) { return }
-        }
-        XCTFail("transport controls never became visible")
-    }
-
-    // Arming can lose the race with the control timeout, so the tap retries until it takes.
-    private func armFinish() {
-        let finish = app.buttons["finish-run"]
-        let hold = app.buttons["hold-to-finish"]
-        for _ in 0..<4 {
-            if hold.exists { return }
-            refreshTransport()
-            guard finish.waitForExistence(timeout: 3) else { continue }
-            finish.tap()
-            if hold.waitForExistence(timeout: 5) { return }
-        }
-        XCTFail("Finish never armed")
-    }
-
-    private func captureTransportAndFinishAfterState(
-        named name: String,
-        arguments: [String] = []
-    ) {
-        prepareApp(arguments)
-        app.launch()
-        revealTransport()
-
-        XCTAssertTrue(app.buttons["previous-track"].exists)
-        XCTAssertTrue(app.buttons["skip-track"].exists)
-        attachScreenshot(named: "after-transport-\(name)")
-
-        armFinish()
-        attachScreenshot(named: "after-finish-armed-\(name)")
-        app.terminate()
-    }
-
-    private func captureTransportAndFinishBeforeState(
-        named name: String,
-        arguments: [String] = []
-    ) {
-        prepareApp(arguments)
-        app.launch()
-        XCTAssertTrue(app.buttons["start-run"].waitForExistence(timeout: 3))
-        app.buttons["start-run"].tap()
-        XCTAssertTrue(element("cadence-lock").waitForExistence(timeout: 6))
-        element("track-identity").tap()
-
-        let pause = app.buttons["pause-run"]
-        let previous = app.buttons["previous-track"]
-        let next = app.buttons["skip-track"]
-        let finish = app.buttons["finish-run"]
-        XCTAssertTrue(pause.waitForExistence(timeout: 2))
-        XCTAssertTrue(previous.exists)
-        XCTAssertTrue(next.exists)
-        XCTAssertTrue(finish.exists)
-        attachScreenshot(named: "before-transport-\(name)")
-
-        finish.tap()
-        XCTAssertTrue(app.buttons["hold-to-finish"].waitForExistence(timeout: 2))
-        attachScreenshot(named: "before-finish-armed-\(name)")
-        app.terminate()
-    }
-
-    private func assertCloseTargetClearsDial(close: XCUIElement, dial: XCUIElement) {
-        XCTAssertTrue(dial.exists)
-        let closeFrame = close.frame
-        let dialFrame = dial.frame
-        let centerDistance = hypot(
-            closeFrame.midX - dialFrame.midX,
-            closeFrame.midY - dialFrame.midY
-        )
-        let dialRadius = min(dialFrame.width, dialFrame.height) / 2
-        let closeHalfDiagonal = hypot(closeFrame.width, closeFrame.height) / 2
-        XCTAssertGreaterThanOrEqual(centerDistance, dialRadius + closeHalfDiagonal)
-    }
-
-    private func waitForVisualSettle(seconds: TimeInterval = 0.3) {
-        RunLoop.current.run(until: Date(timeIntervalSinceNow: seconds))
-    }
-
-    private func currentDisplayedBPM() -> Int? {
-        app.staticTexts.allElementsBoundByIndex
-            .lazy
-            .compactMap { Int($0.label) }
-            .first { 90...210 ~= $0 }
-    }
-
-    private func turn(from start: XCUICoordinate, to end: XCUICoordinate) {
-        start.press(
-            forDuration: 0.12,
-            thenDragTo: end,
-            withVelocity: .slow,
-            thenHoldForDuration: 0.2
-        )
-    }
-
-    private func prepareApp(_ additionalArgument: String? = nil) {
-        prepareApp(additionalArgument.map { [$0] } ?? [])
-    }
-
-    private func prepareApp(_ additionalArguments: [String]) {
-        continueAfterFailure = false
-        app = XCUIApplication()
-        app.launchArguments = ["-SAMADHI_FAST_MODE"]
-        app.launchArguments.append(contentsOf: additionalArguments)
     }
 }

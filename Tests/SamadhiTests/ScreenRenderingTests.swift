@@ -1,0 +1,233 @@
+import Darwin
+import SamadhiDesign
+import SamadhiDomain
+import SwiftUI
+import Testing
+import UIKit
+
+@testable import Samadhi
+
+// These tests draw a screen directly from its state inside the running test host. That takes a
+// fraction of a second where a tap-through launches the whole app, and the environments they set
+// really apply. Real touch and the whole app wired together stay with SamadhiUITests.
+
+// SwiftUI builds its accessibility tree only when something asks for it. This test-only switch is
+// the one accessibility snapshot libraries use. It never ships in the app.
+private let accessibilityTreeEnabled: Bool = {
+    guard let library = dlopen("/usr/lib/libAccessibility.dylib", RTLD_NOW),
+        let symbol = dlsym(library, "_AXSSetAutomationEnabled")
+    else { return false }
+    typealias SetEnabled = @convention(c) (Int32) -> Void
+    unsafeBitCast(symbol, to: SetEnabled.self)(1)
+    return true
+}()
+
+private struct DrawingEnvironment {
+    let name: String
+    var reduceMotion = false
+    var increasedContrast = false
+    var dynamicType = DynamicTypeSize.large
+    // Lists and scroll views only build what fits. A taller window keeps every control in the tree.
+    var height: CGFloat = 874
+
+    static let all = [
+        DrawingEnvironment(name: "normal"),
+        DrawingEnvironment(name: "reduce-motion", reduceMotion: true),
+        DrawingEnvironment(name: "increased-contrast", increasedContrast: true),
+        DrawingEnvironment(name: "accessibility-xxxl", dynamicType: .accessibility5, height: 1400),
+    ]
+}
+
+@MainActor
+private final class HostedScreen {
+    let window: UIWindow
+    private let box: ActionBox
+
+    var sent: [RunAction] { box.actions }
+
+    init(_ state: RunViewState, in environment: DrawingEnvironment = DrawingEnvironment.all[0]) throws {
+        var state = state
+        state.forceReduceMotion = environment.reduceMotion
+        state.forceIncreasedContrast = environment.increasedContrast
+        let box = ActionBox()
+        self.box = box
+        window = try Self.show(
+            SamadhiScreen(state: state) { box.actions.append($0) }
+                .environment(\.dynamicTypeSize, environment.dynamicType),
+            height: environment.height
+        )
+    }
+
+    init(view: some View, dynamicType: DynamicTypeSize = .large, height: CGFloat = 874) throws {
+        box = ActionBox()
+        window = try Self.show(view.environment(\.dynamicTypeSize, dynamicType), height: height)
+    }
+
+    private static func show(_ view: some View, height: CGFloat) throws -> UIWindow {
+        #expect(accessibilityTreeEnabled)
+        let scene = try #require(
+            UIApplication.shared.connectedScenes.compactMap { $0 as? UIWindowScene }.first
+        )
+        let window = UIWindow(windowScene: scene)
+        window.frame = CGRect(x: 0, y: 0, width: 402, height: height)
+        let host = UIHostingController(rootView: view)
+        window.rootViewController = host
+        window.isHidden = false
+        host.view.frame = window.bounds
+        host.view.layoutIfNeeded()
+        RunLoop.current.run(until: Date(timeIntervalSinceNow: 0.15))
+        return window
+    }
+
+    func element(_ identifier: String) -> NSObject? {
+        find(identifier, in: window, depth: 0)
+    }
+
+    private func find(_ identifier: String, in object: NSObject, depth: Int) -> NSObject? {
+        guard depth < 60 else { return nil }
+        // SwiftUI's accessibility nodes answer this selector without declaring the protocol.
+        let selector = NSSelectorFromString("accessibilityIdentifier")
+        if object.responds(to: selector),
+            object.perform(selector)?.takeUnretainedValue() as? String == identifier
+        {
+            return object
+        }
+        if let view = object as? UIView {
+            for child in view.subviews {
+                if let found = find(identifier, in: child, depth: depth + 1) { return found }
+            }
+        }
+        let count = object.accessibilityElementCount()
+        guard count != NSNotFound else { return nil }
+        for index in 0..<count {
+            if let child = object.accessibilityElement(at: index) as? NSObject,
+                let found = find(identifier, in: child, depth: depth + 1)
+            {
+                return found
+            }
+        }
+        return nil
+    }
+
+    func midY(_ identifier: String) throws -> CGFloat {
+        try #require(element(identifier), "\(identifier) is missing").accessibilityFrame.midY
+    }
+
+    func recordFrame(named name: String) {
+        let image = UIGraphicsImageRenderer(bounds: window.bounds).image { _ in
+            window.drawHierarchy(in: window.bounds, afterScreenUpdates: true)
+        }
+        if let data = image.pngData() {
+            Attachment.record(data, named: "\(name).png")
+        }
+    }
+}
+
+@MainActor
+private final class ActionBox {
+    var actions: [RunAction] = []
+}
+
+@MainActor
+@Suite struct ScreenRenderingTests {
+    private func controls(_ phase: RunVisualPhase) -> RunViewState {
+        RunViewState(phase: phase, controlsVisible: true)
+    }
+
+    // A runner's thumb is already on its way when these controls change, so the target has to stay put.
+    @Test(arguments: DrawingEnvironment.all)
+    fileprivate func finishKeepsItsPlaceWhenItArms(_ environment: DrawingEnvironment) throws {
+        let running = try HostedScreen(controls(.running), in: environment)
+        let armed = try HostedScreen(controls(.confirmingFinish), in: environment)
+
+        let finish = try running.midY("finish-run")
+        let hold = try armed.midY("hold-to-finish")
+        #expect(abs(finish - hold) <= 1, "Finish \(finish), Hold \(hold)")
+        running.recordFrame(named: "after-transport-\(environment.name)")
+        armed.recordFrame(named: "after-finish-armed-\(environment.name)")
+    }
+
+    @Test(arguments: DrawingEnvironment.all)
+    fileprivate func pauseAndResumeShareOnePlace(_ environment: DrawingEnvironment) throws {
+        let running = try HostedScreen(controls(.running), in: environment)
+        let paused = try HostedScreen(controls(.paused), in: environment)
+
+        let pause = try running.midY("pause-run")
+        let resume = try paused.midY("resume-run")
+        #expect(abs(pause - resume) <= 1, "Pause \(pause), Resume \(resume)")
+        paused.recordFrame(named: "after-transport-paused-\(environment.name)")
+    }
+
+    @Test func aLockBriefAppearingDoesNotMoveTheControls() throws {
+        var briefed = controls(.running)
+        briefed.showLockBrief = true
+        let quiet = try HostedScreen(controls(.running))
+        let announcing = try HostedScreen(briefed)
+
+        #expect(abs(try quiet.midY("pause-run") - announcing.midY("pause-run")) <= 1)
+    }
+
+    @Test func transportOffersEveryControlAndEachSendsItsOwnAction() throws {
+        let screen = try HostedScreen(controls(.running))
+
+        for identifier in ["previous-track", "pause-run", "skip-track", "finish-run"] {
+            let control = try #require(screen.element(identifier), "\(identifier) is missing")
+            #expect(control.accessibilityActivate())
+        }
+        RunLoop.current.run(until: Date(timeIntervalSinceNow: 0.05))
+
+        #expect(screen.sent.contains(.previous))
+        #expect(screen.sent.contains(.pause))
+        #expect(screen.sent.contains(.skip))
+    }
+
+    @Test(arguments: DrawingEnvironment.all)
+    fileprivate func anOutOfReachPlaylistIsNamedInEveryEnvironment(_ environment: DrawingEnvironment) throws {
+        var state = RunViewState(phase: .running)
+        state.reachNotice = .mostlyFaster
+        let screen = try HostedScreen(state, in: environment)
+
+        let notice = try #require(screen.element("reach-notice"))
+        #expect(notice.accessibilityLabel == "Most of this playlist is faster than you're moving.")
+        screen.recordFrame(named: "out-of-reach-\(environment.name)")
+    }
+
+    @Test func theOutOfReachNoticeNamesTheSlowerDirectionToo() throws {
+        var state = RunViewState(phase: .running)
+        state.reachNotice = .mostlySlower
+        let screen = try HostedScreen(state)
+
+        let notice = try #require(screen.element("reach-notice"))
+        #expect(notice.accessibilityLabel == "Most of this playlist is slower than you're moving.")
+    }
+
+    #if DEBUG
+        @Test(arguments: [
+            ("waiting", TempoDiagnosticStatus.waiting),
+            ("verified", .verified),
+            ("limited", .limited),
+            ("rejected", .rejected),
+        ])
+        func diagnosticsDistinguishEveryAppleMusicResult(_ name: String, _ status: TempoDiagnosticStatus) throws {
+            let screen = try HostedScreen(
+                view: CoreLoopDiagnosticsView(presentation: .fixture(status)),
+                height: 3000
+            )
+
+            let label = try #require(screen.element("tempo-command-status")).accessibilityLabel
+            #expect(label?.isEmpty == false)
+        }
+
+        @Test func diagnosticsRemainReadableAtTheLargestTextSize() throws {
+            let screen = try HostedScreen(
+                view: CoreLoopDiagnosticsView(presentation: .fixture(.limited)),
+                dynamicType: .accessibility5,
+                height: 12000
+            )
+
+            #expect(screen.element("measured-song-speed") != nil)
+            let label = screen.element("tempo-command-status")?.accessibilityLabel
+            #expect(label == "Limited by this song", "label \(label ?? "nil")")
+        }
+    #endif
+}

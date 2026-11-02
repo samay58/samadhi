@@ -131,7 +131,8 @@ struct FinishControl: View {
         return FinishMetrics(
             horizontalPadding: armed ? 30 : 26,
             verticalPadding: armed ? 12 : 9,
-            visibleHeight: armed ? (accessibility ? 58 : 46) : (accessibility ? 46 : 38)
+            visibleHeight: armed ? (accessibility ? 58 : 46) : (accessibility ? 46 : 38),
+            slotHeight: accessibility ? 58 : 46
         )
     }
 
@@ -180,6 +181,8 @@ private struct FinishMetrics {
     let horizontalPadding: CGFloat
     let verticalPadding: CGFloat
     let visibleHeight: CGFloat
+    // The taller armed height at every state, so arming grows the capsule around its own center.
+    let slotHeight: CGFloat
 }
 
 private struct TransportRegion: View {
@@ -294,7 +297,7 @@ private struct FinishControlStyle: ButtonStyle {
                 reduceMotion ? nil : .easeOut(duration: MotionToken.press),
                 value: configuration.isPressed
             )
-            .frame(minHeight: 44)
+            .frame(minHeight: metrics.slotHeight)
             .contentShape(.capsule)
     }
 

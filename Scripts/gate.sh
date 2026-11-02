@@ -8,6 +8,21 @@ project_hash() {
     -exec shasum -a 256 {} + | LC_ALL=C sort -k2 | shasum -a 256
 }
 
+# Everything that can change a result. A push that only touches docs has nothing new to prove.
+gate_stamp() {
+  {
+    ./Scripts/source-fingerprint.sh
+    git ls-files -z Tests Scripts Packages/SamadhiKit/Tests Packages/SamadhiKit/Tools .swift-format |
+      xargs -0 shasum -a 256
+  } | shasum -a 256 | cut -d' ' -f1
+}
+
+stamp_file=.build/last-passed-gate
+if [ "${1:-}" != "--force" ] && [ -f "$stamp_file" ] && [ "$(gate_stamp)" = "$(cat "$stamp_file")" ]; then
+  echo "Nothing that affects the gate has changed since it passed. Run with --force to repeat it."
+  exit 0
+fi
+
 before=$(project_hash)
 ./Scripts/bootstrap.sh >/dev/null
 if [ "$before" != "$(project_hash)" ]; then
@@ -50,4 +65,6 @@ strings -a "$release_binary" | grep -q RunPresentationModel || {
 }
 echo "Debug-only screens are absent from Release."
 
+mkdir -p .build
+gate_stamp > "$stamp_file"
 echo "Software gate passed at $(git rev-parse --short HEAD), fingerprint $(./Scripts/source-fingerprint.sh)."
