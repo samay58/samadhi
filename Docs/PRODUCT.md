@@ -20,7 +20,7 @@ Done means:
 - Sense cadence from one declared phone placement
 - Choose a track whose native pulse fits the requested rhythm
 - Apply fine playback-rate correction inside a declared envelope that passes physical listening
-- Let the runner fine-tune the automatic match or choose a manual BPM without leaving the run
+- Let the runner choose a manual BPM without leaving the run
 - Make a deliberate rhythm change audible enough to verify without watching a number
 - Keep audio stable, pitch-stable, and continuous through lock, pause, resume, and route recovery
 - Show honest progress and tempo-matched summary

@@ -8,7 +8,7 @@ The runner's stable steps per minute. Cadence is sensed from movement and remain
 
 ## Requested musical BPM
 
-The rhythm Samadhi is trying to produce. In Auto it comes from stable cadence plus the runner's fine-tune. In Manual it comes directly from the runner.
+The rhythm Samadhi is trying to produce. In Auto it comes from stable cadence. In Manual it comes directly from the runner.
 
 ## Native pulse
 
