@@ -9,14 +9,6 @@ struct TrackResultsSheet: View {
     var body: some View {
         NavigationStack {
             ZStack {
-                FluidMusicField(
-                    mode: .ready,
-                    usesCollectionPalette: false,
-                    reduceMotionOverride: true,
-                    animates: false
-                )
-                .ignoresSafeArea()
-
                 List {
                     trackSection("Couldn't find the beat", status: .rhythmUnclear)
                     trackSection("No preview to listen to", status: .previewUnavailable)
@@ -37,7 +29,10 @@ struct TrackResultsSheet: View {
                 }
             }
         }
-        .presentationBackground(SamadhiColor.parchment)
+        // A full-height sheet is not system glass, and a bare material reads cold against the field.
+        .presentationBackground {
+            SamadhiColor.parchment.opacity(0.78).background(.ultraThinMaterial)
+        }
         .accessibilityIdentifier("track-results-sheet")
     }
 

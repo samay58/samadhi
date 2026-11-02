@@ -88,7 +88,7 @@ struct FinishControl: View {
             Text(armed ? "Hold to finish" : "Finish")
                 .lineLimit(2)
                 .multilineTextAlignment(.center)
-                .contentTransition(.identity)
+                .contentTransition(.interpolate)
         }
         .buttonStyle(
             FinishControlStyle(
@@ -212,6 +212,7 @@ private struct TransportRegion: View {
         Image(systemName: systemImage)
             .font(.system(size: diameter * (isPrimary ? 0.36 : 0.34), weight: isPrimary ? .bold : .semibold))
             .foregroundStyle(glyphColor)
+            .contentTransition(.symbolEffect(.replace))
             // play.fill sits left of center inside its own box. This puts it back on the optical axis.
             .offset(x: systemImage == "play.fill" ? metrics.opticalNudge : 0)
     }
@@ -277,14 +278,14 @@ private struct FinishControlStyle: ButtonStyle {
             .padding(.horizontal, metrics.horizontalPadding)
             .padding(.vertical, metrics.verticalPadding)
             .frame(minHeight: metrics.visibleHeight)
-            // Arming swaps the word and the width in one frame. A crossfade would show both words
-            // and both widths at once.
-            .transaction { $0.animation = nil }
             // Progress sits behind the label inside the same capsule clip, so it moves and clips
             // with the pressed shape and can never leave the border.
             .background(alignment: .leading) { progress }
             .clipShape(.capsule)
-            .glassEffect(armed ? .regular.tint(SamadhiColor.clay.opacity(0.45)) : .identity, in: .capsule)
+            .glassEffect(
+                armed ? .regular.tint(SamadhiColor.clay.opacity(0.45)).interactive() : .clear.interactive(),
+                in: .capsule
+            )
             .overlay {
                 Capsule().strokeBorder(strokeColor, lineWidth: 1)
             }

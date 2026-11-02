@@ -155,11 +155,11 @@ struct RunRecoveryScreen: View {
         Button(action: action) {
             Text(title)
                 .font(.callout.weight(.semibold))
-                .foregroundStyle(SamadhiColor.ink.opacity(0.82))
-                .frame(minWidth: 176, minHeight: 44)
-                .contentShape(Rectangle())
+                .foregroundStyle(SamadhiColor.ink.opacity(0.86))
+                .padding(.horizontal, Space.x2)
+                .frame(minHeight: 36)
         }
-        .buttonStyle(.plain)
+        .buttonStyle(.glass)
         .accessibilityIdentifier(identifier)
     }
 

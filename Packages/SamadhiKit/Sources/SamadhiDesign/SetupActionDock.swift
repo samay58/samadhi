@@ -16,7 +16,7 @@ struct SetupActionDock: View {
         // The dock keeps one height through every stage, so the playlist name never moves.
         .frame(
             maxWidth: .infinity,
-            minHeight: dynamicTypeSize.isAccessibilitySize ? nil : 120,
+            minHeight: dynamicTypeSize.isAccessibilitySize ? nil : 128,
             alignment: actionAlignment
         )
         .animation(
@@ -35,7 +35,7 @@ struct SetupActionDock: View {
 
     @ViewBuilder
     private var actions: some View {
-        VStack(alignment: dynamicTypeSize.isAccessibilitySize ? .leading : .center, spacing: Space.x2) {
+        VStack(alignment: dynamicTypeSize.isAccessibilitySize ? .leading : .center, spacing: Space.x3) {
             switch selection {
             case .none:
                 SetupPrimaryButton("Choose music", identifier: "choose-music") {
@@ -175,8 +175,6 @@ private struct SetupSecondaryButton: View {
     let identifier: String
     let action: @MainActor () -> Void
 
-    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
-
     init(_ title: String, identifier: String, action: @escaping @MainActor () -> Void) {
         self.title = title
         self.identifier = identifier
@@ -184,17 +182,15 @@ private struct SetupSecondaryButton: View {
     }
 
     var body: some View {
-        Button(title, action: action)
-            .font(.callout.weight(.semibold))
-            .foregroundStyle(SamadhiColor.ink.opacity(0.82))
-            .frame(
-                minWidth: dynamicTypeSize.isAccessibilitySize ? nil : 176,
-                maxWidth: dynamicTypeSize.isAccessibilitySize ? .infinity : 220,
-                minHeight: 44,
-                alignment: dynamicTypeSize.isAccessibilitySize ? .leading : .center
-            )
-            .contentShape(Rectangle())
-            .accessibilitySortPriority(1)
-            .accessibilityIdentifier(identifier)
+        Button(action: action) {
+            Text(title)
+                .font(.callout.weight(.semibold))
+                .foregroundStyle(SamadhiColor.ink.opacity(0.86))
+                .padding(.horizontal, Space.x2)
+                .frame(minHeight: 36)
+        }
+        .buttonStyle(.glass)
+        .accessibilitySortPriority(1)
+        .accessibilityIdentifier(identifier)
     }
 }

@@ -15,21 +15,7 @@ struct PlaylistPickerView: View {
     var body: some View {
         NavigationStack {
             ZStack {
-                FluidMusicField(
-                    mode: .ready,
-                    usesCollectionPalette: false,
-                    reduceMotionOverride: true,
-                    animates: false
-                )
-                .ignoresSafeArea()
-
                 VStack(alignment: .leading, spacing: 0) {
-                    BrandMark()
-                        .frame(width: 34, height: 25)
-                        .frame(maxWidth: .infinity)
-                        .padding(.top, Space.x2)
-                        .padding(.bottom, Space.x4)
-
                     Text("Choose music")
                         .font(.system(.largeTitle, design: .serif).weight(.medium))
                         .foregroundStyle(SamadhiColor.ink)
@@ -48,7 +34,6 @@ struct PlaylistPickerView: View {
             }
             .toolbarBackground(.hidden, for: .navigationBar)
         }
-        .presentationBackground(.clear)
         .presentationDragIndicator(.visible)
         .presentationDetents(presentationDetents)
         .presentationContentInteraction(.scrolls)

@@ -175,6 +175,8 @@ public struct RunViewState: Sendable, Equatable {
     public var showLockBrief: Bool
     public var reachNotice: ReachNoticePresentation?
     public var finishHoldPressing: Bool
+    // The playlist sheet is glass, so a bright button behind it would show through as a smudge.
+    public var isChoosingMusic = false
     public var forceReduceMotion: Bool
     public var forceIncreasedContrast: Bool
     public var musicSelection: MusicSelectionPresentation

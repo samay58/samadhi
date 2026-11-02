@@ -59,6 +59,7 @@ struct RootView: View {
     private var samadhiScreen: some View {
         var state = runModel.viewState
         state.musicSelection = musicModel.presentation
+        state.isChoosingMusic = musicModel.playlistSheet != nil
 
         return ZStack(alignment: .topLeading) {
             SamadhiScreen(state: state) { action in

@@ -104,37 +104,21 @@ private struct TempoOrbDrawing: View {
 
     var body: some View {
         ZStack {
+            // A sunrise under the lens gives the glass something to bend. It swells on the beat.
             Circle()
                 .fill(
-                    AngularGradient(
-                        colors: orbColors,
-                        center: .center,
-                        angle: .degrees(phase * 22)
+                    RadialGradient(
+                        colors: pooledLight,
+                        center: UnitPoint(x: 0.5, y: 1.04),
+                        startRadius: 4,
+                        endRadius: 172
                     )
                 )
-                .overlay {
-                    Circle()
-                        .fill(
-                            RadialGradient(
-                                colors: [
-                                    SamadhiColor.ivory.opacity(0.72),
-                                    SamadhiColor.apricot.opacity(0.16),
-                                    SamadhiColor.plum.opacity(0.34),
-                                ],
-                                center: UnitPoint(x: 0.31, y: 0.24),
-                                startRadius: 3,
-                                endRadius: 175
-                            )
-                        )
-                }
-                .overlay {
-                    Circle()
-                        .strokeBorder(
-                            SamadhiColor.ivory.opacity(increasedContrast ? 0.96 : 0.64),
-                            lineWidth: increasedContrast ? 3 : 1.5)
-                }
-                .shadow(color: SamadhiColor.apricot.opacity(0.28), radius: 30, y: 12)
-                .shadow(color: SamadhiColor.ink.opacity(0.34), radius: 18, y: 14)
+                .opacity(0.72 + 0.28 * exp(-phase * 7.5))
+                .padding(18)
+
+            Color.clear
+                .glassEffect(lens, in: .circle)
                 .padding(18)
 
             Circle()
@@ -161,29 +145,24 @@ private struct TempoOrbDrawing: View {
                     style: StrokeStyle(lineWidth: 1, dash: [2, 8])
                 )
                 .padding(38)
-
-            Ellipse()
-                .fill(SamadhiColor.ivory.opacity(0.36))
-                .frame(width: 64, height: 22)
-                .blur(radius: 8)
-                .rotationEffect(.degrees(-24))
-                .offset(x: -42, y: -54)
         }
     }
 
-    private var orbColors: [Color] {
+    private var lens: Glass {
+        // Regular glass turns pale over this field, so it needs a dark tint for ivory text to hold.
+        increasedContrast ? .regular.tint(SamadhiColor.ink.opacity(0.62)).interactive() : .clear.interactive()
+    }
+
+    private var pooledLight: [Color] {
         switch mode {
         case .acquiring:
-            [SamadhiColor.plum, SamadhiColor.apricot.opacity(0.82), SamadhiColor.olive, SamadhiColor.plum]
+            [SamadhiColor.apricot.opacity(0.45), SamadhiColor.clay.opacity(0.18), .clear]
         case .locked:
-            [SamadhiColor.clay, SamadhiColor.apricot, SamadhiColor.olive, SamadhiColor.plum, SamadhiColor.clay]
+            [SamadhiColor.apricot.opacity(0.9), SamadhiColor.clay.opacity(0.42), .clear]
         case .paused:
-            [SamadhiColor.plum, SamadhiColor.apricot.opacity(0.48), SamadhiColor.ink, SamadhiColor.plum]
+            [SamadhiColor.ivory.opacity(0.14), SamadhiColor.apricot.opacity(0.08), .clear]
         case .interrupted:
-            [
-                SamadhiColor.plum.opacity(0.72), SamadhiColor.ink, SamadhiColor.olive.opacity(0.58),
-                SamadhiColor.plum.opacity(0.72),
-            ]
+            [SamadhiColor.plum.opacity(0.4), .clear]
         }
     }
 }

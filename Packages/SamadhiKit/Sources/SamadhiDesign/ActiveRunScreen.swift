@@ -24,7 +24,7 @@ struct ActiveRunScreen: View {
                 )
 
                 RunStatus(state: state)
-                    .frame(minHeight: reservesStatusRow ? 44 : 4)
+                    .frame(minHeight: reservesStatusRow ? 52 : 4)
                     .padding(.horizontal, showsStatus ? Space.x4 : 0)
                     .background {
                         if showsStatusWell {

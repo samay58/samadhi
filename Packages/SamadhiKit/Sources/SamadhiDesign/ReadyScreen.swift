@@ -67,6 +67,8 @@ struct ReadyScreen: View {
                 reduceMotion: effectiveReduceMotion,
                 send: send
             )
+            .opacity(state.isChoosingMusic ? 0 : 1)
+            .animation(effectiveReduceMotion ? nil : .easeOut(duration: 0.2), value: state.isChoosingMusic)
             .padding(.bottom, Space.x8)
         }
         .frame(maxWidth: .infinity, minHeight: 700)
