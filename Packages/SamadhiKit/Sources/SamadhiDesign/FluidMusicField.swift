@@ -10,15 +10,29 @@ public struct FluidMusicField: View {
     let usesCollectionPalette: Bool
     let reduceMotionOverride: Bool
     let animates: Bool
+    let playlistLines: [PlaylistContourLine]?
+    let warmth: Double
+    let isSettled: Bool
+    let leavesClearing: Bool
 
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @State private var lineBirths: [String: TimeInterval] = [:]
+    @State private var settledAt: TimeInterval?
 
     public init(
         mode: FluidFieldMode,
         usesCollectionPalette: Bool = true,
         reduceMotionOverride: Bool = false,
-        animates: Bool = true
+        animates: Bool = true,
+        contourLines: [PlaylistContourLine]? = nil,
+        warmth: Double = 1,
+        isSettled: Bool = false,
+        leavesClearing: Bool = false
     ) {
+        self.leavesClearing = leavesClearing
+        self.playlistLines = contourLines
+        self.warmth = warmth
+        self.isSettled = isSettled
         self.mode = mode
         self.usesCollectionPalette = usesCollectionPalette
         self.reduceMotionOverride = reduceMotionOverride
@@ -26,8 +40,9 @@ public struct FluidMusicField: View {
     }
 
     public var body: some View {
-        // The field tops out at 20 fps and stops once the tempo aperture becomes the motion owner.
-        TimelineView(.animation(minimumInterval: 1 / 20, paused: !shouldAnimate)) { timeline in
+        // The field rests at 20 fps and stops once the tempo aperture becomes the motion owner. It
+        // runs faster only while a line is being drawn, because a pen stroke shows every dropped frame.
+        TimelineView(.animation(minimumInterval: isDrawing ? 1 / 60 : 1 / 20, paused: !shouldAnimate)) { timeline in
             let time = shouldAnimate ? timeline.date.timeIntervalSinceReferenceDate : 0
             ZStack {
                 MeshGradient(
@@ -38,13 +53,57 @@ public struct FluidMusicField: View {
                     background: mode == .ready ? SamadhiColor.parchment : SamadhiColor.plum,
                     smoothsColors: true
                 )
+                .animation(shouldAnimate ? .easeInOut(duration: 0.9) : nil, value: warmth)
 
                 contourLines(at: time)
+                    .opacity(playlistLines == nil ? 1 : 0)
+                    .animation(shouldAnimate ? .easeOut(duration: 0.4) : nil, value: playlistLines == nil)
+
+                if let playlistLines {
+                    PlaylistContourCanvas(
+                        lines: playlistLines,
+                        births: lineBirths,
+                        settledAt: settledAt,
+                        now: time,
+                        isAnimated: shouldAnimate,
+                        ink: mode == .ready ? SamadhiColor.ink : SamadhiColor.ivory,
+                        accent: mode == .ready ? SamadhiColor.clay : SamadhiColor.apricot,
+                        leavesClearing: leavesClearing
+                    )
+                }
 
                 readabilityWash
             }
         }
         .accessibilityHidden(true)
+        .onChange(of: playlistLines?.map(\.id) ?? []) { oldIDs, newIDs in
+            recordBirths(of: newIDs, excluding: oldIDs)
+        }
+        .onChange(of: isSettled) { _, settled in
+            settledAt = settled && shouldAnimate ? Date.timeIntervalSinceReferenceDate : nil
+        }
+        .task(id: settledAt) {
+            guard settledAt != nil else { return }
+            try? await Task.sleep(for: .seconds(PlaylistContourCanvas.settleDuration))
+            if !Task.isCancelled { settledAt = nil }
+        }
+    }
+
+    private var isDrawing: Bool {
+        guard mode == .ready, playlistLines != nil else { return false }
+        return !isSettled || settledAt != nil
+    }
+
+    // Lines that were already there when the screen appeared stay still. Only a song read now draws.
+    // Songs arrive in batches of three, so each waits a beat for the one before it.
+    private func recordBirths(of ids: [String], excluding existing: [String]) {
+        guard shouldAnimate else { return }
+        let now = Date.timeIntervalSinceReferenceDate
+        var next = max(now, (lineBirths.values.max() ?? 0) + PlaylistContourCanvas.drawStagger)
+        for id in ids where !existing.contains(id) {
+            lineBirths[id] = next
+            next += PlaylistContourCanvas.drawStagger
+        }
     }
 
     private var effectiveReduceMotion: Bool {
@@ -68,15 +127,17 @@ public struct FluidMusicField: View {
         ]
     }
 
+    private static let paleField = [
+        SamadhiColor.parchment, Color(red: 0.94, green: 0.86, blue: 0.75), SamadhiColor.ivory,
+        Color(red: 0.91, green: 0.79, blue: 0.65), Color(red: 0.93, green: 0.83, blue: 0.70),
+        Color(red: 0.94, green: 0.85, blue: 0.73),
+        SamadhiColor.ivory, Color(red: 0.86, green: 0.84, blue: 0.72), SamadhiColor.parchment,
+    ]
+
     private var palette: [Color] {
         guard usesCollectionPalette else {
             return mode == .ready
-                ? [
-                    SamadhiColor.parchment, Color(red: 0.94, green: 0.86, blue: 0.75), SamadhiColor.ivory,
-                    Color(red: 0.91, green: 0.79, blue: 0.65), Color(red: 0.93, green: 0.83, blue: 0.70),
-                    Color(red: 0.94, green: 0.85, blue: 0.73),
-                    SamadhiColor.ivory, Color(red: 0.86, green: 0.84, blue: 0.72), SamadhiColor.parchment,
-                ]
+                ? Self.paleField
                 : [
                     SamadhiColor.plum, Color(red: 0.37, green: 0.35, blue: 0.32), SamadhiColor.ink,
                     Color(red: 0.34, green: 0.32, blue: 0.29), Color(red: 0.26, green: 0.28, blue: 0.25),
@@ -87,13 +148,17 @@ public struct FluidMusicField: View {
 
         switch mode {
         case .ready:
-            return [
+            let sunrise = [
                 SamadhiColor.parchment, Color(red: 0.95, green: 0.73, blue: 0.48), SamadhiColor.ivory,
                 Color(red: 0.82, green: 0.43, blue: 0.27), Color(red: 0.94, green: 0.66, blue: 0.43),
                 Color(red: 0.91, green: 0.58, blue: 0.35),
                 Color(red: 0.58, green: 0.64, blue: 0.48), Color(red: 0.87, green: 0.73, blue: 0.53),
                 SamadhiColor.parchment,
             ]
+            guard warmth < 1 else { return sunrise }
+            return zip(sunrise, Self.paleField).map { warm, pale in
+                warm.mix(with: pale, by: 1 - warmth)
+            }
         case .running:
             return [
                 SamadhiColor.plum, Color(red: 0.55, green: 0.28, blue: 0.24), Color(red: 0.28, green: 0.18, blue: 0.22),

@@ -172,7 +172,7 @@ final class MusicSelectionModel {
         switch fixture {
         case .standard:
             apply(AppMusicCollection.simulatorDemo)
-        case .none:
+        case .none, .readingLibrary:
             presentation = .none
         case .loading:
             presentation = .loadingPlaylists(current: nil)
@@ -240,7 +240,8 @@ final class MusicSelectionModel {
                 ImportedTrackPresentation(
                     id: $0.id.rawValue,
                     title: $0.title,
-                    status: presentationStatus(for: $0.analysisState)
+                    status: presentationStatus(for: $0.analysisState),
+                    pulseBPM: $0.isAdaptiveReady ? $0.tempo?.baseBPM : nil
                 )
             }
         )

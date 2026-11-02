@@ -22,11 +22,31 @@ enum SetupReadinessFeedback {
 
 struct SetupPlaylistIdentity: View {
     let selection: MusicSelectionPresentation
+    let reduceMotion: Bool
 
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     @ScaledMetric(relativeTo: .largeTitle) private var identityFontSize = 46.0
 
     var body: some View {
+        // The name rises into place as the playlist sheet falls away, so the two read as one move.
+        ZStack {
+            identity
+                .id(selection.identityTitle)
+                .transition(identityTransition)
+        }
+        .frame(maxWidth: 520, alignment: dynamicTypeSize.isAccessibilitySize ? .leading : .center)
+        .animation(reduceMotion ? nil : .smooth(duration: 0.5), value: selection.identityTitle)
+    }
+
+    private var identityTransition: AnyTransition {
+        if reduceMotion { return .identity }
+        return .asymmetric(
+            insertion: .opacity.combined(with: .offset(y: 16)).animation(.smooth(duration: 0.55).delay(0.14)),
+            removal: .opacity.combined(with: .offset(y: -10)).animation(.easeOut(duration: 0.16))
+        )
+    }
+
+    private var identity: some View {
         Text(selection.identityTitle)
             .font(identityFont)
             .tracking(dynamicTypeSize.isAccessibilitySize ? -0.25 : -0.8)
@@ -120,10 +140,11 @@ func setupTransition(reduceMotion: Bool) -> AnyTransition {
 
     let removal = AnyTransition.opacity
         .combined(with: .offset(y: -6))
-        .animation(.easeOut(duration: 0.1))
+        .animation(.easeOut(duration: 0.14))
     let insertion = AnyTransition.opacity
-        .combined(with: .offset(y: 8))
-        .animation(.easeOut(duration: 0.1).delay(0.11))
+        .combined(with: .offset(y: 14))
+        .combined(with: .scale(scale: 0.98))
+        .animation(.spring(duration: 0.5, bounce: 0.12).delay(0.12))
 
     return .asymmetric(
         insertion: insertion,

@@ -15,7 +15,7 @@ struct SetupStatusRail: View {
         }
         .frame(
             maxWidth: dynamicTypeSize.isAccessibilitySize ? .infinity : 320,
-            minHeight: dynamicTypeSize.isAccessibilitySize ? nil : 76,
+            minHeight: dynamicTypeSize.isAccessibilitySize ? nil : 84,
             alignment: statusAlignment
         )
         .animation(
@@ -55,7 +55,24 @@ private struct AnalysisProgressRail: View {
         if collection.totalTrackCount > 0 {
             VStack(alignment: .leading, spacing: Space.x3) {
                 HStack(alignment: .firstTextBaseline) {
-                    Text("Reading rhythm")
+                    // Your own songs pass through here as they are read.
+                    ZStack(alignment: .leading) {
+                        Text(collection.latestReadTitle ?? "Reading rhythm")
+                            .lineLimit(1)
+                            .id(collection.latestReadTitle ?? "Reading rhythm")
+                            .transition(
+                                reduceMotion
+                                    ? .identity
+                                    : .asymmetric(
+                                        insertion: .opacity.combined(with: .offset(y: 7)),
+                                        removal: .opacity.combined(with: .offset(y: -7))
+                                    )
+                            )
+                    }
+                    .animation(
+                        reduceMotion ? nil : .smooth(duration: 0.24),
+                        value: collection.latestReadTitle
+                    )
                     Spacer(minLength: Space.x6)
                     Text("\(collection.completedTrackCount) / \(collection.totalTrackCount)")
                         .monospacedDigit()

@@ -152,7 +152,8 @@ struct ActiveRunScreen: View {
 
     private var apertureSize: CGFloat {
         if dynamicTypeSize.isAccessibilitySize {
-            return state.rhythmControl.isVisible ? 228 : 250
+            if state.rhythmControl.isVisible { return 228 }
+            return keepsControlLayout ? 216 : 250
         }
         return state.rhythmControl.isVisible || keepsControlLayout ? 244 : 286
     }

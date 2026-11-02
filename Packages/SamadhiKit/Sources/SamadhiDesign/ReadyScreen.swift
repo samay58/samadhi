@@ -51,7 +51,7 @@ struct ReadyScreen: View {
         VStack(spacing: 0) {
             Spacer(minLength: Space.x12)
 
-            SetupPlaylistIdentity(selection: state.musicSelection)
+            SetupPlaylistIdentity(selection: state.musicSelection, reduceMotion: effectiveReduceMotion)
 
             SetupStatusRail(
                 selection: state.musicSelection,
@@ -74,7 +74,7 @@ struct ReadyScreen: View {
 
     private var accessibilityComposition: some View {
         VStack(alignment: .leading, spacing: 0) {
-            SetupPlaylistIdentity(selection: state.musicSelection)
+            SetupPlaylistIdentity(selection: state.musicSelection, reduceMotion: true)
                 .padding(.top, Space.x8)
 
             SetupStatusRail(

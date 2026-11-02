@@ -69,6 +69,26 @@ enum AppMusicCollection {
 
     static let simulatorCollections = [simulatorDemo, simulatorCruise]
 
+    // Enough songs across a wide range of tempos to judge the reading animation.
+    static let simulatorMorningMiles = MusicCollection(
+        id: MusicCollectionID("simulator-morning-miles"),
+        name: "Morning Miles",
+        tracks: [
+            ("Open Shade", 148.0), ("Low Tide", 96.0), ("Long Light", 160.0), ("Paper Coast", 172.0),
+            ("Second Wind", 184.0), ("Porch Light", 112.0), ("Warm Signal", 168.0), ("Field Note", 128.0),
+            ("Late Coffee", 138.0), ("North Window", 176.0), ("Side Street", 104.0), ("Soft Current", 154.0),
+            ("Quiet Arcade", 88.0), ("Dawn on Valencia", 168.0), ("Afterimage", 142.0), ("Saffron", 190.0),
+            ("Distant Signal", 120.0), ("Home Stretch", 164.0),
+        ].map { title, bpm in
+            demoTrack(
+                id: "morning-\(title.lowercased().replacingOccurrences(of: " ", with: "-"))",
+                title: title,
+                artist: "Field Note",
+                bpm: bpm
+            )
+        }
+    )
+
     static let simulatorExpandedCollections = (1...40).map { index in
         MusicCollection(
             id: MusicCollectionID("simulator-library-\(index)"),
@@ -199,7 +219,9 @@ final class SimulatorMusicImportService: MusicLibraryImporting {
         fixture: MusicSelectionFixture = .standard,
         reviewMode: Bool = false
     ) {
-        trackDelay = reviewMode ? .milliseconds(650) : .milliseconds(120)
+        trackDelay =
+            fixture == .readingLibrary
+            ? .milliseconds(380) : reviewMode ? .milliseconds(650) : .milliseconds(120)
         switch fixture {
         case .emptyLibrary:
             collections = []
@@ -207,6 +229,8 @@ final class SimulatorMusicImportService: MusicLibraryImporting {
             collections = AppMusicCollection.simulatorExpandedCollections
         case .longPlaylistName:
             collections = [AppMusicCollection.simulatorLongName]
+        case .readingLibrary:
+            collections = [AppMusicCollection.simulatorMorningMiles]
         case .standard, .none, .loading, .loadingSelected, .analyzing, .partial,
             .authorizationFailure, .importFailure, .twoPlaylistLibrary:
             collections = AppMusicCollection.simulatorCollections

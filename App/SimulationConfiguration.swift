@@ -13,6 +13,7 @@ enum MusicSelectionFixture: Equatable {
     case twoPlaylistLibrary
     case largeLibrary
     case longPlaylistName
+    case readingLibrary
 }
 
 // A scripted Auto adjustment for Simulator proof. The simulated cadence settles, then moves by the
@@ -188,6 +189,9 @@ struct SimulationConfiguration {
                 }
                 if arguments.contains("-SAMADHI_MUSIC_LONG_NAME") {
                     return .longPlaylistName
+                }
+                if arguments.contains("-SAMADHI_MUSIC_LIBRARY_READING") {
+                    return .readingLibrary
                 }
                 return .standard
             }()

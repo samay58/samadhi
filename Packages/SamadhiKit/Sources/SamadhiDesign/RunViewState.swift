@@ -44,11 +44,19 @@ public struct ImportedTrackPresentation: Sendable, Equatable, Identifiable {
     public let id: String
     public let title: String
     public let status: MusicTrackImportPresentation
+    // The measured musical tempo, present only once the song is ready.
+    public let pulseBPM: Double?
 
-    public init(id: String, title: String, status: MusicTrackImportPresentation) {
+    public init(
+        id: String,
+        title: String,
+        status: MusicTrackImportPresentation,
+        pulseBPM: Double? = nil
+    ) {
         self.id = id
         self.title = title
         self.status = status
+        self.pulseBPM = pulseBPM
     }
 }
 

@@ -13,7 +13,12 @@ struct SetupActionDock: View {
                 .id(selection.visualStage)
                 .transition(setupTransition(reduceMotion: reduceMotion))
         }
-        .frame(maxWidth: .infinity, minHeight: dynamicTypeSize.isAccessibilitySize ? nil : 100)
+        // The dock keeps one height through every stage, so the playlist name never moves.
+        .frame(
+            maxWidth: .infinity,
+            minHeight: dynamicTypeSize.isAccessibilitySize ? nil : 120,
+            alignment: actionAlignment
+        )
         .animation(
             reduceMotion ? nil : .easeOut(duration: MotionToken.feedback),
             value: selection.visualStage
@@ -22,7 +27,10 @@ struct SetupActionDock: View {
     }
 
     private var actionAlignment: Alignment {
-        dynamicTypeSize.isAccessibilitySize ? .leading : .center
+        if dynamicTypeSize.isAccessibilitySize { return .leading }
+        // While reading, the way out sits exactly where Change playlist will appear.
+        if case .analyzing = selection { return .bottom }
+        return .top
     }
 
     @ViewBuilder

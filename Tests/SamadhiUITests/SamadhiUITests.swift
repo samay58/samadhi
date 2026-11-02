@@ -288,6 +288,51 @@ final class SamadhiUITests: XCTestCase {
         attachScreenshot(named: "setup-review-ready")
     }
 
+    func testReadingAPlaylistDrawsItsSongsThenOffersStart() {
+        prepareApp("-SAMADHI_MUSIC_LIBRARY_READING")
+        app.launch()
+
+        XCTAssertTrue(app.buttons["choose-music"].waitForExistence(timeout: 3))
+        attachScreenshot(named: "reading-0-empty")
+        app.buttons["choose-music"].tap()
+        XCTAssertTrue(element("playlist-picker").waitForExistence(timeout: 3))
+        app.buttons["playlist-choice-simulator-morning-miles"].tap()
+
+        XCTAssertTrue(element("music-analyzing").waitForExistence(timeout: 3))
+        XCTAssertFalse(app.buttons["start-run"].exists)
+        RunLoop.current.run(until: Date().addingTimeInterval(2))
+        attachScreenshot(named: "reading-1-early")
+        XCTAssertFalse(app.buttons["start-run"].exists)
+        RunLoop.current.run(until: Date().addingTimeInterval(2.4))
+        attachScreenshot(named: "reading-2-late")
+
+        XCTAssertTrue(element("music-ready").waitForExistence(timeout: 12))
+        XCTAssertTrue(app.buttons["start-run"].isHittable)
+        RunLoop.current.run(until: Date().addingTimeInterval(2.4))
+        attachScreenshot(named: "reading-3-ready")
+    }
+
+    func testReadingAPlaylistStaysCompleteWithReduceMotion() {
+        prepareApp([
+            "-SAMADHI_MUSIC_LIBRARY_READING",
+            "-UIAccessibilityReduceMotionEnabled",
+            "YES",
+        ])
+        app.launch()
+
+        XCTAssertTrue(app.buttons["choose-music"].waitForExistence(timeout: 3))
+        app.buttons["choose-music"].tap()
+        XCTAssertTrue(element("playlist-picker").waitForExistence(timeout: 3))
+        app.buttons["playlist-choice-simulator-morning-miles"].tap()
+
+        XCTAssertTrue(element("music-analyzing").waitForExistence(timeout: 3))
+        RunLoop.current.run(until: Date().addingTimeInterval(3))
+        attachScreenshot(named: "reading-reduce-motion")
+        XCTAssertTrue(element("music-ready").waitForExistence(timeout: 12))
+        XCTAssertTrue(app.buttons["start-run"].isHittable)
+        attachScreenshot(named: "reading-reduce-motion-ready")
+    }
+
     func testChangingMusicMarksTheCurrentPlaylist() {
         prepareApp()
         app.launch()

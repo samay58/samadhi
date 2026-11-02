@@ -5,6 +5,7 @@ public struct SamadhiScreen: View {
     private let send: @MainActor (RunAction) -> Void
 
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
     public init(state: RunViewState, send: @escaping @MainActor (RunAction) -> Void) {
         self.state = state
@@ -47,21 +48,27 @@ public struct SamadhiScreen: View {
                     mode: .ready,
                     usesCollectionPalette: state.hasArtwork,
                     reduceMotionOverride: state.forceReduceMotion,
-                    animates: true
+                    animates: true,
+                    contourLines: state.musicSelection.contourLines,
+                    warmth: state.musicSelection.fieldWarmth,
+                    isSettled: state.musicSelection.isReadyToRun,
+                    leavesClearing: !dynamicTypeSize.isAccessibilitySize
                 )
             case .permissionRecovery, .routeRecovery, .summary:
                 FluidMusicField(
                     mode: .ready,
                     usesCollectionPalette: false,
                     reduceMotionOverride: true,
-                    animates: false
+                    animates: false,
+                    contourLines: state.musicSelection.contourLines
                 )
             default:
                 FluidMusicField(
                     mode: .running,
                     usesCollectionPalette: state.hasArtwork,
                     reduceMotionOverride: state.forceReduceMotion,
-                    animates: state.phase == .preparing || state.phase == .acquiring
+                    animates: state.phase == .preparing || state.phase == .acquiring,
+                    contourLines: state.musicSelection.contourLines
                 )
             }
         }
