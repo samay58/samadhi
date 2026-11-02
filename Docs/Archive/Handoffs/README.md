@@ -5,7 +5,7 @@ Use this directory for large project handoffs that must remain traceable from so
 Each handoff gets one dated directory:
 
 ~~~text
-Docs/Handoffs/YYYY-MM-DD-short-name/
+Docs/Archive/Handoffs/YYYY-MM-DD-short-name/
     original/
     MANIFEST.md
     MAP.md

@@ -10,7 +10,7 @@ Samadhi must make a runner hear and feel music respond to movement. A changing n
 
 This phase is complete when Samay can import one Apple Music playlist, start a normal outdoor run, hear an unmistakable but musical response, settle onto the beat, lock the phone, recover from ordinary interruptions, and trust the summary.
 
-The research basis and source links live in [ADAPTIVE-AUDIO-PLAYBOOK.md](ADAPTIVE-AUDIO-PLAYBOOK.md). Product terms live in [CONTEXT.md](CONTEXT.md).
+The research basis and source links live in [ADAPTIVE-AUDIO-PLAYBOOK.md](../ADAPTIVE-AUDIO-PLAYBOOK.md). Product terms live in [CONTEXT.md](../CONTEXT.md).
 
 ## Current truth
 

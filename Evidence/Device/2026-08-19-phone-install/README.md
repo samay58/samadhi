@@ -1,6 +1,6 @@
 # Phone install of the transport, cause, and Auto feedback candidate
 
-Installed on 2026-08-19 from clean `main` at commit `67adf80f4f9c31ec7a853dd3645cc0f2feebcc4c`. This record covers the build, the signature, the install, and one in-app read-back. It makes no claim about feel, sound, ducking, lock screen, route recovery, or anything else on the checklist in `Docs/PHONE-CHECK-2026-08-19.md`.
+Installed on 2026-08-19 from clean `main` at commit `67adf80f4f9c31ec7a853dd3645cc0f2feebcc4c`. This record covers the build, the signature, the install, and one in-app read-back. It makes no claim about feel, sound, ducking, lock screen, route recovery, or anything else on the checklist in `Docs/PHONE-CHECK.md`.
 
 ## Signed build
 
@@ -38,7 +38,7 @@ The phone was unlocked. The app was launched once normally, then once with `--co
 
 ## Still open
 
-Everything in `Docs/PHONE-CHECK-2026-08-19.md`: endpoint listening and read-back at 0.85 and 1.15, transport and Finish feel, the blinded faster and slower trials on both sound paths, the recorded cause after a natural end and after an explicit Next, and lock, interruption, and route recovery. No run was started and no diagnostics file was pulled for this build.
+Everything in `Docs/PHONE-CHECK.md`: endpoint listening and read-back at 0.85 and 1.15, transport and Finish feel, the blinded faster and slower trials on both sound paths, the recorded cause after a natural end and after an explicit Next, and lock, interruption, and route recovery. No run was started and no diagnostics file was pulled for this build.
 
 ## Second install the same day, commit 13e88bf
 

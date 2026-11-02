@@ -36,4 +36,4 @@ Diagnostic schema 11: a 2,048-entry record that drops per-second ticks first; an
 
 ## Still open
 
-The walk itself. Walk Easy Miles again for at least ten minutes with the phone in the pocket and the screen locked part of the time, then pull `latest-run-diagnostics.json` and parse it. Everything in `Docs/PHONE-CHECK-2026-08-19.md` remains open as well.
+The walk itself. Walk Easy Miles again for at least ten minutes with the phone in the pocket and the screen locked part of the time, then pull `latest-run-diagnostics.json` and parse it. Everything in `Docs/PHONE-CHECK.md` remains open as well.

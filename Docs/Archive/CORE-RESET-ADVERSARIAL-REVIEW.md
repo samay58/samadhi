@@ -23,7 +23,7 @@ The follow-up implementation made Manual belong to the confirmed song and added 
 - Historical: established only by committed repository evidence.
 - Unverified: requires a current device trace, listening check, body-feel test, or Samay decision.
 
-These labels follow the handoff's validation boundary. Source: `Docs/Handoffs/2026-08-14-master-handoff/original/pasted-text.txt:1568-1599`.
+These labels follow the handoff's validation boundary. Source: `Docs/Archive/Handoffs/2026-08-14-master-handoff/original/pasted-text.txt:1568-1599`.
 
 ## Current environment
 
@@ -75,7 +75,7 @@ Keep the current architecture. The reducer owns run state. The app shell owns ti
 
 The reported problems come from product rules and missing Debug evidence, not from the functional-core boundary. Replacing the architecture would increase risk without addressing the complaints.
 
-Source: `Docs/Handoffs/2026-08-14-master-handoff/original/pasted-text.txt:100-124`; code: `Docs/ARCHITECTURE.md`, `Packages/SamadhiKit/Sources/SamadhiDomain/RunReducer.swift`, `App/RunPresentationModel.swift`.
+Source: `Docs/Archive/Handoffs/2026-08-14-master-handoff/original/pasted-text.txt:100-124`; code: `Docs/ARCHITECTURE.md`, `Packages/SamadhiKit/Sources/SamadhiDomain/RunReducer.swift`, `App/RunPresentationModel.swift`.
 
 ## Current behavior traces
 
@@ -204,7 +204,7 @@ Code: `App/RunDiagnosticsStore.swift:4`, `App/RunPresentationModel.swift:663`, `
 | F-019 hidden tempo transformation | Fixed for Debug inspection | The complete numerical chain is readable, tied to the exact app build, and covered by low-tempo, result-state, and song-reset fixtures. Runner-facing product copy remains Phase 1 work. |
 | F-020 success layers | Accepted validation model | Existing docs already separate tests, Simulator, device, listening, and body feel. Keep the stricter wording. |
 
-Source: `Docs/Handoffs/2026-08-14-master-handoff/original/pasted-text.txt:148-283`.
+Source: `Docs/Archive/Handoffs/2026-08-14-master-handoff/original/pasted-text.txt:148-283`.
 
 ## Hypothesis verdicts
 
@@ -231,7 +231,7 @@ Source: `Docs/Handoffs/2026-08-14-master-handoff/original/pasted-text.txt:148-28
 | H-019 | Deferred because evidence is unavailable | Preview tempo is the only practical scalar input. Per-track full-edit representativeness is unproven. |
 | H-020 | Deferred because evidence is unavailable | Queue logic is identified and tested, but five current physical natural transitions have not run. |
 
-This satisfies the handoff's required terminal status set. Source: `Docs/Handoffs/2026-08-14-master-handoff/original/pasted-text.txt:371-407`.
+This satisfies the handoff's required terminal status set. Source: `Docs/Archive/Handoffs/2026-08-14-master-handoff/original/pasted-text.txt:371-407`.
 
 ## Platform claims rechecked against Xcode 27
 
@@ -247,7 +247,7 @@ The installed iOS SDK confirms:
 
 These are capability facts, not quality proof. The SDK does not provide a documented musical quality envelope, full-stream PCM, beat grid, or footfall phase.
 
-Source hypothesis: `Docs/Handoffs/2026-08-14-master-handoff/original/pasted-text.txt:285-369`.
+Source hypothesis: `Docs/Archive/Handoffs/2026-08-14-master-handoff/original/pasted-text.txt:285-369`.
 
 ## Product decisions to carry forward
 
