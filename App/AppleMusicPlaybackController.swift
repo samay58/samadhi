@@ -6,6 +6,11 @@ import SamadhiDomain
 
 @MainActor
 final class AppleMusicPlaybackController: MusicPlaybackProviding {
+    // A starting value for the phone to judge. It must stay shorter than the prepared-song lead
+    // minus one poll, or the blend could begin before a better-fitting song has been queued.
+    private static let songCrossfadeSeconds: TimeInterval = 4
+    private static let preparedSongLeadSeconds = 8.0
+
     private let player = ApplicationMusicPlayer.shared
     private var continuation: AsyncStream<MusicPlaybackEvent>.Continuation?
     private var collection: MusicCollection?
@@ -88,6 +93,7 @@ final class AppleMusicPlaybackController: MusicPlaybackProviding {
 
         player.stop()
         player.state.playbackRate = 1
+        player.transition = .crossfade(duration: Self.songCrossfadeSeconds)
         player.queue = ApplicationMusicPlayer.Queue(for: songs, startingAt: selectedSong)
         self.collection = collection
         self.durations = durations
@@ -195,6 +201,7 @@ final class AppleMusicPlaybackController: MusicPlaybackProviding {
     func stop(operationID: Int) {
         guard isCurrent(operationID) else { return }
         player.stop()
+        player.transition = .none
         collection = nil
         durations = [:]
         songs = [:]
@@ -276,7 +283,7 @@ final class AppleMusicPlaybackController: MusicPlaybackProviding {
 
         if let currentTrackID,
             let duration = durations[currentTrackID],
-            duration - player.playbackTime <= 8
+            duration - player.playbackTime <= Self.preparedSongLeadSeconds
         {
             try? applyPreparedNextIfNeeded()
         }

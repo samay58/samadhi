@@ -65,6 +65,8 @@ Record why a song changed before adding feedback to the boundary.
 
 Since 2026-08-19 the reducer also looks ahead. Inside the last 45 seconds of a song it judges the queued next song against the settled Auto target; if that song cannot reach the target inside the rate window and something in the ready collection can, one better fit is prepared for the boundary, and a plan that still fits is kept rather than traded for a marginally better one. This is the same prepared-song path the boundary already had; it only starts earlier and judges the next song rather than the current one.
 
+Since 2026-11-02 songs change through Apple Music's own crossfade, set to four seconds as a starting value. It softens the break, and it does not align beats. Whether it helps, and whether the new song's speed correction fights the blend, is for the phone to say.
+
 - A user-requested Skip or Previous already has a direct cause. Do not cover it with an Auto story.
 - A natural boundary that uses a previously prepared better-fitting song may use the Auto arrival after the new song and its speed are confirmed.
 - A late reply from the old song must never trigger either part of the new song's feedback.

@@ -35,6 +35,7 @@ Before starting, run `./Scripts/phone.sh install`. It builds with the exact prof
 
 - Start a normal run and let one song play out naturally. After the change, open the Debug screen and read `Last song change`. It should read `Natural end of the song`. Then use Next once and confirm it reads `Next requested here`.
 - If either one reads `Changed outside Samadhi`, write down what happened just before the change.
+- Listen to that natural change as a crossfade. Does it soften the break, and does the new song's speed correction fight the blend? Say whether Next also crossfades, and whether four seconds feels right.
 - Result: both causes correct, or which one was wrong.
 
 ## 6. Lock screen, interruption, route (10 minutes)

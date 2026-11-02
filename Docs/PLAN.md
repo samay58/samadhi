@@ -40,7 +40,7 @@ The wheel keeps one release-blocking contract. It cannot display or commit a BPM
 
 Continue in this order:
 
-1. Walk Easy Miles on the repair build and read the record. This answers what the August 19 walk could not: whether cues played, what happened at a boundary, and whether the reach line fired.
+1. Install the current build, then walk Easy Miles and read the record. This answers what the August 19 walk could not: whether cues played, what happened at a boundary, and whether the reach line fired. It is also the first chance to hear the crossfade.
 2. Run [PHONE-CHECK.md](PHONE-CHECK.md): endpoint listening, transport and Finish feel, blinded direction trials, song-change causes, and lock, call, and route recovery.
 3. Complete one 20-minute outdoor run with an imported playlist. It must feel good, survive normal phone conditions, and end with an honest summary.
 
@@ -48,12 +48,11 @@ After that run, the open question is beat phase. Tempo match and beat lock stay 
 
 The source decision and deferred reliability requirements live in [MUSIC-SOURCE-RESOLUTION-SPEC.md](Archive/MUSIC-SOURCE-RESOLUTION-SPEC.md). A later reliability failure must be fixed before Milestone 2 completion. It does not reopen Spotify or a second-provider project.
 
-## Decisions waiting on Samay
+## Decision waiting on Samay
 
-These came out of the November sweep. None has been built, because each changes the product or adds scope.
+This came out of the November sweep. It has not been built, because it changes the product.
 
-1. Try `ApplicationMusicPlayer.transition = .crossfade(duration:)` on the phone. Apple's player supports it, Samadhi has never set it, and it may soften the abrupt song change Samay named as the biggest hole. The milestone spec currently excludes crossfade design beyond preventing an accidental gap, so this needs his yes. See [RESEARCH-2026-11.md](RESEARCH-2026-11.md).
-2. Keep or remove Auto fine-tune. `PRODUCT.md` and `CONTEXT.md` describe it, and the reducer supports it, but no control sends `adjustRhythmControl` since the wheel moved to `commitRhythmTarget`. Either the wheel gains it back or the reducer path and its tests go.
+1. Keep or remove Auto fine-tune. `PRODUCT.md` and `CONTEXT.md` describe it, and the reducer supports it, but no control sends `adjustRhythmControl` since the wheel moved to `commitRhythmTarget`. Either the wheel gains it back or the reducer path and its tests go.
 
 ## Known debt before any public Release
 

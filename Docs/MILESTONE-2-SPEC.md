@@ -360,7 +360,7 @@ Acceptance:
 - GPS, route maps, distance, pace, coaching, plans, streaks, or social features
 - Run history, cloud sync, accounts, analytics, subscriptions, or a backend
 - Lock Screen artwork, Live Activities, widgets, custom remote-command controls, or App Intents
-- Crossfade design beyond preventing an accidental gap
+- Crossfade design beyond Apple's built-in crossfade between songs
 - Broad device, placement, and headphone compatibility
 - Public App Store release or legal sign-off for preview analysis
 - A large visual redesign of the completed run interface

@@ -20,6 +20,7 @@ The repository is now ahead of the phone. The November sweep fixed recovery dead
 | Tempo wheel | The wheel has a quiet close action with its own 44-point target | Interface tests and inspected Simulator frames |
 | Transport and Finish | Previous, Pause or Resume, and Next are three interactive Liquid Glass circles, the primary larger and tinted. Finish is a quiet button below them that arms a hold drawn inside its own capsule | Serial interface tests and frames in `Evidence/Simulator/2026-08-19-transport-glass/`. Feel on the phone is open |
 | Auto feedback | The reducer owns one directional transaction per meaningful Auto change. Three prototype haptic families, six arrival sounds, and a hidden audition screen exist. Every cue reports what became of it | Domain, app-model, and asset tests. Nothing about feel or sound is physically proved |
+| Song crossfade | Songs change through Apple Music's built-in crossfade, set to four seconds. It softens the break without aligning beats | Compiles against the SDK. No software test can hear it, and it has not been heard on a phone |
 | Song boundaries | In the last 45 seconds of a song the reducer judges the queued next song against the settled target and prepares one better fit when it cannot follow | Reducer tests. Not yet seen at a real boundary on the phone |
 | Reach | When fewer than a quarter of the ready songs can reach the settled target for twenty seconds, the run screen says so once per run per direction | Reducer tests and frames in `Evidence/Simulator/2026-08-19-out-of-reach/` |
 | Recovery | Each audio recovery names its cause: headphones, an interruption, or Apple Music failing. Only the matching event clears it, and every recovery can end the run | Reducer tests, an interface test, and an inspected Simulator frame. Not yet seen on the phone |
@@ -47,7 +48,7 @@ All of these need a body, an ear, or real Apple Music. [PHONE-CHECK.md](PHONE-CH
 - Hear 0.85 and 1.15 through headphones for a full musical section, and read back what Apple Music reports.
 - Judge transport and Finish by hand.
 - Run the blinded faster and slower trials for all three haptic families on both sound paths.
-- Confirm `Last song change` after a natural end and after an explicit Next.
+- Hear the crossfade at a natural song change, and confirm `Last song change` after a natural end and after an explicit Next.
 - Check screen lock, an interruption, and route recovery.
 - Run a clean walking-only check. The 90 SPM floor and five-second delay are software choices, not tuned constants.
 - Complete one 20-minute outdoor run.

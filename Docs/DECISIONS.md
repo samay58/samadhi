@@ -298,3 +298,7 @@ To know which song is queued, the session keeps the collection index the player'
 ## The collection's reach is said once
 
 Auto held 0.85 for most of seven minutes and reported `atLimit` every second, and the screen said nothing, because per-change screen copy is forbidden and that rule stands. Reach is a different fact: it is about the collection, not a change. When fewer than a quarter of the ready songs can reach the settled Auto target inside the rate window, and that has held for twenty seconds, the reducer allows one line, once per run per direction: "Most of this playlist is faster than you're moving." or its slower twin. The shell shows it in the status slot under the dial, the same place the lock brief lives, and takes it down on its own. The words name the playlist and the body, never a limit, a rate, or a number. Manual takeover pauses the count, and a run that can follow the collection never hears the line. The thresholds are starting points and the reducer owns them.
+
+## Songs change through Apple's crossfade
+
+Samay named the abrupt break between songs as the biggest hole in the experience. `ApplicationMusicPlayer.transition` offers a built-in crossfade, so the app sets it to four seconds whenever a queue is prepared and clears it on stop. This does not change when or why a song changes, which stays with the reducer and the player. It does not match beats. Four seconds is a starting value for the phone to judge.
