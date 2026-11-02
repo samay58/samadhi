@@ -26,7 +26,7 @@ Write the failing reducer test first. The core is pure, so most behavior can be 
 ./Scripts/sim.sh matrix setup-partial -SAMADHI_FAST_MODE -SAMADHI_MUSIC_PARTIAL
 ~~~
 
-The five are default, accessibility XXXL, Reduce Motion, Increased Contrast, and Reduced Transparency. Open the sheet and read it. An agent must inspect the image before claiming a visual result.
+The five are default, accessibility XXXL, Reduce Motion, Increased Contrast, and Reduced Transparency. The Simulator cannot change those system settings from a launch argument, so the Reduce Motion and Increased Contrast arguments set the app's design overrides directly. Reduced Transparency has no such override yet. Open the sheet and read it. An agent must inspect the image before claiming a visual result.
 
 ### Motion
 
@@ -36,7 +36,7 @@ UI tests in `Tests/SamadhiUITests/` drive states that take interaction to reach,
 ./Scripts/sim.sh frames testTransportAndFinishAfterStateEvidence
 ~~~
 
-For a press, a hold, or a transition, `./Scripts/sim.sh record finish-hold 6` records video and splits it into frames at 30 per second. The August overflow in Finish was only visible this way.
+For a press, a hold, or a transition, `./Scripts/sim.sh record finish-hold 6` records video and splits it into frames at 30 per second. A running UI test stalls the capture, so record motion without one where you can. `./Scripts/sim.sh run -SAMADHI_FAST_MODE -SAMADHI_MUSIC_READING_DEMO` starts reading a playlist by itself for this. The August overflow in Finish was only visible this way.
 
 ### Phone
 

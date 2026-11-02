@@ -667,5 +667,9 @@ This checkpoint recorded a passing local candidate before its exact-profile buil
 - Removed the dark blob behind the setup title and warmed the gray field behind the summary, recovery, and sheets, which took setup text and the Start label past 5:1 contrast
 - Fixed the white row in the song results sheet, the song title shrinking below its artist at large text, the AirPods icon shown for every headphone, and the white launch screen
 - Rewrote failure labels and called songs songs throughout the interface
+- Made reading a playlist draw it: one contour line per song shaped by its measured tempo, a gap for a song that cannot be read, a field that warms with the count, and one swell when reading ends. The lines stay behind the run, summary, and recovery
+- Replaced the progress bar with a plucked string, set the playlist name lighter and larger with a letter-by-letter arrival, and moved the song, tempo, and count into one centered stack
+- Connected the Reduce Motion and Increased Contrast launch arguments to the design layer, because they had never reached it
+- Shipped this as version 1.1, build 2, and replaced superseded frames with one current sheet
 
 Current state and next steps live in [STATUS.md](STATUS.md) and [PLAN.md](PLAN.md).

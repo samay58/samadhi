@@ -29,6 +29,10 @@ Small-scale reviews live under Evidence/Brand/.
 
 Native ribbon drawing echoes icon without nesting square app icon inside interface. Replace only if transparent production emblem passes 24-point legibility and reduced-transparency checks.
 
+## The playlist map
+
+The signature of the interface is the map a playlist draws of itself. Each song read draws one contour line whose ripple comes from its measured tempo, and the progress line is a string that the same songs pluck. Keep it thin and in the field's own colors. It frames the playlist name and never crosses it.
+
 ## Repository cover
 
 User-supplied Midjourney artwork uses wide interwoven rhythm form over parchment contours. Soft italic “music in stride” sits upper-left, outside sculpture, preserving flow and negative space.

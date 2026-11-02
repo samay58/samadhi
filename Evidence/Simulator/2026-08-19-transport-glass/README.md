@@ -9,3 +9,5 @@ Fresh frames for the transport and Finish controls after the glass capsule bar w
 - `after-transport-*` and `after-finish-armed-*` at accessibility XXXL, Reduce Motion, Increased Contrast, and Reduced Transparency.
 
 What these frames prove: layout, proportion, and the four environment variants. What they do not prove: the glass lensing on real content, the spring press, haptic character, or daylight legibility, all of which are physical.
+
+On 2026-11-02 these frames left the tree, replaced by `../2026-11-02-design-refresh/`. They remain in Git history. The Reduce Motion and Increased Contrast frames did not exercise those settings, because the launch arguments never reached the app's design overrides at the time.

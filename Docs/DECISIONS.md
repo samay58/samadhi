@@ -308,3 +308,11 @@ Samay named the abrupt break between songs as the biggest hole in the experience
 A runner's thumb is already moving when Pause becomes Resume or Finish arms. Those controls keep their exact position, so the tempo aperture and the status row keep their size whenever the controls are up. Two interface tests measure this, because a screenshot cannot show a jump.
 
 The setup field has no dark center. Ink text sat on plum at under 3:1, and a blurred dark shape behind a headline is the first thing to go in a review for generated-looking work. The center is now warm apricot, which reads as sunrise.
+
+## A playlist draws itself from real measurements
+
+Reading a playlist is a rare moment, and it was a generic progress bar. Each song read now draws one contour line that shows two seconds of its measured beat, and a song that cannot be read leaves a gap. The repository bans fake waveforms and decorative charts. This is neither, because every line comes from one song's measured tempo, and removing the measurement removes the line. A long playlist keeps one song per band, up to 28 lines, so the map thins out instead of turning solid.
+
+The field warms with the count of songs read, never with a timer. The progress line is a string that each song plucks, and it reaches only as far as the songs actually read.
+
+Earlier options were rejected. One tick per song on a progress line was the generic version of the same idea. Lines crossing the playlist name hurt legibility, so the map leaves a clearing around it.
