@@ -14,6 +14,7 @@ enum MusicSelectionFixture: Equatable {
     case largeLibrary
     case longPlaylistName
     case readingLibrary
+    case readingDemo
 }
 
 // A scripted Auto adjustment for Simulator proof. The simulated cadence settles, then moves by the
@@ -85,6 +86,10 @@ struct SimulationConfiguration {
     let useAppleMusicCoreLoop: Bool
     let useSimulatorDemoMusic: Bool
     let setupReviewMode: Bool
+    // Launch arguments cannot change the system's own accessibility settings, so Simulator proof of
+    // those environments has to reach the design layer's overrides directly.
+    let forceReduceMotion: Bool
+    let forceIncreasedContrast: Bool
     let musicSelectionFixture: MusicSelectionFixture
 
     init(
@@ -99,6 +104,8 @@ struct SimulationConfiguration {
         useAppleMusicCoreLoop: Bool,
         useSimulatorDemoMusic: Bool,
         setupReviewMode: Bool,
+        forceReduceMotion: Bool = false,
+        forceIncreasedContrast: Bool = false,
         musicSelectionFixture: MusicSelectionFixture
     ) {
         self.fastMode = fastMode
@@ -112,6 +119,8 @@ struct SimulationConfiguration {
         self.useAppleMusicCoreLoop = useAppleMusicCoreLoop
         self.useSimulatorDemoMusic = useSimulatorDemoMusic
         self.setupReviewMode = setupReviewMode
+        self.forceReduceMotion = forceReduceMotion
+        self.forceIncreasedContrast = forceIncreasedContrast
         self.musicSelectionFixture = musicSelectionFixture
     }
 
@@ -164,6 +173,20 @@ struct SimulationConfiguration {
                     false
                 #endif
             }(),
+            forceReduceMotion: {
+                #if DEBUG && targetEnvironment(simulator)
+                    arguments.contains("-UIAccessibilityReduceMotionEnabled")
+                #else
+                    false
+                #endif
+            }(),
+            forceIncreasedContrast: {
+                #if DEBUG && targetEnvironment(simulator)
+                    arguments.contains("-UIAccessibilityDarkerSystemColorsEnabled")
+                #else
+                    false
+                #endif
+            }(),
             musicSelectionFixture: {
                 if arguments.contains("-SAMADHI_MUSIC_NONE") { return .none }
                 if arguments.contains("-SAMADHI_MUSIC_LOADING") { return .loading }
@@ -192,6 +215,10 @@ struct SimulationConfiguration {
                 }
                 if arguments.contains("-SAMADHI_MUSIC_LIBRARY_READING") {
                     return .readingLibrary
+                }
+                // Starts reading by itself, because a test runner's snapshots stall a screen recording.
+                if arguments.contains("-SAMADHI_MUSIC_READING_DEMO") {
+                    return .readingDemo
                 }
                 return .standard
             }()

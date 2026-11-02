@@ -133,7 +133,7 @@ final class SamadhiUITests: XCTestCase {
         finish.tap()
         let hold = app.buttons["hold-to-finish"]
         XCTAssertTrue(hold.waitForExistence(timeout: 5))
-        waitForLayoutToSettle()
+        waitForVisualSettle(seconds: 0.8)
         XCTAssertEqual(hold.frame.midY, finishY, accuracy: 1)
     }
 
@@ -147,7 +147,7 @@ final class SamadhiUITests: XCTestCase {
         pause.tap()
         let resume = app.buttons["resume-run"]
         XCTAssertTrue(resume.waitForExistence(timeout: 5))
-        waitForLayoutToSettle()
+        waitForVisualSettle(seconds: 0.8)
         XCTAssertEqual(resume.frame.midY, pauseY, accuracy: 1)
     }
 
@@ -300,15 +300,15 @@ final class SamadhiUITests: XCTestCase {
 
         XCTAssertTrue(element("music-analyzing").waitForExistence(timeout: 3))
         XCTAssertFalse(app.buttons["start-run"].exists)
-        RunLoop.current.run(until: Date().addingTimeInterval(2))
+        waitForVisualSettle(seconds: 2)
         attachScreenshot(named: "reading-1-early")
         XCTAssertFalse(app.buttons["start-run"].exists)
-        RunLoop.current.run(until: Date().addingTimeInterval(2.4))
+        waitForVisualSettle(seconds: 2.4)
         attachScreenshot(named: "reading-2-late")
 
         XCTAssertTrue(element("music-ready").waitForExistence(timeout: 12))
         XCTAssertTrue(app.buttons["start-run"].isHittable)
-        RunLoop.current.run(until: Date().addingTimeInterval(2.4))
+        waitForVisualSettle(seconds: 2.4)
         attachScreenshot(named: "reading-3-ready")
     }
 
@@ -326,7 +326,7 @@ final class SamadhiUITests: XCTestCase {
         app.buttons["playlist-choice-simulator-morning-miles"].tap()
 
         XCTAssertTrue(element("music-analyzing").waitForExistence(timeout: 3))
-        RunLoop.current.run(until: Date().addingTimeInterval(3))
+        waitForVisualSettle(seconds: 3)
         attachScreenshot(named: "reading-reduce-motion")
         XCTAssertTrue(element("music-ready").waitForExistence(timeout: 12))
         XCTAssertTrue(app.buttons["start-run"].isHittable)
@@ -399,7 +399,7 @@ final class SamadhiUITests: XCTestCase {
         app.launch()
 
         XCTAssertTrue(element("music-analyzing").waitForExistence(timeout: 2))
-        XCTAssertTrue(app.staticTexts["2 / 8"].exists)
+        XCTAssertTrue(app.staticTexts["2 of 8"].exists)
         XCTAssertFalse(app.buttons["start-run"].exists)
     }
 
@@ -793,10 +793,6 @@ final class SamadhiUITests: XCTestCase {
     }
 
     // Arming can lose the race with the control timeout, so the tap retries until it takes.
-    private func waitForLayoutToSettle() {
-        RunLoop.current.run(until: Date().addingTimeInterval(0.8))
-    }
-
     private func armFinish() {
         let finish = app.buttons["finish-run"]
         let hold = app.buttons["hold-to-finish"]
@@ -867,8 +863,8 @@ final class SamadhiUITests: XCTestCase {
         XCTAssertGreaterThanOrEqual(centerDistance, dialRadius + closeHalfDiagonal)
     }
 
-    private func waitForVisualSettle() {
-        RunLoop.current.run(until: Date(timeIntervalSinceNow: 0.3))
+    private func waitForVisualSettle(seconds: TimeInterval = 0.3) {
+        RunLoop.current.run(until: Date(timeIntervalSinceNow: seconds))
     }
 
     private func currentDisplayedBPM() -> Int? {

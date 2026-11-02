@@ -51,6 +51,10 @@ extension ImportedCollectionPresentation {
     var latestReadTitle: String? {
         tracks.last { $0.status != .pending }?.title
     }
+
+    var latestReadBPM: Int? {
+        tracks.last { $0.status != .pending }?.pulseBPM.map { Int($0.rounded()) }
+    }
 }
 
 extension MusicSelectionPresentation {
@@ -169,9 +173,11 @@ struct PlaylistContourCanvas: View {
 
     private func screenFraction(for position: Double) -> Double {
         guard leavesClearing else { return 0.13 + position * 0.76 }
-        let usable = 0.25 + 0.34
-        let travelled = position * usable
-        return travelled < 0.25 ? 0.11 + travelled : 0.60 + (travelled - 0.25)
+        // Two bands, one between the logo and the name and one below the status.
+        let upper = 0.20
+        let lower = 0.29
+        let travelled = position * (upper + lower)
+        return travelled < upper ? 0.16 + travelled : 0.60 + (travelled - upper)
     }
 
     // When the last song is read, one soft swell passes down the map from top to bottom.

@@ -220,7 +220,7 @@ final class SimulatorMusicImportService: MusicLibraryImporting {
         reviewMode: Bool = false
     ) {
         trackDelay =
-            fixture == .readingLibrary
+            fixture == .readingLibrary || fixture == .readingDemo
             ? .milliseconds(380) : reviewMode ? .milliseconds(650) : .milliseconds(120)
         switch fixture {
         case .emptyLibrary:
@@ -229,7 +229,7 @@ final class SimulatorMusicImportService: MusicLibraryImporting {
             collections = AppMusicCollection.simulatorExpandedCollections
         case .longPlaylistName:
             collections = [AppMusicCollection.simulatorLongName]
-        case .readingLibrary:
+        case .readingLibrary, .readingDemo:
             collections = [AppMusicCollection.simulatorMorningMiles]
         case .standard, .none, .loading, .loadingSelected, .analyzing, .partial,
             .authorizationFailure, .importFailure, .twoPlaylistLibrary:

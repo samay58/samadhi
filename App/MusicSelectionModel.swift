@@ -174,6 +174,15 @@ final class MusicSelectionModel {
             apply(AppMusicCollection.simulatorDemo)
         case .none, .readingLibrary:
             presentation = .none
+        case .readingDemo:
+            presentation = .none
+            Task { [weak self] in
+                try? await Task.sleep(for: .seconds(2))
+                let collection = AppMusicCollection.simulatorMorningMiles
+                self?.selectPlaylist(
+                    LibraryPlaylistChoice(id: collection.id.rawValue, name: collection.name)
+                )
+            }
         case .loading:
             presentation = .loadingPlaylists(current: nil)
         case .loadingSelected:

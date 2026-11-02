@@ -69,6 +69,19 @@ import Testing
     )
 
     #expect(collection.latestReadTitle == "second")
+    #expect(collection.latestReadBPM == nil)
+}
+
+@Test func theTempoShownIsTheLatestSongsRoundedMeasurement() {
+    let collection = ImportedCollectionPresentation(
+        name: "Fixture",
+        totalTrackCount: 2,
+        readyTrackCount: 1,
+        completedTrackCount: 1,
+        tracks: [song("first", bpm: 137.6)]
+    )
+
+    #expect(collection.latestReadBPM == 138)
 }
 
 private func song(_ id: String, bpm: Double) -> ImportedTrackPresentation {

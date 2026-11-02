@@ -209,6 +209,8 @@ final class RunPresentationModel {
                 }
             },
             finishHoldPressing: finishHoldPressing,
+            forceReduceMotion: configuration.forceReduceMotion,
+            forceIncreasedContrast: configuration.forceIncreasedContrast,
             rhythmControl: RhythmControlPresentation(
                 mode: session?.rhythmControl.mode ?? .automatic,
                 automaticCorrectionBPM: session?.rhythmControl.automaticCorrectionBPM ?? 0,

@@ -25,7 +25,7 @@ struct SetupPlaylistIdentity: View {
     let reduceMotion: Bool
 
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
-    @ScaledMetric(relativeTo: .largeTitle) private var identityFontSize = 46.0
+    @ScaledMetric(relativeTo: .largeTitle) private var identityFontSize = 50.0
 
     var body: some View {
         // The name rises into place as the playlist sheet falls away, so the two read as one move.
@@ -41,7 +41,7 @@ struct SetupPlaylistIdentity: View {
     private var identityTransition: AnyTransition {
         if reduceMotion { return .identity }
         return .asymmetric(
-            insertion: .opacity.combined(with: .offset(y: 16)).animation(.smooth(duration: 0.55).delay(0.14)),
+            insertion: AnyTransition(TitleRiseTransition()).animation(.linear(duration: 0.85).delay(0.12)),
             removal: .opacity.combined(with: .offset(y: -10)).animation(.easeOut(duration: 0.16))
         )
     }
@@ -49,7 +49,7 @@ struct SetupPlaylistIdentity: View {
     private var identity: some View {
         Text(selection.identityTitle)
             .font(identityFont)
-            .tracking(dynamicTypeSize.isAccessibilitySize ? -0.25 : -0.8)
+            .tracking(dynamicTypeSize.isAccessibilitySize ? -0.25 : -1.1)
             .multilineTextAlignment(dynamicTypeSize.isAccessibilitySize ? .leading : .center)
             .foregroundStyle(SamadhiColor.ink)
             .fixedSize(horizontal: false, vertical: true)
@@ -63,7 +63,7 @@ struct SetupPlaylistIdentity: View {
         if dynamicTypeSize.isAccessibilitySize {
             return .system(.largeTitle, design: .serif).weight(.medium)
         }
-        return .system(size: identityFontSize, weight: .medium, design: .serif)
+        return .system(size: identityFontSize, weight: .regular, design: .serif)
     }
 }
 

@@ -15,7 +15,7 @@ struct SetupStatusRail: View {
         }
         .frame(
             maxWidth: dynamicTypeSize.isAccessibilitySize ? .infinity : 320,
-            minHeight: dynamicTypeSize.isAccessibilitySize ? nil : 84,
+            minHeight: dynamicTypeSize.isAccessibilitySize ? nil : 100,
             alignment: statusAlignment
         )
         .animation(
@@ -51,38 +51,23 @@ private struct AnalysisProgressRail: View {
     let collection: ImportedCollectionPresentation
     let reduceMotion: Bool
 
+    @ScaledMetric(relativeTo: .title3) private var songSize = 21.0
+
     var body: some View {
         if collection.totalTrackCount > 0 {
-            VStack(alignment: .leading, spacing: Space.x3) {
-                HStack(alignment: .firstTextBaseline) {
-                    // Your own songs pass through here as they are read.
-                    ZStack(alignment: .leading) {
-                        Text(collection.latestReadTitle ?? "Reading rhythm")
-                            .lineLimit(1)
-                            .id(collection.latestReadTitle ?? "Reading rhythm")
-                            .transition(
-                                reduceMotion
-                                    ? .identity
-                                    : .asymmetric(
-                                        insertion: .opacity.combined(with: .offset(y: 7)),
-                                        removal: .opacity.combined(with: .offset(y: -7))
-                                    )
-                            )
-                    }
-                    .animation(
-                        reduceMotion ? nil : .smooth(duration: 0.24),
-                        value: collection.latestReadTitle
-                    )
-                    Spacer(minLength: Space.x6)
-                    Text("\(collection.completedTrackCount) / \(collection.totalTrackCount)")
-                        .monospacedDigit()
-                        .contentTransition(.numericText())
-                        .accessibilityHidden(true)
-                }
-                .font(.body.weight(.medium))
-                .foregroundStyle(SamadhiColor.ink.opacity(0.8))
+            VStack(spacing: Space.x3) {
+                PluckedString(
+                    progress: progress,
+                    crests: stringCrests,
+                    plucks: collection.completedTrackCount,
+                    reduceMotion: reduceMotion
+                )
+                .frame(maxWidth: 264)
 
-                TruthfulProgressRail(progress: progress, reduceMotion: reduceMotion)
+                VStack(spacing: Space.x1) {
+                    songName
+                    readings
+                }
             }
             .frame(maxWidth: 320)
             .accessibilityElement(children: .combine)
@@ -105,40 +90,50 @@ private struct AnalysisProgressRail: View {
         }
     }
 
+    // Your own songs pass through here as they are read.
+    private var songName: some View {
+        let name = collection.latestReadTitle ?? "Reading rhythm"
+        return ZStack {
+            Text(name)
+                .font(.system(size: songSize, design: .serif).italic())
+                .foregroundStyle(SamadhiColor.ink.opacity(0.92))
+                .lineLimit(1)
+                .id(name)
+                .transition(songTransition)
+        }
+        .animation(reduceMotion ? nil : .smooth(duration: 0.3), value: name)
+    }
+
+    private var songTransition: AnyTransition {
+        if reduceMotion { return .identity }
+        return .asymmetric(
+            insertion: AnyTransition(.blurReplace(.downUp)).combined(with: .offset(y: 8)),
+            removal: .opacity.combined(with: .offset(y: -6))
+        )
+    }
+
+    private var readings: some View {
+        HStack(spacing: 6) {
+            if let bpm = collection.latestReadBPM {
+                Text("\(bpm) BPM")
+                    .contentTransition(.numericText(value: Double(bpm)))
+                Text("·")
+            }
+            Text("\(collection.completedTrackCount) of \(collection.totalTrackCount)")
+                .contentTransition(.numericText(value: Double(collection.completedTrackCount)))
+        }
+        .font(.footnote.weight(.medium).monospacedDigit())
+        .foregroundStyle(SamadhiColor.ink.opacity(0.74))
+        .animation(reduceMotion ? nil : .smooth(duration: 0.3), value: collection.completedTrackCount)
+    }
+
+    private var stringCrests: Double {
+        Double(collection.latestReadBPM ?? 120) / 60 * PlaylistContourMap.secondsShown
+    }
+
     private var progress: Double {
         guard collection.totalTrackCount > 0 else { return 0 }
         return min(max(Double(collection.completedTrackCount) / Double(collection.totalTrackCount), 0), 1)
-    }
-}
-
-private struct TruthfulProgressRail: View {
-    let progress: Double
-    let reduceMotion: Bool
-
-    var body: some View {
-        GeometryReader { proxy in
-            let width = max(proxy.size.width, 0)
-            let fillWidth = width * progress
-
-            ZStack(alignment: .leading) {
-                Capsule()
-                    .fill(SamadhiColor.ink.opacity(0.12))
-                    .frame(height: 3)
-                Capsule()
-                    .fill(SamadhiColor.clay)
-                    .frame(width: fillWidth, height: 3)
-                if progress > 0 {
-                    Circle()
-                        .fill(SamadhiColor.clay)
-                        .frame(width: 7, height: 7)
-                        .offset(x: min(max(fillWidth - 3.5, 0), max(width - 7, 0)))
-                }
-            }
-            .frame(maxHeight: .infinity)
-        }
-        .frame(height: 9)
-        .animation(reduceMotion ? nil : .easeOut(duration: MotionToken.feedback), value: progress)
-        .accessibilityHidden(true)
     }
 }
 
@@ -147,6 +142,7 @@ private struct ReadinessStatus: View {
     let presentTrackDetails: @MainActor (ImportedCollectionPresentation) -> Void
 
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+    @ScaledMetric(relativeTo: .title3) private var readySize = 21.0
 
     var body: some View {
         VStack(
@@ -154,8 +150,8 @@ private struct ReadinessStatus: View {
             spacing: collection.skippedTrackCount > 0 ? 0 : Space.x2
         ) {
             Text(readyTrackCount)
-                .font(.body.weight(.medium))
-                .foregroundStyle(SamadhiColor.ink.opacity(0.78))
+                .font(.system(size: readySize, design: .serif).italic())
+                .foregroundStyle(SamadhiColor.ink.opacity(0.92))
                 .frame(minHeight: 34)
                 .accessibilityIdentifier("ready-track-count")
 
