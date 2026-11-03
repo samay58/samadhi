@@ -17,7 +17,7 @@ To get the profile onto a Mac, use one of these:
 1. In Xcode, open Settings, then Accounts, select the team, and choose Download Manual Profiles.
 2. In the Apple developer portal, download the iOS App Development profile for the exact App ID, then open the file.
 
-The profile must list the signing certificate of the Mac doing the build, or the build fails before compiling. The current profile is `Samadhi Development 2026-08-15`, reissued on 2026-11-02 with both Macs' certificates. Apple issued this copy for 7 days, so it expires on 2026-11-09 at 9:18 PM Eastern, and the app will not open after that until a fresh profile is installed over it. If it has expired, create a new one for the exact App ID, the current Apple Development certificate, and the registered iPhone.
+Right after pairing, `./Scripts/phone.sh status` can report no pairing until a first connection, and `xcrun devicectl device info details --device <name>` makes that connection. The profile must list the signing certificate of the Mac doing the build, or the build fails before compiling. The current profile is `Samadhi Development 2026-08-15`, reissued on 2026-11-02 with both Macs' certificates. Apple issued this copy for 7 days, so it expires on 2026-11-09 at 9:18 PM Eastern, and the app will not open after that until a fresh profile is installed over it. If it has expired, create a new one for the exact App ID, the current Apple Development certificate, and the registered iPhone.
 
 Do not create a Media Services key or embed a developer token. Apple issues the token automatically to a correctly signed app.
 

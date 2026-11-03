@@ -2,9 +2,9 @@
 
 Last checked: 2026-11-02.
 
-The app is one good walk short of knowing whether its August repairs work. The phone has the repair build, original commit `0aa99a7`. No walk on that build is recorded here, and the phone may hold a later run that has not been pulled.
+The app is one good walk short of knowing whether its August repairs and the November design work hold up. The phone has version 1.2, build 4, commit `42c86a3`, read back from the phone in `Evidence/Device/2026-11-02-install-1.2/`. Its signing profile expires on 2026-11-09 at 9:18 PM Eastern, and the app will not open after that until a fresh one is installed over it.
 
-The repository is now ahead of the phone at version 1.2, build 4. The November sweep fixed recovery dead ends and several timing bugs, and the design refresh changed setup and the run screens, including a Liquid Glass tempo wheel drawn as a speaker. None of that has been installed or tried on a phone. The next step is one install, then one walk.
+The November sweep fixed recovery dead ends and several timing bugs, and the design refresh changed setup and the run screens, including a Liquid Glass tempo wheel drawn as a speaker. All of that is installed, and none of it has been walked or run on. The next step is one walk. An unfinished 10-minute run from October 26 was pulled from the phone and has not been read yet.
 
 ## Product state
 
@@ -35,7 +35,7 @@ The August 17 workout came from an exact-profile build with a matching source fi
 
 The August 19 brisk walk ran for 441 seconds at an average of 113 SPM on the analyzer version 5 build. Auto settled once and wrote 0.90. A natural boundary landed on a 163.75 BPM song the walk could not reach. Only 7 of 41 ready songs can reach a walking cadence inside the rate window, so Auto held the floor for most of the walk. Samay felt perhaps one haptic and could not tell when a change happened. The analysis is in `Evidence/Device/2026-08-19-walk-easy-miles/`.
 
-That walk exposed four software gaps: a lossy record, no proof that cues played, no look-ahead at song boundaries, and nothing said about a playlist out of reach. All four are repaired in commit `0aa99a7`, which is installed on the phone. See `Evidence/Device/2026-08-19-walk-repair-install/`.
+That walk exposed four software gaps: a lossy record, no proof that cues played, no look-ahead at song boundaries, and nothing said about a playlist out of reach. All four were repaired in commit `0aa99a7`. See `Evidence/Device/2026-08-19-walk-repair-install/`.
 
 ## Current software gate
 
@@ -45,7 +45,7 @@ Run `./Scripts/gate.sh`. The result of the latest run is recorded in [TESTING.md
 
 All of these need a body, an ear, or real Apple Music. [PHONE-CHECK.md](PHONE-CHECK.md) orders them.
 
-- Walk Easy Miles on the repair build for at least ten minutes, pocketed, partly locked, then pull and read the record.
+- Walk Easy Miles on this build for at least ten minutes, pocketed, partly locked, then pull and read the record.
 - Hear 0.85 and 1.15 through headphones for a full musical section, and read back what Apple Music reports.
 - Judge transport and Finish by hand.
 - Run the blinded faster and slower trials for all three haptic families on both sound paths.
