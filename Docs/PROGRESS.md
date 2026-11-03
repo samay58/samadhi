@@ -673,6 +673,8 @@ This checkpoint recorded a passing local candidate before its exact-profile buil
 - Shipped this as version 1.1, build 2, and replaced superseded frames with one current sheet
 - Made the controls real Liquid Glass: the playlist sheet is system glass, and Finish, Change playlist, Choose another, and End run join the same family
 - Replaced the painted tempo sphere with a speaker driver under a clear lens, whose cone and center cap pump on the real beat. This is version 1.2, build 3
+- Corrected the wheel's description: it pulses at the music's tempo and does not know where the song's beats fall
+- Tuned the screens and fixed what a review found. In the Simulator the run screen fell from about 11.8 to 8.2 percent of one core, and playlist reading stayed near 33 percent, so reading needs a phone measurement. VoiceOver could not open the tempo wheel, Auto and Manual were only as tall as their words, a tempo change jumped the pulse, the field jumped when the tempo locked, and a missing cadence showed an invented 168. All are fixed with tests. This is version 1.2, build 4
 - Cut the gate from about 15 minutes to about 4 by drawing screens directly in tests, running interface tests on four Simulator clones, and remembering what last passed. Direct drawing also found Pause and Resume 11 points apart at the largest text size, now fixed
 
 Current state and next steps live in [STATUS.md](STATUS.md) and [PLAN.md](PLAN.md).

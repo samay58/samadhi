@@ -85,10 +85,21 @@ struct ActiveRunScreen: View {
         .padding(.vertical, Space.x4)
         .frame(maxWidth: 368)
         .background {
-            Ellipse()
-                .fill(SamadhiColor.ink.opacity(transportControlsVisible ? 0.56 : 0.42))
-                .frame(width: 440, height: transportControlsVisible ? 300 : 190)
-                .blur(radius: 54)
+            // A gradient rather than a blurred shape, because this grows when the controls come up and
+            // a blur this wide would be redrawn on every frame of that.
+            EllipticalGradient(
+                stops: [
+                    .init(color: SamadhiColor.ink.opacity(1), location: 0),
+                    .init(color: SamadhiColor.ink.opacity(0.92), location: 0.3),
+                    .init(color: SamadhiColor.ink.opacity(0.55), location: 0.62),
+                    .init(color: SamadhiColor.ink.opacity(0.16), location: 0.86),
+                    .init(color: .clear, location: 1),
+                ]
+            )
+            .frame(width: 620, height: 470)
+            .scaleEffect(y: transportControlsVisible ? 1 : 0.66)
+            .opacity(transportControlsVisible ? 0.56 : 0.42)
+            .allowsHitTesting(false)
         }
     }
 
@@ -188,15 +199,18 @@ private struct RunStatus: View {
             VStack(spacing: Space.x1) {
                 Text("Tempo matched")
                     .font(.callout.weight(.semibold))
-                HStack(alignment: .firstTextBaseline, spacing: Space.x2) {
-                    Text("\(state.cadenceSPM ?? 168)")
-                        .font(.title2.monospacedDigit().weight(.bold))
-                    Text("steps per minute")
-                        .font(.caption.weight(.semibold))
-                        .foregroundStyle(SamadhiColor.ivory.opacity(0.8))
+                if let cadence = state.cadenceSPM {
+                    HStack(alignment: .firstTextBaseline, spacing: Space.x2) {
+                        Text("\(cadence)")
+                            .font(.title2.monospacedDigit().weight(.bold))
+                        Text("steps per minute")
+                            .font(.caption.weight(.semibold))
+                            .foregroundStyle(SamadhiColor.ivory.opacity(0.8))
+                    }
                 }
             }
-            .accessibilityLabel("Tempo matched at \(state.cadenceSPM ?? 168) steps per minute")
+            .accessibilityElement(children: .ignore)
+            .accessibilityLabel(lockBriefLabel)
             .accessibilityIdentifier("cadence-lock")
         case .paused:
             statusText("Paused", font: .headline)
@@ -211,6 +225,11 @@ private struct RunStatus: View {
         default:
             Color.clear.frame(height: 1)
         }
+    }
+
+    private var lockBriefLabel: String {
+        guard let cadence = state.cadenceSPM else { return "Tempo matched" }
+        return "Tempo matched at \(cadence) steps per minute"
     }
 
     private func statusText(_ text: String, font: Font = .callout.weight(.semibold)) -> some View {

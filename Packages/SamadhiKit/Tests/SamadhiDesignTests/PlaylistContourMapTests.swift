@@ -99,3 +99,37 @@ private func selection(completed: Int, total: Int) -> MusicSelectionPresentation
         )
     )
 }
+
+@Test func aTempoChangeKeepsTheBeatWhereItWas() {
+    var clock = BeatClock(bpm: 120)
+    let before = clock.phase(at: 10.2)
+
+    clock.retime(toBPM: 180, at: 10.2)
+
+    #expect(abs(clock.phase(at: 10.2) - before) < 0.000_1)
+    // 180 BPM is three beats a second, so a tenth of a second later is 0.3 of a beat on.
+    #expect(abs(clock.phase(at: 10.3) - (before + 0.3).truncatingRemainder(dividingBy: 1)) < 0.000_1)
+}
+
+@Test func theConeIsStillForTheLastThirdOfABeat() {
+    #expect(BeatClock.pump(atPhase: 0) == 1)
+    #expect(BeatClock.pump(atPhase: 0.7) == 0)
+    #expect(BeatClock.pump(atPhase: 0.99) == 0)
+}
+
+@Test func theFieldHoldsItsPlaceWhenItStopsAndContinuesFromThere() {
+    var clock = FieldClock()
+    #expect(clock.time(at: 100) == 100)
+
+    clock.stop(at: 100)
+    #expect(clock.time(at: 500) == 100)
+    #expect(clock.restingTime == 100)
+
+    clock.start(at: 500)
+    #expect(clock.time(at: 500) == 100)
+    #expect(clock.time(at: 503) == 103)
+}
+
+@Test func aFieldThatNeverRanRestsAtTheStart() {
+    #expect(FieldClock().restingTime == 0)
+}

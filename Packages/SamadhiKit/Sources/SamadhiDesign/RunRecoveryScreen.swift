@@ -129,7 +129,7 @@ struct RunRecoveryScreen: View {
         quietButton("End run", identifier: "route-end-run", action: endRun)
     }
 
-    // A recovery is often read mid-stride, so the way back is the same large target as Start.
+    // A recovery is often read mid-stride, so the way back is a larger target than Start.
     private func primaryButton(
         _ title: String,
         identifier: String,

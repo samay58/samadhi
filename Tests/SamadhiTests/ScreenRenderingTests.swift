@@ -218,6 +218,76 @@ private final class ActionBox {
         #expect(notice.accessibilityLabel == "Most of this playlist is slower than you're moving.")
     }
 
+    // A moving hand misses small targets, so every control a runner reaches for has to be big enough.
+    @Test(arguments: DrawingEnvironment.all)
+    fileprivate func autoAndManualAreBigEnoughToHit(_ environment: DrawingEnvironment) throws {
+        let state = RunViewState(
+            phase: .running,
+            rhythmControl: RhythmControlPresentation(
+                mode: .automatic,
+                requestedBPM: 168,
+                appliedBPM: 169,
+                isVisible: true,
+                isAvailable: true
+            )
+        )
+        let screen = try HostedScreen(state, in: environment)
+
+        for identifier in ["rhythm-auto", "rhythm-manual"] {
+            let frame = try #require(screen.element(identifier), "\(identifier) is missing").accessibilityFrame
+            #expect(frame.height >= 44 && frame.width >= 44, "\(identifier) is \(frame.size)")
+        }
+    }
+
+    @Test func theWayOutOfARecoveryIsBigEnoughToHit() throws {
+        let screen = try HostedScreen(
+            RunViewState(phase: .routeRecovery(cause: .routeLost, restored: false))
+        )
+
+        let frame = try #require(screen.element("route-end-run")).accessibilityFrame
+        #expect(frame.height >= 44, "End run is \(frame.size)")
+    }
+
+    @Test func aMissingCadenceIsNeverShownAsAnInventedNumber() throws {
+        var state = RunViewState(phase: .running, cadenceSPM: nil)
+        state.showLockBrief = true
+        let screen = try HostedScreen(state)
+
+        let label = try #require(screen.element("cadence-lock")).accessibilityLabel
+        #expect(label == "Tempo matched", "label \(label ?? "nil")")
+    }
+
+    // Until the wheel can adjust anything, the largest thing on screen still answers a tap.
+    @Test func tappingTheWheelBeforeItCanAdjustShowsTheControls() throws {
+        let screen = try HostedScreen(
+            RunViewState(
+                phase: .acquiring,
+                rhythmControl: RhythmControlPresentation(isAvailable: false)
+            )
+        )
+
+        let wheel = try #require(screen.element("tempo-control"))
+        #expect(wheel.accessibilityActivate())
+        RunLoop.current.run(until: Date(timeIntervalSinceNow: 0.05))
+
+        #expect(screen.sent == [.revealControls])
+    }
+
+    @Test func voiceOverCanOpenTheTempoWheel() throws {
+        let screen = try HostedScreen(
+            RunViewState(
+                phase: .running,
+                rhythmControl: RhythmControlPresentation(appliedBPM: 169, isAvailable: true)
+            )
+        )
+
+        let wheel = try #require(screen.element("tempo-control"))
+        #expect(wheel.accessibilityActivate())
+        RunLoop.current.run(until: Date(timeIntervalSinceNow: 0.05))
+
+        #expect(screen.sent.contains(.revealRhythmControl))
+    }
+
     #if DEBUG
         @Test(arguments: [
             ("waiting", TempoDiagnosticStatus.waiting),

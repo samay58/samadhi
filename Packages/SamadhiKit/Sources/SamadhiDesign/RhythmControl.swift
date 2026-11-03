@@ -112,9 +112,12 @@ struct RhythmControl: View {
                 .contentShape(Circle())
             }
             .buttonStyle(.plain)
-            .accessibilityElement(children: .ignore)
             .accessibilityLabel("Tempo control")
-            .accessibilityHint("Opens automatic and manual tempo adjustment")
+            .accessibilityHint(
+                state.rhythmControl.isAvailable
+                    ? "Opens automatic and manual tempo adjustment"
+                    : "Shows playback controls"
+            )
             .accessibilityIdentifier("tempo-control")
             .task(id: shouldPresentAffordanceCue) {
                 await presentAffordanceCue()
@@ -225,30 +228,47 @@ struct RhythmControl: View {
 
     private var adjustmentRow: some View {
         HStack(spacing: Space.x3) {
-            Button("Auto") { send(.resetRhythmControl) }
-                .font(.callout.weight(state.rhythmControl.mode == .automatic ? .bold : .medium))
-                .accessibilityIdentifier("rhythm-auto")
-                .accessibilityAddTraits(
-                    state.rhythmControl.mode == .automatic ? .isSelected : []
-                )
+            modeButton("Auto", isSelected: state.rhythmControl.mode == .automatic) {
+                send(.resetRhythmControl)
+            }
+            .accessibilityIdentifier("rhythm-auto")
+            .accessibilityAddTraits(
+                state.rhythmControl.mode == .automatic ? .isSelected : []
+            )
 
             Rectangle()
                 .fill(SamadhiColor.ivory.opacity(0.34))
                 .frame(width: 1, height: 18)
                 .accessibilityHidden(true)
 
-            Button("Manual") { send(.useManualRhythm) }
-                .font(.callout.weight(state.rhythmControl.mode == .manual ? .bold : .medium))
-                .accessibilityIdentifier("rhythm-manual")
-                .accessibilityAddTraits(
-                    state.rhythmControl.mode == .manual ? .isSelected : []
-                )
+            modeButton("Manual", isSelected: state.rhythmControl.mode == .manual) {
+                send(.useManualRhythm)
+            }
+            .accessibilityIdentifier("rhythm-manual")
+            .accessibilityAddTraits(
+                state.rhythmControl.mode == .manual ? .isSelected : []
+            )
         }
         .buttonStyle(.plain)
-        .frame(minHeight: 48)
         .foregroundStyle(SamadhiColor.ivory)
         .accessibilityElement(children: .contain)
         .accessibilityIdentifier("rhythm-controls")
+    }
+
+    // The weight stays the same in both states, so choosing one never nudges the other. Each button
+    // fills the row, because a hand on the move misses a target the size of the word.
+    private func modeButton(
+        _ title: String,
+        isSelected: Bool,
+        action: @escaping () -> Void
+    ) -> some View {
+        Button(action: action) {
+            Text(title)
+                .font(.callout.weight(.semibold))
+                .opacity(isSelected ? 1 : (effectiveIncreasedContrast ? 0.84 : 0.62))
+                .frame(minWidth: 84, minHeight: 48)
+                .contentShape(Rectangle())
+        }
     }
 
     private var adjustmentGesture: some Gesture {
@@ -393,7 +413,11 @@ struct RhythmControl: View {
     }
 
     private func reveal() {
-        guard state.rhythmControl.isAvailable else { return }
+        guard state.rhythmControl.isAvailable else {
+            // Tapping anywhere else on the run screen shows the controls, so the wheel does too.
+            if state.phase == .acquiring, !state.controlsVisible { send(.revealControls) }
+            return
+        }
         tempoControlDiscovered = true
         if !state.rhythmControl.isVisible { send(.revealRhythmControl) }
         if voiceOverEnabled { send(.controlsInteractionChanged(true)) }

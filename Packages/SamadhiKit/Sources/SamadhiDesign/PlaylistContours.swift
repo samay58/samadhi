@@ -101,7 +101,7 @@ struct PlaylistContourCanvas: View {
     static let drawStagger: TimeInterval = 0.14
     static let settleDuration: TimeInterval = 1.7
 
-    private static let drawDuration: TimeInterval = 0.95
+    static let drawDuration: TimeInterval = 0.95
     private static let heatFade: TimeInterval = 1.6
     private static let swellDuration: TimeInterval = 1.1
     private static let swellSpread: TimeInterval = 0.55
@@ -135,7 +135,7 @@ struct PlaylistContourCanvas: View {
         let width = Double(size.width)
         let baseY: Double = Double(size.height) * screenFraction(for: line.position)
         let amplitude: Double = 8 + swell * 10
-        let drift: Double = isAnimated ? now * line.crests * 0.11 : 0
+        let drift: Double = now * line.crests * 0.11
         let peak: Double = 0.5 + (line.seed - 0.5) * 0.4
 
         func y(atFraction fraction: Double) -> Double {
@@ -158,7 +158,8 @@ struct PlaylistContourCanvas: View {
         let tip = CGPoint(x: end, y: y(atFraction: end / width))
         path.addLine(to: tip)
 
-        let color = ink.mix(with: accent, by: heat).opacity(0.15 + swell * 0.2 + heat * 0.55)
+        let base = heat > 0 ? ink.mix(with: accent, by: heat) : ink
+        let color = base.opacity(0.15 + swell * 0.2 + heat * 0.55)
         context.stroke(
             path,
             with: .color(color),

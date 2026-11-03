@@ -12,7 +12,8 @@ struct PluckedString: View {
     @State private var pluckedAt: TimeInterval = 0
 
     var body: some View {
-        TimelineView(.animation(paused: reduceMotion)) { timeline in
+        // Capped at 60, because an uncapped clock runs at 120 on this phone for a ripple nobody can tell apart.
+        TimelineView(.animation(minimumInterval: 1 / 60, paused: reduceMotion)) { timeline in
             PluckedStringCanvas(
                 progress: progress,
                 crests: crests,

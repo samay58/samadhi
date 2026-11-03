@@ -5,6 +5,32 @@ public enum FluidFieldMode: Sendable, Equatable {
     case running
 }
 
+// The field's own time. Stopping it holds every line and color where it is, and starting it continues
+// from there, so the field never jumps when the tempo locks or a pause ends.
+struct FieldClock: Equatable {
+    private var offset: TimeInterval = 0
+    private var stoppedAt: TimeInterval?
+
+    func time(at date: TimeInterval) -> TimeInterval {
+        stoppedAt ?? date - offset
+    }
+
+    var restingTime: TimeInterval {
+        stoppedAt ?? 0
+    }
+
+    mutating func stop(at date: TimeInterval) {
+        guard stoppedAt == nil else { return }
+        stoppedAt = date - offset
+    }
+
+    mutating func start(at date: TimeInterval) {
+        guard let stoppedAt else { return }
+        offset = date - stoppedAt
+        self.stoppedAt = nil
+    }
+}
+
 public struct FluidMusicField: View {
     let mode: FluidFieldMode
     let usesCollectionPalette: Bool
@@ -18,6 +44,8 @@ public struct FluidMusicField: View {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var lineBirths: [String: TimeInterval] = [:]
     @State private var settledAt: TimeInterval?
+    @State private var drawingUntil: TimeInterval?
+    @State private var clock = FieldClock()
 
     public init(
         mode: FluidFieldMode,
@@ -40,40 +68,48 @@ public struct FluidMusicField: View {
     }
 
     public var body: some View {
-        // The field rests at 20 fps and stops once the tempo aperture becomes the motion owner. It
-        // runs faster only while a line is being drawn, because a pen stroke shows every dropped frame.
-        TimelineView(.animation(minimumInterval: frameInterval, paused: !shouldAnimate)) { timeline in
-            let time = shouldAnimate ? timeline.date.timeIntervalSinceReferenceDate : 0
-            ZStack {
-                MeshGradient(
-                    width: 3,
-                    height: 3,
-                    points: meshPoints(at: time),
-                    colors: palette,
-                    background: mode == .ready ? SamadhiColor.parchment : SamadhiColor.plum,
-                    smoothsColors: true
-                )
-                .animation(shouldAnimate ? .easeInOut(duration: 0.9) : nil, value: warmth)
+        // The field rests at 20 fps and stops once the tempo aperture becomes the motion owner. The
+        // map alone runs faster, and only while a line is being drawn, because a pen stroke shows every
+        // dropped frame and the slow color drift behind it does not.
+        let colors = palette
+        ZStack {
+            TimelineView(.animation(minimumInterval: 1.0 / 20.0, paused: !shouldAnimate)) { timeline in
+                let time = fieldTime(at: timeline.date)
+                ZStack {
+                    MeshGradient(
+                        width: 3,
+                        height: 3,
+                        points: meshPoints(at: time),
+                        colors: colors,
+                        background: mode == .ready ? SamadhiColor.parchment : SamadhiColor.plum,
+                        smoothsColors: true
+                    )
+                    .animation(shouldAnimate ? .easeInOut(duration: 0.9) : nil, value: warmth)
 
-                contourLines(at: time)
-                    .opacity(playlistLines == nil ? 1 : 0)
-                    .animation(shouldAnimate ? .easeOut(duration: 0.4) : nil, value: playlistLines == nil)
+                    if playlistLines == nil {
+                        contourLines(at: time)
+                            .transition(.opacity)
+                    }
+                }
+                .animation(shouldAnimate ? .easeOut(duration: 0.4) : nil, value: playlistLines == nil)
+            }
 
-                if let playlistLines {
+            if let playlistLines {
+                TimelineView(.animation(minimumInterval: mapFrameInterval, paused: !shouldAnimate)) { timeline in
                     PlaylistContourCanvas(
                         lines: playlistLines,
                         births: lineBirths,
                         settledAt: settledAt,
-                        now: time,
+                        now: fieldTime(at: timeline.date),
                         isAnimated: shouldAnimate,
                         ink: mode == .ready ? SamadhiColor.ink : SamadhiColor.ivory,
                         accent: mode == .ready ? SamadhiColor.clay : SamadhiColor.apricot,
                         leavesClearing: leavesClearing
                     )
                 }
-
-                readabilityWash
             }
+
+            readabilityWash
         }
         .accessibilityHidden(true)
         .onChange(of: playlistLines?.map(\.id) ?? []) { oldIDs, newIDs in
@@ -87,15 +123,24 @@ public struct FluidMusicField: View {
             try? await Task.sleep(for: .seconds(PlaylistContourCanvas.settleDuration))
             if !Task.isCancelled { settledAt = nil }
         }
+        .task(id: drawingUntil) {
+            guard let drawingUntil else { return }
+            let remaining = drawingUntil - Date.timeIntervalSinceReferenceDate
+            try? await Task.sleep(for: .seconds(max(remaining, 0)))
+            if !Task.isCancelled { self.drawingUntil = nil }
+        }
+        .onChange(of: shouldAnimate) { _, animating in
+            let now = Date.timeIntervalSinceReferenceDate
+            if animating { clock.start(at: now) } else { clock.stop(at: now) }
+        }
     }
 
-    private var frameInterval: TimeInterval {
-        isDrawing ? 1.0 / 60.0 : 1.0 / 20.0
+    private var mapFrameInterval: TimeInterval {
+        drawingUntil != nil || settledAt != nil ? 1.0 / 60.0 : 1.0 / 20.0
     }
 
-    private var isDrawing: Bool {
-        guard mode == .ready, playlistLines != nil else { return false }
-        return !isSettled || settledAt != nil
+    private func fieldTime(at date: Date) -> TimeInterval {
+        shouldAnimate ? clock.time(at: date.timeIntervalSinceReferenceDate) : clock.restingTime
     }
 
     // Lines that were already there when the screen appeared stay still. Only a song read now draws.
@@ -107,6 +152,9 @@ public struct FluidMusicField: View {
         for id in ids where !existing.contains(id) {
             lineBirths[id] = next
             next += PlaylistContourCanvas.drawStagger
+        }
+        if !ids.allSatisfy(existing.contains) {
+            drawingUntil = next + PlaylistContourCanvas.drawDuration
         }
     }
 

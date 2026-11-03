@@ -4,7 +4,7 @@ Last checked: 2026-11-02.
 
 The app is one good walk short of knowing whether its August repairs work. The phone has the repair build, original commit `0aa99a7`. No walk on that build is recorded here, and the phone may hold a later run that has not been pulled.
 
-The repository is now ahead of the phone at version 1.2, build 3. The November sweep fixed recovery dead ends and several timing bugs, and the design refresh changed setup and the run screens, including a Liquid Glass tempo wheel drawn as a speaker. None of that has been installed or tried on a phone. The next step is one install, then one walk.
+The repository is now ahead of the phone at version 1.2, build 4. The November sweep fixed recovery dead ends and several timing bugs, and the design refresh changed setup and the run screens, including a Liquid Glass tempo wheel drawn as a speaker. None of that has been installed or tried on a phone. The next step is one install, then one walk.
 
 ## Product state
 
@@ -17,7 +17,7 @@ The repository is now ahead of the phone at version 1.2, build 3. The November s
 | Auto | A responsive sensor estimate feeds a separate calm musical target | Noise, spike, faster, slower, missing-input, and walking tests |
 | Manual | Manual stays with the confirmed song and returns to Auto after a different song is confirmed | Reducer, app-model, and interface tests |
 | Playback range | The software candidate is 0.85 through 1.15. Only 0.90 and 1.10 have been heard | Shared limits and endpoint tests. Listening at the endpoints is open |
-| Tempo wheel | The wheel is a speaker driver under a clear glass lens. The cone and center cap push forward on the real beat while the surround stays still. It has a quiet close action with its own 44-point target | Interface tests and inspected Simulator frames |
+| Tempo wheel | The wheel is a speaker driver under a clear glass lens. The cone and center cap push forward at the music's current tempo while the surround stays still. The pulse is not lined up with the song's individual beats, because analysis measures tempo and not beat positions. It has a quiet close action with its own 44-point target | Interface tests and inspected Simulator frames |
 | Transport and Finish | Previous, Pause or Resume, and Next are three interactive Liquid Glass circles, the primary larger and tinted. Finish is a quiet button below them that arms a hold drawn inside its own capsule | Serial interface tests, including two that fail if Pause or Finish moves when it changes state, and the sheet in `Evidence/Simulator/2026-11-02-design-refresh/`. Feel on the phone is open |
 | Reading a playlist | Each song read draws one contour line shaped by its measured tempo and plucks the progress string. The field warms with the count of songs read, and the song, tempo, and count pass in one centered stack | Unit tests for the map and the warmth, interface tests, and inspected frames and video from the Simulator. An invented playlist was read one song at a time, so real import pacing and frame rate on a phone are open |
 | Auto feedback | The reducer owns one directional transaction per meaningful Auto change. Three prototype haptic families, six arrival sounds, and a hidden audition screen exist. Every cue reports what became of it | Domain, app-model, and asset tests. Nothing about feel or sound is physically proved |
@@ -49,7 +49,7 @@ All of these need a body, an ear, or real Apple Music. [PHONE-CHECK.md](PHONE-CH
 - Hear 0.85 and 1.15 through headphones for a full musical section, and read back what Apple Music reports.
 - Judge transport and Finish by hand.
 - Run the blinded faster and slower trials for all three haptic families on both sound paths.
-- Judge the glass and the speaker's beat pump on a real screen, because the Simulator only approximates glass.
+- Judge the glass and the speaker's beat pump on a real screen, and measure frame rate there, because the Simulator only approximates glass and its drawing costs differ from a phone's.
 - Hear the crossfade at a natural song change, and confirm `Last song change` after a natural end and after an explicit Next.
 - Check screen lock, an interruption, and route recovery.
 - Run a clean walking-only check. The 90 SPM floor and five-second delay are software choices, not tuned constants.

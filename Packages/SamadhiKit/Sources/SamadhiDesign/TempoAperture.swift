@@ -35,39 +35,19 @@ public struct TempoAperture: View {
     }
 
     public var body: some View {
-        // One beat phase drives every pulse detail. Pause and Reduce Motion freeze that same clock.
-        TimelineView(
-            .animation(
-                minimumInterval: 1 / 30, paused: effectiveReduceMotion || mode == .paused || mode == .interrupted)
-        ) { _ in
-            let phase = visualPhase
-            TempoOrbDrawing(
-                mode: mode,
-                phase: phase,
-                progress: progress,
-                animatesProgress: !effectiveReduceMotion,
-                increasedContrast: contrast == .increased || increasedContrastOverride,
-                pump: conePump(for: phase),
-                showsReadout: showsReadout
-            )
-        }
+        TempoOrbDrawing(
+            mode: mode,
+            tempoBPM: tempoBPM,
+            progress: progress,
+            animatesProgress: !effectiveReduceMotion,
+            increasedContrast: contrast == .increased || increasedContrastOverride,
+            isPumping: !effectiveReduceMotion && mode == .locked,
+            showsReadout: showsReadout
+        )
         .aspectRatio(1, contentMode: .fit)
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(accessibilityLabel)
         .accessibilityValue(accessibilityValue)
-    }
-
-    private var visualPhase: Double {
-        guard !effectiveReduceMotion, mode != .paused, mode != .interrupted else { return 0.18 }
-        let bpm = Double(tempoBPM ?? 96)
-        let secondsPerBeat = 60 / max(bpm, 1)
-        return (ProcessInfo.processInfo.systemUptime / secondsPerBeat).truncatingRemainder(dividingBy: 1)
-    }
-
-    // How far the cone has pushed forward on this beat. The surround stays still, as on a real driver.
-    private func conePump(for phase: Double) -> Double {
-        guard !effectiveReduceMotion, mode == .locked else { return 0 }
-        return exp(-phase * 7.5)
     }
 
     private var accessibilityLabel: String {
@@ -92,30 +72,22 @@ public struct TempoAperture: View {
 
 private struct TempoOrbDrawing: View {
     let mode: ApertureMode
-    let phase: Double
+    let tempoBPM: Int?
     let progress: Double
     let animatesProgress: Bool
     let increasedContrast: Bool
-    let pump: Double
+    let isPumping: Bool
     let showsReadout: Bool
 
     var body: some View {
         ZStack {
-            SpeakerDriver(pump: pump, isQuiet: showsReadout || mode == .interrupted)
-                .padding(18)
-
-            // A sunrise under the lens gives the glass something to bend. It swells on the beat.
-            Circle()
-                .fill(
-                    RadialGradient(
-                        colors: pooledLight,
-                        center: UnitPoint(x: 0.5, y: 1.04),
-                        startRadius: 4,
-                        endRadius: 172
-                    )
-                )
-                .opacity(0.62 + 0.3 * pump)
-                .padding(18)
+            PumpingDriver(
+                tempoBPM: tempoBPM,
+                isPumping: isPumping,
+                isQuiet: showsReadout || mode == .interrupted,
+                light: pooledLight
+            )
+            .padding(18)
 
             Color.clear
                 .glassEffect(lens, in: .circle)
@@ -163,6 +135,78 @@ private struct TempoOrbDrawing: View {
             [SamadhiColor.ivory.opacity(0.14), SamadhiColor.apricot.opacity(0.08), .clear]
         case .interrupted:
             [SamadhiColor.plum.opacity(0.4), .clear]
+        }
+    }
+}
+
+// How far through a beat the music is. A tempo change alters how fast the beats come without jumping
+// to another point in the beat. It keeps the music's tempo but does not know where the song's beats
+// fall, because analysis measures tempo and no beat positions.
+struct BeatClock: Equatable {
+    private var anchorTime: TimeInterval = 0
+    private var anchorPhase: Double = 0
+    private var beatsPerSecond: Double
+
+    init(bpm: Double) {
+        beatsPerSecond = max(bpm, 1) / 60
+    }
+
+    func phase(at time: TimeInterval) -> Double {
+        (anchorPhase + (time - anchorTime) * beatsPerSecond).truncatingRemainder(dividingBy: 1)
+    }
+
+    mutating func retime(toBPM bpm: Double, at time: TimeInterval) {
+        anchorPhase = phase(at: time)
+        anchorTime = time
+        beatsPerSecond = max(bpm, 1) / 60
+    }
+
+    // How far the cone has pushed forward on this beat. Steps too small to see round to the same value,
+    // so the driver redraws nothing during the still last third of each beat.
+    static func pump(atPhase phase: Double) -> Double {
+        (exp(-phase * 7.5) * 64).rounded() / 64
+    }
+}
+
+// Only the parts that move with the beat sit on the clock, so the glass and the rings above them are
+// not rebuilt 30 times a second. Outside a locked tempo nothing here moves, so the clock stops.
+private struct PumpingDriver: View {
+    let tempoBPM: Int?
+    let isPumping: Bool
+    let isQuiet: Bool
+    let light: [Color]
+
+    @State private var clock: BeatClock
+
+    init(tempoBPM: Int?, isPumping: Bool, isQuiet: Bool, light: [Color]) {
+        self.tempoBPM = tempoBPM
+        self.isPumping = isPumping
+        self.isQuiet = isQuiet
+        self.light = light
+        _clock = State(initialValue: BeatClock(bpm: Double(tempoBPM ?? 96)))
+    }
+
+    var body: some View {
+        TimelineView(.animation(minimumInterval: 1 / 30, paused: !isPumping)) { _ in
+            let pump = isPumping ? BeatClock.pump(atPhase: clock.phase(at: ProcessInfo.processInfo.systemUptime)) : 0
+            ZStack {
+                SpeakerDriver(pump: pump, isQuiet: isQuiet)
+
+                // A sunrise under the lens gives the glass something to bend. It swells on the beat.
+                Circle()
+                    .fill(
+                        RadialGradient(
+                            colors: light,
+                            center: UnitPoint(x: 0.5, y: 1.04),
+                            startRadius: 4,
+                            endRadius: 172
+                        )
+                    )
+                    .opacity(0.62 + 0.3 * pump)
+            }
+        }
+        .onChange(of: tempoBPM) { _, bpm in
+            clock.retime(toBPM: Double(bpm ?? 96), at: ProcessInfo.processInfo.systemUptime)
         }
     }
 }

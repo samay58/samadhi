@@ -35,7 +35,7 @@ The signature of the interface is the map a playlist draws of itself. Each song 
 
 ## The speaker
 
-The tempo wheel is a speaker driver seen head on, under a clear glass lens, with a sunrise grazing it from below. Thin ribs, one domed center cap, and no photo-real detail. It is drawn in the field's own ink so the field stays visible through it, and it moves only on the real beat.
+The tempo wheel is a speaker driver seen head on, under a clear glass lens, with a sunrise grazing it from below. Thin ribs, one domed center cap, and no photo-real detail. It is drawn in the field's own ink so the field stays visible through it, and it pulses only at the music's current tempo.
 
 ## Repository cover
 

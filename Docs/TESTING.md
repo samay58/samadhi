@@ -10,7 +10,7 @@ This regenerates the project and fails if it drifted from `project.yml`, runs th
 
 GitHub Actions repeats the lint, fingerprint, and package tests on every push. Interface tests and phone checks stay on a real Mac.
 
-The latest gate passed on 2026-11-02 on the Mac Mini with Xcode 27.2 and the iOS 27.0 Simulator: 205 package tests, 60 app-model tests, and 32 interface tests in 4 minutes 14 seconds, at source fingerprint `1a6352136861408c9fe019ca494905c631d489610d322a8d0ee6e0d19d2cc944`. Nine of the app-model tests are direct screen tests, described in [DEVELOPMENT.md](DEVELOPMENT.md). The physical checks in [PHONE-CHECK.md](PHONE-CHECK.md) are unaffected and remain open.
+The latest gate passed on 2026-11-02 on the Mac Mini with Xcode 27.2 and the iOS 27.0 Simulator: 209 package tests, 65 app-model tests, and 32 interface tests in 4 minutes 20 seconds, at source fingerprint `7788baca6973664f89e5a9b232a8220d4da533ef7b1f9719d6c626b6e5912b54`. Nine of the app-model tests are direct screen tests, described in [DEVELOPMENT.md](DEVELOPMENT.md). The physical checks in [PHONE-CHECK.md](PHONE-CHECK.md) are unaffected and remain open.
 
 ## Coverage
 
