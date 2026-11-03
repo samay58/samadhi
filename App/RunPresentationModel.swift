@@ -24,7 +24,12 @@ final class RunPresentationModel {
     @ObservationIgnored private let cadenceProvider: any CadenceProviding
     @ObservationIgnored private let musicPlayer: any MusicPlaybackProviding
     @ObservationIgnored private let musicCollection: MusicCollection
-    @ObservationIgnored private let diagnosticsStore: RunDiagnosticsStore
+    #if DEBUG
+        // One queue into the store, so the record keeps the order things happened in and the main
+        // thread only ever hands a batch over.
+        @ObservationIgnored private let diagnosticsWrites: AsyncStream<RunDiagnosticSnapshot>.Continuation
+        @ObservationIgnored private var deviceContextObserver: DeviceContextObserver?
+    #endif
     @ObservationIgnored private let hapticFeedback = RunHapticFeedback()
     @ObservationIgnored private let autoFeedback: any AutoFeedbackPlaying
     @ObservationIgnored private let taskStore = RunTaskStore()
@@ -41,7 +46,15 @@ final class RunPresentationModel {
     ) {
         let configuration = SimulationConfiguration.current
         self.configuration = configuration
-        self.diagnosticsStore = diagnosticsStore
+        #if DEBUG
+            let (writes, continuation) = AsyncStream.makeStream(of: RunDiagnosticSnapshot.self)
+            diagnosticsWrites = continuation
+            Task {
+                for await batch in writes {
+                    try? await diagnosticsStore.append(batch)
+                }
+            }
+        #endif
         self.diagnosticsRecorder = diagnosticsRecorder
         self.autoFeedback = autoFeedback ?? AutoFeedbackService()
         musicCollection =
@@ -341,9 +354,11 @@ final class RunPresentationModel {
                     event: event,
                     oldState: oldState,
                     newState: newState,
+                    effects: effects,
                     collection: musicCollection
                 )
             )
+            recordPeriodicDeviceContext(after: event)
         #endif
 
         if case .cadenceUpdated = event,
@@ -376,6 +391,9 @@ final class RunPresentationModel {
     ) {
         #if DEBUG
             let sample = CadenceDiagnosticSample(
+                totalSteps: observation.totalSteps,
+                distanceMeters: observation.distanceMeters,
+                paceSecondsPerMeter: observation.paceSecondsPerMeter,
                 rawStepsPerMinute: observation.stepsPerMinute,
                 sampleAgeSeconds: observation.sampleAgeSeconds,
                 sampleEndDateSeconds: observation.sampleEndDateSeconds
@@ -410,9 +428,37 @@ final class RunPresentationModel {
     #if DEBUG
         private func persist(_ snapshot: RunDiagnosticSnapshot?) {
             guard let snapshot else { return }
-            Task { [diagnosticsStore] in
-                try? await diagnosticsStore.save(snapshot)
+            diagnosticsWrites.yield(snapshot)
+        }
+
+        // The phone's conditions at the start, every 30 seconds, and whenever one changes.
+        private func recordPeriodicDeviceContext(after event: RunEvent) {
+            switch event {
+            case .startTapped:
+                if deviceContextObserver == nil {
+                    deviceContextObserver = DeviceContextObserver { [weak self] reason in
+                        self?.recordDeviceContext(reason: reason)
+                    }
+                }
+                recordDeviceContext(reason: "start")
+            case .activeSecond:
+                guard let seconds = state.session?.elapsedActiveSeconds, seconds % 30 == 0 else { return }
+                recordDeviceContext(reason: "periodic")
+            case .finishCompleted:
+                recordDeviceContext(reason: "finish")
+            default:
+                break
             }
+        }
+
+        private func recordDeviceContext(reason: String) {
+            persist(
+                diagnosticsRecorder.record(
+                    device: .current(reason: reason),
+                    state: state,
+                    collection: musicCollection
+                )
+            )
         }
     #endif
 

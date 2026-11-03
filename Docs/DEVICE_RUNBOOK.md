@@ -41,11 +41,15 @@ After a run finishes, pull its record while the phone is awake:
 ./Scripts/phone.sh pull
 ~~~
 
-This copies every record on the phone to `~/Documents/Samadhi Run Records/` and prints a summary of the latest. Set `SAMADHI_RUN_ARCHIVE` to use another folder. `install` does the same first, so an install never risks a log. To reread a saved record, run `python3 Scripts/read-run.py <file>`. The raw files can hold personal music data, so they stay out of Git.
+This keeps every new run in `~/Documents/Samadhi Run Records/runs/`, one file per run however often you pull, refreshes `ledger.csv` beside it, and prints the latest run and the ledger. Set `SAMADHI_RUN_ARCHIVE` to use another folder. `install` saves first in the same way, so an install never risks a log. The records stay out of Git.
 
-The phone keeps the current run in `latest-run-diagnostics.json` and the previous 30 in `run-records/`. Builds from before 2026-11-02 keep only one run, and starting a run on them overwrites it. Installing a newer build keeps that file, and its first run moves it into `run-records/`.
+~~~sh
+python3 Scripts/runs.py ledger        # One line per run, oldest first
+python3 Scripts/runs.py read <file>   # One run in detail
+swift run --package-path Packages/SamadhiKit RunReplay <file.jsonl>   # That run through today's logic
+~~~
 
-The record holds 2,048 entries and drops per-second ticks first, so every song change, rate write, mode change, cue, and notice from a realistic run survives.
+Each run is one `.jsonl` file that only ever grows, with no limit on length: the playlist and its measured tempos, every input to the reducer and what it asked for, the state after each change, steps, distance, and pace from the pedometer, and the phone's battery, heat, lock state, and sound output. A run costs about 9 MB an hour. The phone keeps the newest 60, so pull at least that often. Builds before version 1.2 build 5 wrote a single JSON file, and `runs.py` reads both.
 
 ## Reading cue outcomes
 

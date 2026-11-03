@@ -54,8 +54,20 @@ actor MusicImportDiagnosticsStore {
         let encoder = JSONEncoder()
         encoder.dateEncodingStrategy = .iso8601
         encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
-        try encoder.encode(snapshot).write(to: fileURL, options: .atomic)
+        let data = try encoder.encode(snapshot)
+        try data.write(to: fileURL, options: .atomic)
+
+        let history = directoryURL.appending(path: "import-records", directoryHint: .isDirectory)
+        try FileManager.default.createDirectory(at: history, withIntermediateDirectories: true)
+        let stamp = Date().ISO8601Format().replacing(":", with: "-")
+        try data.write(to: history.appending(path: "\(stamp).json"), options: .atomic)
+        let kept = try FileManager.default.contentsOfDirectory(atPath: history.path).sorted()
+        for name in kept.dropLast(Self.importRecordLimit) {
+            try FileManager.default.removeItem(at: history.appending(path: name))
+        }
     }
+
+    private static let importRecordLimit = 30
 }
 
 @MainActor

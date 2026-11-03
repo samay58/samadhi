@@ -55,10 +55,10 @@ The phone answers what nothing else can: cadence, sound, touch, and locked-scree
 ./Scripts/phone.sh status     # Is it reachable, and is signing ready?
 ./Scripts/phone.sh install    # Exact profile, verified signature, in-place install
 # Walk or run.
-./Scripts/phone.sh pull       # Copies the run record here and summarizes it
+./Scripts/phone.sh pull       # Keeps every new run, prints the latest and the ledger across runs
 ~~~
 
-The summary answers what a walk leaves behind: which build ran, what became of each cue, and why each song changed.
+The summary answers what a walk leaves behind: which build ran, what became of each cue, and why each song changed. To test a change to Auto against real walks, run `swift run --package-path Packages/SamadhiKit RunReplay <file.jsonl>` on any kept run.
 
 ### Recording what was learned
 

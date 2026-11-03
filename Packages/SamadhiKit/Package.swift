@@ -22,6 +22,11 @@ let package = Package(
             resources: [.process("Corpus.json")]
         ),
         .executableTarget(
+            name: "RunReplay",
+            dependencies: ["SamadhiDomain"],
+            path: "Tools/RunReplay"
+        ),
+        .executableTarget(
             name: "TempoProbe",
             dependencies: ["SamadhiAudio", "SamadhiDomain"],
             path: "Tools/TempoProbe"

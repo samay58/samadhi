@@ -2,9 +2,19 @@ import Foundation
 import SamadhiDomain
 import SamadhiMotion
 
-struct RunDiagnosticSnapshot: Codable, Equatable, Sendable {
+// One batch of a run's record. It holds only what is new since the last batch, because the store
+// adds to the file instead of rewriting it.
+struct RunDiagnosticSnapshot: Equatable, Sendable {
     // Bump when a reader of the pulled file needs to know the shape changed.
-    static let currentSchemaVersion = 11
+    static let currentSchemaVersion = 12
+
+    // Every input the reducer saw, so a run can be replayed through later logic. Effects are the
+    // readable names of what it asked for, to compare against a replay.
+    struct LoggedEvent: Codable, Equatable, Sendable {
+        let offsetSeconds: Double
+        let event: RunEvent
+        let effects: [String]
+    }
 
     enum CompletionState: String, Codable, Sendable {
         case inProgress
@@ -50,17 +60,6 @@ struct RunDiagnosticSnapshot: Codable, Equatable, Sendable {
             // The reducer planned a next song for the boundary, or said the collection is out of reach.
             case nextSongPlanned
             case reachNoticed
-
-            // Per-second ticks are the only entries the buffer may drop. Everything else survives
-            // a whole run.
-            var isTick: Bool {
-                switch self {
-                case .activeSecond, .cadenceObserved, .cadenceUpdated, .playerProgress:
-                    true
-                default:
-                    false
-                }
-            }
         }
 
         let offsetSeconds: Double
@@ -122,6 +121,9 @@ struct RunDiagnosticSnapshot: Codable, Equatable, Sendable {
         let nextSongOutlook: String?
         let plannedNextTrackTitle: String?
         let collectionReach: String?
+        let totalSteps: Int?
+        let distanceMeters: Double?
+        let paceSecondsPerMeter: Double?
 
         init(
             offsetSeconds: Double,
@@ -181,8 +183,14 @@ struct RunDiagnosticSnapshot: Codable, Equatable, Sendable {
             hapticEngineEvent: String? = nil,
             nextSongOutlook: String? = nil,
             plannedNextTrackTitle: String? = nil,
-            collectionReach: String? = nil
+            collectionReach: String? = nil,
+            totalSteps: Int? = nil,
+            distanceMeters: Double? = nil,
+            paceSecondsPerMeter: Double? = nil
         ) {
+            self.totalSteps = totalSteps
+            self.distanceMeters = distanceMeters
+            self.paceSecondsPerMeter = paceSecondsPerMeter
             self.offsetSeconds = offsetSeconds
             self.kind = kind
             self.activeSeconds = activeSeconds
@@ -254,6 +262,12 @@ struct RunDiagnosticSnapshot: Codable, Equatable, Sendable {
     let readyTrackCount: Int
     let summary: Summary
     let timeline: [Entry]
+    let startedAt: Date
+    // The first batch of a run opens its file and carries what only needs saying once.
+    let startsRun: Bool
+    let tracks: [MusicTrack]
+    let events: [LoggedEvent]
+    let device: [TimedDeviceContext]
 
     init(
         schemaVersion: Int,
@@ -265,8 +279,18 @@ struct RunDiagnosticSnapshot: Codable, Equatable, Sendable {
         collectionName: String,
         readyTrackCount: Int,
         summary: Summary,
-        timeline: [Entry]
+        timeline: [Entry],
+        startedAt: Date? = nil,
+        startsRun: Bool = false,
+        tracks: [MusicTrack] = [],
+        events: [LoggedEvent] = [],
+        device: [TimedDeviceContext] = []
     ) {
+        self.startedAt = startedAt ?? capturedAt
+        self.startsRun = startsRun
+        self.tracks = tracks
+        self.events = events
+        self.device = device
         self.schemaVersion = schemaVersion
         self.capturedAt = capturedAt
         self.build = build
@@ -280,97 +304,140 @@ struct RunDiagnosticSnapshot: Codable, Equatable, Sendable {
     }
 }
 
+// Each run is one file with one JSON object per line, and writing only ever adds to the end. A run of
+// any length costs the same per line, and a crash loses at most the last few seconds of ticks.
 actor RunDiagnosticsStore {
-    private let directoryURL: URL
-    private let fileURL: URL
-    private let archiveURL: URL
-    private let archivedRunLimit: Int
-    // True until the current run has written once. The first write of a run must not replace the
-    // previous run's record, because that file may be the only copy of a real outing.
-    private var previousRunNeedsArchiving = true
+    private let recordsURL: URL
+    private let runLimit: Int
+    private let encoder: JSONEncoder
+    private var handle: FileHandle?
 
-    init(directoryURL: URL? = nil, archivedRunLimit: Int = 30) {
-        let directory: URL
-        if let directoryURL {
-            directory = directoryURL
-        } else if let applicationSupport = FileManager.default.urls(
-            for: .applicationSupportDirectory,
-            in: .userDomainMask
-        ).first {
-            directory = applicationSupport.appending(
-                path: "Samadhi",
-                directoryHint: .isDirectory
-            )
-        } else {
-            directory = FileManager.default.temporaryDirectory.appending(
-                path: "Samadhi",
-                directoryHint: .isDirectory
-            )
-        }
-        self.directoryURL = directory
-        fileURL = directory.appending(path: "latest-run-diagnostics.json")
-        archiveURL = directory.appending(path: "run-records", directoryHint: .isDirectory)
-        self.archivedRunLimit = archivedRunLimit
+    private struct Line<Body: Encodable>: Encodable {
+        let line: String
+        let body: Body
     }
 
-    func save(_ snapshot: RunDiagnosticSnapshot) throws {
-        try FileManager.default.createDirectory(
-            at: directoryURL,
-            withIntermediateDirectories: true
-        )
-        if previousRunNeedsArchiving {
-            // Losing a record is worse than repeating this attempt on the next write.
-            try archivePreviousRun()
-            previousRunNeedsArchiving = false
-        }
-        let encoder = JSONEncoder()
+    private struct Header: Encodable {
+        let schemaVersion: Int
+        let startedAt: Date
+        let build: BuildIdentity
+        let environment: DiagnosticEnvironment
+        let collectionID: String
+        let collectionName: String
+        let readyTrackCount: Int
+        let tracks: [MusicTrack]
+    }
+
+    private struct Status: Encodable {
+        let capturedAt: Date
+        let completionState: RunDiagnosticSnapshot.CompletionState?
+        let summary: RunDiagnosticSnapshot.Summary
+    }
+
+    init(directoryURL: URL? = nil, runLimit: Int = 60) {
+        let directory =
+            directoryURL
+            ?? FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)
+            .first?
+            .appending(path: "Samadhi", directoryHint: .isDirectory)
+            ?? FileManager.default.temporaryDirectory.appending(
+                path: "Samadhi",
+                directoryHint: .isDirectory
+            )
+        recordsURL = directory.appending(path: "run-records", directoryHint: .isDirectory)
+        self.runLimit = runLimit
+        encoder = JSONEncoder()
         encoder.dateEncodingStrategy = .iso8601
-        encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
-        try encoder.encode(snapshot).write(to: fileURL, options: .atomic)
-        if snapshot.completionState == .completed {
-            previousRunNeedsArchiving = true
+    }
+
+    func append(_ batch: RunDiagnosticSnapshot) throws {
+        if batch.startsRun {
+            try openRecord(for: batch)
+        }
+        guard let handle else { return }
+
+        var data = Data()
+        if batch.startsRun {
+            try add(
+                "header",
+                Header(
+                    schemaVersion: batch.schemaVersion,
+                    startedAt: batch.startedAt,
+                    build: batch.build,
+                    environment: batch.environment,
+                    collectionID: batch.collectionID,
+                    collectionName: batch.collectionName,
+                    readyTrackCount: batch.readyTrackCount,
+                    tracks: batch.tracks
+                ),
+                to: &data
+            )
+        }
+        for event in batch.events {
+            try add("event", event, to: &data)
+        }
+        for entry in batch.timeline {
+            try add("entry", entry, to: &data)
+        }
+        for sample in batch.device {
+            try add("device", sample, to: &data)
+        }
+        try add(
+            "status",
+            Status(
+                capturedAt: batch.capturedAt,
+                completionState: batch.completionState,
+                summary: batch.summary
+            ),
+            to: &data
+        )
+        try handle.write(contentsOf: data)
+
+        if batch.completionState == .completed {
+            try handle.close()
+            self.handle = nil
         }
     }
 
-    private func archivePreviousRun() throws {
+    func runCount() throws -> Int {
+        guard FileManager.default.fileExists(atPath: recordsURL.path) else { return 0 }
+        return try FileManager.default.contentsOfDirectory(atPath: recordsURL.path).count
+    }
+
+    private func add(_ line: String, _ body: some Encodable, to data: inout Data) throws {
+        data.append(try encoder.encode(Line(line: line, body: body)))
+        data.append(0x0A)
+    }
+
+    private func openRecord(for batch: RunDiagnosticSnapshot) throws {
+        try handle?.close()
+        handle = nil
+
         let manager = FileManager.default
-        guard manager.fileExists(atPath: fileURL.path) else { return }
-        try manager.createDirectory(at: archiveURL, withIntermediateDirectories: true)
-        let attributes = try manager.attributesOfItem(atPath: fileURL.path)
-        let written = attributes[.modificationDate] as? Date ?? Date()
-        let stamp = written.ISO8601Format().replacing(":", with: "-")
-        var destination = archiveURL.appending(path: "\(stamp).json")
+        try manager.createDirectory(at: recordsURL, withIntermediateDirectories: true)
+        let stamp = batch.startedAt.ISO8601Format().replacing(":", with: "-")
+        var url = recordsURL.appending(path: "\(stamp).jsonl")
         var attempt = 1
-        while manager.fileExists(atPath: destination.path) {
+        while manager.fileExists(atPath: url.path) {
             attempt += 1
-            destination = archiveURL.appending(path: "\(stamp)-\(attempt).json")
+            url = recordsURL.appending(path: "\(stamp)-\(attempt).jsonl")
         }
-        try manager.moveItem(at: fileURL, to: destination)
+        manager.createFile(atPath: url.path, contents: nil)
+        handle = try FileHandle(forWritingTo: url)
 
-        let archived = try manager.contentsOfDirectory(atPath: archiveURL.path)
-            .filter { $0.hasSuffix(".json") }
-            .sorted()
-        for name in archived.dropLast(archivedRunLimit) {
-            try manager.removeItem(at: archiveURL.appending(path: name))
+        let kept = try manager.contentsOfDirectory(atPath: recordsURL.path).sorted()
+        for name in kept.dropLast(runLimit) {
+            try manager.removeItem(at: recordsURL.appending(path: name))
         }
-    }
-
-    func archivedRunCount() throws -> Int {
-        guard FileManager.default.fileExists(atPath: archiveURL.path) else { return 0 }
-        return try FileManager.default.contentsOfDirectory(atPath: archiveURL.path).count
-    }
-
-    func latest() throws -> RunDiagnosticSnapshot? {
-        guard FileManager.default.fileExists(atPath: fileURL.path) else { return nil }
-        let decoder = JSONDecoder()
-        decoder.dateDecodingStrategy = .iso8601
-        return try decoder.decode(RunDiagnosticSnapshot.self, from: Data(contentsOf: fileURL))
     }
 }
 
 // One raw Core Motion sample and what the filter made of it. This changes no product state, so it
 // never becomes a RunEvent; the shell hands it straight to the recorder.
 struct CadenceDiagnosticSample {
+    var totalSteps: Int?
+    var distanceMeters: Double?
+    var paceSecondsPerMeter: Double?
     let rawStepsPerMinute: Double?
     let sampleAgeSeconds: Double
     let sampleEndDateSeconds: Double
@@ -381,15 +448,16 @@ struct CadenceDiagnosticSample {
 }
 
 struct RunDiagnosticsRecorder {
-    // About 1.4 KB per pretty-printed entry, so a full buffer is under 3 MB. Ticks fill whatever
-    // the story of the run leaves free and are the first to go.
-    static let maximumEntries = 2_048
     private static let checkpointInterval: TimeInterval = 5
 
     private let now: () -> Date
     private var startedAt: Date?
     private var lastCheckpointAt: Date?
+    private var startsRun = false
+    // Only what the store has not been handed yet.
     private var timeline: [RunDiagnosticSnapshot.Entry] = []
+    private var events: [RunDiagnosticSnapshot.LoggedEvent] = []
+    private var device: [TimedDeviceContext] = []
 
     init(now: @escaping () -> Date = Date.init) {
         self.now = now
@@ -399,15 +467,28 @@ struct RunDiagnosticsRecorder {
         event: RunEvent,
         oldState: RunState,
         newState: RunState,
+        effects: [RunEffect] = [],
         collection: MusicCollection
     ) -> RunDiagnosticSnapshot? {
         if case .startTapped = event, newState != oldState {
             startedAt = now()
+            startsRun = true
             lastCheckpointAt = nil
             timeline.removeAll(keepingCapacity: true)
+            events.removeAll(keepingCapacity: true)
+            device.removeAll(keepingCapacity: true)
         }
+        guard let startedAt else { return nil }
+        // Every input goes in, including one that changed nothing, because that is a fact as well.
+        events.append(
+            RunDiagnosticSnapshot.LoggedEvent(
+                offsetSeconds: max(now().timeIntervalSince(startedAt), 0),
+                event: event,
+                effects: effects.map { String(describing: $0) }
+            )
+        )
 
-        guard startedAt != nil, newState != oldState else { return nil }
+        guard newState != oldState else { return nil }
         let tempoMatched: Bool?
         if case let .activeSecond(value) = event {
             tempoMatched = value
@@ -567,6 +648,23 @@ struct RunDiagnosticsRecorder {
         )
     }
 
+    mutating func record(
+        device sample: DeviceContext,
+        state: RunState,
+        collection: MusicCollection
+    ) -> RunDiagnosticSnapshot? {
+        guard let startedAt else { return nil }
+        device.append(
+            TimedDeviceContext(offsetSeconds: max(now().timeIntervalSince(startedAt), 0), context: sample)
+        )
+        return checkpoint(
+            completingWith: state,
+            session: state.session,
+            collection: collection,
+            isImmediate: false
+        )
+    }
+
     private mutating func append(
         kind: RunDiagnosticSnapshot.Entry.Kind,
         state stateForEntry: RunState,
@@ -660,22 +758,12 @@ struct RunDiagnosticsRecorder {
                 hapticEngineEvent: engineEvent?.name,
                 nextSongOutlook: session?.nextSongOutlook.rawValue,
                 plannedNextTrackTitle: plannedTrack?.title,
-                collectionReach: session?.collectionReach.condition?.rawValue
+                collectionReach: session?.collectionReach.condition?.rawValue,
+                totalSteps: cadenceObservation?.totalSteps,
+                distanceMeters: cadenceObservation?.distanceMeters,
+                paceSecondsPerMeter: cadenceObservation?.paceSecondsPerMeter
             )
         )
-        trimTimeline()
-    }
-
-    // Oldest tick first. Only when no tick is left does the oldest story entry go, so the cap
-    // still holds on a run that somehow produces thousands of changes.
-    private mutating func trimTimeline() {
-        while timeline.count > Self.maximumEntries {
-            if let oldestTick = timeline.firstIndex(where: { $0.kind.isTick }) {
-                timeline.remove(at: oldestTick)
-            } else {
-                timeline.removeFirst()
-            }
-        }
     }
 
     // An unfinished run still writes evidence so an abandoned field check is not lost. Frequent
@@ -696,7 +784,7 @@ struct RunDiagnosticsRecorder {
             lastCheckpointAt.map { now().timeIntervalSince($0) >= Self.checkpointInterval } ?? true
         guard completedSummary != nil || isImmediate || throttleElapsed else { return nil }
         // Never fabricate a summary. Without a run there is nothing honest to write.
-        guard let summary = completedSummary ?? session?.summary else { return nil }
+        guard let summary = completedSummary ?? session?.summary, let startedAt else { return nil }
         lastCheckpointAt = now()
         let snapshot = RunDiagnosticSnapshot(
             schemaVersion: RunDiagnosticSnapshot.currentSchemaVersion,
@@ -714,12 +802,20 @@ struct RunDiagnosticsRecorder {
                 manualSeconds: summary.manualSeconds,
                 songCount: summary.songCount
             ),
-            timeline: timeline
+            timeline: timeline,
+            startedAt: startedAt,
+            startsRun: startsRun,
+            tracks: startsRun ? collection.tracks : [],
+            events: events,
+            device: device
         )
+        startsRun = false
+        timeline.removeAll(keepingCapacity: true)
+        events.removeAll(keepingCapacity: true)
+        device.removeAll(keepingCapacity: true)
         if completedSummary != nil {
             self.startedAt = nil
             lastCheckpointAt = nil
-            timeline.removeAll(keepingCapacity: true)
         }
         return snapshot
     }

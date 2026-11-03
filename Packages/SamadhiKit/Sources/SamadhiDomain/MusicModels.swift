@@ -253,13 +253,23 @@ public struct CadenceObservation: Sendable, Equatable {
     public let elapsedSeconds: Double
     public let sampleAgeSeconds: Double
     public let sampleEndDateSeconds: Double?
+    // Evidence only. The pedometer already delivers these, so keeping them costs no extra sensing.
+    public let totalSteps: Int?
+    public let distanceMeters: Double?
+    public let paceSecondsPerMeter: Double?
 
     public init(
         stepsPerMinute: Double?,
         elapsedSeconds: Double,
         sampleAgeSeconds: Double = 0,
-        sampleEndDateSeconds: Double? = nil
+        sampleEndDateSeconds: Double? = nil,
+        totalSteps: Int? = nil,
+        distanceMeters: Double? = nil,
+        paceSecondsPerMeter: Double? = nil
     ) {
+        self.totalSteps = totalSteps
+        self.distanceMeters = distanceMeters
+        self.paceSecondsPerMeter = paceSecondsPerMeter
         self.stepsPerMinute = stepsPerMinute
         self.elapsedSeconds = max(elapsedSeconds, 0)
         self.sampleAgeSeconds = max(sampleAgeSeconds, 0)

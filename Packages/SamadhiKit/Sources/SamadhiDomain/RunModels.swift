@@ -1,5 +1,5 @@
 // Read this file before RunReducer: states describe what can be true, events enter, and effects leave.
-public enum MotionAuthorization: Sendable, Equatable {
+public enum MotionAuthorization: Sendable, Equatable, Codable {
     case authorized
     case denied
     case unavailable
@@ -480,7 +480,7 @@ public enum RunEffect: Sendable, Equatable {
     case cancelAllTasks(sessionID: Int)
 }
 
-public enum RunEvent: Sendable, Equatable {
+public enum RunEvent: Sendable, Equatable, Codable {
     case startTapped(sessionID: Int)
     case authorizationResolved(sessionID: Int, MotionAuthorization)
     case useFixedRhythmTapped

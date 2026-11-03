@@ -2,7 +2,7 @@
 
 Last checked: 2026-11-02.
 
-The app is one good walk short of knowing whether its August repairs and the November design work hold up. The phone has version 1.2, build 4, commit `42c86a3`, read back from the phone in `Evidence/Device/2026-11-02-install-1.2/`. Its signing profile expires on 2026-11-09 at 9:18 PM Eastern, and the app will not open after that until a fresh one is installed over it.
+The app is one good walk short of knowing whether its August repairs and the November design work hold up. The phone has version 1.2, build 5, installed the same way as build 4 in `Evidence/Device/2026-11-02-install-1.2/`. Its signing profile expires on 2026-11-09 at 9:18 PM Eastern, and the app will not open after that until a fresh one is installed over it.
 
 The November sweep fixed recovery dead ends and several timing bugs, and the design refresh changed setup and the run screens, including a Liquid Glass tempo wheel drawn as a speaker. All of that is installed, and none of it has been walked or run on. The next step is one walk. An unfinished 10-minute run from October 26 was pulled from the phone and has not been read yet.
 
@@ -25,7 +25,7 @@ The November sweep fixed recovery dead ends and several timing bugs, and the des
 | Song boundaries | In the last 45 seconds of a song the reducer judges the queued next song against the settled target and prepares one better fit when it cannot follow | Reducer tests. Not yet seen at a real boundary on the phone |
 | Reach | When fewer than a quarter of the ready songs can reach the settled target for twenty seconds, the run screen says so once per run per direction | Reducer tests and frames in `Evidence/Simulator/2026-08-19-out-of-reach/` |
 | Recovery | Each audio recovery names its cause: headphones, an interruption, or Apple Music failing. Only the matching event clears it, and every recovery can end the run | Reducer tests, an interface test, and an inspected Simulator frame. Not yet seen on the phone |
-| Run record | The phone keeps the current run and the previous 30. Each holds 2,048 entries. Per-second ticks are evicted first, so the story of the run survives. Schema 11 adds cue delivery, engine, next-song plan, and reach entries | Eviction and delivery tests. Under 3 MB for an hour |
+| Run record | Each run is one file that only grows, holding every input, every state change, pedometer steps, distance, and pace, and the phone's conditions. The phone keeps the newest 60 and `phone.sh pull` keeps every run on the Mac with a ledger across runs. `RunReplay` puts any recorded run through today's logic | Store, replay, and long-run tests, and a recorded Simulator run that replayed with no differences. No walk has been recorded in this form yet |
 | Song-change cause | Every confirmed song change records natural end, outside change, or explicit Previous or Next | Attribution tests and the Debug row `Last song change` |
 | Release isolation | Neither the hidden Debug screen nor the audition screen ships in Release | Release binary strings and symbol counts |
 

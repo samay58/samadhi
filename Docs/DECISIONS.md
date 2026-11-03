@@ -114,7 +114,7 @@ The reducer owns adaptation state and rate decisions. Each rate effect carries s
 
 ## Latest-run diagnostics, not run history
 
-Debug builds write the current run to `latest-run-diagnostics.json` during a run and at completion. When the next run starts, the previous file moves to `run-records/`, which keeps the newest 30. Samay lost the raw logs of every earlier run to the old overwrite. This is a developer archive, and the app shows no history. The bounded rolling trace records raw and filtered cadence, sample freshness, requested and applied rates, track identity, transition authority, recovery events, and the final summary when one exists. An abandoned or interrupted check therefore leaves useful evidence without adding analytics, a dashboard, or a run-history product. Release behavior and the visible run interface remain unchanged.
+Debug builds keep one append-only file per run. See "Every run is kept, and can be replayed" below.
 
 Each built app writes its own Git commit, branch, tracked-file state, build date, app version, and build number into the built Info.plist before signing. Debug diagnostics add the analyzer version, diagnostic-file version, device and system, real or simulated services, and sanitized launch arguments. A hidden Debug screen reads the same run state and diagnostic values. It is not a second state system and it is absent from the normal Release interface.
 
@@ -332,3 +332,13 @@ Launching the app to check a fixed screen cost about 6 seconds a frame, and dire
 The run screen stays on for as long as a run does, so wasted redraws cost battery. The wheel's clock now covers only the speaker and the light under it, and it stops unless the tempo is locked. The glass and rings above it are no longer rebuilt 30 times a second. The field's own clock holds its place when it stops, because resetting it made every line jump at the moment the tempo locked.
 
 While a playlist is read, the map runs at 60 frames a second only while a line is being drawn, and the color behind it stays at 20. The wide blur under the run details became a gradient, because it grows when the controls appear and a blur that wide would be redrawn on every frame of that. These were measured as app processor time in the Simulator, which says nothing about the phone's graphics chip, so frame rate on a phone stays open.
+
+## Every run is kept, and can be replayed
+
+The old record rewrote one growing JSON file every few seconds and dropped old ticks to stay under its limit, so a longer run cost more to save and kept less of itself. Each run is now one file that only grows, so a line costs the same at any length and nothing is dropped.
+
+The record holds every input the reducer saw. The reducer is pure, so those inputs rebuild a run exactly, and `RunReplay` shows what today's logic would have done with any past walk. A walk is therefore a permanent test: a change to Auto can be checked against every walk already taken. Once the logic differs, later replies from the player may no longer match what it would have been answering, so differences after the first are a strong hint and not a measurement.
+
+Recording stays in Debug builds, which is what the phone runs. It adds no sensor, timer, or network use. It keeps what the pedometer already delivers and reads the phone's conditions when one changes or every 30 seconds. Raw motion from the accelerometer is left out, because sampling it 100 times a second would cost real battery for data nothing yet reads. Add it when a question needs it.
+
+The raw files are personal and stay out of Git. What a run teaches goes in `Evidence/Device/` as it always has.

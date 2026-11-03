@@ -146,78 +146,38 @@ import Testing
     )
 }
 
-@Test func runDiagnosticsRoundTripPreservesPhysicalEvidence() async throws {
-    let directory = FileManager.default.temporaryDirectory
-        .appending(path: UUID().uuidString, directoryHint: .isDirectory)
-    defer { try? FileManager.default.removeItem(at: directory) }
-    let store = RunDiagnosticsStore(directoryURL: directory)
-    let capturedAt = Date(timeIntervalSince1970: 1_721_000_000)
-    let snapshot = RunDiagnosticSnapshot(
-        schemaVersion: 3,
-        capturedAt: capturedAt,
-        collectionID: "playlist",
-        collectionName: "Strut Frequency",
-        readyTrackCount: 3,
-        summary: RunDiagnosticSnapshot.Summary(
-            durationSeconds: 59,
-            averageCadence: 155,
-            tempoMatchedPercent: 98,
-            tempoMatchedCoveragePercent: 95,
-            automaticSeconds: 40,
-            manualSeconds: 19,
-            songCount: 2
-        ),
-        timeline: [
-            RunDiagnosticSnapshot.Entry(
-                offsetSeconds: 12,
-                kind: .rateApplied,
-                activeSeconds: 10,
-                cadenceSPM: 155,
-                targetRate: 1.035,
-                controlMode: RhythmControlMode.automatic.rawValue,
-                automaticCorrectionBPM: 2,
-                manualTargetBPM: 168,
-                requestedBPM: 157,
-                originalStepRhythmSPM: 152,
-                appliedStepRhythmSPM: 157,
-                derivedTargetRate: 1.035,
-                atLimit: false,
-                commandStatus: TempoCommandStatus.applied.rawValue,
-                achievableBPM: 157,
-                commandedRate: 1.03,
-                commandLatencySeconds: 0.08,
-                appliedRate: 1.03,
-                awaitingRateFeedback: false,
-                trackID: "101",
-                trackTitle: "First",
-                trackIndex: 0,
-                trackElapsedSeconds: 10,
-                trackDurationSeconds: 180,
-                tempoMatched: true
-            )
-        ]
-    )
+// Each write carries only what is new. Tests read the run whole, as a reader of the file would.
+private final class WholeRun {
+    private var timeline: [RunDiagnosticSnapshot.Entry] = []
 
-    try await store.save(snapshot)
-
-    #expect(try await store.latest() == snapshot)
-    let encoded = try String(
-        contentsOf: directory.appending(path: "latest-run-diagnostics.json"),
-        encoding: .utf8
-    )
-    #expect(encoded.contains("originalStepRhythmSPM"))
-    #expect(encoded.contains("appliedStepRhythmSPM"))
-    #expect(!encoded.contains("runningPulseBPM"))
-    #expect(!encoded.contains("appliedRunningPulseBPM"))
+    func add(_ batch: RunDiagnosticSnapshot?) -> RunDiagnosticSnapshot? {
+        guard let batch else { return nil }
+        timeline += batch.timeline
+        return RunDiagnosticSnapshot(
+            schemaVersion: batch.schemaVersion,
+            capturedAt: batch.capturedAt,
+            build: batch.build,
+            environment: batch.environment,
+            completionState: batch.completionState,
+            collectionID: batch.collectionID,
+            collectionName: batch.collectionName,
+            readyTrackCount: batch.readyTrackCount,
+            summary: batch.summary,
+            timeline: timeline
+        )
+    }
 }
 
-private func archiveFixtureSnapshot(
+private func runRecordBatch(
     collectionName: String,
-    completionState: RunDiagnosticSnapshot.CompletionState
+    startsRun: Bool,
+    completionState: RunDiagnosticSnapshot.CompletionState,
+    startedAt: Date = Date(timeIntervalSince1970: 1_721_000_000),
+    timeline: [RunDiagnosticSnapshot.Entry] = []
 ) -> RunDiagnosticSnapshot {
     RunDiagnosticSnapshot(
         schemaVersion: RunDiagnosticSnapshot.currentSchemaVersion,
-        capturedAt: Date(timeIntervalSince1970: 1_721_000_000),
+        capturedAt: startedAt,
         completionState: completionState,
         collectionID: collectionName,
         collectionName: collectionName,
@@ -231,58 +191,254 @@ private func archiveFixtureSnapshot(
             manualSeconds: 0,
             songCount: 1
         ),
-        timeline: []
+        timeline: timeline,
+        startedAt: startedAt,
+        startsRun: startsRun
     )
 }
 
-@Test func aNewRunKeepsThePreviousRunRecordInsteadOfOverwritingIt() async throws {
-    let directory = FileManager.default.temporaryDirectory
-        .appending(path: UUID().uuidString, directoryHint: .isDirectory)
-    defer { try? FileManager.default.removeItem(at: directory) }
-    let store = RunDiagnosticsStore(directoryURL: directory)
+private func temporaryRecordDirectory() -> URL {
+    FileManager.default.temporaryDirectory.appending(path: UUID().uuidString, directoryHint: .isDirectory)
+}
 
-    try await store.save(archiveFixtureSnapshot(collectionName: "first", completionState: .inProgress))
-    try await store.save(archiveFixtureSnapshot(collectionName: "first", completionState: .inProgress))
-    try await store.save(archiveFixtureSnapshot(collectionName: "first", completionState: .completed))
-    #expect(try await store.archivedRunCount() == 0)
-
-    try await store.save(archiveFixtureSnapshot(collectionName: "second", completionState: .inProgress))
-    #expect(try await store.archivedRunCount() == 1)
-    #expect(try await store.latest()?.collectionName == "second")
-
-    let records = try FileManager.default.contentsOfDirectory(
+private func recordFiles(in directory: URL) throws -> [URL] {
+    try FileManager.default.contentsOfDirectory(
         at: directory.appending(path: "run-records"),
         includingPropertiesForKeys: nil
     )
-    let kept = try String(contentsOf: try #require(records.first), encoding: .utf8)
-    #expect(kept.contains("first"))
+    .sorted { $0.lastPathComponent < $1.lastPathComponent }
+}
+
+private func recordLines(in file: URL) throws -> [String] {
+    try String(contentsOf: file, encoding: .utf8)
+        .split(separator: "\n")
+        .map(String.init)
+}
+
+@Test func aRunRecordOnlyGrowsAndKeepsThePhysicalEvidence() async throws {
+    let directory = temporaryRecordDirectory()
+    defer { try? FileManager.default.removeItem(at: directory) }
+    let store = RunDiagnosticsStore(directoryURL: directory)
+    let entry = RunDiagnosticSnapshot.Entry(
+        offsetSeconds: 1,
+        kind: .rateApplied,
+        activeSeconds: 1,
+        cadenceSPM: 160,
+        targetRate: 0.98,
+        originalStepRhythmSPM: 162,
+        appliedStepRhythmSPM: 158.8,
+        appliedRate: 0.98,
+        awaitingRateFeedback: false,
+        trackID: "a",
+        trackTitle: "Song",
+        trackIndex: 0,
+        trackElapsedSeconds: 1,
+        trackDurationSeconds: 200,
+        tempoMatched: nil
+    )
+
+    try await store.append(runRecordBatch(collectionName: "walk", startsRun: true, completionState: .inProgress))
+    let file = try #require(try recordFiles(in: directory).first)
+    let before = try Data(contentsOf: file)
+    try await store.append(
+        runRecordBatch(collectionName: "walk", startsRun: false, completionState: .completed, timeline: [entry])
+    )
+    let after = try Data(contentsOf: file)
+
+    #expect(after.starts(with: before))
+    let lines = try recordLines(in: file)
+    #expect(lines.first?.hasPrefix("{") == true)
+    #expect(lines.contains { $0.contains("\"schemaVersion\"") && $0.contains("\"header\"") })
+    let written = try #require(lines.first { $0.contains("\"entry\"") })
+    #expect(written.contains("originalStepRhythmSPM"))
+    #expect(written.contains("appliedStepRhythmSPM"))
+    #expect(!written.contains("runningPulseBPM"))
+    #expect(lines.last?.contains("\"completed\"") == true)
+}
+
+@Test func aNewRunGetsItsOwnRecordAndTheLastOneStays() async throws {
+    let directory = temporaryRecordDirectory()
+    defer { try? FileManager.default.removeItem(at: directory) }
+    let store = RunDiagnosticsStore(directoryURL: directory)
+
+    try await store.append(runRecordBatch(collectionName: "first", startsRun: true, completionState: .completed))
+    try await store.append(
+        runRecordBatch(
+            collectionName: "second",
+            startsRun: true,
+            completionState: .inProgress,
+            startedAt: Date(timeIntervalSince1970: 1_721_000_600)
+        )
+    )
+
+    let files = try recordFiles(in: directory)
+    #expect(files.count == 2)
+    #expect(try recordLines(in: files[0]).contains { $0.contains("first") })
+    #expect(try recordLines(in: files[1]).contains { $0.contains("second") })
 }
 
 @Test func relaunchingKeepsARunThatNeverFinished() async throws {
-    let directory = FileManager.default.temporaryDirectory
-        .appending(path: UUID().uuidString, directoryHint: .isDirectory)
+    let directory = temporaryRecordDirectory()
     defer { try? FileManager.default.removeItem(at: directory) }
 
     let killed = RunDiagnosticsStore(directoryURL: directory)
-    try await killed.save(archiveFixtureSnapshot(collectionName: "killed", completionState: .inProgress))
+    try await killed.append(runRecordBatch(collectionName: "killed", startsRun: true, completionState: .inProgress))
 
     let relaunched = RunDiagnosticsStore(directoryURL: directory)
-    try await relaunched.save(archiveFixtureSnapshot(collectionName: "next", completionState: .inProgress))
-    #expect(try await relaunched.archivedRunCount() == 1)
-    #expect(try await relaunched.latest()?.collectionName == "next")
+    try await relaunched.append(runRecordBatch(collectionName: "next", startsRun: true, completionState: .inProgress))
+    #expect(try await relaunched.runCount() == 2)
 }
 
 @Test func theRunArchiveKeepsOnlyTheNewestRecordsWithinItsLimit() async throws {
-    let directory = FileManager.default.temporaryDirectory
-        .appending(path: UUID().uuidString, directoryHint: .isDirectory)
+    let directory = temporaryRecordDirectory()
     defer { try? FileManager.default.removeItem(at: directory) }
-    let store = RunDiagnosticsStore(directoryURL: directory, archivedRunLimit: 2)
+    let store = RunDiagnosticsStore(directoryURL: directory, runLimit: 2)
 
     for run in 0..<5 {
-        try await store.save(archiveFixtureSnapshot(collectionName: "run-\(run)", completionState: .completed))
+        try await store.append(
+            runRecordBatch(
+                collectionName: "run-\(run)",
+                startsRun: true,
+                completionState: .completed,
+                startedAt: Date(timeIntervalSince1970: 1_721_000_000 + Double(run))
+            )
+        )
     }
-    #expect(try await store.archivedRunCount() == 2)
-    #expect(try await store.latest()?.collectionName == "run-4")
+    let files = try recordFiles(in: directory)
+    #expect(files.count == 2)
+    #expect(try recordLines(in: try #require(files.last)).contains { $0.contains("run-4") })
+}
+
+// Every run is worth keeping, so a run has to be able to rebuild itself exactly from its own record.
+@Test func aRecordedRunReplaysThroughTheReducerExactly() async throws {
+    let directory = temporaryRecordDirectory()
+    defer { try? FileManager.default.removeItem(at: directory) }
+    let store = RunDiagnosticsStore(directoryURL: directory)
+    var time = Date(timeIntervalSince1970: 1_721_000_000)
+    var recorder = RunDiagnosticsRecorder(now: { time })
+    let collection = importedCollection(id: "walk", name: "Walk", readyCount: 3)
+    let reducer = RunReducer(tracks: collection.tracks)
+    var state = RunState.ready
+
+    var inputs: [RunEvent] = [
+        .startTapped(sessionID: 1),
+        .authorizationResolved(sessionID: 1, .authorized),
+        .playbackPrepared(sessionID: 1, trackID: collection.tracks[0].id),
+        .surfaceTapped(timeoutID: 2),
+    ]
+    for second in 0..<40 {
+        inputs.append(
+            .cadenceUpdated(
+                sessionID: 1,
+                acquisitionID: 1,
+                stepsPerMinute: 150 + Double(second % 3),
+                deltaSeconds: 1,
+                rateRequestID: 100 + second
+            )
+        )
+        inputs.append(.activeSecond(tempoMatched: true))
+    }
+    inputs += [
+        .playbackTrackChanged(
+            sessionID: 1,
+            operationID: 1,
+            trackID: collection.tracks[1].id,
+            trackIndex: 1,
+            reason: .naturalBoundary,
+            rateRequestID: 200
+        ),
+        .finishTapped,
+        .finishHoldBegan(holdID: 9),
+        .finishHoldCompleted(holdID: 9),
+        .finishCompleted(sessionID: 1),
+    ]
+
+    for event in inputs {
+        let oldState = state
+        let (newState, effects) = reducer.reduce(state: state, event: event)
+        state = newState
+        time = time.addingTimeInterval(0.5)
+        if let batch = recorder.record(
+            event: event,
+            oldState: oldState,
+            newState: newState,
+            effects: effects,
+            collection: collection
+        ) {
+            try await store.append(batch)
+        }
+    }
+    #expect(state != .ready)
+
+    struct Line<Body: Decodable>: Decodable {
+        let body: Body
+    }
+    struct Header: Decodable {
+        let tracks: [MusicTrack]
+    }
+    let decoder = JSONDecoder()
+    decoder.dateDecodingStrategy = .iso8601
+    let lines = try recordLines(in: try #require(try recordFiles(in: directory).first))
+    let header = try #require(lines.first { $0.contains("\"line\":\"header\"") })
+    let tracks = try decoder.decode(Line<Header>.self, from: Data(header.utf8)).body.tracks
+    let logged = try lines.filter { $0.contains("\"line\":\"event\"") }.map {
+        try decoder.decode(Line<RunDiagnosticSnapshot.LoggedEvent>.self, from: Data($0.utf8)).body
+    }
+
+    #expect(logged.map(\.event) == inputs)
+    let replayer = RunReducer(tracks: tracks)
+    var replayed = RunState.ready
+    for entry in logged {
+        let (next, effects) = replayer.reduce(state: replayed, event: entry.event)
+        replayed = next
+        #expect(effects.map { String(describing: $0) } == entry.effects)
+    }
+    #expect(replayed == state)
+}
+
+// Writing must not get slower as a run gets longer, because the whole point is to keep everything.
+@Test func addingToARecordCostsTheSameEarlyAndLate() async throws {
+    let directory = temporaryRecordDirectory()
+    defer { try? FileManager.default.removeItem(at: directory) }
+    let store = RunDiagnosticsStore(directoryURL: directory)
+    let entry = RunDiagnosticSnapshot.Entry(
+        offsetSeconds: 1,
+        kind: .activeSecond,
+        activeSeconds: 1,
+        cadenceSPM: 160,
+        targetRate: 0.98,
+        appliedRate: 0.98,
+        awaitingRateFeedback: false,
+        trackID: "a",
+        trackTitle: "Song",
+        trackIndex: 0,
+        trackElapsedSeconds: 1,
+        trackDurationSeconds: 200,
+        tempoMatched: true
+    )
+    let batch = runRecordBatch(
+        collectionName: "long",
+        startsRun: false,
+        completionState: .inProgress,
+        timeline: Array(repeating: entry, count: 10)
+    )
+    try await store.append(runRecordBatch(collectionName: "long", startsRun: true, completionState: .inProgress))
+
+    func timeOfOneHundredBatches() async throws -> Duration {
+        let clock = ContinuousClock()
+        let start = clock.now
+        for _ in 0..<100 {
+            try await store.append(batch)
+        }
+        return clock.now - start
+    }
+    let early = try await timeOfOneHundredBatches()
+    for _ in 0..<20 {
+        _ = try await timeOfOneHundredBatches()
+    }
+    let late = try await timeOfOneHundredBatches()
+
+    #expect(late < early * 3, "early \(early), late \(late)")
 }
 
 @Test func runDiagnosticsCapturePlayerTruthThroughFinish() throws {
@@ -292,16 +448,19 @@ private func archiveFixtureSnapshot(
     let reducer = RunReducer(tracks: collection.tracks)
     var state: RunState = .ready
 
+    let whole = WholeRun()
     func apply(_ event: RunEvent) -> RunDiagnosticSnapshot? {
         let oldState = state
         let newState = reducer.reduce(state: state, event: event).0
         state = newState
         time = time.addingTimeInterval(1)
-        return recorder.record(
-            event: event,
-            oldState: oldState,
-            newState: newState,
-            collection: collection
+        return whole.add(
+            recorder.record(
+                event: event,
+                oldState: oldState,
+                newState: newState,
+                collection: collection
+            )
         )
     }
 
@@ -398,14 +557,17 @@ private func archiveFixtureSnapshot(
     let reducer = RunReducer(tracks: collection.tracks)
     var state: RunState = .ready
 
+    let whole = WholeRun()
     func apply(_ event: RunEvent) -> RunDiagnosticSnapshot? {
         let oldState = state
         state = reducer.reduce(state: state, event: event).0
-        let snapshot = recorder.record(
-            event: event,
-            oldState: oldState,
-            newState: state,
-            collection: collection
+        let snapshot = whole.add(
+            recorder.record(
+                event: event,
+                oldState: oldState,
+                newState: state,
+                collection: collection
+            )
         )
         time = time.addingTimeInterval(1)
         return snapshot
@@ -440,25 +602,28 @@ private func archiveFixtureSnapshot(
     #expect(rolling.timeline.last?.filteredCadenceSPM == 159)
 }
 
-// The August 19 walk lost its first 205 seconds and a whole song because the buffer evicted by
-// age alone. Ticks go first now; the story of the run stays.
-@Test func runDiagnosticsEvictPerSecondTicksBeforeTheStoryOfTheRun() throws {
+// The August 19 walk lost its first 205 seconds and a whole song because a fixed buffer dropped old
+// entries. A record now only grows, so a long run keeps every second.
+@Test func aLongRunKeepsEverySecondAndTheWholeStory() throws {
     var time = Date(timeIntervalSince1970: 1_721_000_000)
     var recorder = RunDiagnosticsRecorder(now: { time })
     let collection = importedCollection(id: "long", name: "Long run", readyCount: 3)
     let reducer = RunReducer(tracks: collection.tracks)
     var state: RunState = .ready
     var lastSnapshot: RunDiagnosticSnapshot?
+    let whole = WholeRun()
 
     func apply(_ event: RunEvent) {
         let oldState = state
         state = reducer.reduce(state: state, event: event).0
         time = time.addingTimeInterval(1)
-        if let snapshot = recorder.record(
-            event: event,
-            oldState: oldState,
-            newState: state,
-            collection: collection
+        if let snapshot = whole.add(
+            recorder.record(
+                event: event,
+                oldState: oldState,
+                newState: state,
+                collection: collection
+            )
         ) {
             lastSnapshot = snapshot
         }
@@ -477,8 +642,8 @@ private func archiveFixtureSnapshot(
         )
     )
 
-    // Far more ticks than the buffer holds, with a song change every 400 seconds.
-    let seconds = RunDiagnosticsRecorder.maximumEntries * 2
+    // Well over an hour, with a song change every 400 seconds.
+    let seconds = 5_000
     var songChanges = 0
     for second in 0..<seconds {
         apply(.activeSecond(tempoMatched: second.isMultiple(of: 2)))
@@ -505,17 +670,12 @@ private func archiveFixtureSnapshot(
     let snapshot = try #require(lastSnapshot)
 
     #expect(snapshot.completionState == .completed)
-    #expect(snapshot.timeline.count == RunDiagnosticsRecorder.maximumEntries)
-    let story = snapshot.timeline.filter { !$0.kind.isTick }
-    #expect(story.first?.kind == .started)
-    #expect(story.filter { $0.kind == .trackChanged }.count == songChanges)
-    #expect(story.last?.kind == .finished)
-    // Every surviving tick is newer than every evicted one: the oldest ticks went first.
-    let ticks = snapshot.timeline.filter { $0.kind.isTick }
-    #expect(ticks.allSatisfy { $0.kind == .activeSecond })
-    let oldestSurvivingTick = try #require(ticks.first?.activeSeconds)
-    #expect(oldestSurvivingTick == seconds - ticks.count + 1)
+    let ticks = snapshot.timeline.filter { $0.kind == .activeSecond }
+    #expect(ticks.count == seconds)
     #expect(ticks.map(\.activeSeconds) == ticks.map(\.activeSeconds).sorted())
+    #expect(snapshot.timeline.first?.kind == .started)
+    #expect(snapshot.timeline.filter { $0.kind == .trackChanged }.count == songChanges)
+    #expect(snapshot.timeline.last?.kind == .finished)
 }
 
 @Test func runDiagnosticsRecordCueDeliveryAndEngineEvents() throws {
@@ -566,7 +726,7 @@ private func archiveFixtureSnapshot(
     #expect(entry.autoFeedbackSoundPath == "avAudioPlayer")
     #expect(entry.autoFeedbackDeliveryOutcome == "playedLocalSoundOnly")
     #expect(entry.autoFeedbackDeliveryDetail == "engine not running")
-    #expect(delivery.schemaVersion == 11)
+    #expect(delivery.schemaVersion == RunDiagnosticSnapshot.currentSchemaVersion)
 }
 
 @Test func diagnosticViewKeepsSongBeatsAndRunnerStepsSeparate() throws {
@@ -1091,8 +1251,8 @@ private extension SimulationConfiguration {
     )
 }
 
-@Test func diagnosticFileVersionRecordsTheDeliveryAndReachFields() {
-    #expect(RunDiagnosticSnapshot.currentSchemaVersion == 11)
+@Test func diagnosticFileVersionRecordsTheAppendOnlyRunRecord() {
+    #expect(RunDiagnosticSnapshot.currentSchemaVersion == 12)
 }
 
 @Test func trackChangeAttributionOnlyCallsTheEndOfASongANaturalBoundary() {
@@ -1147,6 +1307,7 @@ private extension SimulationConfiguration {
     let reducer = RunReducer(tracks: collection.tracks)
     var state: RunState = .ready
     var latest: RunDiagnosticSnapshot?
+    let whole = WholeRun()
 
     @discardableResult
     func apply(_ event: RunEvent) -> [RunEffect] {
@@ -1154,11 +1315,13 @@ private extension SimulationConfiguration {
         let result = reducer.reduce(state: state, event: event)
         state = result.0
         time = time.addingTimeInterval(1)
-        if let snapshot = recorder.record(
-            event: event,
-            oldState: oldState,
-            newState: state,
-            collection: collection
+        if let snapshot = whole.add(
+            recorder.record(
+                event: event,
+                oldState: oldState,
+                newState: state,
+                collection: collection
+            )
         ) {
             latest = snapshot
         }
@@ -1221,6 +1384,7 @@ private extension SimulationConfiguration {
     let reducer = RunReducer(tracks: collection.tracks)
     var state: RunState = .ready
     var latest: RunDiagnosticSnapshot?
+    let whole = WholeRun()
 
     @discardableResult
     func apply(_ event: RunEvent) -> [RunEffect] {
@@ -1228,11 +1392,13 @@ private extension SimulationConfiguration {
         let result = reducer.reduce(state: state, event: event)
         state = result.0
         time = time.addingTimeInterval(1)
-        if let snapshot = recorder.record(
-            event: event,
-            oldState: oldState,
-            newState: state,
-            collection: collection
+        if let snapshot = whole.add(
+            recorder.record(
+                event: event,
+                oldState: oldState,
+                newState: state,
+                collection: collection
+            )
         ) {
             latest = snapshot
         }
@@ -1253,7 +1419,7 @@ private extension SimulationConfiguration {
     )
     #expect(state.session?.autoFeedback.transaction != nil)
 
-    let sameSong = recorder.record(sameSongCallbackIn: state, collection: collection)
+    let sameSong = whole.add(recorder.record(sameSongCallbackIn: state, collection: collection))
     if let sameSong { latest = sameSong }
     apply(.audioRouteLost)
     let snapshot = try #require(latest)

@@ -12,7 +12,7 @@ Usage: ./Scripts/phone.sh <command>
   install           Build with the exact profile, verify it, and install in place
   launch [args]     Launch the installed app, for example --core-diagnostics
   screenshot <name> Capture the phone's screen
-  pull              Save every run record from the phone and summarize the latest
+  pull              Keep every new run from the phone, and print the latest and the ledger
 TEXT
   exit 2
 }
@@ -92,14 +92,17 @@ collection_checksum() {
   rm -rf "$copy"
 }
 
-# Copies everything the phone holds into a new dated folder and prints that folder.
+# Keeps each run once in the archive's runs folder. The dated folder keeps only the rest of what the
+# phone holds, such as the selected collection, so repeat pulls do not store the same runs again.
 save_run_records() {
   stamp=$(date +%Y-%m-%d-%H%M%S)
-  destination="$run_archive/$stamp"
-  mkdir -p "$run_archive"
+  destination="$run_archive/phone-copies/$stamp"
+  mkdir -p "$run_archive/phone-copies"
   xcrun devicectl device copy from --device "$1" --domain-type appDataContainer \
     --domain-identifier "$bundle_id" --source "$record_directory" \
     --destination "$destination" >/dev/null
+  SAMADHI_RUN_ARCHIVE="$run_archive" python3 Scripts/runs.py ingest "$destination" >&2
+  rm -rf "$destination/run-records" "$destination/latest-run-diagnostics.json"
   echo "$destination"
 }
 
@@ -185,15 +188,17 @@ case "$command" in
     ;;
   pull)
     device=$(device_id)
-    saved=$(save_run_records "$device")
-    latest=$(find "$saved" -name latest-run-diagnostics.json | head -1)
+    save_run_records "$device" >/dev/null
+    latest=$(find "$run_archive/runs" -type f 2>/dev/null | sort | tail -1)
     if [ -n "$latest" ]; then
-      python3 Scripts/read-run.py "$latest"
+      SAMADHI_RUN_ARCHIVE="$run_archive" python3 Scripts/runs.py read "$latest"
+      echo
+      SAMADHI_RUN_ARCHIVE="$run_archive" python3 Scripts/runs.py ledger
     else
-      echo "The phone holds no run record yet."
+      echo "No runs kept yet."
     fi
     echo
-    echo "Raw records stay out of Git: $saved"
+    echo "Raw records stay out of Git: $run_archive"
     ;;
   *)
     usage

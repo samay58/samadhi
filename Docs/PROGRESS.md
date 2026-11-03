@@ -676,6 +676,7 @@ This checkpoint recorded a passing local candidate before its exact-profile buil
 - Corrected the wheel's description: it pulses at the music's tempo and does not know where the song's beats fall
 - Tuned the screens and fixed what a review found. In the Simulator the run screen fell from about 11.8 to 8.2 percent of one core, and playlist reading stayed near 33 percent, so reading needs a phone measurement. VoiceOver could not open the tempo wheel, Auto and Manual were only as tall as their words, a tempo change jumped the pulse, the field jumped when the tempo locked, and a missing cadence showed an invented 168. All are fixed with tests. This is version 1.2, build 4
 - Paired the Mac Mini with the phone, saved its run records, and installed version 1.2, build 4 in place. The diagnostics screen read back the same fingerprint
+- Rebuilt the run record so each run is one file that only grows and can be replayed through later logic, and so the Mac keeps every run with a ledger across runs. This cut the run screen in the Simulator from about 8.2 to about 6.2 percent of one core, because the app no longer rewrites a whole file every few seconds. This is version 1.2, build 5
 - Cut the gate from about 15 minutes to about 4 by drawing screens directly in tests, running interface tests on four Simulator clones, and remembering what last passed. Direct drawing also found Pause and Resume 11 points apart at the largest text size, now fixed
 
 Current state and next steps live in [STATUS.md](STATUS.md) and [PLAN.md](PLAN.md).

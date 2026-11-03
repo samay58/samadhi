@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		07D013B48DAAF6A86489BBE0 /* CoreLoopDiagnosticsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0F72FD4AEB0DCFEBEB35798 /* CoreLoopDiagnosticsView.swift */; };
 		08C7CAABAD85AB4BC3C88E80 /* SamadhiDomain in Frameworks */ = {isa = PBXBuildFile; productRef = FCB42BF9FF49F690F8EEE5F2 /* SamadhiDomain */; };
+		3022038E4E83175AE50DD2FE /* DeviceContext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37AC18573AE5314A64A9160D /* DeviceContext.swift */; };
 		30746AF11D4691CA7071C973 /* ScreenRenderingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 648ABDDFE2CB1912364DAE64 /* ScreenRenderingTests.swift */; };
 		3645E123FF7B0E5AD2BFF640 /* TrackChangeAttribution.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D1DC69D053D26289313867F /* TrackChangeAttribution.swift */; };
 		3901FBCDBFF2D76C7111DF07 /* SamadhiAudio in Frameworks */ = {isa = PBXBuildFile; productRef = 17821AD6BA1BB0FB3F9794E0 /* SamadhiAudio */; };
@@ -71,6 +72,7 @@
 		22DE37CDF525C7843D5F365B /* AppMusicCollection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppMusicCollection.swift; sourceTree = "<group>"; };
 		27E4457C2F93694193D8E85D /* RunPresentationModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RunPresentationModel.swift; sourceTree = "<group>"; };
 		288FFDAAC404B6DC56E04D4B /* MusicKitFeasibilityView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicKitFeasibilityView.swift; sourceTree = "<group>"; };
+		37AC18573AE5314A64A9160D /* DeviceContext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceContext.swift; sourceTree = "<group>"; };
 		3E0A057778B7B97CA63AAF73 /* AutoFeedbackService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AutoFeedbackService.swift; sourceTree = "<group>"; };
 		43016700FEA62148736FD0BB /* MusicSelectionModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicSelectionModel.swift; sourceTree = "<group>"; };
 		475C0E9AEDB57921D9893CA3 /* RunTaskStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RunTaskStore.swift; sourceTree = "<group>"; };
@@ -202,6 +204,7 @@
 				036B4F7F43B0687A14D17D62 /* BuildIdentity.swift */,
 				F806C6B8683EBFAAC8F4B331 /* CatalogMatchSelection.swift */,
 				E0F72FD4AEB0DCFEBEB35798 /* CoreLoopDiagnosticsView.swift */,
+				37AC18573AE5314A64A9160D /* DeviceContext.swift */,
 				154EE935A446131D42338848 /* FeedbackAuditionView.swift */,
 				E3F20844D8B2427EC13193D1 /* MusicCollectionStore.swift */,
 				54135107A419A0D2E9DC0C01 /* MusicKitFeasibilityModel.swift */,
@@ -429,6 +432,7 @@
 				51EB9C96F9C249EF44D2F1D1 /* BuildIdentity.swift in Sources */,
 				7E4F98E24CEFF3F70746D3A2 /* CatalogMatchSelection.swift in Sources */,
 				07D013B48DAAF6A86489BBE0 /* CoreLoopDiagnosticsView.swift in Sources */,
+				3022038E4E83175AE50DD2FE /* DeviceContext.swift in Sources */,
 				72E64F72041838CDC66563F9 /* FeedbackAuditionView.swift in Sources */,
 				4DF6F900AB14574D241956D6 /* MusicCollectionStore.swift in Sources */,
 				4CDD1CED415564CC371BD9F1 /* MusicKitFeasibilityModel.swift in Sources */,
