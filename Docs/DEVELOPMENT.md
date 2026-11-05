@@ -29,7 +29,7 @@ Write the failing reducer test first. The core is pure, so most behavior can be 
 
 ### Look
 
-`./Scripts/sim.sh flags` lists the launch arguments that put the app into a known state. For example, this shows the partial import screen in all five environments on one contact sheet:
+`./Scripts/sim.sh flags` lists the launch arguments that put the app into a known state. For example, this shows the partial import screen in all six environments on one contact sheet:
 
 ~~~sh
 ./Scripts/sim.sh matrix setup-partial -SAMADHI_FAST_MODE -SAMADHI_MUSIC_PARTIAL

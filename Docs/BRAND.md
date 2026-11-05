@@ -21,13 +21,13 @@ There is no orange, apricot, clay, plum, or olive anywhere. Text and line pairin
 
 Setup, recovery, and the summary follow the system appearance. The run screens are always dark, like Apple's Workout app, because lime on black reads at arm's length in sun and the glass has more to bend. Colors are named by role in `SamadhiColor`, so a new screen gets both appearances without extra work.
 
-The field behind every screen is two soft radial lights over the ground, lime low on the left and lilac high on the right, and a still layer of faint noise. They are drawn together at high precision, so the noise lands before the colors are rounded to the display's 8 bits. That is true dithering, and it removes the banding dark gradients otherwise show. A mesh gradient was tried first and showed a faint vertical edge at each of its columns. Noise added after rounding was tried next and only masked the bands.
+The field behind every screen is two soft radial lights over the ground, lime low on the left and lilac high on the right, and a still layer of faint noise. They are drawn together at high precision, so the noise lands before the colors are rounded to the display's 8 bits. That is true dithering, and it removes the banding dark gradients otherwise show.
 
 ## App icon
 
 The icon is a polished lilac sphere with bold lines of air parting around it and swaying behind it, on a full field of lime. Lilac and lime together are the two brand colors, and the lime field is the loudest thing on a Home Screen. The lines are real flow past a sphere, so it is a literal slipstream, and the wake's left and right sway is the rhythm of a stride.
 
-`Scripts/render-icon.py` draws all three versions from code, so a change is a number and a rerun, and no image model is involved. Light is ink on lime. Dark is lime on near-black. Tinted is a grayscale of the light version. It was judged at real size on a real Home Screen, and every earlier direction is in `Evidence/Brand/`.
+`Scripts/render-icon.py` draws all three versions from code, so a change is a number and a rerun, and no image model is involved. Light is ink on lime. Dark is lime on near-black. Tinted is a grayscale of the light version. Samay approved it on his phone on 2026-11-05. Every earlier direction is in `Evidence/Brand/`.
 
 ## In-app mark
 

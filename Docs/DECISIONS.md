@@ -30,7 +30,7 @@ Use one visual owner. Reserve glass for controls, which now include the tempo wh
 
 The product was named Samadhi here, and is now Slipstream (see the end of this file). “In step” remains lowercase cadence metric. Public tagline is “music in stride.”
 
-The compact ribbon icon chosen here is replaced by Smoke (see the end of this file). The in-app mark is still a native drawing instead of the square icon.
+The compact ribbon icon chosen here has been replaced (see the end of this file). The in-app mark is still a native drawing instead of the square icon.
 
 ## Evidence
 
@@ -373,4 +373,4 @@ The name has not had a trademark check, which matters only if the app goes publi
 
 On the phone, Samay found that Smoke's matte lime sphere looked like a tennis ball and that the icon did not stand out, and asked for a polished finish and lines edge to edge. Glossier image-model versions looked like clip art with ornamental smoke, and they could not be tuned, so the icon is now drawn by `Scripts/render-icon.py`.
 
-Each choice was tested at real size on a real Home Screen. A full lime field stood out far more than white lines on black, which turned to gray stripes at 60 points. A lilac sphere stood out most, ruled out the tennis ball, and is the green and lilac pairing Samay asked for at the start. An obsidian sphere read as a pupil and a lime sphere on lime lines turned muddy. About 13 lines survive at 60 points where 24 turned to hatching. The wake sways because vortex rings read as drips and dots. The sphere sits left of center, and the small mark has nothing ahead of its sphere, because a centered sphere inside the lines read as an eye.
+Each choice was tested at real size on a real Home Screen. A full lime field stood out far more than white lines on black, which turned to gray stripes at 60 points. A lilac sphere stood out most, ruled out the tennis ball, and is the green and lilac pairing Samay asked for at the start. An obsidian sphere read as a pupil and a lime sphere on lime lines turned muddy. About 13 lines survive at 60 points where 24 turned to hatching. The wake sways because vortex rings read as drips and dots. The sphere sits left of center, and the small mark has nothing ahead of its sphere, because a centered sphere inside the lines read as an eye. Samay saw it on his phone and approved it.

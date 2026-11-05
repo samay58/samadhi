@@ -87,5 +87,6 @@ if __name__ == '__main__':
     folder = sys.argv[1] if len(sys.argv) > 1 else 'Resources/Assets.xcassets/AppIcon.appiconset'
     render(ground='D8F24C', line='0B0D08', shadow=.5).save(f'{folder}/AppIcon.png', optimize=True)
     render(ground='0B0D08', line='D8F24C', shadow=.95).save(f'{folder}/AppIcon-dark.png', optimize=True)
-    # The system tints this one, so it carries only light and dark.
-    render(ground='D8F24C', line='0B0D08', shadow=.5).convert('L').save(f'{folder}/AppIcon-tinted.png', optimize=True)
+    # The system tints this one, so it carries only light and dark, stored as RGB for the asset catalog.
+    gray = render(ground='D8F24C', line='0B0D08', shadow=.5).convert('L').convert('RGB')
+    gray.save(f'{folder}/AppIcon-tinted.png', optimize=True)
