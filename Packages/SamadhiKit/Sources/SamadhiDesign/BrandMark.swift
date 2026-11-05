@@ -1,8 +1,10 @@
 import SwiftUI
 
-// The app icon reduced to what survives at 38 points: four streamlines parting around one sphere. The sphere
-// is the same object as the wheel's center, which lights up when the tempo matches.
+// The app icon at 38 points: one lilac sphere with four bold lines streaming away behind it and swaying. The
+// lines are lime on dark and ink on light, the same pairing the two icons use.
 public struct BrandMark: View {
+    private static let lineColor = Color(light: Swatch.inkLight, dark: Swatch.lime)
+
     public init() {}
 
     public var body: some View {
@@ -13,40 +15,34 @@ public struct BrandMark: View {
                 CGPoint(x: origin.x + x * unit, y: origin.y + y * unit)
             }
 
-            // One streamline, bowing away from the sphere and running straight behind it, so the mark moves left to right. `side` is -1 above and 1 below.
-            func streamline(rest: CGFloat, peak: CGFloat, side: CGFloat) -> Path {
+            // One line, leaving the sphere, settling, then swaying. `side` is -1 above and 1 below.
+            func streamline(startX: CGFloat, start: CGFloat, settled: CGFloat, side: CGFloat) -> Path {
+                let rest = 14 + side * settled
                 var path = Path()
-                path.move(to: point(1, 14 + side * rest))
+                path.move(to: point(startX, 14 + side * start))
                 path.addCurve(
-                    to: point(12, 14 + side * peak),
-                    control1: point(5, 14 + side * rest),
-                    control2: point(7.5, 14 + side * peak)
+                    to: point(24, rest),
+                    control1: point(startX + 5, 14 + side * start),
+                    control2: point(19, rest)
                 )
                 path.addCurve(
-                    to: point(26, 14 + side * rest),
-                    control1: point(16.5, 14 + side * peak),
-                    control2: point(20, 14 + side * rest)
+                    to: point(36.8, rest + 1.3),
+                    control1: point(28, rest + 2.8),
+                    control2: point(32, rest + 2.8)
                 )
-                path.addLine(to: point(37, 14 + side * rest))
                 return path
             }
 
-            let style = StrokeStyle(lineWidth: 1.4 * unit, lineCap: .round)
+            let style = StrokeStyle(lineWidth: 1.8 * unit, lineCap: .round)
             for side in [CGFloat(-1), 1] {
-                context.stroke(
-                    streamline(rest: 3.6, peak: 6.9, side: side),
-                    with: .color(SamadhiColor.ink.opacity(0.9)),
-                    style: style
-                )
-                context.stroke(
-                    streamline(rest: 8.6, peak: 11, side: side),
-                    with: .color(SamadhiColor.ink.opacity(0.45)),
-                    style: style
-                )
+                let inner = streamline(startX: 15.5, start: 2.7, settled: 3, side: side)
+                let outer = streamline(startX: 7.5, start: 9.3, settled: 7.8, side: side)
+                context.stroke(inner, with: .color(Self.lineColor), style: style)
+                context.stroke(outer, with: .color(Self.lineColor), style: style)
             }
 
-            let center = point(12, 14)
-            let radius = 4.4 * unit
+            let center = point(8, 14)
+            let radius = 6.2 * unit
             context.fill(
                 Path(
                     ellipseIn: CGRect(
@@ -56,7 +52,7 @@ public struct BrandMark: View {
                         height: radius * 2
                     )
                 ),
-                with: .color(SamadhiColor.line)
+                with: .color(SamadhiColor.lilac)
             )
         }
         .accessibilityHidden(true)

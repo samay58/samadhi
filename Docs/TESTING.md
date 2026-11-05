@@ -12,7 +12,7 @@ GitHub Actions repeats the lint, fingerprint, and package tests on every push. I
 
 The latest gate passed on 2026-11-02 on the Mac Mini with Xcode 27.2 and the iOS 27.0 Simulator: 209 package tests, 67 app-model tests, and 32 interface tests in 4 minutes 28 seconds, at source fingerprint `1b649fd7b86d142f0553c57a50a60947d2b28d4b787acb444925bdb974d9b975`. Nine of the app-model tests are direct screen tests, described in [DEVELOPMENT.md](DEVELOPMENT.md). The physical checks in [PHONE-CHECK.md](PHONE-CHECK.md) are unaffected and remain open.
 
-The gate passed again on 2026-11-05 with 210 package tests, 68 app-model tests, and 32 interface tests, at source fingerprint `5ef58e035a78189710163d9abf24ed2cea1b7248567fa563e0df652be1ec4411`, for the color refresh and rename. It adds `PaletteContrastTests`, a dark environment for every parameterized screen test, and `everyScreenDrawsInBothAppearances`, which draws 16 screens in light and dark. `./Scripts/sim.sh matrix` now captures dark as a sixth environment.
+The gate passed again on 2026-11-05 with 210 package tests, 68 app-model tests, and 32 interface tests, at source fingerprint `51414f3f7e6bd8431dcce6395ada4c21b14352a75dea125f92712e86450e13b3`, for the color refresh and rename. It adds `PaletteContrastTests`, a dark environment for every parameterized screen test, and `everyScreenDrawsInBothAppearances`, which draws 16 screens in light and dark. `./Scripts/sim.sh matrix` now captures dark as a sixth environment.
 
 ## Coverage
 

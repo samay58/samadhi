@@ -357,16 +357,20 @@ The wheel's center cap turns lime only when the tempo has matched, which gives t
 
 This pass was done before the walk that the plan's stop rule asks for, because Samay asked for it directly. It changes color only: no layout, timing, gesture, or audio logic changed.
 
-## The product is Slipstream, and the icon is Smoke
+## The product is Slipstream
 
-Samay rejected the first pair offered, Crest and Lilt, as lame, liked a lime stone in raked gravel, and asked for something about getting into flow. He chose Slipstream and the Smoke icon, and asked for the icon to fill more of its height, so the lines now run edge to edge.
+Samay rejected the first pair offered, Crest and Lilt, as lame, liked a lime stone in raked gravel, and asked for something about getting into flow. He chose Slipstream and a wind-tunnel icon called Smoke.
 
-Slipstream names the feeling of being carried with almost no effort, and at least three meditation apps on the App Store already use the name Samadhi. Smoke is the same idea drawn literally, and it ties the icon to the wheel and the playlist map.
+Slipstream names the feeling of being carried with almost no effort, and at least three meditation apps on the App Store already use the name Samadhi.
 
 Only what a person sees changed: the display name, on-screen copy, permission text, and the Debug strings. The bundle identifier, the modules, the repository, and the `Samadhi` data folder on the phone stay, because renaming the identifier or the folder would cost the phone its only copy of the selected playlist and analysis.
 
-The small mark is four streamlines around a sphere. A symmetric first drawing read as an eye, so the sphere moved left and the lines run straight behind it.
-
 Other names considered: Second Wind, Groove, Mushin, Laya, Rubato, Pocket, Tala, Locked In, Footfall, Iamb, Downbeat. Other icons considered, all in `Evidence/Brand/2026-11-05-icon-explorations.jpg`: Stone, Wake, Wave, Enso, Grooves, River, Draft, Runner, Footnotes, Ribbon, Cycle, Metronome, Crest, Driver, Phase, Lockstep, Loop, and two bars for Iamb.
 
-Neither the name nor the icon has had a trademark check, which matters only if the app goes public. Smoke's large matte sphere can read as a tennis ball, and that is worth a look on the phone.
+The name has not had a trademark check, which matters only if the app goes public.
+
+## The icon is drawn from code, with a lilac sphere on lime
+
+On the phone, Samay found that Smoke's matte lime sphere looked like a tennis ball and that the icon did not stand out, and asked for a polished finish and lines edge to edge. Glossier image-model versions looked like clip art with ornamental smoke, and they could not be tuned, so the icon is now drawn by `Scripts/render-icon.py`.
+
+Each choice was tested at real size on a real Home Screen. A full lime field stood out far more than white lines on black, which turned to gray stripes at 60 points. A lilac sphere stood out most, ruled out the tennis ball, and is the green and lilac pairing Samay asked for at the start. An obsidian sphere read as a pupil and a lime sphere on lime lines turned muddy. About 13 lines survive at 60 points where 24 turned to hatching. The wake sways because vortex rings read as drips and dots. The sphere sits left of center, and the small mark has nothing ahead of its sphere, because a centered sphere inside the lines read as an eye.

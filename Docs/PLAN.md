@@ -63,7 +63,7 @@ This came out of the November sweep. It has not been built, because it changes t
 
 Nothing here affects today's Debug phone builds.
 
-- Run a trademark check on Slipstream and clear the icon, which began as an image-model picture.
+- Run a trademark check on Slipstream.
 - Diagnostics and simulator launch flags still compile into Release, although Release never records and the Debug screens are absent. Wrap them in `#if DEBUG` before an App Store build.
 - `RunReducer.init(trackCount:)` exists only for tests, and it keeps a `demo-0` fallback in the domain. Move those tests to `init(tracks:)`.
 - `FeedbackAuditionView` plays cues directly. It is a Debug harness that goes away once a cue family is chosen.

@@ -11,7 +11,7 @@ The app was first called Samadhi, and that stays the name of the repository, the
 Two hues come from Phoenix Workbench, and each one means something.
 
 - Lime `#D8F24C` means go and live. It fills the primary action, and it marks the music following the runner: the wheel's center cap, the progress arc, and the word Auto.
-- Lilac means the runner took over. It marks Manual and the hold that ends a run. It is `#6E5C9E` on paper and on the hold's fill, and `#B8A9E8` on the dark ground. If lilac ever feels like too much, these are the only places to remove it.
+- Lilac means the runner took over. It marks Manual and the hold that ends a run. It is `#6E5C9E` on paper and on the hold's fill, and `#B8A9E8` on the dark ground. It is also the sphere in the icon and the mark, where it is identity and carries no state.
 - Moss `#566400` stands in for lime on any thin line in light mode, because lime on paper has a contrast of about 1.1 to 1. Lime on paper is only ever a fill with dark text on it.
 - The neutrals are Workbench paper `#F4F0E7` with ink `#15170F`, and near-black `#0B0D08` with ink `#F2F1E6`. Both carry a slight green bias so they agree with the lime.
 
@@ -25,13 +25,13 @@ The field behind every screen is two soft radial lights over the ground, lime lo
 
 ## App icon
 
-Smoke is the icon: a wind-tunnel photograph of smoke lines bending around one lime sphere, running the full height of the square. It is a literal slipstream. The sphere is the same object as the center of the wheel on the run screen, which lights up when the tempo matches, and the lines are the same lines as the playlist map.
+The icon is a polished lilac sphere with bold lines of air parting around it and swaying behind it, on a full field of lime. Lilac and lime together are the two brand colors, and the lime field is the loudest thing on a Home Screen. The lines are real flow past a sphere, so it is a literal slipstream, and the wake's left and right sway is the rhythm of a stride.
 
-It began as an image-model picture, and the master is `Resources/Assets.xcassets/AppIcon.appiconset/AppIcon.png`. Light and dark use that one file, because the image is already dark, and the tinted version is a grayscale of it. Every direction explored and the small-scale reviews live under `Evidence/Brand/`.
+`Scripts/render-icon.py` draws all three versions from code, so a change is a number and a rerun, and no image model is involved. Light is ink on lime. Dark is lime on near-black. Tinted is a grayscale of the light version. It was judged at real size on a real Home Screen, and every earlier direction is in `Evidence/Brand/`.
 
 ## In-app mark
 
-`BrandMark` reduces the icon to four streamlines parting around one sphere, drawn natively so it stays sharp at 38 points and takes the screen's ink. The sphere is lime in dark mode and moss in light mode.
+`BrandMark` reduces the icon to one lilac sphere with four bold lines streaming behind it, drawn natively so it stays sharp at 38 points. The lines are lime in dark mode and ink in light mode. Nothing sits ahead of the sphere, because lines wrapped around it read as an eye.
 
 ## The playlist map
 
