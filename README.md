@@ -1,10 +1,10 @@
-![Samadhi: music in stride](Brand/GitHub-Cover-Samadhi-1280x640.png)
+![Slipstream: music in stride](Brand/GitHub-Cover.png)
 
-# Samadhi
+# Slipstream
 
 *music in stride*
 
-Samadhi is a native iPhone music player that lets movement and music settle into one rhythm. You import an Apple Music playlist. The phone analyzes each song's tempo locally, senses your steps through Core Motion, chooses songs that fit, and gently adjusts their speed while you walk or run.
+Slipstream is a native iPhone music player that lets movement and music settle into one rhythm. You import an Apple Music playlist. The phone analyzes each song's tempo locally, senses your steps through Core Motion, chooses songs that fit, and gently adjusts their speed while you walk or run. It was first called Samadhi, which is still the name of this repository and its code.
 
 It is deliberately small. There is no backend, account, analytics, GPS, or coaching, and no third-party code ships in the app.
 

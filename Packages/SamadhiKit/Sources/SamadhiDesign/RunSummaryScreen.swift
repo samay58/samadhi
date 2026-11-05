@@ -39,12 +39,12 @@ struct RunSummaryScreen: View {
                 Button(action: done) {
                     Text("Done")
                         .font(.headline)
-                        .foregroundStyle(SamadhiColor.ivory)
+                        .foregroundStyle(SamadhiColor.onLime)
                         .dynamicTypeSize(...DynamicTypeSize.accessibility2)
                         .frame(width: 164, height: 58)
                 }
                 .buttonStyle(.glassProminent)
-                .tint(SamadhiColor.clay)
+                .tint(SamadhiColor.lime)
                 .accessibilityIdentifier("summary-done")
 
                 Spacer(minLength: Space.x8)
@@ -194,17 +194,7 @@ private struct SummaryRhythmGauge: View {
                 )
                 context.stroke(
                     path.trimmedPath(from: 0, to: min(max(progress, 0), 1)),
-                    with: .linearGradient(
-                        Gradient(
-                            colors: [
-                                SamadhiColor.clay,
-                                SamadhiColor.apricot,
-                                SamadhiColor.olive,
-                            ]
-                        ),
-                        startPoint: .zero,
-                        endPoint: CGPoint(x: size.width, y: size.height)
-                    ),
+                    with: .color(SamadhiColor.line),
                     style: StrokeStyle(lineWidth: 7, lineCap: .round)
                 )
             }

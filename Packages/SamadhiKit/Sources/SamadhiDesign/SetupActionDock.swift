@@ -131,7 +131,7 @@ private struct SetupPrimaryButton: View {
         Button(action: action) {
             Text(title)
                 .font(.headline)
-                .foregroundStyle(SamadhiColor.ivory)
+                .foregroundStyle(SamadhiColor.onLime)
                 .multilineTextAlignment(.center)
                 .padding(.horizontal, Space.x4)
                 .frame(
@@ -141,7 +141,7 @@ private struct SetupPrimaryButton: View {
                 )
         }
         .buttonStyle(.glassProminent)
-        .tint(SamadhiColor.clay)
+        .tint(SamadhiColor.lime)
         .accessibilityIdentifier(identifier)
     }
 }
@@ -153,7 +153,7 @@ private struct SetupLoadingAction: View {
         HStack(spacing: Space.x3) {
             ProgressView()
                 .controlSize(.small)
-                .tint(SamadhiColor.clay)
+                .tint(SamadhiColor.line)
             Text("Opening playlists")
                 .font(.headline)
         }
@@ -186,6 +186,9 @@ private struct SetupSecondaryButton: View {
             Text(title)
                 .font(.callout.weight(.semibold))
                 .foregroundStyle(SamadhiColor.ink.opacity(0.86))
+                // A capsule cannot hold two lines, so the largest text sizes shrink slightly to stay on one.
+                .lineLimit(1)
+                .minimumScaleFactor(0.72)
                 .padding(.horizontal, Space.x2)
                 .frame(minHeight: 36)
         }

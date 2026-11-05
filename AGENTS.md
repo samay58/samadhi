@@ -3,6 +3,7 @@
 Start with Docs/STATUS.md and Docs/PLAN.md. Docs/DEVELOPMENT.md explains the development loop and its commands. Docs/Archive/ is history, not instruction.
 
 ## Product
+- The product is Slipstream. Samadhi remains the repository, module, and bundle name, and the phone's data folder. Never rename the bundle identifier or that folder, because the phone holds the only copy of its playlist and analysis.
 - This is a minimal body-aware music player, not a fitness platform.
 - Do not add features not present in Docs/PRODUCT.md and Docs/PLAN.md.
 - The shipped app contains no AI or network dependency beyond Apple Music.

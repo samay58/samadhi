@@ -76,7 +76,7 @@ struct RhythmControl: View {
                     ZStack {
                         Circle()
                             .fill(
-                                SamadhiColor.ink.opacity(
+                                SamadhiColor.paper.opacity(
                                     effectiveIncreasedContrast ? 0.36 : 0.08
                                 )
                             )
@@ -85,7 +85,7 @@ struct RhythmControl: View {
                         Image(systemName: "xmark")
                             .font(.system(size: 11.5, weight: .medium))
                             .foregroundStyle(
-                                SamadhiColor.ivory.opacity(
+                                SamadhiColor.ink.opacity(
                                     effectiveIncreasedContrast ? 1 : 0.9
                                 )
                             )
@@ -140,7 +140,7 @@ struct RhythmControl: View {
         VStack(spacing: Space.x1) {
             Text(modeLabel)
                 .font(.caption.weight(.semibold))
-                .foregroundStyle(SamadhiColor.ivory.opacity(0.88))
+                .foregroundStyle(modeTint)
 
             HStack(alignment: .firstTextBaseline, spacing: Space.x1) {
                 Text(displayBPM.map(String.init) ?? "--")
@@ -153,10 +153,10 @@ struct RhythmControl: View {
                 .font(.caption.weight(.semibold))
                 .foregroundStyle(
                     state.rhythmControl.isAtLimit
-                        ? SamadhiColor.ivory
-                        : SamadhiColor.ivory.opacity(0.96)
+                        ? SamadhiColor.ink
+                        : SamadhiColor.ink.opacity(0.96)
                 )
-                .shadow(color: SamadhiColor.ink.opacity(0.55), radius: 3, y: 1)
+                .shadow(color: SamadhiColor.paper.opacity(0.55), radius: 3, y: 1)
                 .lineLimit(1)
         }
     }
@@ -165,9 +165,8 @@ struct RhythmControl: View {
     private var wheelIndicator: some View {
         if let wheelIndicatorAngle {
             Capsule()
-                .fill(SamadhiColor.ivory.opacity(0.94))
+                .fill(modeTint)
                 .frame(width: 3, height: 18)
-                .shadow(color: SamadhiColor.ivory.opacity(0.5), radius: 6)
                 .offset(y: -(size * 0.41))
                 .rotationEffect(.radians(wheelIndicatorAngle + .pi / 2))
                 .transition(.opacity)
@@ -181,7 +180,7 @@ struct RhythmControl: View {
                 let isMajor = index.isMultiple(of: 5)
                 Capsule()
                     .fill(
-                        SamadhiColor.ivory.opacity(isMajor ? 0.46 : 0.2)
+                        SamadhiColor.ink.opacity(isMajor ? 0.46 : 0.2)
                     )
                     .frame(width: isMajor ? 2 : 1, height: isMajor ? 9 : 5)
                     .offset(y: -(size * 0.445))
@@ -200,7 +199,7 @@ struct RhythmControl: View {
             ForEach(-1...1, id: \.self) { index in
                 Capsule()
                     .fill(
-                        SamadhiColor.ivory.opacity(index == 0 ? 0.56 : 0.3)
+                        SamadhiColor.ink.opacity(index == 0 ? 0.56 : 0.3)
                     )
                     .frame(width: index == 0 ? 2 : 1, height: index == 0 ? 8 : 5)
                     .offset(y: -(size * 0.445))
@@ -219,8 +218,8 @@ struct RhythmControl: View {
             Text("Turn")
                 .font(.caption.weight(.semibold))
                 .tracking(0.6)
-                .foregroundStyle(SamadhiColor.ivory.opacity(0.96))
-                .shadow(color: SamadhiColor.ink.opacity(0.55), radius: 3, y: 1)
+                .foregroundStyle(SamadhiColor.ink.opacity(0.96))
+                .shadow(color: SamadhiColor.paper.opacity(0.55), radius: 3, y: 1)
                 .offset(y: size * 0.365)
                 .accessibilityHidden(true)
         }
@@ -237,7 +236,7 @@ struct RhythmControl: View {
             )
 
             Rectangle()
-                .fill(SamadhiColor.ivory.opacity(0.34))
+                .fill(SamadhiColor.ink.opacity(0.34))
                 .frame(width: 1, height: 18)
                 .accessibilityHidden(true)
 
@@ -250,7 +249,7 @@ struct RhythmControl: View {
             )
         }
         .buttonStyle(.plain)
-        .foregroundStyle(SamadhiColor.ivory)
+        .foregroundStyle(SamadhiColor.ink)
         .accessibilityElement(children: .contain)
         .accessibilityIdentifier("rhythm-controls")
     }
@@ -265,7 +264,9 @@ struct RhythmControl: View {
         Button(action: action) {
             Text(title)
                 .font(.callout.weight(.semibold))
-                .opacity(isSelected ? 1 : (effectiveIncreasedContrast ? 0.84 : 0.62))
+                .foregroundStyle(
+                    isSelected ? modeTint : SamadhiColor.ink.opacity(effectiveIncreasedContrast ? 0.84 : 0.62)
+                )
                 .frame(minWidth: 84, minHeight: 48)
                 .contentShape(Rectangle())
         }
@@ -331,6 +332,11 @@ struct RhythmControl: View {
 
     private var displayBPM: Int? {
         frozenDisplayBPM ?? state.rhythmControl.requestedBPM
+    }
+
+    // Lime while Auto follows the runner, lilac once the runner has taken over.
+    private var modeTint: Color {
+        state.rhythmControl.mode == .manual ? SamadhiColor.lilac : SamadhiColor.lime
     }
 
     private var modeLabel: String {

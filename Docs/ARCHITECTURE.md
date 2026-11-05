@@ -2,7 +2,7 @@
 
 ## Shape
 
-Samadhi uses functional core with main-actor shell.
+Slipstream uses functional core with main-actor shell.
 
 ~~~text
 SwiftUI screens
@@ -89,7 +89,7 @@ Debug builds overwrite one local latest-run diagnostic file after finish. `RunDi
 - Finish requires visible control plus hold
 - Progress resets on track navigation
 - Reduce Motion freezes ambient motion
-- No Samadhi backend; Apple Music is the only production network path
+- No Slipstream backend; Apple Music is the only production network path
 - Tempo match measurement enters the reducer as evidence from the app shell; the reducer does not infer a match from cadence alone
 - Playback progress and recovery callbacks carry session and operation identity before entering the reducer
 - Applied-rate callbacks also carry request and track identity; stale feedback cannot alter a replacement run

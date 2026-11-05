@@ -4,13 +4,13 @@
 
 **Music in stride.**
 
-Samadhi should make movement and music feel like one calm system. Name refers to meditative consciousness: absorbed attention, steady motion, reduced self-consciousness.
+Slipstream should make movement and music feel like one calm system. The name is the moving air that pulls a runner along with almost no effort: absorbed attention, steady motion, reduced self-consciousness.
 
 Runner opens app, presses Start, begins moving. Music finds their rhythm. Interface confirms lock, then withdraws.
 
 ## North star
 
-Samadhi is done for the first real product milestone when Samay can go for a normal outdoor run with one imported Apple Music playlist, hear an unmistakable response when rhythm changes, and feel his stride settle onto the music without thinking about the app.
+Slipstream is done for the first real product milestone when Samay can go for a normal outdoor run with one imported Apple Music playlist, hear an unmistakable response when rhythm changes, and feel his stride settle onto the music without thinking about the app.
 
 Done means:
 
@@ -77,9 +77,9 @@ Raw sensor changes never drive frantic UI. Product should feel composed when inp
 
 Never imply beat-perfect adaptation, real cadence quality, or audio quality before physical proof exists.
 
-### No Samadhi backend
+### No Slipstream backend
 
-No Samadhi account, cloud backend, remote listening history, analytics SDK, ad identifier, or model call. Music provider access is allowed only when the runner selects it. Tempo analysis and Samadhi persistence remain local.
+No Slipstream account, cloud backend, remote listening history, analytics SDK, ad identifier, or model call. Music provider access is allowed only when the runner selects it. Tempo analysis and Slipstream persistence remain local.
 
 ### No product inflation
 
@@ -87,7 +87,7 @@ No dashboard, map, coaching layer, streak, social surface, recommendation feed, 
 
 ## Design character
 
-Warm, tactile, restrained, native. Depth signals hierarchy, not decoration.
+Tactile, restrained, native, and at home in the dark. Depth signals hierarchy, not decoration.
 
 - One visual owner at a time
 - Open typography instead of passive cards

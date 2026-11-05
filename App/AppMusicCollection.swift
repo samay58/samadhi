@@ -5,7 +5,7 @@ import SamadhiDomain
 enum AppMusicCollection {
     static let simulated = MusicCollection(
         id: MusicCollectionID("simulation"),
-        name: "Samadhi demo",
+        name: "Slipstream demo",
         tracks: TrackMetadata.demoTracks.enumerated().map { index, track in
             MusicTrack(
                 id: MusicTrackID("demo-\(index)"),
@@ -24,7 +24,7 @@ enum AppMusicCollection {
 
     static let simulatorDemo = MusicCollection(
         id: MusicCollectionID("simulator-demo"),
-        name: "Samadhi demo",
+        name: "Slipstream demo",
         tracks: zip(TrackMetadata.demoTracks, [156.0, 168.0, 180.0]).map { track, bpm in
             demoTrack(
                 id: "demo-\(track.title.lowercased().replacingOccurrences(of: " ", with: "-"))",
@@ -97,7 +97,7 @@ enum AppMusicCollection {
                 demoTrack(
                     id: "simulator-library-\(index)-track",
                     title: "Open Road \(index)",
-                    artist: "Samadhi fixture",
+                    artist: "Slipstream fixture",
                     bpm: Double(148 + index % 36)
                 )
             ]

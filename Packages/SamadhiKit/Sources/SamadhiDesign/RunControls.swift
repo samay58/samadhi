@@ -63,6 +63,7 @@ struct TransportControls: View {
             gap: accessibility ? 16 : 20,
             blendSpacing: 6,
             opticalNudge: accessibility ? 2.5 : 2,
+            primaryIsLit: state.phase != .confirmingFinish,
             reduceMotion: reduceMotion || state.forceReduceMotion,
             increasedContrast: colorSchemeContrast == .increased || state.forceIncreasedContrast
         )
@@ -173,6 +174,8 @@ private struct TransportMetrics {
     let gap: CGFloat
     let blendSpacing: CGFloat
     let opticalNudge: CGFloat
+    // Lime means go. While Finish is armed the run is ending, so the primary lens goes to clear glass.
+    let primaryIsLit: Bool
     let reduceMotion: Bool
     let increasedContrast: Bool
 }
@@ -220,18 +223,18 @@ private struct TransportRegion: View {
             .offset(x: systemImage == "play.fill" ? metrics.opticalNudge : 0)
     }
 
-    // The primary lens carries a light ivory tint so it reads as the brighter, nearer object; the
-    // secondaries stay clear glass so the field shows through them.
+    // The primary lens carries the lime so it reads as the brighter, nearer object; the secondaries stay
+    // clear glass so the field shows through them.
     private var glass: Glass {
-        if isPrimary {
-            return .regular.tint(SamadhiColor.ivory.opacity(metrics.increasedContrast ? 0.92 : 0.5)).interactive()
+        if isPrimary && metrics.primaryIsLit {
+            return .regular.tint(SamadhiColor.lime.opacity(metrics.increasedContrast ? 1 : 0.9)).interactive()
         }
         return .regular.interactive()
     }
 
     private var glyphColor: Color {
-        if isPrimary { return SamadhiColor.ink }
-        return SamadhiColor.ivory.opacity(metrics.increasedContrast ? 1 : 0.92)
+        if isPrimary && metrics.primaryIsLit { return SamadhiColor.onLime }
+        return SamadhiColor.ink.opacity(metrics.increasedContrast ? 1 : 0.92)
     }
 
     private var diameter: CGFloat {
@@ -277,7 +280,7 @@ private struct FinishControlStyle: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
             .font(.subheadline.weight(.semibold))
-            .foregroundStyle(SamadhiColor.ivory.opacity(labelOpacity))
+            .foregroundStyle(SamadhiColor.ink.opacity(labelOpacity))
             .padding(.horizontal, metrics.horizontalPadding)
             .padding(.vertical, metrics.verticalPadding)
             .frame(minHeight: metrics.visibleHeight)
@@ -286,7 +289,7 @@ private struct FinishControlStyle: ButtonStyle {
             .background(alignment: .leading) { progress }
             .clipShape(.capsule)
             .glassEffect(
-                armed ? .regular.tint(SamadhiColor.clay.opacity(0.45)).interactive() : .clear.interactive(),
+                armed ? .regular.tint(SamadhiColor.lilacFill.opacity(0.42)).interactive() : .clear.interactive(),
                 in: .capsule
             )
             .overlay {
@@ -305,7 +308,7 @@ private struct FinishControlStyle: ButtonStyle {
     private var progress: some View {
         if armed {
             GeometryReader { proxy in
-                SamadhiColor.clay
+                SamadhiColor.lilacFill
                     .opacity(increasedContrast ? 1 : 0.92)
                     .frame(width: filled ? proxy.size.width : 0)
             }
@@ -321,7 +324,7 @@ private struct FinishControlStyle: ButtonStyle {
     }
 
     private var strokeColor: Color {
-        if armed { return SamadhiColor.ivory.opacity(increasedContrast ? 0.62 : 0.34) }
-        return SamadhiColor.ivory.opacity(increasedContrast ? 0.58 : 0.3)
+        if armed { return SamadhiColor.ink.opacity(increasedContrast ? 0.62 : 0.34) }
+        return SamadhiColor.ink.opacity(increasedContrast ? 0.58 : 0.3)
     }
 }

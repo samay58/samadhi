@@ -76,9 +76,9 @@ extension MusicSelectionPresentation {
         }
     }
 
-    // The field pales when reading begins and warms with each song, reaching full sunrise only when
-    // the work is really done. Progress is the count of songs read, never a timer.
-    var fieldWarmth: Double {
+    // The field stills when reading begins and its color comes up with each song, reaching full bloom only
+    // when the work is really done. Progress is the count of songs read, never a timer.
+    var fieldBloom: Double {
         switch self {
         case .none, .failed, .loadingPlaylists(current: nil):
             return 0.55
@@ -186,7 +186,8 @@ struct PlaylistContourCanvas: View {
     }
 
     private func screenFraction(for position: Double) -> Double {
-        guard leavesClearing else { return 0.13 + position * 0.76 }
+        // The first band starts below the mark, so no line ever runs through it.
+        guard leavesClearing else { return 0.18 + position * 0.71 }
         // Two bands, one between the logo and the name and one below the status.
         let upper = 0.20
         let lower = 0.29

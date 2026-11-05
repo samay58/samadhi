@@ -8,7 +8,7 @@ The runner's stable steps per minute. Cadence is sensed from movement and remain
 
 ## Requested musical BPM
 
-The rhythm Samadhi is trying to produce. In Auto it comes from stable cadence. In Manual it comes directly from the runner.
+The rhythm Slipstream is trying to produce. In Auto it comes from stable cadence. In Manual it comes directly from the runner.
 
 ## Native pulse
 
@@ -24,7 +24,7 @@ Music and cadence have the same frequency within the documented tolerance. This 
 
 ## Beat lock
 
-Musical beat position and footfall timing align. Samadhi must measure end-to-end phase and latency before using this claim.
+Musical beat position and footfall timing align. Slipstream must measure end-to-end phase and latency before using this claim.
 
 ## Felt synchronization
 
@@ -36,8 +36,8 @@ The playback-rate range that passed physical listening on the supported player a
 
 ## Auto follows
 
-Samadhi follows reliable cadence, ignores sensor noise, chooses compatible music, and makes restrained corrections.
+Slipstream follows reliable cadence, ignores sensor noise, chooses compatible music, and makes restrained corrections.
 
 ## Manual leads
 
-The runner declares a musical BPM. Samadhi chooses compatible music and applies bounded correction without inventing measured cadence.
+The runner declares a musical BPM. Slipstream chooses compatible music and applies bounded correction without inventing measured cadence.

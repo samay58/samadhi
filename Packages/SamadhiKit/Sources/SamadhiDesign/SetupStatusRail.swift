@@ -80,7 +80,7 @@ private struct AnalysisProgressRail: View {
             HStack(spacing: Space.x3) {
                 ProgressView()
                     .controlSize(.small)
-                    .tint(SamadhiColor.clay)
+                    .tint(SamadhiColor.line)
                 Text("Opening playlist")
                     .font(.body.weight(.medium))
             }

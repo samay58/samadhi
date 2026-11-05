@@ -89,15 +89,16 @@ private struct PluckedStringCanvas: View, @preconcurrency Animatable {
             drawn.addLine(to: CGPoint(x: head, y: middle))
             context.stroke(
                 drawn,
-                with: .color(SamadhiColor.clay),
+                with: .color(SamadhiColor.line),
                 style: StrokeStyle(lineWidth: 2.25, lineCap: .round, lineJoin: .round)
             )
 
             let radius: Double = isAnimated ? 4.5 + 2 * exp(-7 * sincePluck) : 4.5
-            context.fill(
-                Path(ellipseIn: CGRect(x: head - radius, y: middle - radius, width: radius * 2, height: radius * 2)),
-                with: .color(SamadhiColor.clay)
+            let bead = Path(
+                ellipseIn: CGRect(x: head - radius, y: middle - radius, width: radius * 2, height: radius * 2)
             )
+            context.fill(bead, with: .color(SamadhiColor.lime))
+            context.stroke(bead, with: .color(SamadhiColor.line), lineWidth: 1.25)
         }
     }
 }

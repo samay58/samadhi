@@ -1,47 +1,64 @@
 import SwiftUI
 
+// The app icon reduced to what survives at 38 points: four streamlines parting around one sphere. The sphere
+// is the same object as the wheel's center, which lights up when the tempo matches.
 public struct BrandMark: View {
-    let inverted: Bool
-
-    public init(inverted: Bool = false) {
-        self.inverted = inverted
-    }
+    public init() {}
 
     public var body: some View {
         Canvas { context, size in
-            let scaleX = size.width / 38
-            let scaleY = size.height / 28
+            let unit = min(size.width / 38, size.height / 28)
+            let origin = CGPoint(x: (size.width - 38 * unit) / 2, y: (size.height - 28 * unit) / 2)
+            func point(_ x: CGFloat, _ y: CGFloat) -> CGPoint {
+                CGPoint(x: origin.x + x * unit, y: origin.y + y * unit)
+            }
 
-            var ribbon = Path()
-            ribbon.move(to: CGPoint(x: 3 * scaleX, y: 18 * scaleY))
-            ribbon.addCurve(
-                to: CGPoint(x: 22 * scaleX, y: 11 * scaleY),
-                control1: CGPoint(x: 10 * scaleX, y: 5 * scaleY),
-                control2: CGPoint(x: 13 * scaleX, y: 28 * scaleY)
-            )
-            ribbon.addCurve(
-                to: CGPoint(x: 35 * scaleX, y: 13 * scaleY),
-                control1: CGPoint(x: 27 * scaleX, y: 4 * scaleY),
-                control2: CGPoint(x: 32 * scaleX, y: 7 * scaleY)
-            )
+            // One streamline, bowing away from the sphere and running straight behind it, so the mark moves left to right. `side` is -1 above and 1 below.
+            func streamline(rest: CGFloat, peak: CGFloat, side: CGFloat) -> Path {
+                var path = Path()
+                path.move(to: point(1, 14 + side * rest))
+                path.addCurve(
+                    to: point(12, 14 + side * peak),
+                    control1: point(5, 14 + side * rest),
+                    control2: point(7.5, 14 + side * peak)
+                )
+                path.addCurve(
+                    to: point(26, 14 + side * rest),
+                    control1: point(16.5, 14 + side * peak),
+                    control2: point(20, 14 + side * rest)
+                )
+                path.addLine(to: point(37, 14 + side * rest))
+                return path
+            }
 
-            context.stroke(
-                ribbon,
-                with: .linearGradient(
-                    Gradient(
-                        colors: inverted
-                            ? [SamadhiColor.ivory, SamadhiColor.apricot, SamadhiColor.ivory]
-                            : [SamadhiColor.plum, SamadhiColor.clay, SamadhiColor.olive]),
-                    startPoint: .zero,
-                    endPoint: CGPoint(x: size.width, y: size.height)
+            let style = StrokeStyle(lineWidth: 1.4 * unit, lineCap: .round)
+            for side in [CGFloat(-1), 1] {
+                context.stroke(
+                    streamline(rest: 3.6, peak: 6.9, side: side),
+                    with: .color(SamadhiColor.ink.opacity(0.9)),
+                    style: style
+                )
+                context.stroke(
+                    streamline(rest: 8.6, peak: 11, side: side),
+                    with: .color(SamadhiColor.ink.opacity(0.45)),
+                    style: style
+                )
+            }
+
+            let center = point(12, 14)
+            let radius = 4.4 * unit
+            context.fill(
+                Path(
+                    ellipseIn: CGRect(
+                        x: center.x - radius,
+                        y: center.y - radius,
+                        width: radius * 2,
+                        height: radius * 2
+                    )
                 ),
-                style: StrokeStyle(lineWidth: 4.2 * min(scaleX, scaleY), lineCap: .round, lineJoin: .round)
+                with: .color(SamadhiColor.line)
             )
-
-            let sparkRect = CGRect(x: 28 * scaleX, y: 2 * scaleY, width: 4.2 * scaleX, height: 4.2 * scaleY)
-            context.fill(Path(ellipseIn: sparkRect), with: .color(inverted ? SamadhiColor.ivory : SamadhiColor.clay))
         }
-        .shadow(color: inverted ? SamadhiColor.ink.opacity(0.34) : SamadhiColor.ivory.opacity(0.68), radius: 8, y: 3)
         .accessibilityHidden(true)
     }
 }

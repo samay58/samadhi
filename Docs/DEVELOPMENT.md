@@ -4,7 +4,7 @@ The Mac Mini is the main development machine. It has the disk for current Xcode,
 
 ## The loop
 
-Samadhi improves in widening rings, from logic out to the phone. Stay in the innermost ring that can answer the question, and move outward only when it cannot.
+Slipstream improves in widening rings, from logic out to the phone. Stay in the innermost ring that can answer the question, and move outward only when it cannot.
 
 | Ring | Question it answers | Command | Time |
 | --- | --- | --- | --- |

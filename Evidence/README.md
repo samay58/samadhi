@@ -7,13 +7,15 @@ This directory holds the proof behind claims in `Docs/STATUS.md` and `Docs/TESTI
 | `Device/` | What a signed build did on the physical iPhone: install receipts, pulled-record analyses, and listening notes |
 | `Simulator/` | Interface behavior in Simulator, with frames for the current run controls and setup flow |
 | `Audio/` | Tempo analyzer corpus results and the Auto feedback prototype record |
-| `Brand/` | Small-scale app icon reviews |
+| `Brand/` | Small-scale app icon reviews and every icon direction explored |
 
 ## What is kept in Git
 
 Every written record stays. Images stay only when they show the current interface.
 
 On 2026-11-02, 112 superseded images, logs, and export manifests left the repository to keep it light, and Git history was rewritten so they no longer download with every clone. Older records still name those files. They are all in the [evidence archive](https://github.com/samay58/samadhi/releases/tag/evidence-archive-2026-08-19).
+
+On 2026-11-05, frames of the old warm palette left too, in keeping with that rule. They remain in Git history at commit `658bbcb`.
 
 Commit hashes written in records before 2026-11-02 belong to the original history. [COMMIT-MAP.txt](../Docs/Archive/COMMIT-MAP.txt) gives each one's current hash, and the same release holds a complete backup of the original history. A build's source fingerprint did not change.
 

@@ -31,7 +31,7 @@ struct TrackResultsSheet: View {
         }
         // A full-height sheet is not system glass, and a bare material reads cold against the field.
         .presentationBackground {
-            SamadhiColor.parchment.opacity(0.78).background(.ultraThinMaterial)
+            SamadhiColor.paper.opacity(0.78).background(.ultraThinMaterial)
         }
         .accessibilityIdentifier("track-results-sheet")
     }

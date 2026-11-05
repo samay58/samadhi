@@ -43,11 +43,11 @@ import Testing
 }
 
 @Test func theFieldWarmsOnlyWithSongsActuallyRead() {
-    #expect(selection(completed: 0, total: 0).fieldWarmth == 0.25)
-    #expect(selection(completed: 0, total: 4).fieldWarmth == 0.25)
-    #expect(selection(completed: 2, total: 4).fieldWarmth == 0.625)
-    #expect(selection(completed: 4, total: 4).fieldWarmth == 1)
-    #expect(MusicSelectionPresentation.none.fieldWarmth == 0.55)
+    #expect(selection(completed: 0, total: 0).fieldBloom == 0.25)
+    #expect(selection(completed: 0, total: 4).fieldBloom == 0.25)
+    #expect(selection(completed: 2, total: 4).fieldBloom == 0.625)
+    #expect(selection(completed: 4, total: 4).fieldBloom == 1)
+    #expect(MusicSelectionPresentation.none.fieldBloom == 0.55)
 }
 
 @Test func thePlainRestingLinesShowOnlyWithoutAPlaylist() {

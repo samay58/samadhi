@@ -77,7 +77,7 @@ import Testing
 
     let choices = model.playlistSheet?.playlists ?? []
     #expect(choices.map(\.id) == ["simulator-demo", "simulator-cruise"])
-    #expect(choices.map(\.name) == ["Samadhi demo", "Soft Miles"])
+    #expect(choices.map(\.name) == ["Slipstream demo", "Soft Miles"])
     #expect(Set(choices.map(\.id)).count == choices.count)
 }
 
@@ -1474,7 +1474,7 @@ private extension SimulationConfiguration {
     #expect(presentation.autoCueText.contains("slower"))
     #expect(presentation.autoCueText.contains("small"))
     #expect(presentation.autoCueText.contains("waiting for Apple Music"))
-    #expect(presentation.lastSongChangeText == "Changed outside Samadhi")
+    #expect(presentation.lastSongChangeText == "Changed outside Slipstream")
 }
 
 // The scripted cadence is raw sensor truth. It reaches Auto only after the shell's filter, so this

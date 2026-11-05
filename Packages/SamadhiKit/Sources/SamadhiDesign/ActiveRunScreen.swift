@@ -12,7 +12,7 @@ struct ActiveRunScreen: View {
     var body: some View {
         ScrollView {
             VStack(spacing: Space.x4) {
-                BrandMark(inverted: true)
+                BrandMark()
                     .frame(width: 38, height: 28)
                     .padding(.top, Space.x6)
 
@@ -31,7 +31,7 @@ struct ActiveRunScreen: View {
                     .background {
                         if showsStatusWell {
                             Ellipse()
-                                .fill(SamadhiColor.ink.opacity(0.38))
+                                .fill(SamadhiColor.paper.opacity(0.38))
                                 .frame(width: 210, height: 70)
                                 .blur(radius: 24)
                         }
@@ -62,7 +62,7 @@ struct ActiveRunScreen: View {
             Text(RunDurationText.formatted(state.trackElapsedSeconds))
                 .font(.callout.monospacedDigit().weight(.semibold))
                 .dynamicTypeSize(...DynamicTypeSize.accessibility1)
-                .foregroundStyle(SamadhiColor.ivory.opacity(0.82))
+                .foregroundStyle(SamadhiColor.ink.opacity(0.82))
                 .accessibilityLabel(
                     "Song position, \(RunDurationText.spoken(state.trackElapsedSeconds))"
                 )
@@ -89,10 +89,10 @@ struct ActiveRunScreen: View {
             // a blur this wide would be redrawn on every frame of that.
             EllipticalGradient(
                 stops: [
-                    .init(color: SamadhiColor.ink.opacity(1), location: 0),
-                    .init(color: SamadhiColor.ink.opacity(0.92), location: 0.3),
-                    .init(color: SamadhiColor.ink.opacity(0.55), location: 0.62),
-                    .init(color: SamadhiColor.ink.opacity(0.16), location: 0.86),
+                    .init(color: SamadhiColor.paper.opacity(1), location: 0),
+                    .init(color: SamadhiColor.paper.opacity(0.92), location: 0.3),
+                    .init(color: SamadhiColor.paper.opacity(0.55), location: 0.62),
+                    .init(color: SamadhiColor.paper.opacity(0.16), location: 0.86),
                     .init(color: .clear, location: 1),
                 ]
             )
@@ -205,7 +205,7 @@ private struct RunStatus: View {
                             .font(.title2.monospacedDigit().weight(.bold))
                         Text("steps per minute")
                             .font(.caption.weight(.semibold))
-                            .foregroundStyle(SamadhiColor.ivory.opacity(0.8))
+                            .foregroundStyle(SamadhiColor.ink.opacity(0.8))
                     }
                 }
             }
@@ -252,7 +252,7 @@ private struct ReachNoticeLine: View {
         Text(notice?.text ?? "")
             .font(.callout.weight(.medium))
             .dynamicTypeSize(...DynamicTypeSize.accessibility2)
-            .foregroundStyle(SamadhiColor.ivory.opacity(increasedContrast ? 1 : 0.9))
+            .foregroundStyle(SamadhiColor.ink.opacity(increasedContrast ? 1 : 0.9))
             .multilineTextAlignment(.center)
             .lineLimit(3)
             .fixedSize(horizontal: false, vertical: true)
@@ -280,7 +280,7 @@ private struct TrackIdentity: View {
             Text(track.artist)
                 .font(.body.weight(.medium))
                 .dynamicTypeSize(...DynamicTypeSize.accessibility2)
-                .foregroundStyle(SamadhiColor.ivory.opacity(0.82))
+                .foregroundStyle(SamadhiColor.ink.opacity(0.82))
                 .lineLimit(2)
         }
         .multilineTextAlignment(.center)

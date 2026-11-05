@@ -123,7 +123,7 @@ struct RootView: View {
         var body: some View {
             Button(action: open) {
                 VStack(alignment: .leading, spacing: 2) {
-                    Text("What Samadhi saw")
+                    Text("What Slipstream saw")
                         .fontWeight(.semibold)
                     Text(presentation.status.label)
                     Text("Sent \(formatted(presentation.sentRate))")
@@ -137,7 +137,7 @@ struct RootView: View {
             .buttonStyle(.plain)
             .padding(.leading, 12)
             .padding(.top, 54)
-            .accessibilityLabel("Open what Samadhi saw and changed")
+            .accessibilityLabel("Open what Slipstream saw and changed")
         }
 
         private func formatted(_ value: Double?) -> String {

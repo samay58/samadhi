@@ -6,6 +6,7 @@ public struct SamadhiScreen: View {
 
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+    @Environment(\.colorScheme) private var systemColorScheme
 
     public init(state: RunViewState, send: @escaping @MainActor (RunAction) -> Void) {
         self.state = state
@@ -18,7 +19,10 @@ public struct SamadhiScreen: View {
             atmosphere
             content
         }
-        .foregroundStyle(foregroundColor)
+        .foregroundStyle(SamadhiColor.ink)
+        // Setup, recovery, and the summary follow the system. The run is always dark, like Workout: lime
+        // on black reads in sun at arm's length, and the glass has more to bend.
+        .environment(\.colorScheme, isRunning ? .dark : systemColorScheme)
         .animation(effectiveReduceMotion ? nil : .smooth(duration: MotionToken.transition), value: state.phase)
         .animation(effectiveReduceMotion ? nil : .smooth(duration: MotionToken.control), value: state.controlsVisible)
     }
@@ -46,18 +50,18 @@ public struct SamadhiScreen: View {
             case .ready:
                 FluidMusicField(
                     mode: .ready,
-                    usesCollectionPalette: state.hasArtwork,
+                    usesFullLight: state.hasArtwork,
                     reduceMotionOverride: state.forceReduceMotion,
                     animates: true,
                     contourLines: state.musicSelection.contourLines,
-                    warmth: state.musicSelection.fieldWarmth,
+                    bloom: state.musicSelection.fieldBloom,
                     isSettled: state.musicSelection.isReadyToRun,
                     leavesClearing: !dynamicTypeSize.isAccessibilitySize
                 )
             case .permissionRecovery, .routeRecovery, .summary:
                 FluidMusicField(
                     mode: .ready,
-                    usesCollectionPalette: false,
+                    usesFullLight: false,
                     reduceMotionOverride: true,
                     animates: false,
                     contourLines: state.musicSelection.contourLines
@@ -65,7 +69,7 @@ public struct SamadhiScreen: View {
             default:
                 FluidMusicField(
                     mode: .running,
-                    usesCollectionPalette: state.hasArtwork,
+                    usesFullLight: state.hasArtwork,
                     reduceMotionOverride: state.forceReduceMotion,
                     animates: state.phase == .preparing || state.phase == .acquiring,
                     contourLines: state.musicSelection.contourLines
@@ -75,12 +79,12 @@ public struct SamadhiScreen: View {
         .ignoresSafeArea()
     }
 
-    private var foregroundColor: Color {
+    private var isRunning: Bool {
         switch state.phase {
         case .ready, .permissionRecovery, .routeRecovery, .summary:
-            SamadhiColor.ink
-        default:
-            SamadhiColor.ivory
+            false
+        case .preparing, .acquiring, .running, .paused, .confirmingFinish, .finishing:
+            true
         }
     }
 

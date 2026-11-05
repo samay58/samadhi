@@ -28,9 +28,9 @@ Use one visual owner. Reserve glass for controls, which now include the tempo wh
 
 ## Brand
 
-Product name is Samadhi. “In step” remains lowercase cadence metric. Public tagline is “music in stride.”
+The product was named Samadhi here, and is now Slipstream (see the end of this file). “In step” remains lowercase cadence metric. Public tagline is “music in stride.”
 
-Use compact interlocking ribbon icon on opaque parchment. In-app mark uses native ribbon drawing instead of square icon.
+The compact ribbon icon chosen here is replaced by Smoke (see the end of this file). The in-app mark is still a native drawing instead of the square icon.
 
 ## Evidence
 
@@ -313,7 +313,7 @@ The setup field has no dark center. Ink text sat on plum at under 3:1, and a blu
 
 Reading a playlist is a rare moment, and it was a generic progress bar. Each song read now draws one contour line that shows two seconds of its measured beat, and a song that cannot be read leaves a gap. The repository bans fake waveforms and decorative charts. This is neither, because every line comes from one song's measured tempo, and removing the measurement removes the line. A long playlist keeps one song per band, up to 28 lines, so the map thins out instead of turning solid.
 
-The field warms with the count of songs read, never with a timer. The progress line is a string that each song plucks, and it reaches only as far as the songs actually read.
+The field gains color with the count of songs read, never with a timer. The progress line is a string that each song plucks, and it reaches only as far as the songs actually read.
 
 Earlier options were rejected. One tick per song on a progress line was the generic version of the same idea. Lines crossing the playlist name hurt legibility, so the map leaves a clearing around it.
 
@@ -321,7 +321,7 @@ Earlier options were rejected. One tick per song on a progress line was the gene
 
 The painted sphere never read as what it was meant to be, which is a speaker. The wheel is now a driver seen head on: a surround that stays still, a ribbed cone, and a center cap that push forward at the music's tempo, under a clear Liquid Glass lens. The repository bans glowing orbs, and this replaces one. Reading text stays off glass, because an earlier glass bar read as a milky slab on the phone.
 
-A full-height sheet is not system glass, so the results sheet uses warm parchment over a thin material. The playlist sheet is real glass, so the button behind it fades away while it is open.
+A full-height sheet is not system glass, so the results sheet uses paper over a thin material. The playlist sheet is real glass, so the button behind it fades away while it is open.
 
 ## Most interface tests draw the screen directly
 
@@ -342,3 +342,31 @@ The record holds every input the reducer saw. The reducer is pure, so those inpu
 Recording stays in Debug builds, which is what the phone runs. It adds no sensor, timer, or network use. It keeps what the pedometer already delivers and reads the phone's conditions when one changes or every 30 seconds. Raw motion from the accelerometer is left out, because sampling it 100 times a second would cost real battery for data nothing yet reads. Add it when a question needs it.
 
 The raw files are personal and stay out of Git. What a run teaches goes in `Evidence/Device/` as it always has.
+
+## Lime and lilac replace the warm palette, and dark mode is real
+
+Samay asked for the green and lilac from Phoenix Workbench, for the orange to go, and for dark mode to look outstanding on every screen. The app had ignored the system appearance until now. The green is the Workbench lime `#D8F24C`, read from the live pages, where it is the only green large enough to notice.
+
+Each hue carries a meaning, so color stays a signal: lime means go and live, and lilac means the runner took over. Thin lines use moss in light mode because lime on paper has almost no contrast. `Docs/BRAND.md` has the values.
+
+The run screens are always dark, and everything else follows the system. Following the system on the run screen was rejected because a pale run screen has less contrast in sun, the glass has less to bend, and a light speaker would need a second drawing for no gain. Apple's Workout app makes the same choice.
+
+The mesh gradient behind every screen became two radial lights and a still noise layer, drawn together in one high-precision layer. On a surface this dark the mesh showed a faint vertical edge at each column. Noise over a finished 8-bit image only hid the bands, and they returned as soon as the eye averaged the noise away, so the noise now lands before the colors are rounded. The field redraws this layer at 20 frames a second during setup and stops during a run. Its cost on a phone is not measured.
+
+The wheel's center cap turns lime only when the tempo has matched, which gives the run screen one bright object with a meaning. It stays neutral under the open readout, so the number keeps its contrast. While Finish is armed the primary lens goes to clear glass, because dimming a lime lens turned it muddy and lime means go.
+
+This pass was done before the walk that the plan's stop rule asks for, because Samay asked for it directly. It changes color only: no layout, timing, gesture, or audio logic changed.
+
+## The product is Slipstream, and the icon is Smoke
+
+Samay rejected the first pair offered, Crest and Lilt, as lame, liked a lime stone in raked gravel, and asked for something about getting into flow. He chose Slipstream and the Smoke icon, and asked for the icon to fill more of its height, so the lines now run edge to edge.
+
+Slipstream names the feeling of being carried with almost no effort, and at least three meditation apps on the App Store already use the name Samadhi. Smoke is the same idea drawn literally, and it ties the icon to the wheel and the playlist map.
+
+Only what a person sees changed: the display name, on-screen copy, permission text, and the Debug strings. The bundle identifier, the modules, the repository, and the `Samadhi` data folder on the phone stay, because renaming the identifier or the folder would cost the phone its only copy of the selected playlist and analysis.
+
+The small mark is four streamlines around a sphere. A symmetric first drawing read as an eye, so the sphere moved left and the lines run straight behind it.
+
+Other names considered: Second Wind, Groove, Mushin, Laya, Rubato, Pocket, Tala, Locked In, Footfall, Iamb, Downbeat. Other icons considered, all in `Evidence/Brand/2026-11-05-icon-explorations.jpg`: Stone, Wake, Wave, Enso, Grooves, River, Draft, Runner, Footnotes, Ribbon, Cycle, Metronome, Crest, Driver, Phase, Lockstep, Loop, and two bars for Iamb.
+
+Neither the name nor the icon has had a trademark check, which matters only if the app goes public. Smoke's large matte sphere can read as a tennis ball, and that is worth a look on the phone.

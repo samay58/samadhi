@@ -10,7 +10,7 @@ Usage: ./Scripts/sim.sh <command>
   run [launch args]        Build, install, and launch the app fresh
   shot <name>              Save the current screen
   record <name> <seconds>  Record video, then split it into frames at 30 per second
-  matrix <name> [args]     Launch in all five environments and build one contact sheet
+  matrix <name> [args]     Launch in all six environments and build one contact sheet
   frames <test name>       Run one UI test and export every frame it attached
   flags                    List the launch arguments the Debug app understands
 
@@ -81,6 +81,12 @@ case "$command" in
     build_and_install
     mkdir -p "$output_dir/$name"
     while IFS='|' read -r environment arguments; do
+      # Appearance is a Simulator setting rather than a launch argument, and it stays set until changed.
+      if [ "$environment" = dark ]; then
+        xcrun simctl ui "$simulator_name" appearance dark
+      else
+        xcrun simctl ui "$simulator_name" appearance light
+      fi
       # shellcheck disable=SC2086
       launch "$@" $arguments
       sleep "${SAMADHI_SETTLE_SECONDS:-3}"
@@ -88,15 +94,18 @@ case "$command" in
         "$output_dir/$name/$environment.png" >/dev/null 2>&1
     done <<'MATRIX'
 default|
+dark|
 accessibility-xxxl|-UIPreferredContentSizeCategoryName UICTContentSizeCategoryAccessibilityXXXL
 reduce-motion|-UIAccessibilityReduceMotionEnabled YES
 increased-contrast|-UIAccessibilityDarkerSystemColorsEnabled YES
 reduced-transparency|-UIAccessibilityReduceTransparencyEnabled YES
 MATRIX
-    magick montage "$output_dir/$name"/default.png "$output_dir/$name"/accessibility-xxxl.png \
+    xcrun simctl ui "$simulator_name" appearance light
+    magick montage "$output_dir/$name"/default.png "$output_dir/$name"/dark.png \
+      "$output_dir/$name"/accessibility-xxxl.png \
       "$output_dir/$name"/reduce-motion.png "$output_dir/$name"/increased-contrast.png \
       "$output_dir/$name"/reduced-transparency.png \
-      -tile 5x1 -geometry 402x874+8+8 -background '#f4efe6' "$output_dir/$name-sheet.png"
+      -tile 6x1 -geometry 402x874+8+8 -background '#f4efe6' "$output_dir/$name-sheet.png"
     echo "$output_dir/$name-sheet.png"
     ;;
   frames)

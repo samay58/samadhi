@@ -35,7 +35,7 @@ public struct TempoAperture: View {
     }
 
     public var body: some View {
-        TempoOrbDrawing(
+        TempoWheelDrawing(
             mode: mode,
             tempoBPM: tempoBPM,
             progress: progress,
@@ -70,7 +70,7 @@ public struct TempoAperture: View {
     }
 }
 
-private struct TempoOrbDrawing: View {
+private struct TempoWheelDrawing: View {
     let mode: ApertureMode
     let tempoBPM: Int?
     let progress: Double
@@ -85,6 +85,7 @@ private struct TempoOrbDrawing: View {
                 tempoBPM: tempoBPM,
                 isPumping: isPumping,
                 isQuiet: showsReadout || mode == .interrupted,
+                isLit: mode == .locked && !showsReadout,
                 light: pooledLight
             )
             .padding(18)
@@ -95,7 +96,7 @@ private struct TempoOrbDrawing: View {
 
             Circle()
                 .stroke(
-                    SamadhiColor.ivory.opacity(mode == .interrupted ? 0.2 : 0.28),
+                    SamadhiColor.ink.opacity(mode == .interrupted ? 0.2 : 0.28),
                     lineWidth: increasedContrast ? 3 : 1.5
                 )
                 .padding(7)
@@ -104,7 +105,7 @@ private struct TempoOrbDrawing: View {
                 // The outer arc is song progress. It must remain visually separate from the beat pulse.
                 .trim(from: 0, to: max(progress, 0.012))
                 .stroke(
-                    SamadhiColor.ivory.opacity(mode == .interrupted ? 0.36 : 0.9),
+                    progressColor,
                     style: StrokeStyle(lineWidth: increasedContrast ? 4 : 2.25, lineCap: .round)
                 )
                 .rotationEffect(.degrees(-90))
@@ -112,29 +113,45 @@ private struct TempoOrbDrawing: View {
                 .animation(animatesProgress ? .smooth(duration: 0.5) : nil, value: progress)
 
             Circle()
+                // The ring opens at the bottom where the word Turn sits, so the dashes never cross it.
+                .trim(from: leavesRoomForLabel ? 0.035 : 0, to: leavesRoomForLabel ? 0.965 : 1)
+                .rotation(.degrees(90))
                 .stroke(
-                    SamadhiColor.apricot.opacity(mode == .paused ? 0.22 : 0.52),
+                    SamadhiColor.ink.opacity(mode == .paused ? 0.14 : 0.26),
                     style: StrokeStyle(lineWidth: 1, dash: [2, 8])
                 )
                 .padding(38)
         }
     }
 
+    private var leavesRoomForLabel: Bool {
+        mode == .locked && !showsReadout
+    }
+
+    // The progress arc is lime only while the music is following the runner.
+    private var progressColor: Color {
+        switch mode {
+        case .locked: SamadhiColor.lime
+        case .acquiring, .paused: SamadhiColor.ink.opacity(0.72)
+        case .interrupted: SamadhiColor.ink.opacity(0.36)
+        }
+    }
+
     private var lens: Glass {
-        // Regular glass turns pale over this field, so it needs a dark tint for ivory text to hold.
-        increasedContrast ? .regular.tint(SamadhiColor.ink.opacity(0.62)).interactive() : .clear.interactive()
+        // Regular glass turns pale over this field, so it needs a dark tint for the text to hold.
+        increasedContrast ? .regular.tint(SamadhiColor.paper.opacity(0.62)).interactive() : .clear.interactive()
     }
 
     private var pooledLight: [Color] {
         switch mode {
         case .acquiring:
-            [SamadhiColor.apricot.opacity(0.45), SamadhiColor.clay.opacity(0.18), .clear]
+            [SamadhiColor.lime.opacity(0.14), SamadhiColor.lime.opacity(0.05), .clear]
         case .locked:
-            [SamadhiColor.apricot.opacity(0.9), SamadhiColor.clay.opacity(0.42), .clear]
+            [SamadhiColor.lime.opacity(0.26), SamadhiColor.lime.opacity(0.08), .clear]
         case .paused:
-            [SamadhiColor.ivory.opacity(0.14), SamadhiColor.apricot.opacity(0.08), .clear]
+            [SamadhiColor.ink.opacity(0.08), SamadhiColor.ink.opacity(0.03), .clear]
         case .interrupted:
-            [SamadhiColor.plum.opacity(0.4), .clear]
+            [SamadhiColor.ink.opacity(0.04), .clear]
         }
     }
 }
@@ -174,14 +191,16 @@ private struct PumpingDriver: View {
     let tempoBPM: Int?
     let isPumping: Bool
     let isQuiet: Bool
+    let isLit: Bool
     let light: [Color]
 
     @State private var clock: BeatClock
 
-    init(tempoBPM: Int?, isPumping: Bool, isQuiet: Bool, light: [Color]) {
+    init(tempoBPM: Int?, isPumping: Bool, isQuiet: Bool, isLit: Bool, light: [Color]) {
         self.tempoBPM = tempoBPM
         self.isPumping = isPumping
         self.isQuiet = isQuiet
+        self.isLit = isLit
         self.light = light
         _clock = State(initialValue: BeatClock(bpm: Double(tempoBPM ?? 96)))
     }
@@ -190,9 +209,9 @@ private struct PumpingDriver: View {
         TimelineView(.animation(minimumInterval: 1 / 30, paused: !isPumping)) { _ in
             let pump = isPumping ? BeatClock.pump(atPhase: clock.phase(at: ProcessInfo.processInfo.systemUptime)) : 0
             ZStack {
-                SpeakerDriver(pump: pump, isQuiet: isQuiet)
+                SpeakerDriver(pump: pump, isQuiet: isQuiet, isLit: isLit)
 
-                // A sunrise under the lens gives the glass something to bend. It swells on the beat.
+                // A low light under the lens gives the glass something to bend. It swells on the beat.
                 Circle()
                     .fill(
                         RadialGradient(
@@ -213,10 +232,12 @@ private struct PumpingDriver: View {
 
 // A speaker driver seen head on: a rolled surround that stays still, a ribbed cone, and a domed
 // center cap. Each piece pushes forward on the beat, the center furthest, so the wheel moves the way
-// a real speaker does. It is drawn in the field's own ink so the field stays visible through it.
+// a real speaker does. It is drawn in the field's own ink so the field stays visible through it, and
+// the cap turns lime only when the tempo has matched, so the one bright thing on screen means something.
 private struct SpeakerDriver: View {
     let pump: Double
     let isQuiet: Bool
+    let isLit: Bool
 
     private static let ribCount = 6
 
@@ -243,8 +264,8 @@ private struct SpeakerDriver: View {
             func raised(_ light: Double, _ shade: Double) -> GraphicsContext.Shading {
                 .linearGradient(
                     Gradient(colors: [
-                        SamadhiColor.ivory.opacity(light * detail),
-                        SamadhiColor.ink.opacity(shade * detail),
+                        SamadhiColor.ink.opacity(light * detail),
+                        SamadhiColor.paper.opacity(shade * detail),
                     ]),
                     startPoint: topLeft,
                     endPoint: bottomRight
@@ -255,9 +276,9 @@ private struct SpeakerDriver: View {
                 circle(radius),
                 with: .radialGradient(
                     Gradient(colors: [
-                        SamadhiColor.ink.opacity(0.5),
-                        SamadhiColor.ink.opacity(0.26),
-                        SamadhiColor.ink.opacity(0.42),
+                        SamadhiColor.paper.opacity(0.5),
+                        SamadhiColor.paper.opacity(0.26),
+                        SamadhiColor.paper.opacity(0.42),
                     ]),
                     center: center,
                     startRadius: radius * 0.2,
@@ -267,8 +288,8 @@ private struct SpeakerDriver: View {
 
             context.stroke(
                 circle(radius * 0.9),
-                with: raised(0.42, 0.58),
-                lineWidth: radius * 0.1
+                with: raised(0.24, 0.5),
+                lineWidth: radius * 0.085
             )
 
             for index in 0..<Self.ribCount {
@@ -286,11 +307,14 @@ private struct SpeakerDriver: View {
             context.fill(
                 circle(capRadius),
                 with: .radialGradient(
-                    Gradient(colors: [
-                        SamadhiColor.ivory.opacity(0.42 * detail),
-                        SamadhiColor.apricot.opacity(0.2 * detail),
-                        SamadhiColor.ink.opacity(0.5 * detail),
-                    ]),
+                    Gradient(
+                        colors: isLit
+                            ? [Color(hex: 0xE8F77E), SamadhiColor.lime, Color(hex: 0x7E9021)]
+                            : [
+                                SamadhiColor.ink.opacity(0.42 * detail),
+                                SamadhiColor.ink.opacity(0.14 * detail),
+                                SamadhiColor.paper.opacity(0.5 * detail),
+                            ]),
                     center: CGPoint(x: center.x - capRadius * 0.34, y: center.y - capRadius * 0.4),
                     startRadius: 0,
                     endRadius: capRadius * 1.5

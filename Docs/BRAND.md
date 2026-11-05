@@ -1,33 +1,37 @@
 # Brand
 
-## Meaning
+## Name
 
-Samadhi means meditative consciousness. Brand should feel absorbed, steady, warm, and present while movement and music settle into one rhythm.
+The product is Slipstream. A slipstream is the pocket of moving air behind a runner or rider that pulls you along with almost no effort, which is how the app should feel: you run in the music's slipstream. The word also holds "stream," and it names flow without naming meditation. The public tagline is "music in stride." "In step" is a lowercase run metric, not a second brand.
 
-Product name is Samadhi. “In step” is lowercase run metric, not second brand. Public tagline is “music in stride.”
+The app was first called Samadhi, and that stays the name of the repository, the code modules, the bundle identifier, and the folder on the phone that holds its data. Changing that folder or the identifier would cost the phone its only copy of the selected playlist and analysis. Older docs use Samadhi for the same product.
+
+## Color
+
+Two hues come from Phoenix Workbench, and each one means something.
+
+- Lime `#D8F24C` means go and live. It fills the primary action, and it marks the music following the runner: the wheel's center cap, the progress arc, and the word Auto.
+- Lilac means the runner took over. It marks Manual and the hold that ends a run. It is `#6E5C9E` on paper and on the hold's fill, and `#B8A9E8` on the dark ground. If lilac ever feels like too much, these are the only places to remove it.
+- Moss `#566400` stands in for lime on any thin line in light mode, because lime on paper has a contrast of about 1.1 to 1. Lime on paper is only ever a fill with dark text on it.
+- The neutrals are Workbench paper `#F4F0E7` with ink `#15170F`, and near-black `#0B0D08` with ink `#F2F1E6`. Both carry a slight green bias so they agree with the lime.
+
+There is no orange, apricot, clay, plum, or olive anywhere. Text and line pairings are held to 4.5 to 1 by `PaletteContrastTests`.
+
+## Dark mode
+
+Setup, recovery, and the summary follow the system appearance. The run screens are always dark, like Apple's Workout app, because lime on black reads at arm's length in sun and the glass has more to bend. Colors are named by role in `SamadhiColor`, so a new screen gets both appearances without extra work.
+
+The field behind every screen is two soft radial lights over the ground, lime low on the left and lilac high on the right, and a still layer of faint noise. They are drawn together at high precision, so the noise lands before the colors are rounded to the display's 8 bits. That is true dithering, and it removes the banding dark gradients otherwise show. A mesh gradient was tried first and showed a faint vertical edge at each of its columns. Noise added after rounding was tried next and only masked the bands.
 
 ## App icon
 
-Compact interlocking ribbon wins because silhouette survives Home Screen scale, loops imply continuity, and form avoids literal runner or music symbol.
+Smoke is the icon: a wind-tunnel photograph of smoke lines bending around one lime sphere, running the full height of the square. It is a literal slipstream. The sphere is the same object as the center of the wheel on the run screen, which lights up when the tempo matches, and the lines are the same lines as the playlist map.
 
-Production master:
-
-Resources/Assets.xcassets/AppIcon.appiconset/Samadhi-AppIcon-1024.png
-
-Rules:
-
-- Opaque 1024 by 1024 PNG
-- Warm parchment field
-- Emblem occupies about 69 percent of square
-- Apricot, orange, plum, olive, and ivory palette
-- Satin depth, not toy-like gloss
-- No text, shoe, runner, note, or fitness glyph
-
-Small-scale reviews live under Evidence/Brand/.
+It began as an image-model picture, and the master is `Resources/Assets.xcassets/AppIcon.appiconset/AppIcon.png`. Light and dark use that one file, because the image is already dark, and the tinted version is a grayscale of it. Every direction explored and the small-scale reviews live under `Evidence/Brand/`.
 
 ## In-app mark
 
-Native ribbon drawing echoes icon without nesting square app icon inside interface. Replace only if transparent production emblem passes 24-point legibility and reduced-transparency checks.
+`BrandMark` reduces the icon to four streamlines parting around one sphere, drawn natively so it stays sharp at 38 points and takes the screen's ink. The sphere is lime in dark mode and moss in light mode.
 
 ## The playlist map
 
@@ -35,14 +39,8 @@ The signature of the interface is the map a playlist draws of itself. Each song 
 
 ## The speaker
 
-The tempo wheel is a speaker driver seen head on, under a clear glass lens, with a sunrise grazing it from below. Thin ribs, one domed center cap, and no photo-real detail. It is drawn in the field's own ink so the field stays visible through it, and it pulses only at the music's current tempo.
+The tempo wheel is a speaker driver seen head on, under a clear glass lens, with a low light under it. Thin ribs, one domed center cap, and no photo-real detail. It is drawn in the field's own ink so the field stays visible through it, and it pulses only at the music's current tempo. The cap turns lime only when the tempo has matched, so the one bright thing on the screen means something.
 
 ## Repository cover
 
-User-supplied Midjourney artwork uses wide interwoven rhythm form over parchment contours. Soft italic “music in stride” sits upper-left, outside sculpture, preserving flow and negative space.
-
-- Original art: Brand/GitHub-Cover-Midjourney-Original.png
-- Typeset master: Brand/GitHub-Cover-Samadhi-Master.png
-- GitHub export: Brand/GitHub-Cover-Samadhi-1280x640.png
-
-Original art stays preserved. Final typography remains controlled post-generation.
+`Brand/GitHub-Cover.png` is the mark, the name, and the tagline over a contour map in the dark palette. The contour tempos in it are illustrative.

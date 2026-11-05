@@ -63,6 +63,7 @@ This came out of the November sweep. It has not been built, because it changes t
 
 Nothing here affects today's Debug phone builds.
 
+- Run a trademark check on Slipstream and clear the icon, which began as an image-model picture.
 - Diagnostics and simulator launch flags still compile into Release, although Release never records and the Debug screens are absent. Wrap them in `#if DEBUG` before an App Store build.
 - `RunReducer.init(trackCount:)` exists only for tests, and it keeps a `demo-0` fallback in the domain. Move those tests to `init(tracks:)`.
 - `FeedbackAuditionView` plays cues directly. It is a Debug harness that goes away once a cue family is chosen.
@@ -91,4 +92,4 @@ Excluded:
 
 ## Stop rule
 
-Do not redesign the app or build playlist generation before imported music and the physical body-to-music loop work. The BPM control is part of that loop, not a settings feature. If public MusicKit cannot make a clean change that Samay can reliably feel, reopen the source decision. The complete mechanics and evidence thresholds live in [ADAPTIVE-AUDIO-PLAYBOOK.md](ADAPTIVE-AUDIO-PLAYBOOK.md).
+Do not redesign the app or build playlist generation before imported music and the physical body-to-music loop work. The November 5 color, name, and icon pass is the one exception, at Samay's direct request, and it left layout and behavior alone. The BPM control is part of that loop, not a settings feature. If public MusicKit cannot make a clean change that Samay can reliably feel, reopen the source decision. The complete mechanics and evidence thresholds live in [ADAPTIVE-AUDIO-PLAYBOOK.md](ADAPTIVE-AUDIO-PLAYBOOK.md).

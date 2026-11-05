@@ -89,7 +89,7 @@ struct PlaylistPickerView: View {
         } label: {
             HStack(alignment: .firstTextBaseline, spacing: Space.x3) {
                 Circle()
-                    .fill(SamadhiColor.clay)
+                    .fill(SamadhiColor.line)
                     .frame(width: 6, height: 6)
                     .opacity(isSelected ? 1 : 0)
                     .accessibilityHidden(true)
@@ -119,7 +119,7 @@ struct PlaylistPickerView: View {
                 trailing: Space.x6
             )
         )
-        .listRowBackground(isSelected ? SamadhiColor.clay.opacity(0.1) : Color.clear)
+        .listRowBackground(isSelected ? SamadhiColor.line.opacity(0.12) : Color.clear)
         .listRowSeparatorTint(SamadhiColor.ink.opacity(0.14))
         .accessibilityLabel(
             isSelected ? "\(playlist.name), Current playlist" : playlist.name

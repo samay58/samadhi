@@ -358,3 +358,47 @@ private let previewSend: @MainActor (RunAction) -> Void = { _ in }
 #Preview("Missing artwork") {
     SamadhiScreen(state: RunViewState(phase: .ready, hasArtwork: false), send: previewSend)
 }
+
+#Preview("Dark, ready") {
+    SamadhiScreen(state: RunViewState(phase: .ready), send: { _ in })
+        .preferredColorScheme(.dark)
+}
+
+#Preview("Dark, reading") {
+    SamadhiScreen(
+        state: RunViewState(
+            phase: .ready,
+            musicSelection: .analyzing(
+                ImportedCollectionPresentation(
+                    name: "Morning Miles",
+                    totalTrackCount: 18,
+                    readyTrackCount: 9,
+                    completedTrackCount: 9,
+                    tracks: []
+                )
+            )
+        ),
+        send: { _ in }
+    )
+    .preferredColorScheme(.dark)
+}
+
+#Preview("Dark, summary") {
+    SamadhiScreen(
+        state: RunViewState(
+            phase: .summary(
+                RunSummary(durationSeconds: 1843, averageCadence: 168, tempoMatchedPercent: 86, songCount: 7)
+            )
+        ),
+        send: { _ in }
+    )
+    .preferredColorScheme(.dark)
+}
+
+#Preview("Dark, recovery") {
+    SamadhiScreen(
+        state: RunViewState(phase: .routeRecovery(cause: .routeLost, restored: true)),
+        send: { _ in }
+    )
+    .preferredColorScheme(.dark)
+}

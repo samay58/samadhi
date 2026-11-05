@@ -27,11 +27,13 @@ private struct DrawingEnvironment {
     var reduceMotion = false
     var increasedContrast = false
     var dynamicType = DynamicTypeSize.large
+    var appearance = UIUserInterfaceStyle.light
     // Lists and scroll views only build what fits. A taller window keeps every control in the tree.
     var height: CGFloat = 874
 
     static let all = [
         DrawingEnvironment(name: "normal"),
+        DrawingEnvironment(name: "dark", appearance: .dark),
         DrawingEnvironment(name: "reduce-motion", reduceMotion: true),
         DrawingEnvironment(name: "increased-contrast", increasedContrast: true),
         DrawingEnvironment(name: "accessibility-xxxl", dynamicType: .accessibility5, height: 1400),
@@ -54,7 +56,8 @@ private final class HostedScreen {
         window = try Self.show(
             SamadhiScreen(state: state) { box.actions.append($0) }
                 .environment(\.dynamicTypeSize, environment.dynamicType),
-            height: environment.height
+            height: environment.height,
+            appearance: environment.appearance
         )
     }
 
@@ -63,13 +66,18 @@ private final class HostedScreen {
         window = try Self.show(view.environment(\.dynamicTypeSize, dynamicType), height: height)
     }
 
-    private static func show(_ view: some View, height: CGFloat) throws -> UIWindow {
+    private static func show(
+        _ view: some View,
+        height: CGFloat,
+        appearance: UIUserInterfaceStyle = .light
+    ) throws -> UIWindow {
         #expect(accessibilityTreeEnabled)
         let scene = try #require(
             UIApplication.shared.connectedScenes.compactMap { $0 as? UIWindowScene }.first
         )
         let window = UIWindow(windowScene: scene)
         window.frame = CGRect(x: 0, y: 0, width: 402, height: height)
+        window.overrideUserInterfaceStyle = appearance
         let host = UIHostingController(rootView: view)
         window.rootViewController = host
         window.isHidden = false
@@ -286,6 +294,75 @@ private final class ActionBox {
         RunLoop.current.run(until: Date(timeIntervalSinceNow: 0.05))
 
         #expect(screen.sent.contains(.revealRhythmControl))
+    }
+
+    // Every screen a runner can reach, in both appearances. The frames are what a person looks at.
+    @Test(arguments: [UIUserInterfaceStyle.light, .dark])
+    func everyScreenDrawsInBothAppearances(_ appearance: UIUserInterfaceStyle) throws {
+        let collection = ImportedCollectionPresentation(
+            name: "Morning Miles",
+            totalTrackCount: 18,
+            readyTrackCount: 18,
+            completedTrackCount: 18,
+            tracks: (0..<18).map {
+                ImportedTrackPresentation(
+                    id: "\($0)", title: "Song \($0)", status: .ready, pulseBPM: 120 + Double($0) * 4)
+            }
+        )
+        let reading = ImportedCollectionPresentation(
+            name: "Morning Miles",
+            totalTrackCount: 18,
+            readyTrackCount: 9,
+            completedTrackCount: 9,
+            tracks: (0..<9).map {
+                ImportedTrackPresentation(
+                    id: "\($0)", title: "Late Coffee", status: .ready, pulseBPM: 120 + Double($0) * 4)
+            }
+        )
+        let open = RhythmControlPresentation(
+            mode: .automatic, requestedBPM: 168, appliedBPM: 169, isVisible: true, isAvailable: true)
+        let manual = RhythmControlPresentation(
+            mode: .manual, requestedBPM: 172, appliedBPM: 171, isVisible: true, isAvailable: true)
+        let locked = RhythmControlPresentation(appliedBPM: 169, isAvailable: true)
+        let brief = RunViewState(phase: .running, cadenceSPM: 168, showLockBrief: true, rhythmControl: locked)
+
+        let states: [(String, RunViewState)] = [
+            ("01-empty", RunViewState(phase: .ready, musicSelection: .none)),
+            ("02-reading", RunViewState(phase: .ready, musicSelection: .analyzing(reading))),
+            ("03-ready", RunViewState(phase: .ready, musicSelection: .ready(collection))),
+            ("04-failed", RunViewState(phase: .ready, musicSelection: .failed(.authorizationDenied))),
+            ("05-acquiring", RunViewState(phase: .acquiring)),
+            ("06-running", RunViewState(phase: .running, rhythmControl: locked)),
+            ("07-lock-brief", brief),
+            ("08-controls", RunViewState(phase: .running, controlsVisible: true, rhythmControl: locked)),
+            ("09-wheel-auto", RunViewState(phase: .running, rhythmControl: open)),
+            ("10-wheel-manual", RunViewState(phase: .running, rhythmControl: manual)),
+            ("11-paused", RunViewState(phase: .paused, rhythmControl: locked)),
+            ("12-finish-armed", RunViewState(phase: .confirmingFinish, controlsVisible: true, rhythmControl: locked)),
+            ("13-route-lost", RunViewState(phase: .routeRecovery(cause: .routeLost, restored: false))),
+            ("14-route-back", RunViewState(phase: .routeRecovery(cause: .routeLost, restored: true))),
+            ("15-permission", RunViewState(phase: .permissionRecovery)),
+            (
+                "16-summary",
+                RunViewState(
+                    phase: .summary(
+                        RunSummary(
+                            durationSeconds: 1843,
+                            averageCadence: 168,
+                            tempoMatchedPercent: 86,
+                            tempoMatchedCoveragePercent: 92,
+                            automaticSeconds: 1500,
+                            manualSeconds: 343,
+                            songCount: 7
+                        )
+                    ))
+            ),
+        ]
+        let environment = DrawingEnvironment(name: appearance == .dark ? "dark" : "light", appearance: appearance)
+        for (name, state) in states {
+            let screen = try HostedScreen(state, in: environment)
+            screen.recordFrame(named: "\(environment.name)-\(name)")
+        }
     }
 
     #if DEBUG

@@ -80,7 +80,7 @@ struct RunRecoveryScreen: View {
     private var message: String {
         switch kind {
         case .motionPermission:
-            "Samadhi uses step rhythm to adapt the music. You can change access in Settings or continue at a fixed rhythm."
+            "Slipstream uses step rhythm to adapt the music. You can change access in Settings or continue at a fixed rhythm."
         case .audio(cause: .routeLost, restored: true):
             "Resume when you’re ready."
         case .audio(cause: .routeLost, restored: false):
@@ -138,12 +138,12 @@ struct RunRecoveryScreen: View {
         Button(action: action) {
             Text(title)
                 .font(.headline)
-                .foregroundStyle(SamadhiColor.ivory)
+                .foregroundStyle(SamadhiColor.onLime)
                 .padding(.horizontal, Space.x4)
                 .frame(minWidth: 176, minHeight: 58)
         }
         .buttonStyle(.glassProminent)
-        .tint(SamadhiColor.clay)
+        .tint(SamadhiColor.lime)
         .accessibilityIdentifier(identifier)
     }
 
@@ -156,6 +156,9 @@ struct RunRecoveryScreen: View {
             Text(title)
                 .font(.callout.weight(.semibold))
                 .foregroundStyle(SamadhiColor.ink.opacity(0.86))
+                // A capsule cannot hold two lines, so the largest text sizes shrink slightly to stay on one.
+                .lineLimit(1)
+                .minimumScaleFactor(0.72)
                 .padding(.horizontal, Space.x2)
                 .frame(minHeight: 36)
         }

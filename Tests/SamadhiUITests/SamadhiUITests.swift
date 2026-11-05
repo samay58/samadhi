@@ -182,7 +182,7 @@ final class PlaylistReadingUITests: SamadhiUITestCase {
         app.launch()
 
         XCTAssertTrue(element("music-ready").waitForExistence(timeout: 3))
-        XCTAssertTrue(app.staticTexts["Samadhi demo"].exists)
+        XCTAssertTrue(app.staticTexts["Slipstream demo"].exists)
         app.buttons["start-run"].tap()
         XCTAssertTrue(element("cadence-lock").waitForExistence(timeout: 6))
     }
@@ -257,7 +257,7 @@ final class PlaylistSetupUITests: SamadhiUITestCase {
         app.launch()
 
         XCTAssertTrue(element("music-loading").waitForExistence(timeout: 2))
-        XCTAssertTrue(app.staticTexts["Samadhi demo"].exists)
+        XCTAssertTrue(app.staticTexts["Slipstream demo"].exists)
         XCTAssertFalse(app.buttons["start-run"].exists)
         XCTAssertFalse(app.buttons["change-music"].exists)
     }

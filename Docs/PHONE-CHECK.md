@@ -6,7 +6,7 @@ Before starting, run `./Scripts/phone.sh install`. It builds with the exact prof
 
 ## 1. Launch and fingerprint (2 minutes)
 
-- Open Samadhi, start a short run, open the hidden Debug screen, and read the source fingerprint. It must match the fingerprint of the signed build you inspected before installing.
+- Open Slipstream, start a short run, open the hidden Debug screen, and read the source fingerprint. It must match the fingerprint of the signed build you inspected before installing.
 - Result: match or mismatch. If mismatch, stop and rebuild.
 
 ## 2. Endpoint listening (10 minutes, headphones)
@@ -19,6 +19,7 @@ Before starting, run `./Scripts/phone.sh install`. It builds with the exact prof
 ## 3. Transport and Finish feel (5 minutes)
 
 - Judge the glass wheel, the speaker's beat pump, and the glass sheet in daylight. The Simulator only approximates glass.
+- Judge the lime button, the lime center cap, and the icon on the Home Screen in full sun.
 
 - With controls visible: press Pause, Resume, Previous, Next several times. Each Previous or Next should tick once; the song change follows only when Apple Music confirms it.
 - Tap Finish, release early twice, then hold to completion once. The fill must never show outside the pill; early release must snap the fill back; completion must feel like one event.
@@ -36,14 +37,14 @@ Before starting, run `./Scripts/phone.sh install`. It builds with the exact prof
 ## 5. Song boundary with a known cause (5 minutes)
 
 - Start a normal run and let one song play out naturally. After the change, open the Debug screen and read `Last song change`. It should read `Natural end of the song`. Then use Next once and confirm it reads `Next requested here`.
-- If either one reads `Changed outside Samadhi`, write down what happened just before the change.
+- If either one reads `Changed outside Slipstream`, write down what happened just before the change.
 - Listen to that natural change as a crossfade. Does it soften the break, and does the new song's speed correction fight the blend? Say whether Next also crossfades, and whether four seconds feels right.
 - Result: both causes correct, or which one was wrong.
 
 ## 6. Lock screen, interruption, route (10 minutes)
 
 - Lock the phone for two minutes during a run with Auto active. Music must continue; after the phone is opened again, the Debug screen must not show a stale or replayed Auto cue.
-- Take or simulate a call, then end it. Samadhi should show the recovery screen and require an explicit resume; Manual (if set) must survive on the same song.
+- Take or simulate a call, then end it. Slipstream should show the recovery screen and require an explicit resume; Manual (if set) must survive on the same song.
 - Disconnect the headphones, reconnect, resume. Same expectations. Record whether the audio route came back cleanly.
 
 ## 7. Save

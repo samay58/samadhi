@@ -304,7 +304,7 @@
             case .explicitPrevious: "Previous requested here"
             case .explicitSkip: "Next requested here"
             case .naturalBoundary: "Natural end of the song"
-            case .externalUnknown: "Changed outside Samadhi"
+            case .externalUnknown: "Changed outside Slipstream"
             case .recovery: "Recovery"
             case nil: "No confirmed song change yet"
             }
@@ -430,7 +430,7 @@
                         .foregroundStyle(.secondary)
                     }
                 }
-                .navigationTitle("What Samadhi saw")
+                .navigationTitle("What Slipstream saw")
                 .navigationBarTitleDisplayMode(.inline)
             }
             .accessibilityIdentifier("core-loop-diagnostics")
