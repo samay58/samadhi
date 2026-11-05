@@ -8,6 +8,6 @@ An earlier build from the same day, 1.3 (6), recorded its identity in a run head
 
 Run records were copied off the phone before the install and stay outside Git, in `~/Documents/Samadhi Run Records`.
 
-The signing profile did not change, so the app still stops opening after 2026-11-09 at 9:18 PM Eastern until a fresh one is installed over it.
+At 2:26 PM the same build was installed in place again, signed with a renewed profile that expires on 2027-11-05. The app on the phone carries that profile, and its fingerprint and the selected collection were unchanged.
 
 Samay looked at the icon on the phone and approved it. No walk or run has happened on this build, so feel, sound, lime in sun, and the cost of the new field on the phone are all still open.

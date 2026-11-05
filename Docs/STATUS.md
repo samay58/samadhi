@@ -2,7 +2,7 @@
 
 Last checked: 2026-11-05.
 
-The app is one good walk short of knowing whether its August repairs and the November design work hold up. The phone has version 1.3, build 8, recorded in `Evidence/Device/2026-11-05-install-1.3/`. It shows the name Slipstream, which the product now uses, while the code and bundle keep the name Samadhi. Its signing profile expires on 2026-11-09 at 9:18 PM Eastern, and the app will not open after that until a fresh one is installed over it.
+The app is one good walk short of knowing whether its August repairs and the November design work hold up. The phone has version 1.3, build 8, recorded in `Evidence/Device/2026-11-05-install-1.3/`. It shows the name Slipstream, which the product now uses, while the code and bundle keep the name Samadhi. Its signing profile runs until 2027-11-05.
 
 The November sweep fixed recovery dead ends and several timing bugs, and the design refresh changed setup and the run screens, including a Liquid Glass tempo wheel drawn as a speaker. All of that is installed, and none of it has been walked or run on. The next step is one walk. The November 5 color pass and the rename are on the phone too, and neither has been walked or run on. An unfinished 10-minute run from October 26 was pulled from the phone and has not been read yet.
 
